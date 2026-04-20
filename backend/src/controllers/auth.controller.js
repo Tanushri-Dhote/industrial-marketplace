@@ -21,9 +21,8 @@ exports.register = async (req, res) => {
       role,
     } = req.body;
 
-    // validation
     if (!name || !email || !password || !confirmPassword) {
-      return res.status(400).json({ message: "Required fields missing" });
+      return res.status(400).json({ message: "Basic fields missing" });
     }
 
     if (password !== confirmPassword) {
@@ -37,7 +36,7 @@ exports.register = async (req, res) => {
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // 🧠 SUPER ADMIN (NO TENANT)
+    // ================= SUPER ADMIN =================
     if (role === "super_admin") {
       const user = await User.create({
         name,
@@ -46,25 +45,23 @@ exports.register = async (req, res) => {
         role: "super_admin",
       });
 
-      const userObj = user.toObject();
-      delete userObj.password;
-
       return res.status(201).json({
         message: "Super admin created",
-        data: userObj,
+        data: user,
       });
     }
 
-    // 🏢 CREATE WEBSITE (TENANT)
+    // ================= NORMAL USER =================
     if (!business_name || !phone1 || !warranty) {
-      return res.status(400).json({ message: "Business details missing" });
+      return res.status(400).json({
+        message: "Business fields required",
+      });
     }
 
     const website = await Website.create({
       name: business_name,
     });
 
-    // 👤 CREATE USER
     const user = await User.create({
       name,
       email,
@@ -74,20 +71,17 @@ exports.register = async (req, res) => {
       phone2,
       warranty,
       vat_number,
-      website_id: website._id,
       role: role || "admin",
+      website_id: website._id,
     });
 
-    // 🔗 LINK OWNER
     website.owner = user._id;
     await website.save();
 
-    const userObj = user.toObject();
-    delete userObj.password;
-
     res.status(201).json({
       message: "Business account created",
-      data: userObj,
+      data: user,
+      website_id: website._id,
     });
 
   } catch (error) {

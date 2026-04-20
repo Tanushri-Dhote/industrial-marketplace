@@ -77,9 +77,9 @@ export default function EnginesModule() {
           <Tbody>
             {engines.map((engine) => (
               <Tr key={engine.id}>
-                <Td fontSize="16px" fontWeight="600">{engine.name}</Td>
-                <Td fontSize="16px">{engine.type}</Td>
-                <Td fontSize="16px" fontWeight="600">{engine.power}</Td>
+                <Td fontSize="12px" fontWeight="600">{engine.name}</Td>
+                <Td fontSize="12px">{engine.type}</Td>
+                <Td fontSize="12px" fontWeight="600">{engine.power}</Td>
                 <Td>
                   <Badge colorScheme="green" fontSize="12px" borderRadius="full" px={3}>
                     {engine.status}

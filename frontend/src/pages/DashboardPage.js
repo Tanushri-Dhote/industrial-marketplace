@@ -48,7 +48,7 @@ export default function DashboardPage() {
   const user = JSON.parse(localStorage.getItem('user') || '{}');
   const validRoles = ['Super Admin', 'Website Admin', 'Sales Manager', 'Viewer'];
   const role = validRoles.includes(user.role) ? user.role : 'Super Admin';
-  
+
   const accentColor = "#D90404";
   const darkBlue = "#0F172A";
 
@@ -59,25 +59,27 @@ export default function DashboardPage() {
   const borderColor = useColorModeValue("gray.100", "gray.700");
 
   const allModules = [
-    { id: 'overview', name: 'Overview', icon: FiServer, component: () => (
-      <VStack spacing={6} w="full">
-        {showExpiredNotice && <MembershipExpiredCard />}
-        {!showExpiredNotice && (
-          <ModuleFrame 
-            icon={FiServer}
-            title={`Welcome ${user.name || 'Admin'}`}
-            description={`System Role: ${role} | Business: ${user.businessName || 'N/A'}`}
-          >
-            <Box textAlign="center" py={10}>
-              <Text color={secTextColor} fontSize="18px" fontWeight="600">
-                You are currently viewing the system overview as a {role}. 
-                {role === 'Super Admin' ? ' You have full diagnostic access across all tenants.' : ' You are managing access for your assigned website.'}
-              </Text>
-            </Box>
-          </ModuleFrame>
-        )}
-      </VStack>
-    ) },
+    {
+      id: 'overview', name: 'Overview', icon: FiServer, component: () => (
+        <VStack spacing={6} w="full">
+          {showExpiredNotice && <MembershipExpiredCard />}
+          {!showExpiredNotice && (
+            <ModuleFrame
+              icon={FiServer}
+              title={`Welcome ${user.name || 'Admin'}`}
+              description={`System Role: ${role} | Business: ${user.businessName || 'N/A'}`}
+            >
+              <Box textAlign="center" py={10}>
+                <Text color={secTextColor} fontSize="18px" fontWeight="600">
+                  You are currently viewing the system overview as a {role}.
+                  {role === 'Super Admin' ? ' You have full diagnostic access across all tenants.' : ' You are managing access for your assigned website.'}
+                </Text>
+              </Box>
+            </ModuleFrame>
+          )}
+        </VStack>
+      )
+    },
     { id: 'users', name: 'Users / Admins', icon: FiUsers, component: UsersModule, roles: ['Super Admin'] },
     { id: 'websites', name: 'Websites / Tenants', icon: FiServer, component: WebsitesModule, roles: ['Super Admin'] },
     { id: 'engines', name: 'Products / Engines', icon: FiPackage, component: EnginesModule, roles: ['Super Admin', 'Website Admin', 'Viewer'] },
@@ -87,16 +89,16 @@ export default function DashboardPage() {
   ];
 
   const filteredModules = allModules.filter(m => !m.roles || m.roles.includes(role));
-  
+
   const ActiveModule = filteredModules.find(m => m.id === activeModule) || filteredModules[0];
   const ActiveComponent = ActiveModule.component;
 
   const stats = [
-    { label: 'Total Websites', value: '12', change: '+2', color: "blue.500" },
-    { label: 'Total Products', value: '4,567', change: '+5%', color: "orange.500" },
-    { label: 'Total Leads', value: '890', change: '+18%', color: "purple.500" },
-    { label: 'Active Admins', value: '24', change: '+1', color: "green.500" },
-    { label: 'Revenue', value: '$840K', change: '+22%', color: accentColor },
+    { label: 'Total Websites', value: '12', change: '+2', color: "blue.500", module: 'websites' },
+    { label: 'Total Products', value: '4,567', change: '+5%', color: "orange.500", module: 'engines' },
+    { label: 'Total Leads', value: '890', change: '+18%', color: "purple.500", module: 'leads' },
+    { label: 'Active Admins', value: '24', change: '+1', color: "green.500", module: 'users' },
+    { label: 'Revenue', value: '$840K', change: '+22%', color: accentColor, module: 'quotes' },
   ];
 
   // Blinking Animation Keyframes
@@ -165,11 +167,16 @@ export default function DashboardPage() {
             <Badge colorScheme="orange" fontSize="12px" px={3} borderRadius="full">Session Active</Badge>
           </HStack>
         </Flex>
-        
+
         {/* Stats Grid */}
         <SimpleGrid columns={{ base: 1, sm: 2, md: 5 }} spacing={4} mb={10}>
           {stats.map((stat, index) => (
-            <Card key={index} bg={cardBg} border="none" borderRadius="xl" overflow="hidden" boxShadow="md" transition="all 0.3s" _hover={{ transform: "translateY(-3px)", boxShadow: "lg" }}>
+            <Card key={index} bg={cardBg} border="none" borderRadius="xl" overflow="hidden" boxShadow="md" transition="all 0.3s" _hover={{ transform: "translateY(-3px)", boxShadow: "lg" }}
+
+              onClick={() => {
+                setActiveModule(stat.module);
+                setShowExpiredNotice(false);
+              }}>
               <CardBody py={4} px={5}>
                 <Stat>
                   <StatLabel fontSize="12px" fontWeight="800" color="gray.400" textTransform="uppercase" letterSpacing="1px">{stat.label}</StatLabel>
@@ -212,7 +219,7 @@ export default function DashboardPage() {
                       h="48px"
                       borderRadius="lg"
                       px={4}
-                      _hover={{ 
+                      _hover={{
                         bg: isActive ? (isActive && bgColor === "gray.900" ? "blue.800" : darkBlue) : "gray.50",
                         color: isActive ? "white" : accentColor,
                         transform: "translateX(3px)"

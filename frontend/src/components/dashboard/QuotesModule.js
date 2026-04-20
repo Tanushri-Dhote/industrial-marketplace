@@ -27,9 +27,9 @@ export default function QuotesModule() {
 
   // Dark Mode Colors
   const cardBg = useColorModeValue('white', 'gray.800');
-  const borderColor = useColorModeValue('gray.100', 'gray.700');
   const textMuted = useColorModeValue('gray.600', 'gray.400');
   const inputBg = useColorModeValue('white', 'gray.700');
+    const borderColor = useColorModeValue('gray.100', 'gray.700');
 
   const handleSave = (data) => {
     if (editingQuote) {
@@ -89,15 +89,15 @@ export default function QuotesModule() {
           <Tbody>
             {quotes.map((quote) => (
               <Tr key={quote.id} _hover={{ bg: useColorModeValue('gray.50', 'gray.700') }}>
-                <Td fontSize="16px" fontWeight="600">{quote.customer}</Td>
-                <Td fontSize="16px">{quote.product}</Td>
-                <Td fontSize="16px" fontWeight="700">${quote.amount.toLocaleString()}</Td>
+                <Td fontSize="12px" fontWeight="600">{quote.customer}</Td>
+                <Td fontSize="12px">{quote.product}</Td>
+                <Td fontSize="12px" fontWeight="700">${quote.amount.toLocaleString()}</Td>
                 <Td>
                   <Select 
                     value={quote.status} 
                     size="sm" 
-                    width="130px" 
-                    fontSize="14px"
+                    width="95px" 
+                    fontSize="12px"
                     borderRadius="md"
                     onChange={(e) => handleStatusChange(quote.id, e.target.value)}
                     bg={inputBg}
@@ -110,7 +110,7 @@ export default function QuotesModule() {
                 <Td>
                   <Badge colorScheme="purple" fontSize="11px">SITE ADMIN</Badge>
                 </Td>
-                <Td fontSize="16px" color={textMuted}>{quote.date}</Td>
+                <Td fontSize="12px" color={textMuted}>{quote.date}</Td>
                 <Td>
                   <IconButton 
                     icon={<ViewIcon />} 
@@ -164,6 +164,7 @@ function QuoteModal({ isOpen, onClose, onSave, quote }) {
   const cardBg = useColorModeValue('white', 'gray.800');
   const inputBg = useColorModeValue('white', 'gray.700');
   const textMuted = useColorModeValue('gray.600', 'gray.400');
+  const borderColor = useColorModeValue('gray.100', 'gray.700');
 
   React.useEffect(() => {
     if (quote) {
@@ -365,6 +366,7 @@ function QuoteViewModal({ isOpen, onClose, quote }) {
   const textMuted = useColorModeValue('gray.600', 'gray.400');
   const notesBg = useColorModeValue('gray.50', 'gray.700');
   const notesBorder = useColorModeValue('gray.100', 'gray.600');
+  const borderColor = useColorModeValue('gray.100', 'gray.700');
 
   return (
     <Modal 

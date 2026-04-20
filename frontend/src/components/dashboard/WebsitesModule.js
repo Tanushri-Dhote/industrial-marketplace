@@ -71,13 +71,13 @@ export default function WebsitesModule() {
           <Tbody>
             {websites.map((site) => (
               <Tr key={site.id}>
-                <Td fontSize="16px" fontWeight="600">{site.domain}</Td>
+                <Td fontSize="12px" fontWeight="600">{site.domain}</Td>
                 <Td>
                   <Badge colorScheme="green" fontSize="12px" borderRadius="full" px={3}>
                     {site.status}
                   </Badge>
                 </Td>
-                <Td fontSize="16px" fontWeight="600">{site.visitors}</Td>
+                <Td fontSize="12px" fontWeight="600">{site.visitors}</Td>
                 <Td>
                   <IconButton
                     icon={<EditIcon />}

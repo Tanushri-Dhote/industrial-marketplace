@@ -1,19 +1,18 @@
 const Permission = require("../models/Permission");
 
-module.exports = (moduleName, action) => {
+const permission = (module, action) => {
   return async (req, res, next) => {
     try {
-      // 🔥 Super admin bypass
-      if (req.user.role === "super_admin") return next();
+      const role = req.user.role;
 
-      const permission = await Permission.findOne({
-        role: req.user.role,
-        module: moduleName,
+      const perm = await Permission.findOne({
+        role,
+        module,
       });
 
-      if (!permission || !permission.actions.includes(action)) {
+      if (!perm || !perm.actions.includes(action)) {
         return res.status(403).json({
-          message: "Permission denied",
+          message: "Access denied",
         });
       }
 
@@ -23,3 +22,5 @@ module.exports = (moduleName, action) => {
     }
   };
 };
+
+module.exports = permission 

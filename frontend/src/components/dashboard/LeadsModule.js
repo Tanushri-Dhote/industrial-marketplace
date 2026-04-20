@@ -86,15 +86,15 @@ export default function LeadsModule() {
           <Tbody>
             {leads.map((lead) => (
               <Tr key={lead.id}>
-                <Td fontSize="16px" fontWeight="600">{lead.name}</Td>
-                <Td fontSize="16px">{lead.email}</Td>
-                <Td fontSize="16px">{lead.product}</Td>
+                <Td fontSize="12px" fontWeight="600">{lead.name}</Td>
+                <Td fontSize="12px">{lead.email}</Td>
+                <Td fontSize="12px">{lead.product}</Td>
                 <Td>
                   <Select 
                     value={lead.status} 
                     size="sm" 
-                    width="130px" 
-                    fontSize="14px"
+                    width="80px" 
+                    fontSize="12px"
                     borderRadius="md"
                     onChange={(e) => handleStatusChange(lead.id, e.target.value)}
                     isDisabled={isViewer}
@@ -106,7 +106,7 @@ export default function LeadsModule() {
                     <option value="Won">Won</option>
                   </Select>
                 </Td>
-                <Td fontSize="16px">{lead.date}</Td>
+                <Td fontSize="12px">{lead.date}</Td>
                 <Td>
                   <IconButton 
                     icon={<ViewIcon />} 

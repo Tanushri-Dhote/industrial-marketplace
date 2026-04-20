@@ -77,8 +77,8 @@ export default function BlogsModule() {
           <Tbody>
             {blogs.map((blog) => (
               <Tr key={blog.id}>
-                <Td fontSize="16px" fontWeight="600">{blog.title}</Td>
-                <Td fontSize="16px">{blog.author}</Td>
+                <Td fontSize="12px" fontWeight="600">{blog.title}</Td>
+                <Td fontSize="12px">{blog.author}</Td>
                 <Td>
                   <Badge 
                     colorScheme={blog.status === 'Published' ? 'green' : 'yellow'} 
@@ -89,7 +89,7 @@ export default function BlogsModule() {
                     {blog.status}
                   </Badge>
                 </Td>
-                <Td fontSize="16px">{blog.date}</Td>
+                <Td fontSize="12px">{blog.date}</Td>
                 <Td>
                   {!isViewer ? (
                     <>

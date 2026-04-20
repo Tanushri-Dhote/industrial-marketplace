@@ -109,9 +109,9 @@ export default function UsersModule() {
           <Tbody>
             {filteredUsers.map((user) => (
               <Tr key={user.id}>
-                <Td fontSize="16px" fontWeight="600">{user.name}</Td>
-                <Td fontSize="16px">{user.email}</Td>
-                <Td fontSize="16px">
+                <Td fontSize="12px" fontWeight="600">{user.name}</Td>
+                <Td fontSize="12px">{user.email}</Td>
+                <Td fontSize="12px">
                   <Badge
                     variant="subtle"
                     colorScheme={roleColorScheme(user.role)}
@@ -122,7 +122,7 @@ export default function UsersModule() {
                     {user.role}
                   </Badge>
                 </Td>
-                <Td fontSize="16px" fontWeight="700" color="gray.600">
+                <Td fontSize="12px" fontWeight="600" color="gray.600">
                   {user.website || 'Global'}
                 </Td>
                 <Td>
