@@ -10,7 +10,6 @@ backend/.env
 .cache/
 frontend/.cache/
 backend/.cache/
-
 build/
 dist/
 .env
