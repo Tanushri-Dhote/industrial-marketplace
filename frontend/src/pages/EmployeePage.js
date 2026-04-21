@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Box, Container, HStack, VStack, Heading, Text,
   Table, Thead, Tbody, Tr, Th, Td, Badge, Button, IconButton,
@@ -15,20 +15,49 @@ import {
   FiUsers, FiUserCheck, FiShield, FiBriefcase,
 } from 'react-icons/fi';
 import { useNavigate } from 'react-router-dom';
-
-const initial = [
-  { id: 1, name: 'Alex Turner', email: 'superadmin@hq.com', phone: '+44 7700 100001', role: 'Super Admin', website: 'Global', status: 'Active', joinDate: '2024-01-01', lastLogin: '2026-04-18' },
-  { id: 2, name: 'Sarah Chen', email: 'admin@enginecity.com', phone: '+44 7700 100002', role: 'Website Admin', website: 'SITE-101', status: 'Active', joinDate: '2024-03-15', lastLogin: '2026-04-17' },
-  { id: 3, name: 'James Okafor', email: 'sales@enginecity.com', phone: '+44 7700 100003', role: 'Sales Manager', website: 'SITE-101', status: 'Active', joinDate: '2024-06-01', lastLogin: '2026-04-16' },
-  { id: 4, name: 'Priya Sharma', email: 'viewer@hq.com', phone: '+44 7700 100004', role: 'Viewer', website: 'Global', status: 'Inactive', joinDate: '2024-09-10', lastLogin: '2026-03-01' },
-  { id: 5, name: 'David Park', email: 'admin@marineparts.com', phone: '+44 7700 100005', role: 'Website Admin', website: 'SITE-102', status: 'Active', joinDate: '2025-01-20', lastLogin: '2026-04-15' },
-];
+import API from "../services/api";
 
 const ROLES = ['Super Admin', 'Website Admin', 'Sales Manager', 'Viewer'];
-const SITES = ['Global', 'SITE-101 (Engine City)', 'SITE-102 (Marine Parts)', 'SITE-103 (Truck Solutions)'];
+const SITES = [
+  'Global',
+  'SITE-101 (Engine City)',
+  'SITE-102 (Marine Parts)',
+  'SITE-103 (Truck Solutions)'
+];
 
-const roleColor = (r) => ({ 'Super Admin': 'red', 'Website Admin': 'purple', 'Sales Manager': 'blue', 'Viewer': 'gray' }[r] || 'teal');
-const roleIcon = (r) => ({ 'Super Admin': FiShield, 'Website Admin': FiBriefcase, 'Sales Manager': FiUserCheck, 'Viewer': FiUsers }[r] || FiUsers);
+// Fixed role color function - now matches based on keywords instead of exact strings
+// Fixed role color function - now distinguishes between admin and superadmin
+const roleColor = (role) => {
+  if (!role) return 'teal';
+
+  const roleLower = role.toLowerCase();
+
+  // Check for super admin first (more specific)
+  if (roleLower.includes('super')) return 'red';
+  // Then check for regular admin
+  if (roleLower.includes('admin')) return 'purple';
+  if (roleLower.includes('website')) return 'purple';
+  if (roleLower.includes('sales')) return 'blue';
+  if (roleLower.includes('viewer')) return 'gray';
+
+  return 'teal'; // default fallback
+};
+
+// Fixed role icon function
+const roleIcon = (role) => {
+  if (!role) return FiUsers;
+
+  const roleLower = role.toLowerCase();
+
+  if (roleLower.includes('super')) return FiShield;
+  if (roleLower.includes('admin')) return FiShield;
+  if (roleLower.includes('website')) return FiBriefcase;
+  if (roleLower.includes('sales')) return FiUserCheck;
+  if (roleLower.includes('viewer')) return FiUsers;
+
+  return FiUsers; // default fallback
+};
+
 
 export default function EmployeePage() {
   const navigate = useNavigate();
@@ -37,7 +66,7 @@ export default function EmployeePage() {
   const currentRole = currentUser.role || 'Super Admin';
   const isSuperAdmin = currentRole === 'Super Admin';
 
-  const [employees, setEmployees] = useState(initial);
+  const [employees, setEmployees] = useState([]);
   const [search, setSearch] = useState('');
   const [filterRole, setFilterRole] = useState('All');
   const [filterStatus, setFilterStatus] = useState('All');
@@ -46,6 +75,8 @@ export default function EmployeePage() {
   const { isOpen: isPwOpen, onOpen: onPwOpen, onClose: onPwClose } = useDisclosure();
   const [resetTarget, setResetTarget] = useState(null);
   const [newPw, setNewPw] = useState('');
+
+
 
   const accentColor = '#D90404';
 
@@ -58,12 +89,15 @@ export default function EmployeePage() {
 
   const total = employees.length;
   const active = employees.filter(e => e.status === 'Active').length;
-  const admins = employees.filter(e => ['Super Admin', 'Website Admin'].includes(e.role)).length;
-  const sales = employees.filter(e => e.role === 'Sales Manager').length;
+  const admins = employees.filter(e => {
+    const role = e.role?.toLowerCase() || '';
+    return role.includes('super') || role.includes('admin') || role === 'admin';
+  }).length;
+  const sales = employees.filter(e => e.role?.toLowerCase().includes('sales')).length;
 
   const filtered = employees.filter(e => {
-    const matchSearch = e.name.toLowerCase().includes(search.toLowerCase()) ||
-                       e.email.toLowerCase().includes(search.toLowerCase());
+    const matchSearch = e.name?.toLowerCase().includes(search.toLowerCase()) ||
+      e.email?.toLowerCase().includes(search.toLowerCase());
     const matchRole = filterRole === 'All' || e.role === filterRole;
     const matchStatus = filterStatus === 'All' || e.status === filterStatus;
     return matchSearch && matchRole && matchStatus;
@@ -74,11 +108,11 @@ export default function EmployeePage() {
       setEmployees(employees.map(e => e.id === editing.id ? { ...data, id: editing.id } : e));
       toast({ title: 'Employee updated', status: 'success', duration: 2000, position: 'top-right' });
     } else {
-      setEmployees([...employees, { 
-        ...data, 
-        id: Date.now(), 
-        joinDate: new Date().toISOString().split('T')[0], 
-        lastLogin: 'Never' 
+      setEmployees([...employees, {
+        ...data,
+        id: Date.now(),
+        joinDate: new Date().toISOString().split('T')[0],
+        lastLogin: 'Never'
       }]);
       toast({ title: 'Employee created & invite sent', status: 'success', duration: 3000, position: 'top-right' });
     }
@@ -95,7 +129,7 @@ export default function EmployeePage() {
       e.id === id ? { ...e, status: e.status === 'Active' ? 'Inactive' : 'Active' } : e
     ));
     const emp = employees.find(e => e.id === id);
-    toast({ title: `${emp.name} ${emp.status === 'Active' ? 'deactivated' : 'activated'}`, status: 'info', duration: 2000 });
+    toast({ title: `${emp?.name} ${emp?.status === 'Active' ? 'deactivated' : 'activated'}`, status: 'info', duration: 2000 });
   };
 
   const handleResetPassword = () => {
@@ -106,6 +140,35 @@ export default function EmployeePage() {
     toast({ title: `Password reset for ${resetTarget?.name}`, status: 'success', duration: 2000 });
     setNewPw('');
     onPwClose();
+  };
+
+
+  useEffect(() => {
+    fetchEmployees();
+  }, []);
+
+  const fetchEmployees = async () => {
+    try {
+      const res = await API.get("/employees");
+
+      // Keep role exactly as from backend
+      const mappedData = res.data.data.map((u) => ({
+        id: u._id,
+        name: u.name,
+        email: u.email,
+        phone: u.phone1,
+        role: u.role, // Keep original role from backend
+        website: u.business_name,
+        status: u.isActive ? "Active" : "Inactive",
+        joinDate: new Date(u.createdAt).toISOString().split("T")[0],
+        lastLogin: "—",
+      }));
+
+      setEmployees(mappedData);
+
+    } catch (error) {
+      console.error("Error fetching employees:", error);
+    }
   };
 
   return (
@@ -206,11 +269,12 @@ export default function EmployeePage() {
               <Tbody>
                 {filtered.map((emp) => {
                   const RoleIcon = roleIcon(emp.role);
+                  const colorScheme = roleColor(emp.role);
                   return (
                     <Tr key={emp.id} _hover={{ bg: useColorModeValue('gray.50', 'gray.700') }} transition="background 0.2s">
                       <Td>
                         <HStack spacing={3}>
-                          <Avatar name={emp.name} size="sm" bg={`${roleColor(emp.role)}.500`} color="white" />
+                          <Avatar name={emp.name} size="sm" bg={`${colorScheme}.500`} color="white" />
                           <VStack align="flex-start" spacing={0}>
                             <Text fontWeight="800" fontSize="15px">{emp.name}</Text>
                             <Text fontSize="12px" color={textColor}>Joined {emp.joinDate}</Text>
@@ -224,7 +288,7 @@ export default function EmployeePage() {
                         </VStack>
                       </Td>
                       <Td>
-                        <Badge colorScheme={roleColor(emp.role)} fontSize="12px" px={3} py={1} borderRadius="full" display="flex" alignItems="center" gap={1}>
+                        <Badge colorScheme={colorScheme} fontSize="12px" px={3} py={1} borderRadius="full" display="flex" alignItems="center" gap={1}>
                           <Box as={RoleIcon} mr={1} /> {emp.role}
                         </Badge>
                       </Td>

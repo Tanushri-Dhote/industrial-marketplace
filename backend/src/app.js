@@ -1,5 +1,6 @@
 const express = require("express");
 const cors = require("cors");
+const employeeRoutes = require("./routes/employee.routes");
 
 const app = express();
 
@@ -14,6 +15,9 @@ const productRoutes = require("./routes/product.routes");
 // 🔥 ADD THIS (use routes)
 app.use("/api/auth", authRoutes);
 app.use("/api/products", productRoutes);
+
+// 
+app.use("/api/employees", employeeRoutes);
 
 // test route
 app.get("/", (req, res) => {
