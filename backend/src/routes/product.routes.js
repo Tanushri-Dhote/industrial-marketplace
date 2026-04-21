@@ -32,6 +32,12 @@ router.get(
   controller.getProducts
 );
 
+// GET SINGLE
+router.get(
+  "/:id",
+  controller.getProductById
+);
+
 // UPDATE
 router.put(
   "/:id",

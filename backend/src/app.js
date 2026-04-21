@@ -11,10 +11,12 @@ app.use(express.json());
 // 🔥 ADD THIS (import routes)
 const authRoutes = require("./routes/auth.routes");
 const productRoutes = require("./routes/product.routes");
+const blogRoutes = require("./routes/blog.routes");
 
 // 🔥 ADD THIS (use routes)
 app.use("/api/auth", authRoutes);
 app.use("/api/products", productRoutes);
+app.use("/api/blogs", blogRoutes);
 
 // 
 app.use("/api/employees", employeeRoutes);
