@@ -31,6 +31,7 @@ import { Link as RouterLink, useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
+import API from "../services/api";
 
 const schema = yup.object({
   businessName: yup.string().required('Business name is required').min(2, 'Must be at least 2 characters'),
@@ -58,36 +59,48 @@ export default function RegisterPage() {
   });
 
   const onSubmit = async (data) => {
-    setIsLoading(true);
-    
-    setTimeout(() => {
-      const userData = {
-        businessName: data.businessName,
+    try {
+      setIsLoading(true);
+
+      // ✅ Send FULL backend-compatible data
+      const payload = {
+        name: data.businessName,          // required
         email: data.email,
+        password: data.password,
+        confirmPassword: data.confirmPassword,
+        business_name: data.businessName, // required
         phone1: data.phone1,
-        phone2: data.phone2,
+        phone2: data.phone2 || "",
         warranty: data.warranty,
-        vatNumber: data.vatNumber,
+        vat_number: data.vatNumber || "",
+        role: "admin", // or "super_admin" if needed
       };
-      
-      sessionStorage.setItem('registeredEmail', data.email);
-      
+
+      const res = await API.post("/auth/register", payload);
+
       toast({
-        title: 'Registration Successful!',
-        description: `Welcome ${data.businessName}! Please login with your credentials.`,
-        status: 'success',
+        title: "Registration Successful!",
+        description: res.data.message,
+        status: "success",
         duration: 3000,
         isClosable: true,
-        position: 'top-right',
-        variant: 'left-accent',
+        position: "top-right",
       });
-      
-      setTimeout(() => {
-        navigate('/login');
-      }, 100);
-      
+
+      navigate("/login");
+
+    } catch (error) {
+      toast({
+        title: "Registration Failed",
+        description:
+          error.response?.data?.message || "Something went wrong",
+        status: "error",
+        duration: 3000,
+        isClosable: true,
+      });
+    } finally {
       setIsLoading(false);
-    }, 1500);
+    }
   };
 
   const bgColor = useColorModeValue('white', 'gray.800');
@@ -96,34 +109,34 @@ export default function RegisterPage() {
 
   return (
     <Container maxW="lg" py={8}>
-      <Box 
-        bg={bgColor} 
+      <Box
+        bg={bgColor}
         p={0}
-        borderRadius="xl" 
+        borderRadius="xl"
         boxShadow="xl"
         overflow="hidden"
         border="1px solid"
         borderColor={borderColor}>
-        
+
         {/* Header with Industrial Theme */}
         <Box bg="#0F172A" py={4} px={6} textAlign="center">
           <HStack spacing={3} justify="center">
-             <Box
-                         h="50px"
-                       >
-                         <img
-                           src="/logo_engine.PNG"
-                           alt="All Engines Logo"
-                           style={{
-                             height: "100%",
-                             objectFit: "contain"
-                           }}
-                         />
-                       </Box>
-            <Heading 
-              as="h1" 
-              fontSize="24px" 
-              fontWeight="800" 
+            <Box
+              h="50px"
+            >
+              <img
+                src="/logo_engine.PNG"
+                alt="All Engines Logo"
+                style={{
+                  height: "100%",
+                  objectFit: "contain"
+                }}
+              />
+            </Box>
+            <Heading
+              as="h1"
+              fontSize="24px"
+              fontWeight="800"
               letterSpacing="-0.5px"
               color="white"
             >
@@ -321,11 +334,10 @@ export default function RegisterPage() {
                       _focus={{ borderColor: accentColor, boxShadow: `0 0 0 1px ${accentColor}` }}
                       {...register('warranty')}
                     >
-                      <option value="6">6 Months</option>
-                      <option value="12">12 Months</option>
-                      <option value="18">18 Months</option>
-                      <option value="24">24 Months</option>
-                      <option value="36">36 Months</option>
+                      <option value="3 months">3 Months</option>
+                      <option value="6 months">6 Months</option>
+                      <option value="12 months">12 Months</option>
+                      <option value="1 year">1 Year</option>
                     </Select>
                     <FormErrorMessage fontSize="11px">{errors.warranty?.message}</FormErrorMessage>
                   </FormControl>

@@ -26,6 +26,7 @@ import { Link as RouterLink, useNavigate } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
+import API from "../services/api";
 
 const schema = yup.object({
   username: yup.string().required('Username is required'),
@@ -43,54 +44,41 @@ export default function LoginPage() {
     mode: 'onChange',
   });
 
-  const onSubmit = async (data) => {
+ const onSubmit = async (data) => {
+  try {
     setIsLoading(true);
 
-    setTimeout(() => {
-      const roleMap = {
-        'superadmin': { role: 'Super Admin', business: 'Global Marketplace HQ', websiteId: 'all' },
-        'demo':       { role: 'Super Admin', business: 'All Engine Global', websiteId: 'all' },
-        'admin':      { role: 'Super Admin', business: 'Global Marketplace HQ', websiteId: 'all' },
-        'webadmin':   { role: 'Website Admin', business: 'Engine City Tenant', websiteId: 'SITE-101' },
-        'sales':      { role: 'Sales Manager', business: 'Engine City Tenant', websiteId: 'SITE-101' },
-        'viewer':     { role: 'Viewer', business: 'Audit Services', websiteId: 'all' }
-      };
+    const payload = {
+      email: data.username, // ⚠️ your backend expects email
+      password: data.password,
+    };
 
-      const lookupKey = data.username.trim().toLowerCase();
-      const roleInfo = roleMap[lookupKey] || { role: 'Super Admin', business: 'All Engine Global', websiteId: 'all' };
+    const res = await API.post("/auth/login", payload);
 
-      const user = {
-        username: data.username,
-        email: `${data.username}@industrialmarket.com`,
-        name: data.username.charAt(0).toUpperCase() + data.username.slice(1),
-        businessName: roleInfo.business,
-        role: roleInfo.role,
-        websiteId: roleInfo.websiteId,
-        loginTime: new Date().toISOString()
-      };
+    toast({
+      title: "Verification Required",
+      description: "Check your email to verify login",
+      status: "info",
+      duration: 4000,
+      isClosable: true,
+    });
 
-      localStorage.setItem('token', 'dummy-token-' + Date.now());
-      localStorage.setItem('user', JSON.stringify(user));
+    // 👉 Redirect to verify page
+    navigate("/verify-login");
 
-      sessionStorage.removeItem('registeredEmail');
-
-      toast({
-        title: 'Login Successful!',
-        description: `Welcome back, ${user.username}!`,
-        status: 'success',
-        duration: 3000,
-        isClosable: true,
-        position: 'top-right',
-        variant: 'left-accent',
-      });
-
-      setTimeout(() => {
-        navigate('/dashboard');
-      }, 100);
-
-      setIsLoading(false);
-    }, 1500);
-  };
+  } catch (error) {
+    toast({
+      title: "Login Failed",
+      description:
+        error.response?.data?.message || "Something went wrong",
+      status: "error",
+      duration: 3000,
+      isClosable: true,
+    });
+  } finally {
+    setIsLoading(false);
+  }
+};
 
   const bgColor = useColorModeValue('white', 'gray.800');
   const borderColor = useColorModeValue('gray.200', 'gray.600');

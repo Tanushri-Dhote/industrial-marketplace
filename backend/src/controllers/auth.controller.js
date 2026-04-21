@@ -139,12 +139,24 @@ exports.verifyLogin = async (req, res) => {
   try {
     const { token } = req.body;
 
-    const user = await User.findOne({
+    let user = await User.findOne({
       loginVerifyToken: token,
       loginVerifyExpires: { $gt: Date.now() },
     });
 
+    // If token not found, check if already verified (optional improvement)
     if (!user) {
+      const existingUser = await User.findOne({
+        loginVerifyToken: null,
+      });
+
+      if (existingUser) {
+        return res.status(200).json({
+          message: "Already verified",
+          alreadyVerified: true,
+        });
+      }
+
       return res.status(400).json({ message: "Invalid or expired token" });
     }
 
@@ -158,6 +170,7 @@ exports.verifyLogin = async (req, res) => {
       { expiresIn: "24h" }
     );
 
+    // Clear token after success
     user.loginVerifyToken = undefined;
     user.loginVerifyExpires = undefined;
 

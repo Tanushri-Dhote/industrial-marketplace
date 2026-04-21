@@ -17,6 +17,7 @@ import AccountPage from './pages/AccountPage';
 import CreateQuotePage from './pages/CreateQuotePage';
 import EmployeePage from './pages/EmployeePage';
 import ProtectedRoute from './components/common/ProtectedRoute';
+import VerifyLoginPage from './pages/VerifyLoginPage';
 
 function App() {
   return (
@@ -37,6 +38,7 @@ function App() {
           <Route path="/register" element={<RegisterPage />} />
           <Route path="/blog" element={<BlogPage />} />
           <Route path="/blog/:id" element={<BlogDetailPage />} />
+          <Route path="/verify-login" element={<VerifyLoginPage />} />
           <Route path="/dashboard" element={
             <ProtectedRoute>
               <DashboardPage />
