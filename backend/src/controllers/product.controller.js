@@ -67,6 +67,29 @@ exports.updateProduct = async (req, res) => {
   }
 };
 
+// ================= GET PRODUCT BY ID =================
+exports.getProductById = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const mongoose = require("mongoose");
+
+    const query = mongoose.Types.ObjectId.isValid(id) 
+      ? { _id: id } 
+      : { slug: id };
+
+    const product = await Product.findOne(query);
+
+    if (!product) {
+      return res.status(404).json({ message: "Product not found" });
+    }
+
+    res.json(product);
+
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
 // ================= DELETE PRODUCT =================
 exports.deleteProduct = async (req, res) => {
   try {
@@ -90,6 +113,7 @@ exports.deleteProduct = async (req, res) => {
 module.exports = {
   createProduct: exports.createProduct,
   getProducts: exports.getProducts,
+  getProductById: exports.getProductById,
   updateProduct: exports.updateProduct,
   deleteProduct: exports.deleteProduct,
 };

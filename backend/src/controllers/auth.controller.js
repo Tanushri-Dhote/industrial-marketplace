@@ -146,18 +146,9 @@ exports.verifyLogin = async (req, res) => {
 
     // If token not found, check if already verified (optional improvement)
     if (!user) {
-      const existingUser = await User.findOne({
-        loginVerifyToken: null,
+      return res.status(400).json({
+        message: "Invalid or expired token",
       });
-
-      if (existingUser) {
-        return res.status(200).json({
-          message: "Already verified",
-          alreadyVerified: true,
-        });
-      }
-
-      return res.status(400).json({ message: "Invalid or expired token" });
     }
 
     const jwtToken = jwt.sign(
@@ -207,15 +198,18 @@ exports.forgotPassword = async (req, res) => {
 
     await user.save();
 
-    const resetLink = `http://localhost:3000/reset-password?token=${resetToken}`;
+    // 🔥 Send email with frontend link
+    const resetLink = `http://localhost:3000/login?token=${resetToken}`;
 
     await sendEmail(
       user.email,
       "Reset Password",
-      `Click to reset password:\n${resetLink}`
+      `Click to reset your password:\n${resetLink}`
     );
 
-    res.json({ message: "Reset link sent to email" });
+    res.json({
+      message: "Reset link sent to email",
+    });
 
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -227,6 +221,11 @@ exports.resetPassword = async (req, res) => {
   try {
     const { token, newPassword } = req.body;
 
+    if (!token || !newPassword) {
+      return res.status(400).json({ message: "Token and password required" });
+    }
+
+    // 🔍 find user
     const user = await User.findOne({
       resetPasswordToken: token,
       resetPasswordExpires: { $gt: Date.now() },
@@ -236,16 +235,22 @@ exports.resetPassword = async (req, res) => {
       return res.status(400).json({ message: "Invalid or expired token" });
     }
 
-    user.password = await bcrypt.hash(newPassword, 10);
+    // 🔐 hash new password
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    user.password = hashedPassword;
 
+    // ❌ clear token
     user.resetPasswordToken = undefined;
     user.resetPasswordExpires = undefined;
 
     await user.save();
 
-    res.json({ message: "Password reset successful" });
+    res.json({
+      message: "Password reset successful",
+    });
 
   } catch (error) {
+    console.error("RESET ERROR:", error);
     res.status(500).json({ message: error.message });
   }
 };
@@ -268,6 +273,28 @@ exports.forgotUsername = async (req, res) => {
     );
 
     res.json({ message: "Username sent to email" });
+
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+
+
+// 
+
+exports.getMyProfile = async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id).select("-password");
+
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    res.json({
+      success: true,
+      data: user,
+    });
 
   } catch (error) {
     res.status(500).json({ message: error.message });

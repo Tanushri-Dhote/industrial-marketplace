@@ -17,8 +17,10 @@ import {
 } from "@chakra-ui/react";
 import { CheckCircleIcon, WarningIcon, LockIcon, EmailIcon } from "@chakra-ui/icons";
 import API from "../services/api";
+import { useUser } from "../context/UserContext";
 
 export default function VerifyLoginPage() {
+    const { setUser } = useUser();
     const [searchParams] = useSearchParams();
     const navigate = useNavigate();
     const toast = useToast();
@@ -50,7 +52,7 @@ export default function VerifyLoginPage() {
                 const res = await API.post("/auth/verify-login", { token });
 
                 localStorage.setItem("token", res.data.token);
-                localStorage.setItem("user", JSON.stringify(res.data.data));
+                setUser(res.data.data);
 
                 setProgress(100);
                 setStatus('success');
@@ -68,29 +70,29 @@ export default function VerifyLoginPage() {
                     navigate("/dashboard");
                 }, 2000);
 
-            } 
-           catch (error) {
-  clearInterval(interval);
+            }
+            catch (error) {
+                clearInterval(interval);
 
-  const msg =
-    error.response?.data?.message ||
-    "Verification failed. Please try again.";
+                const msg =
+                    error.response?.data?.message ||
+                    "Verification failed. Please try again.";
 
-  // 🔥 KEY CHANGE
-  if (msg.includes("expired") || msg.includes("Invalid")) {
-    setStatus("idle"); // 👈 go back to email check UI
-  } else {
-    setStatus("error"); // real error
-  }
+                // 🔥 KEY CHANGE
+                if (msg.includes("expired") || msg.includes("Invalid")) {
+                    setStatus("idle"); // 👈 go back to email check UI
+                } else {
+                    setStatus("error"); // real error
+                }
 
-  setErrorMessage(msg);
+                setErrorMessage(msg);
 
-  toast({
-    title: "Verification Failed",
-    description: msg,
-    status: "error",
-  });
-}
+                toast({
+                    title: "Verification Failed",
+                    description: msg,
+                    status: "error",
+                });
+            }
         };
 
         verifyLogin();

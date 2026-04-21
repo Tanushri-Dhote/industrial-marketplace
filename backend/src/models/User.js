@@ -53,6 +53,10 @@ const userSchema = new mongoose.Schema(
     vat_number: {
       type: String,
     },
+    address: {
+  type: String,
+  default: ""
+},
 
     // ================= SYSTEM =================
     role: {

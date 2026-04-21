@@ -16,11 +16,14 @@ import BlogDetailPage from './pages/BlogDetailPage';
 import AccountPage from './pages/AccountPage';
 import CreateQuotePage from './pages/CreateQuotePage';
 import EmployeePage from './pages/EmployeePage';
+import ProductDetailPage from './pages/ProductDetailPage';
 import ProtectedRoute from './components/common/ProtectedRoute';
 import VerifyLoginPage from './pages/VerifyLoginPage';
+import { UserProvider } from './context/UserContext';
 
 function App() {
   return (
+     <UserProvider>
     <Box minH="100vh" display="flex" flexDirection="column">
       <Header />
       <Box flex="1">
@@ -37,7 +40,8 @@ function App() {
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
           <Route path="/blog" element={<BlogPage />} />
-          <Route path="/blog/:id" element={<BlogDetailPage />} />
+          <Route path="/blog/:slug" element={<BlogDetailPage />} />
+          <Route path="/products/:id" element={<ProductDetailPage />} />
           <Route path="/verify-login" element={<VerifyLoginPage />} />
           <Route path="/dashboard" element={
             <ProtectedRoute>
@@ -63,6 +67,7 @@ function App() {
       </Box>
       <Footer />
     </Box>
+    </UserProvider>
   );
 }
 
