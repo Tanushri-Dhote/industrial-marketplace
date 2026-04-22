@@ -1,241 +1,510 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import {
-  Container,
-  Grid,
-  GridItem,
-  Box,
-  Heading,
-  Text,
-  VStack,
-  Tabs,
-  TabList,
-  TabPanels,
-  Tab,
-  TabPanel,
-  SimpleGrid,
-  Stat,
-  StatLabel,
-  StatNumber,
-  StatHelpText,
-  Card,
-  CardBody,
-  Table,
-  Thead,
-  Tbody,
-  Tr,
-  Th,
-  Td,
-  Badge,
-  Button,
-  Icon,
-  Flex,
-  HStack,
-  useColorModeValue,
+  Box, Flex, HStack, VStack, Text, Heading, Icon,
+  Badge, Button, Avatar, Tooltip, Divider,
+  useColorModeValue, Spinner, SimpleGrid,
+  useBreakpointValue, IconButton, Drawer,
+  Center,
+  DrawerBody, DrawerOverlay, DrawerContent, DrawerCloseButton, useDisclosure,
 } from '@chakra-ui/react';
-import { FiUsers, FiPackage, FiServer, FiBookOpen, FiMessageSquare, FiDollarSign } from 'react-icons/fi';
+import { 
+  Users, LayoutGrid, Server, Package, BookOpen, 
+  MessageSquare, DollarSign, Menu, RefreshCcw, LogOut,
+  Activity, TrendingUp, TrendingDown, ChevronRight, Home, Settings
+} from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { useUser } from '../context/UserContext';
+import { toast } from 'sonner';
+import API from '../services/api';
+
+// Modules
 import UsersModule from '../components/dashboard/UsersModule';
 import WebsitesModule from '../components/dashboard/WebsitesModule';
 import EnginesModule from '../components/dashboard/EnginesModule';
 import BlogsModule from '../components/dashboard/BlogsModule';
 import LeadsModule from '../components/dashboard/LeadsModule';
 import QuotesModule from '../components/dashboard/QuotesModule';
-import MembershipExpiredCard from '../components/dashboard/MembershipExpiredCard';
-import ModuleFrame from '../components/dashboard/ModuleFrame';
 
+// ─── Constants ─────────────────────────────────────────────────────────────
+const ACCENT = '#D90404';
+const SIDEBAR_BG = '#0F172A';
+const SIDEBAR_W = '260px';
+
+const mapRoleToUI = (role) => ({
+  super_admin: 'Super Admin',
+  admin: 'Admin',
+  website_manager: 'Website Admin',
+  sales_manager: 'Sales Manager',
+  viewer: 'Viewer',
+}[role] || role);
+
+const roleColor = (role) => ({
+  'Super Admin': 'red', 'Admin': 'orange',
+  'Website Admin': 'purple', 'Sales Manager': 'blue', 'Viewer': 'gray',
+}[role] || 'teal');
+
+const getGreeting = () => {
+  const h = new Date().getHours();
+  if (h < 12) return 'Good Morning';
+  if (h < 18) return 'Good Afternoon';
+  return 'Good Evening';
+};
+
+// ─── All Module Definitions ─────────────────────────────────────────────────
+const ALL_MODULES = [
+  { id: 'admins', name: 'Admins & Staff', icon: Users, roles: ['super_admin', 'admin'], component: UsersModule },
+  { id: 'users', name: 'Customers & Users', icon: Users, roles: ['super_admin', 'admin'], component: UsersModule },
+  { id: 'websites', name: 'Sites & Tenants', icon: Server, roles: ['super_admin', 'admin'], component: WebsitesModule },
+  { id: 'engines', name: 'Products', icon: Package, roles: ['super_admin', 'admin', 'website_manager', 'viewer'], component: EnginesModule },
+  { id: 'blogs', name: 'Blogs', icon: BookOpen, roles: ['super_admin', 'admin', 'website_manager'], component: BlogsModule },
+  { id: 'leads', name: 'Leads', icon: MessageSquare, roles: ['super_admin', 'admin', 'website_manager', 'sales_manager', 'viewer'], component: LeadsModule },
+  { id: 'quotes', name: 'Quotes', icon: DollarSign, roles: ['super_admin', 'admin', 'website_manager', 'sales_manager', 'viewer'], component: QuotesModule },
+];
+
+// ─── Stat Card ───────────────────────────────────────────────────────────────
+function StatCard({ label, value, change, color, onClick, icon }) {
+  const cardBg = useColorModeValue('white', 'gray.800');
+  const textColor = useColorModeValue('gray.900', 'white');
+  
+  return (
+    <Box
+      bg={cardBg}
+      p={6}
+      borderRadius="3xl"
+      boxShadow="0 10px 40px -10px rgba(0,0,0,0.05)"
+      border="1px solid"
+      borderColor={useColorModeValue('gray.50', 'gray.700')}
+      cursor={onClick ? 'pointer' : 'default'}
+      onClick={onClick}
+      transition="all 0.3s cubic-bezier(.4,0,.2,1)"
+      _hover={onClick ? { 
+        transform: 'translateY(-5px)', 
+        boxShadow: '0 20px 60px -15px rgba(0,0,0,0.1)',
+        borderColor: color 
+      } : {}}
+      position="relative"
+      overflow="hidden"
+    >
+      <HStack justify="space-between" align="flex-start" mb={4}>
+        <VStack align="flex-start" spacing={0}>
+          <Text fontSize="13px" fontWeight="700" color="gray.400" letterSpacing="0.5px">
+            {label}
+          </Text>
+          <Text fontSize="32px" fontWeight="900" color={textColor} letterSpacing="-1px">
+            {value}
+          </Text>
+        </VStack>
+        
+        {icon && (
+          <Center 
+            bg={`${color}15`} 
+            p={3} 
+            borderRadius="2xl" 
+            color={color}
+          >
+            <Icon as={icon} size={24} />
+          </Center>
+        )}
+      </HStack>
+
+      <HStack spacing={2}>
+        {change && (
+          <Badge 
+            bg={`${color}10`} 
+            color={color} 
+            px={3} 
+            py={1} 
+            borderRadius="full" 
+            fontSize="11px" 
+            fontWeight="800"
+            display="flex"
+            alignItems="center"
+          >
+            <Activity size={12} style={{ marginRight: '4px' }} />
+            {change}
+          </Badge>
+        )}
+        {!change && (
+          <Text fontSize="11px" color="gray.400" fontWeight="600">
+            Current dynamic status
+          </Text>
+        )}
+      </HStack>
+
+      {/* Subtle bottom progress line */}
+      <Box 
+        position="absolute" 
+        bottom={0} 
+        left={0} 
+        h="4px" 
+        bg={`${color}20`} 
+        w="full"
+      >
+        <Box h="full" bg={color} w="40%" borderRadius="full" />
+      </Box>
+    </Box>
+  );
+}
+
+// ─── Sidebar Nav Item ─────────────────────────────────────────────────────────
+function NavItem({ module, isActive, onClick }) {
+  return (
+    <Button
+      w="full"
+      justifyContent="flex-start"
+      leftIcon={<Icon as={module.icon} size={18} />}
+      variant="ghost"
+      onClick={onClick}
+      bg={isActive ? 'rgba(217,4,4,0.15)' : 'transparent'}
+      color={isActive ? ACCENT : 'gray.400'}
+      borderLeft={isActive ? `3px solid ${ACCENT}` : '3px solid transparent'}
+      borderRadius="lg"
+      h="44px"
+      px={4}
+      fontSize="14px"
+      fontWeight={isActive ? '700' : '500'}
+      _hover={{ bg: 'rgba(255,255,255,0.06)', color: 'white' }}
+      transition="all 0.15s"
+    >
+      {module.name}
+    </Button>
+  );
+}
+
+// ─── Sidebar ─────────────────────────────────────────────────────────────────
+function Sidebar({ modules, activeModule, onSelect, user, userRole, onLogout }) {
+  const navigate = useNavigate();
+  return (
+    <Flex
+      direction="column"
+      bg={SIDEBAR_BG}
+      w={SIDEBAR_W}
+      h="100vh"
+      position="fixed"
+      top={0}
+      left={0}
+      zIndex={100}
+      py={6}
+      px={4}
+      overflowY="auto"
+    >
+      {/* Logo */}
+      <HStack spacing={3} mb={8} px={2}>
+        <Box bg={ACCENT} p="6px" borderRadius="lg">
+          <Package color="white" size={20} />
+        </Box>
+        <VStack align="flex-start" spacing={0}>
+          <Text fontSize="15px" fontWeight="900" color="white" lineHeight="1">
+            All Engine
+          </Text>
+          <Text fontSize="11px" color={ACCENT} fontWeight="700" letterSpacing="2px">
+            4 YOU
+          </Text>
+        </VStack>
+      </HStack>
+
+      {/* User Info */}
+      <Box
+        bg="rgba(255,255,255,0.05)"
+        borderRadius="xl"
+        p={3}
+        mb={6}
+        border="1px solid rgba(255,255,255,0.08)"
+      >
+        <HStack spacing={3}>
+          <Avatar size="sm" name={user?.name} bg={ACCENT} color="white" />
+          <VStack align="flex-start" spacing={0} flex={1} minW={0}>
+            <Text fontSize="13px" fontWeight="700" color="white" noOfLines={1}>
+              {user?.name || 'User'}
+            </Text>
+            <Badge colorScheme={roleColor(userRole)} fontSize="10px" px={2} borderRadius="full">
+              {userRole}
+            </Badge>
+          </VStack>
+        </HStack>
+      </Box>
+
+      {/* Nav */}
+      <Text fontSize="10px" fontWeight="800" color="gray.600" letterSpacing="2px" mb={3} px={2}>
+        NAVIGATION
+      </Text>
+      <VStack align="stretch" spacing={1} flex={1}>
+        {modules.map((m) => (
+          <NavItem
+            key={m.id}
+            module={m}
+            isActive={activeModule === m.id}
+            onClick={() => onSelect(m.id)}
+          />
+        ))}
+      </VStack>
+
+      <Divider borderColor="whiteAlpha.100" mb={4} />
+
+      {/* Bottom Actions */}
+      <VStack align="stretch" spacing={1}>
+        <Button
+          w="full"
+          justifyContent="flex-start"
+          leftIcon={<Home size={18} />}
+          variant="ghost"
+          color="gray.400"
+          onClick={() => navigate('/')}
+          h="40px" px={4} fontSize="13px"
+          _hover={{ bg: 'rgba(255,255,255,0.06)', color: 'white' }}
+        >
+          View Site
+        </Button>
+        <Button
+          w="full"
+          justifyContent="flex-start"
+          leftIcon={<LogOut size={18} />}
+          variant="ghost"
+          color="gray.400"
+          onClick={onLogout}
+          h="40px" px={4} fontSize="13px"
+          _hover={{ bg: 'rgba(255,255,255,0.06)', color: ACCENT }}
+        >
+          Logout
+        </Button>
+      </VStack>
+    </Flex>
+  );
+}
+
+// ─── Main Dashboard Page ──────────────────────────────────────────────────────
 export default function DashboardPage() {
-  const [activeModule, setActiveModule] = useState('overview');
-  const [showExpiredNotice, setShowExpiredNotice] = useState(false);
-  const user = JSON.parse(localStorage.getItem('user') || '{}');
-  const validRoles = ['Super Admin', 'Website Admin', 'Sales Manager', 'Viewer'];
-  const role = validRoles.includes(user.role) ? user.role : 'Super Admin';
+  const { user, setUser } = useUser();
+  const navigate = useNavigate();
+  const [activeModule, setActiveModule] = useState('users');
+  const [stats, setStats] = useState(null);
+  const [statsLoading, setStatsLoading] = useState(true);
+  const { isOpen: isMobileOpen, onOpen: onMobileOpen, onClose: onMobileClose } = useDisclosure();
+  const isMobile = useBreakpointValue({ base: true, lg: false });
 
-  const accentColor = "#D90404";
-  const darkBlue = "#0F172A";
+  const bgColor = useColorModeValue('#F8FAFC', '#0A0F1E');
 
-  const bgColor = useColorModeValue("gray.100", "gray.900");
-  const cardBg = useColorModeValue("white", "gray.800");
-  const textColor = useColorModeValue(darkBlue, "white");
-  const secTextColor = useColorModeValue("gray.500", "gray.400");
-  const borderColor = useColorModeValue("gray.100", "gray.700");
+  // Derive role
+  const rawRole = user?.role || JSON.parse(localStorage.getItem('user') || '{}')?.role || 'viewer';
+  const userRole = mapRoleToUI(rawRole);
+  const currentUser = user || JSON.parse(localStorage.getItem('user') || '{}');
 
-  const allModules = [
-    {
-      id: 'users',
-      name: 'Users / Admins',
-      icon: FiUsers,
-      roles: ['Super Admin'],
-      component: (props) => (
-        <UsersModule
-          {...props}
-          dashboardUser={user}
-          role={role}
-        />
-      )
-    },
-    { id: 'websites', name: 'Websites / Tenants', icon: FiServer, component: WebsitesModule, roles: ['Super Admin'] },
-    { id: 'engines', name: 'Products / Engines', icon: FiPackage, component: EnginesModule, roles: ['Super Admin', 'Website Admin', 'Viewer'] },
-    { id: 'blogs', name: 'Blogs / Content', icon: FiBookOpen, component: BlogsModule, roles: ['Super Admin', 'Website Admin', 'Viewer'] },
-    { id: 'leads', name: 'Leads / Routing', icon: FiMessageSquare, component: LeadsModule, roles: ['Super Admin', 'Website Admin', 'Sales Manager', 'Viewer'] },
-    { id: 'quotes', name: 'Quotes / Sales', icon: FiDollarSign, component: QuotesModule, roles: ['Super Admin', 'Website Admin', 'Sales Manager', 'Viewer'] },
-  ];
+  // Filter modules by role
+  const filteredModules = ALL_MODULES.filter((m) => m.roles.includes(rawRole));
 
-  const filteredModules = allModules.filter(m => !m.roles || m.roles.includes(role));
+  // Fetch stats
+  const fetchStats = useCallback(async () => {
+    setStatsLoading(true);
+    try {
+      const [usersRes, websitesRes, productsRes, blogsRes] = await Promise.allSettled([
+        API.get('/employees'),
+        API.get('/websites'),
+        API.get('/products'),
+        API.get('/blogs'),
+      ]);
+      const usersData = usersRes.status === 'fulfilled' ? usersRes.value.data.data : [];
+      const websites = websitesRes.status === 'fulfilled' ? websitesRes.value.data.data : [];
+      const products = productsRes.status === 'fulfilled' ? (productsRes.value.data.data || productsRes.value.data) : [];
+      const blogs = blogsRes.status === 'fulfilled' ? (blogsRes.value.data.data || blogsRes.value.blogs || []) : [];
+      
+      const adminRoles = ['super_admin', 'admin', 'website_manager', 'sales_manager'];
+      const admins = usersData.filter(u => adminRoles.includes(u.role));
+      const regularUsers = usersData.filter(u => !adminRoles.includes(u.role));
 
-  const ActiveModule = filteredModules.find(m => m.id === activeModule) || filteredModules[0];
-  const ActiveComponent = ActiveModule.component;
-
-  const stats = [
-    { label: 'Total Websites', value: '12', change: '+2', color: "blue.500", module: 'websites' },
-    { label: 'Total Products', value: '4,567', change: '+5%', color: "orange.500", module: 'engines' },
-    { label: 'Total Leads', value: '890', change: '+18%', color: "purple.500", module: 'leads' },
-    { label: 'Active Admins', value: '24', change: '+1', color: "green.500", module: 'users' },
-    { label: 'Revenue', value: '$840K', change: '+22%', color: accentColor, module: 'quotes' },
-  ];
-
-  // Blinking Animation Keyframes
-  const blinkStyles = `
-    @keyframes blink {
-      0% { opacity: 1; }
-      50% { opacity: 0.4; transform: scale(1.02); }
-      100% { opacity: 1; }
+      setStats({
+        users: { value: regularUsers.length, active: regularUsers.filter(u => u.isActive).length },
+        admins: { value: admins.length, active: admins.filter(u => u.isActive).length },
+        websites: { value: websites.length },
+        products: { value: products.length },
+        blogs: { value: blogs.length },
+      });
+    } catch (e) {
+      console.error('Stats fetch error:', e);
+    } finally {
+      setStatsLoading(false);
     }
-  `;
+  }, []);
+
+  useEffect(() => { fetchStats(); }, [fetchStats]);
+
+  // Auto-select first allowed module
+  useEffect(() => {
+    if (filteredModules.length && !filteredModules.find(m => m.id === activeModule)) {
+      setActiveModule(filteredModules[0].id);
+    }
+  }, [rawRole, activeModule, filteredModules]);
+
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    setUser(null);
+    toast.success('Logged out successfully');
+    navigate('/login');
+  };
+
+  const ActiveModuleObj = filteredModules.find(m => m.id === activeModule) || filteredModules[0];
+  const ActiveComponent = ActiveModuleObj?.component;
+
+  const sidebarProps = {
+    modules: filteredModules,
+    activeModule,
+    onSelect: (id) => { setActiveModule(id); onMobileClose(); },
+    user: currentUser,
+    userRole,
+    onLogout: handleLogout,
+  };
+
+  const statsData = [
+    {
+      label: 'Staff Admins',
+      value: statsLoading ? '...' : stats?.admins?.value ?? '0',
+      change: statsLoading ? null : `${stats?.admins?.active ?? 0} Active`,
+      color: '#6366F1',
+      module: 'admins',
+      icon: Users,
+    },
+    {
+      label: 'Customers',
+      value: statsLoading ? '...' : stats?.users?.value ?? '0',
+      change: statsLoading ? null : `${stats?.users?.active ?? 0} Active`,
+      color: '#D90404',
+      module: 'users',
+      icon: Activity,
+    },
+    {
+      label: 'Active Sites',
+      value: statsLoading ? '...' : stats?.websites?.value ?? '0',
+      change: '100% Up',
+      color: '#10B981',
+      module: 'websites',
+      icon: Server,
+    },
+    {
+      label: 'Products',
+      value: statsLoading ? '...' : stats?.products?.value ?? '0',
+      change: 'Catalog',
+      color: '#0EA5E9',
+      module: 'engines',
+      icon: Package,
+    },
+    {
+      label: 'Blog Posts',
+      value: statsLoading ? '...' : stats?.blogs?.value ?? '0',
+      change: 'Insights',
+      color: '#F59E0B',
+      module: 'blogs',
+      icon: BookOpen,
+    },
+  ];
 
   return (
     <Box bg={bgColor} minH="100vh">
-      <style>{blinkStyles}</style>
-      <Container maxW="container.xl" py={8}>
-        <Flex justify="space-between" align="center" mb={8} direction={{ base: 'column', md: 'row' }} gap={4}>
-          <HStack spacing={4}>
-            <Box bg={accentColor} w="4px" h="32px" borderRadius="full" />
-            <Heading fontSize="36px" color={textColor} letterSpacing="-0.5px">Dashboard Overview</Heading>
-          </HStack>
-          <Button
-            bg={accentColor}
-            color="white"
-            variant="solid"
-            size="md"
-            onClick={() => {
-              setActiveModule('overview');
-              setShowExpiredNotice(!showExpiredNotice);
-            }}
-            animation="blink 1.5s infinite"
-            boxShadow={`0 10px 20px ${accentColor}40`}
-            fontWeight="800"
-            borderRadius="full"
-            px={8}
-            fontSize="16px"
-            _hover={{ bg: "#c74848", transform: "translateY(-2px)" }}
-            _active={{ bg: "#a53a3a" }}
-          >
-            {showExpiredNotice ? '✕ CLOSE ALERT' : '⚠️ MEMBERSHIP EXPIRED'}
-          </Button>
-        </Flex>
+      {/* Desktop Sidebar */}
+      {!isMobile && <Sidebar {...sidebarProps} />}
 
-        {/* Role Context Banner */}
-        <Flex
-          mb={6}
-          p={3}
-          bg={cardBg}
-          borderRadius="xl"
-          border="1px solid"
-          borderColor={borderColor}
-          justify="space-between"
-          align="center"
-          flexWrap="wrap"
-          gap={3}
+      {/* Mobile Drawer */}
+      {isMobile && (
+        <Drawer isOpen={isMobileOpen} placement="left" onClose={onMobileClose} size="xs">
+          <DrawerOverlay />
+          <DrawerContent bg={SIDEBAR_BG} p={0}>
+            <DrawerCloseButton color="white" />
+            <DrawerBody p={0} pt={10}>
+              <Sidebar {...sidebarProps} />
+            </DrawerBody>
+          </DrawerContent>
+        </Drawer>
+      )}
+
+      {/* Main Content */}
+      <Box ml={isMobile ? 0 : SIDEBAR_W} minH="100vh" transition="margin 0.2s">
+        {/* Top Bar */}
+        <Box
+          bg={useColorModeValue('white', 'gray.900')}
+          borderBottom="1px solid"
+          borderColor={useColorModeValue('gray.100', 'gray.800')}
+          px={6}
+          py={4}
+          position="sticky"
+          top={0}
+          zIndex={10}
         >
-          <HStack spacing={3}>
-            <Badge colorScheme={role === 'Super Admin' ? 'red' : role === 'Website Admin' ? 'purple' : role === 'Sales Manager' ? 'blue' : 'gray'} fontSize="13px" px={3} py={1} borderRadius="full">
-              {role}
-            </Badge>
-            <Text fontSize="14px" fontWeight="700" color={textColor}>{user.name || 'User'}</Text>
-            <Text fontSize="13px" color="gray.500">·</Text>
-            <Text fontSize="13px" color="gray.500">{user.businessName || 'N/A'}</Text>
-          </HStack>
-          <HStack spacing={2}>
-            <Badge colorScheme="teal" fontSize="12px" px={3} borderRadius="full">Tenant: {user.websiteId || 'N/A'}</Badge>
-            <Badge colorScheme="orange" fontSize="12px" px={3} borderRadius="full">Session Active</Badge>
-          </HStack>
-        </Flex>
-
-        {/* Stats Grid */}
-        <SimpleGrid columns={{ base: 1, sm: 2, md: 5 }} spacing={4} mb={10}>
-          {stats.map((stat, index) => (
-            <Card key={index} bg={cardBg} border="none" borderRadius="xl" overflow="hidden" boxShadow="md" transition="all 0.3s" _hover={{ transform: "translateY(-3px)", boxShadow: "lg" }}
-
-              onClick={() => {
-                setActiveModule(stat.module);
-                setShowExpiredNotice(false);
-              }}>
-              <CardBody py={4} px={5}>
-                <Stat>
-                  <StatLabel fontSize="12px" fontWeight="800" color="gray.400" textTransform="uppercase" letterSpacing="1px">{stat.label}</StatLabel>
-                  <StatNumber fontSize="20px" fontWeight="900" color={textColor} mt={1}>{stat.value}</StatNumber>
-                  <Box mt={1} display="flex" alignItems="center">
-                    <Badge colorScheme="green" fontSize="12px" borderRadius="full" px={2}>{stat.change}</Badge>
-                    <Text as="span" fontSize="12px" color="gray.400" ml={2}>growth</Text>
-                  </Box>
-                  <Box position="absolute" top="-15px" right="-15px" bg={stat.color} opacity={0.05} w="50px" h="50px" borderRadius="full" />
-                </Stat>
-              </CardBody>
-            </Card>
-          ))}
-        </SimpleGrid>
-
-        {/* Modules Navigation */}
-        <Grid templateColumns={{ base: '1fr', lg: '280px 1fr' }} gap={8}>
-          <GridItem>
-            <Box bg={cardBg} p={5} borderRadius="xl" boxShadow="lg" border="1px solid" borderColor={borderColor}>
-              <VStack align="stretch" spacing={1}>
-                <Text fontSize="12px" fontWeight="900" color="gray.400" mb={3} px={3} textTransform="uppercase" letterSpacing="2px">
-                  SYSTEM MODULES
-                </Text>
-                {filteredModules.map((module) => {
-                  const isActive = activeModule === module.id;
-                  return (
-                    <Button
-                      key={module.id}
-                      variant={isActive ? 'solid' : 'ghost'}
-                      bg={isActive ? (isActive && bgColor === "gray.900" ? "blue.700" : darkBlue) : "transparent"}
-                      color={isActive ? "white" : secTextColor}
-                      justifyContent="flex-start"
-                      leftIcon={<Icon as={module.icon} />}
-                      onClick={() => {
-                        setActiveModule(module.id);
-                        if (module.id !== 'overview') setShowExpiredNotice(false);
-                      }}
-                      fontSize="14px"
-                      fontWeight="700"
-                      h="48px"
-                      borderRadius="lg"
-                      px={4}
-                      _hover={{
-                        bg: isActive ? (isActive && bgColor === "gray.900" ? "blue.800" : darkBlue) : "gray.50",
-                        color: isActive ? "white" : accentColor,
-                        transform: "translateX(3px)"
-                      }}
-                      transition="all 0.2s"
-                    >
-                      {module.name}
-                    </Button>
-                  );
-                })}
-              </VStack>
-            </Box>
-          </GridItem>
-
-          <GridItem>
-            <Box minH="600px">
-              {typeof ActiveComponent === "function" ? (
-                <ActiveComponent user={user} role={role} />
-              ) : (
-                <ActiveComponent />
+          <Flex align="center" justify="space-between">
+            <HStack spacing={4}>
+              {isMobile && (
+                <IconButton
+                  icon={<Menu />}
+                  variant="ghost"
+                  onClick={onMobileOpen}
+                  aria-label="Open menu"
+                />
               )}
-            </Box>
-          </GridItem>
-        </Grid>
-      </Container>
+              <VStack align="flex-start" spacing={0}>
+                <Heading fontSize={{ base: '18px', md: '22px' }} fontWeight="800" color={useColorModeValue('gray.900', 'white')} letterSpacing="-0.5px">
+                  {getGreeting()}, {currentUser?.name?.split(' ')[0] || 'User'} 👋
+                </Heading>
+                <Text fontSize="12px" color="gray.400" fontWeight="500">
+                  {ActiveModuleObj?.name} · {new Date().toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long' })}
+                </Text>
+              </VStack>
+            </HStack>
+
+            <HStack spacing={3}>
+              <Tooltip label="Refresh stats">
+                <IconButton
+                  icon={<RefreshCcw size={14} />}
+                  variant="ghost"
+                  size="sm"
+                  onClick={fetchStats}
+                  isLoading={statsLoading}
+                  aria-label="Refresh"
+                />
+              </Tooltip>
+              <Box w="1px" h="20px" bg="gray.200" mx={2} />
+              <Button 
+                leftIcon={<Settings size={14} />} 
+                variant="ghost" 
+                size="sm" 
+                fontSize="13px"
+                display={{ base: 'none', md: 'flex' }}
+              >
+                Settings
+              </Button>
+            </HStack>
+          </Flex>
+        </Box>
+
+        {/* Page Content */}
+        <Box p={{ base: 4, md: 8 }} maxW="1600px">
+          {/* Stats Grid */}
+          <SimpleGrid columns={{ base: 1, sm: 2, lg: 3, xl: 5 }} spacing={6} mb={10}>
+            {statsData.map((s) => (
+              filteredModules.find(m => m.id === s.module) ? (
+                <StatCard
+                  key={s.label}
+                  {...s}
+                  onClick={() => setActiveModule(s.module)}
+                />
+              ) : null
+            ))}
+          </SimpleGrid>
+
+          {/* Active Module Content */}
+          {ActiveComponent ? (
+            <ActiveComponent 
+              user={currentUser} 
+              role={rawRole} 
+              moduleId={activeModule}
+            />
+          ) : (
+            <Flex justify="center" align="center" h="400px">
+              <VStack spacing={4} color="gray.400">
+                <LayoutGrid size={48} />
+                <Text fontSize="18px" fontWeight="600">No module selected</Text>
+              </VStack>
+            </Flex>
+          )}
+        </Box>
+      </Box>
     </Box>
   );
 }

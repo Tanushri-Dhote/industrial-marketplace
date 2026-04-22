@@ -259,13 +259,13 @@ export default function CallSellerPage() {
                             </Button>
                             <Button
                                 size="lg"
-                                colorScheme="#D90404"
+                                colorScheme="green"
                                 onClick={handleNext}
                                 isDisabled={fittingOptions.length === 0}
                                 rightIcon={<ChevronRightIcon />}
                                 px={8}
                             >
-                                Next ({fittingOptions.length} selected)
+                                Next 
                             </Button>
                         </Center>
                     </Box>

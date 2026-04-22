@@ -34,7 +34,9 @@ exports.getEmployees = async (request, reply) => {
 			filter.isActive = status === "Active";
 		}
 
-		const users = await User.find(filter).select("-password");
+		const users = await User.find(filter)
+			.select("-password")
+			.populate("website_id", "name domain");
 
 		return {
 			success: true,

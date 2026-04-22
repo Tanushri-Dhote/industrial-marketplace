@@ -1,7 +1,6 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import {
-    useToast,
     Box,
     Container,
     VStack,
@@ -15,7 +14,8 @@ import {
     CircularProgress,
     CircularProgressLabel,
 } from "@chakra-ui/react";
-import { CheckCircleIcon, WarningIcon, LockIcon, EmailIcon } from "@chakra-ui/icons";
+import { CheckCircleIcon, LockIcon, EmailIcon } from "@chakra-ui/icons";
+import { toast } from 'sonner';
 import API from "../services/api";
 import { useUser } from "../context/UserContext";
 
@@ -23,20 +23,23 @@ export default function VerifyLoginPage() {
     const { setUser } = useUser();
     const [searchParams] = useSearchParams();
     const navigate = useNavigate();
-    const toast = useToast();
     const [status, setStatus] = useState('idle');
     // idle | verifying | success | error
     const [errorMessage, setErrorMessage] = useState('');
     const [progress, setProgress] = useState(0);
+    const hasVerified = useRef(false);
 
     useEffect(() => {
         const token = searchParams.get("token");
 
         if (!token) {
-            // 👉 This is NOT an error — user just opened page manually
-            setStatus('idle'); // new state
+            setStatus('idle');
             return;
         }
+
+        if (hasVerified.current) return;
+        hasVerified.current = true;
+
         setStatus('verifying');
 
         // Simulate progress for better UX
@@ -57,14 +60,7 @@ export default function VerifyLoginPage() {
                 setProgress(100);
                 setStatus('success');
 
-                toast({
-                    title: "Login Successful",
-                    description: "Welcome back! Redirecting to dashboard...",
-                    status: "success",
-                    duration: 3000,
-                    isClosable: true,
-                    position: "top",
-                });
+                toast.success("Login Successful. Welcome back!");
 
                 setTimeout(() => {
                     navigate("/dashboard");
@@ -78,27 +74,21 @@ export default function VerifyLoginPage() {
                     error.response?.data?.message ||
                     "Verification failed. Please try again.";
 
-                // 🔥 KEY CHANGE
                 if (msg.includes("expired") || msg.includes("Invalid")) {
-                    setStatus("idle"); // 👈 go back to email check UI
+                    setStatus("idle");
                 } else {
-                    setStatus("error"); // real error
+                    setStatus("error");
                 }
 
                 setErrorMessage(msg);
-
-                toast({
-                    title: "Verification Failed",
-                    description: msg,
-                    status: "error",
-                });
+                toast.error(msg);
             }
         };
 
         verifyLogin();
 
         return () => clearInterval(interval);
-    }, [searchParams, navigate, toast]);
+    }, [searchParams, navigate, setUser]);
 
     // Verifying State
     if (status === 'verifying') {

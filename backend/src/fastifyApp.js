@@ -1,12 +1,12 @@
 const fastify = require("fastify")({
-	logger: process.env.NODE_ENV === "development" ? {
+	logger: {
 		level: "info",
 		transport: {
 			target: "pino-pretty",
 		},
-	} : true,
+	},
+	ignoreTrailingSlash: true,
 });
-const path = require("path");
 
 // Plugins
 fastify.register(require("@fastify/helmet"), {
@@ -37,6 +37,8 @@ fastify.register(require("./routes/fastify/product.routes"), { prefix: "/api/pro
 fastify.register(require("./routes/fastify/blog.routes"), { prefix: "/api/blogs" });
 fastify.register(require("./routes/fastify/employee.routes"), { prefix: "/api/employees" });
 fastify.register(require("./routes/fastify/registration.routes"), { prefix: "/api" });
+fastify.register(require("./routes/fastify/website.routes"), { prefix: "/api/websites" });
+
 
 // Root route
 fastify.get("/", async (request, reply) => {
@@ -46,6 +48,7 @@ fastify.get("/", async (request, reply) => {
 // Global Error Handler
 fastify.setErrorHandler((error, request, reply) => {
 	fastify.log.error(error);
+	console.error(error);
 	reply.status(error.statusCode || 500).send({
 		message: error.message || "Internal Server Error",
 		error: process.env.NODE_ENV === "development" ? error.stack : undefined,

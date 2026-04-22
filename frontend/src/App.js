@@ -17,6 +17,9 @@ import AccountPage from './pages/AccountPage';
 import CreateQuotePage from './pages/CreateQuotePage';
 import EmployeePage from './pages/EmployeePage';
 import ProductDetailPage from './pages/ProductDetailPage';
+import ForgotPasswordPage from './pages/ForgotPasswordPage';
+import ResetPasswordPage from './pages/ResetPasswordPage';
+import { Toaster } from 'sonner';
 import ProtectedRoute from './components/common/ProtectedRoute';
 import VerifyLoginPage from './pages/VerifyLoginPage';
 import { UserProvider } from './context/UserContext';
@@ -24,11 +27,15 @@ import CheckoutPage from './pages/CheckoutPage';
 import ThankYouPage from './pages/ThankYouPage';
 import CallSellerPage from './pages/CallSellerPage';
 
+
+
 function App() {
   return (
     <UserProvider>
       <Box minH="100vh" display="flex" flexDirection="column">
+
         <Header />
+
         <Box flex="1">
           <Routes>
             <Route path="/" element={<HomePage />} />
@@ -36,31 +43,42 @@ function App() {
             <Route path="/used-engines" element={<HomePage />} />
             <Route path="/reconditioned-engines" element={<HomePage />} />
             <Route path="/gearboxes" element={<HomePage />} />
+
             <Route path="/about" element={<AboutPage />} />
             <Route path="/contact" element={<ContactPage />} />
-            <Route path="terms-and-conditions" element={<TermsPage />} />
+            <Route path="/terms-and-conditions" element={<TermsPage />} />
             <Route path="/privacy-policy" element={<PrivacyPage />} />
+
             <Route path="/login" element={<LoginPage />} />
             <Route path="/register" element={<RegisterPage />} />
+            <Route path="/verify-login" element={<VerifyLoginPage />} />
+
+            <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+            <Route path="/reset-password" element={<ResetPasswordPage />} />
+
             <Route path="/blog" element={<BlogPage />} />
             <Route path="/blog/:slug" element={<BlogDetailPage />} />
+
             <Route path="/products/:id" element={<ProductDetailPage />} />
-            <Route path="/verify-login" element={<VerifyLoginPage />} />
+
             <Route path="/dashboard" element={
               <ProtectedRoute>
                 <DashboardPage />
               </ProtectedRoute>
             } />
+
             <Route path="/account" element={
               <ProtectedRoute>
                 <AccountPage />
               </ProtectedRoute>
             } />
+
             <Route path="/create-quote" element={
               <ProtectedRoute>
                 <CreateQuotePage />
               </ProtectedRoute>
             } />
+
             <Route path="/employee" element={
               <ProtectedRoute>
                 <EmployeePage />
@@ -72,10 +90,13 @@ function App() {
             <Route path="/call-seller" element={<CallSellerPage />} />
           </Routes>
         </Box>
+
         <Footer />
+        <Toaster position="top-center" richColors />
       </Box>
     </UserProvider>
   );
 }
+
 
 export default App;
