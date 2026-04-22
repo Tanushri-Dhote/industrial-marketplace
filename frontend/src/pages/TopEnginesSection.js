@@ -1,19 +1,20 @@
-import React, { useState, useEffect } from 'react';
 import {
+  Badge,
   Box,
+  Center,
   Container,
   Heading,
-  Text,
-  VStack,
   HStack,
-  Badge,
   Icon,
-  SimpleGrid,
   Image,
+  SimpleGrid,
   Spinner,
-  Center,
+  Text,
+  VStack
 } from '@chakra-ui/react';
+import { useEffect, useState } from 'react';
 import { FaCheckCircle, FaTruck } from 'react-icons/fa';
+import { Link as RouterLink } from 'react-router-dom';
 import API from '../services/api';
 
 export default function TopEnginesSection({ category }) {
@@ -25,14 +26,12 @@ export default function TopEnginesSection({ category }) {
     const fetchProducts = async () => {
       try {
         setLoading(true);
-        const { data } = await API.get('/products');
+        const res = await API.get('/products');
+        const products = res.data.data || res.data || [];
         
-        // Filter by category if needed
-        // Assuming backend returns products with category.name or similar
-        // For now, filtering based on matching the 'category' prop if it's not 'Industrial Engines'
-        let filtered = data;
+        let filtered = products;
         if (category && category !== 'Industrial Engines') {
-          filtered = data.filter(p => 
+          filtered = products.filter(p => 
             p.category?.name === category || 
             (category === 'Used Engines' && p.condition?.toLowerCase() === 'used') ||
             (category === 'Reconditioned Engines' && p.condition?.toLowerCase() === 'reconditioned')
@@ -52,6 +51,8 @@ export default function TopEnginesSection({ category }) {
 
   const EngineCard = ({ engine }) => (
     <VStack 
+      as={RouterLink}
+      to={`/products/${engine._id}`}
       align="start" 
       spacing={2} 
       bg="white" 
@@ -60,8 +61,10 @@ export default function TopEnginesSection({ category }) {
       boxShadow="sm" 
       border="1px solid" 
       borderColor="gray.100" 
-      _hover={{ boxShadow: "md", borderColor: "blue.200" }}
+      _hover={{ boxShadow: "md", borderColor: "blue.200", textDecoration: "none" }}
       transition="all 0.2s"
+      cursor="pointer"
+      w="full"
     >
       <Box w="full" h="120px" borderRadius="md" overflow="hidden" bg="gray.50">
         <Image 
@@ -138,4 +141,4 @@ export default function TopEnginesSection({ category }) {
       </Container>
     </Box>
   );
-}
+}

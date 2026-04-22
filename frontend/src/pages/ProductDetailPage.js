@@ -56,6 +56,8 @@ const MotionBox = motion(Box);
 
 const ProductCard = ({ product }) => (
   <MotionBox 
+    as={Link}
+    to={`/products/${product._id}`}
     whileHover={{ y: -5 }}
     bg="white" 
     borderRadius="xl" 
@@ -66,6 +68,8 @@ const ProductCard = ({ product }) => (
     p={4}
     minW="220px"
     cursor="pointer"
+    _hover={{ textDecoration: 'none', boxShadow: 'md' }}
+    display="block"
   >
     <Image src={product.images?.[0]} borderRadius="lg" mb={4} h="140px" w="full" objectFit="cover" />
     <VStack align="start" spacing={1}>
@@ -93,8 +97,8 @@ const PriceRow = ({ label, value, isTotal, color = "gray.600" }) => (
 );
 
 const fetchProduct = async (id) => {
-  const { data } = await API.get(`/products/${id}`);
-  return data;
+  const res = await API.get(`/products/${id}`);
+  return res.data.data || res.data;
 };
 
 export default function ProductDetailPage() {

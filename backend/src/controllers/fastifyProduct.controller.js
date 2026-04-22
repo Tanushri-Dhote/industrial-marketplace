@@ -8,7 +8,7 @@ exports.getProducts = async (request, reply) => {
 			filter.website_id = request.tenantId;
 		}
 		const products = await Product.find(filter).populate("category");
-		return products;
+		return { success: true, data: products };
 	} catch (error) {
 		reply.status(500).send({ message: error.message });
 	}

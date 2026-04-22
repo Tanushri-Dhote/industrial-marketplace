@@ -17,6 +17,9 @@ import AccountPage from './pages/AccountPage';
 import CreateQuotePage from './pages/CreateQuotePage';
 import EmployeePage from './pages/EmployeePage';
 import ProductDetailPage from './pages/ProductDetailPage';
+import ForgotPasswordPage from './pages/ForgotPasswordPage';
+import ResetPasswordPage from './pages/ResetPasswordPage';
+import { Toaster } from 'sonner';
 import ProtectedRoute from './components/common/ProtectedRoute';
 import VerifyLoginPage from './pages/VerifyLoginPage';
 import { UserProvider } from './context/UserContext';
@@ -24,6 +27,7 @@ import { UserProvider } from './context/UserContext';
 function App() {
   return (
      <UserProvider>
+      <Toaster position="top-center" richColors />
     <Box minH="100vh" display="flex" flexDirection="column">
       <Header />
       <Box flex="1">
@@ -41,6 +45,8 @@ function App() {
           <Route path="/register" element={<RegisterPage />} />
           <Route path="/blog" element={<BlogPage />} />
           <Route path="/blog/:slug" element={<BlogDetailPage />} />
+          <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+          <Route path="/reset-password" element={<ResetPasswordPage />} />
           <Route path="/products/:id" element={<ProductDetailPage />} />
           <Route path="/verify-login" element={<VerifyLoginPage />} />
           <Route path="/dashboard" element={
