@@ -1,20 +1,20 @@
-import { Link as RouterLink } from 'react-router-dom';
 import {
+  Badge,
   Box,
+  Center,
   Container,
   Heading,
-  Text,
-  VStack,
   HStack,
-  Badge,
   Icon,
-  SimpleGrid,
   Image,
+  SimpleGrid,
   Spinner,
-  Center,
-  Link,
+  Text,
+  VStack
 } from '@chakra-ui/react';
+import { useEffect, useState } from 'react';
 import { FaCheckCircle, FaTruck } from 'react-icons/fa';
+import { Link as RouterLink } from 'react-router-dom';
 import API from '../services/api';
 
 export default function TopEnginesSection({ category }) {
@@ -26,11 +26,12 @@ export default function TopEnginesSection({ category }) {
     const fetchProducts = async () => {
       try {
         setLoading(true);
-        const { data } = await API.get('/products');
+        const res = await API.get('/products');
+        const products = res.data.data || res.data || [];
         
-        let filtered = data;
+        let filtered = products;
         if (category && category !== 'Industrial Engines') {
-          filtered = data.filter(p => 
+          filtered = products.filter(p => 
             p.category?.name === category || 
             (category === 'Used Engines' && p.condition?.toLowerCase() === 'used') ||
             (category === 'Reconditioned Engines' && p.condition?.toLowerCase() === 'reconditioned')
@@ -140,4 +141,4 @@ export default function TopEnginesSection({ category }) {
       </Container>
     </Box>
   );
-}
+}

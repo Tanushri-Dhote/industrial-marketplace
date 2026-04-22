@@ -1,511 +1,544 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
 import {
-  Table, Thead, Tbody, Tr, Th, Td, Button, IconButton, HStack,
-  Modal, ModalOverlay, ModalContent, ModalHeader, ModalFooter,
-  ModalBody, ModalCloseButton, FormControl, FormLabel, Input,
-  useDisclosure, useToast, Badge, InputGroup, InputLeftElement,
-  Box, Text, Select, VStack, Icon, SimpleGrid, Spinner, Center,
-} from '@chakra-ui/react';
-import { AddIcon, EditIcon, DeleteIcon, SearchIcon } from '@chakra-ui/icons';
-import { FiUsers } from 'react-icons/fi';
-import ModuleFrame from './ModuleFrame';
-import API from '../../services/api';
+	Table,
+	Thead,
+	Tbody,
+	Tr,
+	Th,
+	Td,
+	Button,
+	IconButton,
+	HStack,
+	Modal,
+	ModalOverlay,
+	ModalContent,
+	ModalHeader,
+	ModalFooter,
+	ModalBody,
+	ModalCloseButton,
+	FormControl,
+	FormLabel,
+	Input,
+	useDisclosure,
+	Badge,
+	InputGroup,
+	InputLeftElement,
+	Box,
+	Text,
+	Select,
+	VStack,
+	Icon,
+	SimpleGrid,
+	Spinner,
+	Center,
+} from "@chakra-ui/react";
+import { AddIcon, EditIcon, DeleteIcon, SearchIcon } from "@chakra-ui/icons";
+import { Users } from "lucide-react";
+import { toast } from "sonner";
+import ModuleFrame from "./ModuleFrame";
+import API from "../../services/api";
 
+// ─── Role mapping ─────────────────────────────────────────────────────────────
+const mapRoleToUI = (role) =>
+	({
+		super_admin: "Super Admin",
+		admin: "Admin",
+		website_manager: "Website Admin",
+		sales_manager: "Sales Manager",
+		viewer: "Viewer",
+	})[role] || role;
 
+const mapRoleToBackend = (role) =>
+	({
+		"Super Admin": "super_admin",
+		Admin: "admin",
+		"Website Admin": "website_manager",
+		"Sales Manager": "sales_manager",
+		Viewer: "viewer",
+	})[role] || role;
 
+const roleColorScheme = (role) =>
+	({
+		"Super Admin": "red",
+		Admin: "orange",
+		"Website Admin": "purple",
+		"Sales Manager": "blue",
+		Viewer: "gray",
+	})[role] || "teal";
 
+// ─── Main Component ───────────────────────────────────────────────────────────
+export default function UsersModule({ moduleId }) {
+	const [users, setUsers] = useState([]);
+	const [websites, setWebsites] = useState([]);
+	const [isLoading, setIsLoading] = useState(true);
+	const [editingUser, setEditingUser] = useState(null);
+	const [searchTerm, setSearchTerm] = useState("");
+	const { isOpen, onOpen, onClose } = useDisclosure();
 
-const mapRoleToUI = (role) => {
-  switch (role) {
-    case "super_admin":
-      return "Super Admin";
-    case "admin":
-      return "Admin";
-    case "website_manager":
-      return "Website Admin";
-    case "sales_manager":
-      return "Sales Manager";
-    case "viewer":
-      return "Viewer";
-    default:
-      return role;
-  }
-};
+	useEffect(() => {
+		fetchWebsites();
+	}, []);
+	useEffect(() => {
+		fetchUsers();
+	}, [searchTerm, moduleId]);
 
-const mapRoleToBackend = (role) => {
-  switch (role) {
-    case "Super Admin":
-      return "super_admin";
-    case "Admin":
-      return "admin";
-    case "Website Admin":
-      return "website_manager";
-    case "Sales Manager":
-      return "sales_manager";
-    case "Viewer":
-      return "viewer";
-    default:
-      return role;
-  }
-};
+	const fetchWebsites = async () => {
+		try {
+			const res = await API.get("/websites");
+			setWebsites(res.data.data || []);
+		} catch (e) {
+			/* silent — supplementary data */
+		}
+	};
 
-export default function UsersModule({ dashboardUser, role }) {
-  const [users, setUsers] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [editingUser, setEditingUser] = useState(null);
-  const [searchTerm, setSearchTerm] = useState('');
-  const { isOpen, onOpen, onClose } = useDisclosure();
-  const toast = useToast();
+	const fetchUsers = async () => {
+		setIsLoading(true);
+		try {
+			const res = await API.get("/employees", { params: { search: searchTerm } });
+			const adminRoles = ["super_admin", "admin", "website_manager", "sales_manager"];
 
-  useEffect(() => {
-    fetchUsers();
-  }, [searchTerm]);
+			const filtered = res.data.data.filter((u) => {
+				const isAdmin = adminRoles.includes(u.role);
+				return moduleId === "admins" ? isAdmin : !isAdmin;
+			});
 
-  const fetchUsers = async () => {
-    setIsLoading(true);
-    try {
-      const res = await API.get("/employees", {
-        params: {
-          search: searchTerm,
-        }
-      });
+			const mappedData = filtered.map((u) => ({
+				id: u._id,
+				name: u.name,
+				email: u.email,
+				phone: u.phone1,
+				role: mapRoleToUI(u.role),
+				business_name: u.business_name || "—",
+				website_id: u.website_id?._id || u.website_id || "",
+				websiteName: u.website_id?.name || "—",
+				status: u.isActive ? "Active" : "Inactive",
+				joinDate: new Date(u.createdAt).toISOString().split("T")[0],
+			}));
+			setUsers(mappedData);
+		} catch (error) {
+			toast.error(error.response?.data?.message || "Failed to load users");
+		} finally {
+			setIsLoading(false);
+		}
+	};
 
-      const mappedData = res.data.data.map((u) => ({
-        id: u._id,
-        name: u.name,
-        email: u.email,
-        phone: u.phone1,
-        role: mapRoleToUI(u.role),
-        website: u.business_name,
-        status: u.isActive ? "Active" : "Inactive",
-        joinDate: new Date(u.createdAt).toISOString().split("T")[0],
-        lastLogin: "—",
-      }));
+	const handleSave = async (userData) => {
+		try {
+			if (editingUser) {
+				await API.put(`/employees/${editingUser.id}`, {
+					name: userData.name,
+					email: userData.email,
+					role: mapRoleToBackend(userData.role),
+					isActive: userData.status === "Active",
+					business_name: userData.business_name,
+					website_id: userData.website_id || null,
+				});
+				toast.success("User updated successfully");
+			} else {
+				toast.info("Use the registration page to add new users.");
+			}
+			fetchUsers();
+			onClose();
+		} catch (error) {
+			toast.error(error.response?.data?.message || "Update failed");
+		}
+	};
 
-      setUsers(mappedData);
-    } catch (error) {
-      console.error("Error fetching users:", error);
-      toast({
-        title: 'Error fetching users',
-        description: error.response?.data?.message || 'Something went wrong',
-        status: 'error',
-        duration: 3000,
-        isClosable: true,
-      });
-    } finally {
-      setIsLoading(false);
-    }
-  };
+	const handleDelete = async (id) => {
+		if (!window.confirm("Delete this user? This cannot be undone.")) return;
+		try {
+			await API.delete(`/employees/${id}`);
+			toast.success("User deleted");
+			fetchUsers();
+		} catch (error) {
+			toast.error("Delete failed");
+		}
+	};
 
-  // RBAC: get current logged-in user context
-  const currentUser = JSON.parse(localStorage.getItem('user') || '{}');
-  const currentRole = currentUser.role || 'Super Admin';
+	const handleToggleStatus = async (id) => {
+		try {
+			await API.patch(`/employees/${id}/status`);
+			toast.success("Status updated");
+			fetchUsers();
+		} catch (error) {
+			toast.error("Failed to update status");
+		}
+	};
 
-  const roleColorScheme = (role) => {
-    switch (role) {
-      case 'Super Admin': return 'red';
-      case 'Website Admin': return 'purple';
-      case 'Sales Manager': return 'blue';
-      case 'Viewer': return 'gray';
-      default: return 'teal';
-    }
-  };
+	const filteredUsers = users.filter(
+		(u) =>
+			u.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+			u.email.toLowerCase().includes(searchTerm.toLowerCase()),
+	);
 
-  const handleSave = async (userData) => {
-    try {
-      if (editingUser) {
-        // ✅ CALL UPDATE API
-        await API.put(`/employees/${editingUser.id}`, {
-          name: userData.name,
-          email: userData.email,
-          role: mapRoleToBackend(userData.role),
-          isActive: userData.status === "Active",
-          business_name: userData.website,
-        });
+	const isAdminsMode = moduleId === "admins";
 
-        toast({ title: 'User updated', status: 'success', duration: 2000 });
-      } else {
-        // (Optional) Create API if you have
-        toast({ title: 'Create API not implemented', status: 'info' });
-      }
+	return (
+		<ModuleFrame
+			icon={Users}
+			title={isAdminsMode ? "Admins & Staff" : "Customers & Users"}
+			description={
+				isAdminsMode
+					? "Manage administrative staff, assign site roles, and control access permissions across all tenants."
+					: "View and manage registered customers and marketplace members assigned to specific sites."
+			}
+		>
+			<HStack justify="space-between" mb={6}>
+				<InputGroup maxW="300px">
+					<InputLeftElement pointerEvents="none">
+						<SearchIcon color="gray.300" />
+					</InputLeftElement>
+					<Input
+						placeholder="Search users..."
+						value={searchTerm}
+						onChange={(e) => setSearchTerm(e.target.value)}
+						fontSize="14px"
+						h="42px"
+						borderRadius="lg"
+					/>
+				</InputGroup>
+				<Button
+					leftIcon={<AddIcon />}
+					bg="#D90404"
+					color="white"
+					_hover={{ bg: "#c74848" }}
+					onClick={() => {
+						setEditingUser(null);
+						onOpen();
+					}}
+					fontSize="14px"
+					px={6}
+					h="42px"
+					borderRadius="lg"
+				>
+					Add User
+				</Button>
+			</HStack>
 
-      fetchUsers(); // ✅ refresh list
-      onClose();
+			<Box overflowX="auto">
+				<Table variant="simple" size="sm">
+					<Thead>
+						<Tr>
+							<Th fontSize="11px" fontWeight="800" textTransform="uppercase" letterSpacing="1px">
+								Name
+							</Th>
+							<Th fontSize="11px" fontWeight="800" textTransform="uppercase" letterSpacing="1px">
+								Email
+							</Th>
+							<Th fontSize="11px" fontWeight="800" textTransform="uppercase" letterSpacing="1px">
+								Role
+							</Th>
+							<Th fontSize="11px" fontWeight="800" textTransform="uppercase" letterSpacing="1px">
+								Business
+							</Th>
+							<Th fontSize="11px" fontWeight="800" textTransform="uppercase" letterSpacing="1px">
+								Site
+							</Th>
+							<Th fontSize="11px" fontWeight="800" textTransform="uppercase" letterSpacing="1px">
+								Status
+							</Th>
+							<Th fontSize="11px" fontWeight="800" textTransform="uppercase" letterSpacing="1px">
+								Actions
+							</Th>
+						</Tr>
+					</Thead>
+					<Tbody>
+						{isLoading ? (
+							<Tr>
+								<Td colSpan={7}>
+									<Center py={10}>
+										<VStack spacing={3}>
+											<Spinner color="#D90404" size="lg" thickness="4px" />
+											<Text fontWeight="600" color="gray.500" fontSize="14px">
+												Loading users...
+											</Text>
+										</VStack>
+									</Center>
+								</Td>
+							</Tr>
+						) : filteredUsers.length === 0 ? (
+							<Tr>
+								<Td colSpan={7}>
+									<Center py={10}>
+										<VStack spacing={2}>
+											<Icon as={Users} boxSize={8} color="gray.300" />
+											<Text color="gray.500" fontWeight="600">
+												No users found
+											</Text>
+										</VStack>
+									</Center>
+								</Td>
+							</Tr>
+						) : (
+							filteredUsers.map((user) => (
+								<Tr key={user.id} _hover={{ bg: "gray.50" }}>
+									<Td fontSize="13px" fontWeight="700">
+										{user.name}
+									</Td>
+									<Td fontSize="12px" color="gray.600">
+										{user.email}
+									</Td>
+									<Td>
+										<Badge
+											variant="subtle"
+											colorScheme={roleColorScheme(user.role)}
+											fontSize="11px"
+											borderRadius="full"
+											px={3}
+										>
+											{user.role}
+										</Badge>
+									</Td>
+									<Td fontSize="12px" color="gray.500">
+										{user.business_name}
+									</Td>
+									<Td fontSize="12px" fontWeight="600" color="gray.700">
+										{user.websiteName}
+									</Td>
+									<Td>
+										<Badge
+											colorScheme={user.status === "Active" ? "green" : "red"}
+											fontSize="11px"
+											borderRadius="full"
+											px={3}
+											cursor="pointer"
+											onClick={() => handleToggleStatus(user.id)}
+											_hover={{ opacity: 0.7 }}
+										>
+											{user.status}
+										</Badge>
+									</Td>
+									<Td>
+										<HStack spacing={1}>
+											<IconButton
+												icon={<EditIcon />}
+												size="sm"
+												variant="ghost"
+												onClick={() => {
+													setEditingUser(user);
+													onOpen();
+												}}
+												aria-label="Edit User"
+											/>
+											<IconButton
+												icon={<DeleteIcon />}
+												size="sm"
+												variant="ghost"
+												colorScheme="red"
+												onClick={() => handleDelete(user.id)}
+												aria-label="Delete User"
+											/>
+										</HStack>
+									</Td>
+								</Tr>
+							))
+						)}
+					</Tbody>
+				</Table>
+			</Box>
 
-    } catch (error) {
-      console.error("UPDATE ERROR:", error.response?.data || error.message);
-      toast({
-        title: 'Update failed',
-        description: error.response?.data?.message || "Server error",
-        status: 'error',
-        duration: 3000
-      });
-    }
-  };
-
-  const handleDelete = async (id) => {
-    try {
-      await API.delete(`/employees/${id}`);
-
-      toast({ title: 'User deleted', status: 'success', duration: 2000 });
-
-      fetchUsers(); // ✅ refresh
-
-    } catch (error) {
-      toast({
-        title: 'Delete failed',
-        status: 'error'
-      });
-    }
-  };
-
-  const handleToggleStatus = async (id) => {
-    try {
-      await API.patch(`/employees/${id}/toggle-status`);
-
-      toast({
-        title: 'Status updated',
-        status: 'success',
-        duration: 2000,
-      });
-
-      fetchUsers(); // refresh list
-
-    } catch (error) {
-      toast({
-        title: 'Failed to update status',
-        status: 'error',
-        duration: 2000,
-      });
-    }
-  };
-
-  const filteredUsers = users.filter(u =>
-    u.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    u.email.toLowerCase().includes(searchTerm.toLowerCase())
-  );
-
-  return (
-    <ModuleFrame
-      icon={FiUsers}
-      title="User Management"
-      description="Manage administrative access and system users. You can add new team members or update existing roles and permissions."
-    >
-      <HStack justify="space-between" mb={8}>
-        <InputGroup maxW="300px">
-          <InputLeftElement pointerEvents="none">
-            <SearchIcon color="gray.300" />
-          </InputLeftElement>
-          <Input
-            placeholder="Search users..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            fontSize="15px"
-            h="45px"
-            borderRadius="lg"
-          />
-        </InputGroup>
-        <Button
-          leftIcon={<AddIcon />}
-          bg="#D90404"
-          color="white"
-          _hover={{ bg: "#c74848" }}
-          onClick={() => { setEditingUser(null); onOpen(); }}
-          fontSize="16px"
-          px={6}
-          h="45px"
-          borderRadius="lg"
-        >
-          Add User
-        </Button>
-      </HStack>
-
-      <Box overflowX="auto">
-        <Table variant="simple">
-          <Thead>
-            <Tr>
-              <Th fontSize="12px" fontWeight="800" textTransform="uppercase" letterSpacing="1px">Name</Th>
-              <Th fontSize="12px" fontWeight="800" textTransform="uppercase" letterSpacing="1px">Email</Th>
-              <Th fontSize="12px" fontWeight="800" textTransform="uppercase" letterSpacing="1px">Role</Th>
-              <Th fontSize="12px" fontWeight="800" textTransform="uppercase" letterSpacing="1px">Website</Th>
-              <Th fontSize="12px" fontWeight="800" textTransform="uppercase" letterSpacing="1px">Status</Th>
-              <Th fontSize="12px" fontWeight="800" textTransform="uppercase" letterSpacing="1px">Actions</Th>
-            </Tr>
-          </Thead>
-          <Tbody>
-            {isLoading ? (
-              <Tr>
-                <Td colSpan={6}>
-                  <Center py={10}>
-                    <VStack spacing={4}>
-                      <Spinner color="#D90404" size="xl" thickness="4px" />
-                      <Text fontWeight="bold" color="gray.500">Loading team members...</Text>
-                    </VStack>
-                  </Center>
-                </Td>
-              </Tr>
-            ) : filteredUsers.length === 0 ? (
-              <Tr>
-                <Td colSpan={6}>
-                  <Center py={10}>
-                    <Text color="gray.500">No users found</Text>
-                  </Center>
-                </Td>
-              </Tr>
-            ) : (
-              filteredUsers.map((user) => (
-                <Tr key={user.id}>
-                  <Td fontSize="12px" fontWeight="600">{user.name}</Td>
-                  <Td fontSize="12px">{user.email}</Td>
-                  <Td fontSize="12px">
-                    <Badge
-                      variant="subtle"
-                      colorScheme={roleColorScheme(user.role)}
-                      fontSize="12px"
-                      borderRadius="full"
-                      px={3}
-                    >
-                      {user.role}
-                    </Badge>
-                  </Td>
-                  <Td fontSize="12px" fontWeight="600" color="gray.600">
-                    {user.website || '---'}
-                  </Td>
-                  <Td>
-                    <Badge
-                      colorScheme={user.status === 'Active' ? 'green' : 'red'}
-                      fontSize="12px"
-                      borderRadius="full"
-                      px={3}
-                      cursor="pointer"
-                      onClick={() => handleToggleStatus(user.id)}
-                      _hover={{ opacity: 0.8 }}
-                    >
-                      {user.status}
-                    </Badge>
-                  </Td>
-                  <Td>
-                    <IconButton
-                      icon={<EditIcon />}
-                      size="sm"
-                      variant="ghost"
-                      mr={2}
-                      onClick={() => { setEditingUser(user); onOpen(); }}
-                      aria-label="Edit User"
-                    />
-                    <IconButton
-                      icon={<DeleteIcon />}
-                      size="sm"
-                      variant="ghost"
-                      colorScheme="red"
-                      onClick={() => handleDelete(user.id)}
-                      aria-label="Delete User"
-                    />
-                  </Td>
-                </Tr>
-              ))
-            )}
-          </Tbody>
-        </Table>
-      </Box>
-
-      <UserModal isOpen={isOpen} onClose={onClose} onSave={handleSave} user={editingUser} />
-    </ModuleFrame>
-  );
+			<UserModal
+				isOpen={isOpen}
+				onClose={onClose}
+				onSave={handleSave}
+				user={editingUser}
+				websites={websites}
+			/>
+		</ModuleFrame>
+	);
 }
 
-function UserModal({ isOpen, onClose, onSave, user }) {
-  const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    role: 'Viewer',
-    status: 'Active',
-    website: ''
-  });
+// ─── User Modal ───────────────────────────────────────────────────────────────
+function UserModal({ isOpen, onClose, onSave, user, websites }) {
+	const [formData, setFormData] = useState({
+		name: "",
+		email: "",
+		role: "Viewer",
+		status: "Active",
+		business_name: "",
+		website_id: "",
+	});
+	const [isSaving, setIsSaving] = useState(false);
 
-  React.useEffect(() => {
-    if (user) {
-      setFormData(user);
-    } else {
-      setFormData({
-        name: '',
-        email: '',
-        role: 'Viewer',
-        status: 'Active',
-        website: ''
-      });
-    }
-  }, [user]);
+	useEffect(() => {
+		setFormData(
+			user
+				? {
+						name: user.name,
+						email: user.email,
+						role: user.role,
+						status: user.status,
+						business_name: user.business_name || "",
+						website_id: user.website_id || "",
+					}
+				: {
+						name: "",
+						email: "",
+						role: "Viewer",
+						status: "Active",
+						business_name: "",
+						website_id: "",
+					},
+		);
+	}, [user]);
 
+	const handleSubmit = async () => {
+		setIsSaving(true);
+		await onSave(formData);
+		setIsSaving(false);
+	};
 
-  const isEditing = !!user;
+	return (
+		<Modal isOpen={isOpen} onClose={onClose} isCentered size="xl">
+			<ModalOverlay backdropFilter="blur(8px)" bg="blackAlpha.500" />
+			<ModalContent borderRadius="2xl" overflow="hidden" boxShadow="2xl">
+				{/* Header */}
+				<Box bgGradient="linear(to-r, #0F172A, #1E293B)" color="white" py={6} px={8}>
+					<HStack spacing={4}>
+						<Icon as={Users} boxSize={7} />
+						<VStack align="flex-start" spacing={0}>
+							<ModalHeader fontSize="22px" fontWeight="800" p={0}>
+								{user ? "Edit User" : "Add Team Member"}
+							</ModalHeader>
+							<Text opacity={0.7} fontSize="13px">
+								{user ? "Update user info, role, and site assignment" : "Create a new user account"}
+							</Text>
+						</VStack>
+					</HStack>
+				</Box>
+				<ModalCloseButton color="white" top={5} right={5} />
 
-  return (
-    <Modal
-      isOpen={isOpen}
-      onClose={onClose}
-      isCentered
-      size="xl"
-    >
-      <ModalOverlay backdropFilter="blur(10px)" bg="blackAlpha.600" />
+				<ModalBody p={8}>
+					<SimpleGrid columns={{ base: 1, md: 2 }} spacing={6}>
+						{/* Left */}
+						<VStack spacing={5} align="stretch">
+							<FormControl isRequired>
+								<FormLabel fontSize="12px" fontWeight="700" color="gray.600">
+									FULL NAME
+								</FormLabel>
+								<Input
+									value={formData.name}
+									onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+									placeholder="John Smith"
+									h="44px"
+									borderRadius="xl"
+									fontSize="14px"
+									_focus={{ borderColor: "#D90404", boxShadow: "0 0 0 3px rgba(217,4,4,0.1)" }}
+								/>
+							</FormControl>
+							<FormControl isRequired>
+								<FormLabel fontSize="12px" fontWeight="700" color="gray.600">
+									EMAIL ADDRESS
+								</FormLabel>
+								<Input
+									type="email"
+									value={formData.email}
+									onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+									placeholder="john@company.com"
+									h="44px"
+									borderRadius="xl"
+									fontSize="14px"
+									_focus={{ borderColor: "#D90404", boxShadow: "0 0 0 3px rgba(217,4,4,0.1)" }}
+								/>
+							</FormControl>
+							<FormControl>
+								<FormLabel fontSize="12px" fontWeight="700" color="gray.600">
+									BUSINESS NAME
+								</FormLabel>
+								<Input
+									value={formData.business_name}
+									onChange={(e) => setFormData({ ...formData, business_name: e.target.value })}
+									placeholder="Smith Engine Repairs"
+									h="44px"
+									borderRadius="xl"
+									fontSize="14px"
+									_focus={{ borderColor: "#D90404", boxShadow: "0 0 0 3px rgba(217,4,4,0.1)" }}
+								/>
+							</FormControl>
+						</VStack>
 
-      <ModalContent
-        borderRadius="3xl"
-        overflow="hidden"
-        boxShadow="2xl"
-      >
-        {/* Header with subtle gradient */}
-        <Box
-          bgGradient="linear(to-r, #D90404, #f56565)"
-          color="white"
-          py={8}
-          px={8}
-        >
-          <HStack spacing={4}>
-            <Box>
-              <Icon as={FiUsers} boxSize={8} opacity={0.9} />
-            </Box>
-            <VStack align="flex-start" spacing={0}>
-              <ModalHeader
-                fontSize="28px"
-                fontWeight="800"
-                p={0}
-                letterSpacing="-0.5px"
-              >
-                {isEditing ? 'Edit User' : 'Add New Team Member'}
-              </ModalHeader>
-              <Text opacity={0.85} fontSize="15px">
-                {isEditing
-                  ? 'Update user information and permissions'
-                  : 'Invite a new member to your team'}
-              </Text>
-            </VStack>
-          </HStack>
-        </Box>
+						{/* Right */}
+						<VStack spacing={5} align="stretch">
+							<FormControl isRequired>
+								<FormLabel fontSize="12px" fontWeight="700" color="gray.600">
+									ROLE
+								</FormLabel>
+								<Select
+									value={formData.role}
+									onChange={(e) => setFormData({ ...formData, role: e.target.value })}
+									h="44px"
+									borderRadius="xl"
+									fontSize="14px"
+									_focus={{ borderColor: "#D90404" }}
+								>
+									<option value="Super Admin">Super Admin</option>
+									<option value="Admin">Admin</option>
+									<option value="Website Admin">Website Admin</option>
+									<option value="Sales Manager">Sales Manager</option>
+									<option value="Viewer">Viewer</option>
+								</Select>
+							</FormControl>
+							<FormControl>
+								<FormLabel fontSize="12px" fontWeight="700" color="gray.600">
+									ASSIGNED SITE
+								</FormLabel>
+								<Select
+									value={formData.website_id}
+									onChange={(e) => setFormData({ ...formData, website_id: e.target.value })}
+									h="44px"
+									borderRadius="xl"
+									fontSize="14px"
+									_focus={{ borderColor: "#D90404" }}
+								>
+									<option value="">— No site assigned —</option>
+									{websites.map((w) => (
+										<option key={w._id} value={w._id}>
+											{w.name}
+										</option>
+									))}
+								</Select>
+							</FormControl>
+							<FormControl isRequired>
+								<FormLabel fontSize="12px" fontWeight="700" color="gray.600">
+									STATUS
+								</FormLabel>
+								<Select
+									value={formData.status}
+									onChange={(e) => setFormData({ ...formData, status: e.target.value })}
+									h="44px"
+									borderRadius="xl"
+									fontSize="14px"
+									_focus={{ borderColor: "#D90404" }}
+								>
+									<option value="Active">Active</option>
+									<option value="Inactive">Inactive</option>
+								</Select>
+							</FormControl>
+						</VStack>
+					</SimpleGrid>
+				</ModalBody>
 
-        <ModalCloseButton color="white" top={6} right={6} />
-
-        <ModalBody p={10}>
-          <SimpleGrid columns={{ base: 1, md: 2 }} spacing={8}>
-            {/* Left Column */}
-            <VStack spacing={7} align="stretch">
-              <FormControl isRequired>
-                <FormLabel fontWeight="700" fontSize="14px" color="gray.600">FULL NAME</FormLabel>
-                <Input
-                  size="lg"
-                  h="56px"
-                  borderRadius="2xl"
-                  fontSize="17px"
-                  value={formData.name}
-                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  placeholder="John Smith"
-                  _focus={{ borderColor: "#D90404", boxShadow: "0 0 0 3px rgba(217, 4, 4, 0.1)" }}
-                />
-              </FormControl>
-
-              <FormControl isRequired>
-                <FormLabel fontWeight="700" fontSize="14px" color="gray.600">EMAIL ADDRESS</FormLabel>
-                <Input
-                  type="email"
-                  size="lg"
-                  h="56px"
-                  borderRadius="2xl"
-                  fontSize="17px"
-                  value={formData.email}
-                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  placeholder="john.smith@company.com"
-                  _focus={{ borderColor: "#D90404", boxShadow: "0 0 0 3px rgba(217, 4, 4, 0.1)" }}
-                />
-              </FormControl>
-            </VStack>
-
-            {/* Right Column */}
-            <VStack spacing={7} align="stretch">
-              <FormControl isRequired>
-                <FormLabel fontWeight="700" fontSize="14px" color="gray.600">ROLE</FormLabel>
-                <Select
-                  size="lg"
-                  h="56px"
-                  borderRadius="2xl"
-                  fontSize="16px"
-                  value={formData.role}
-                  onChange={(e) => setFormData({ ...formData, role: e.target.value })}
-                  _focus={{ borderColor: "#D90404" }}
-                >
-                  <option value="Super Admin">Super Admin </option>
-                  <option value="Website Admin">Website Admin </option>
-                  <option value="Sales Manager">Sales Manager </option>
-                  <option value="Viewer">Viewer </option>
-                </Select>
-              </FormControl>
-
-              <FormControl isRequired>
-                <FormLabel fontWeight="700" fontSize="14px" color="gray.600">ASSIGNED WEBSITE</FormLabel>
-                <Select
-                  size="lg"
-                  h="56px"
-                  borderRadius="2xl"
-                  fontSize="16px"
-                  value={formData.website}
-                  onChange={(e) => setFormData({ ...formData, website: e.target.value })}
-                  _focus={{ borderColor: "#D90404" }}
-                >
-                  <option value="">Select a Website</option>
-                  <option value="SITE-101">SITE-101 - Engine City</option>
-                  <option value="SITE-102">SITE-102 - Marine Parts</option>
-                  <option value="SITE-103">SITE-103 - Truck Solutions</option>
-                </Select>
-              </FormControl>
-
-              <FormControl isRequired>
-                <FormLabel fontWeight="700" fontSize="14px" color="gray.600">STATUS</FormLabel>
-                <Select
-                  size="lg"
-                  h="56px"
-                  borderRadius="2xl"
-                  fontSize="16px"
-                  value={formData.status}
-                  onChange={(e) => setFormData({ ...formData, status: e.target.value })}
-                  _focus={{ borderColor: "#D90404" }}
-                >
-                  <option value="Active">Active </option>
-                  <option value="Inactive">Inactive </option>
-                  <option value="Suspended">Suspended</option>
-                </Select>
-              </FormControl>
-            </VStack>
-          </SimpleGrid>
-        </ModalBody>
-
-        <ModalFooter bg="gray.50" borderTop="1px solid" borderColor="gray.100" py={8} px={10}>
-          <HStack spacing={4} width="full" justify="flex-end">
-            <Button
-              variant="ghost"
-              size="lg"
-              onClick={onClose}
-              fontWeight="500"
-              px={8}
-            >
-              Cancel
-            </Button>
-
-            <Button
-              size="lg"
-              bg="#D90404"
-              color="white"
-              _hover={{ bg: "#c00404" }}
-              _active={{ bg: "#a00404" }}
-              onClick={() => onSave(formData)}
-              px={12}
-              fontWeight="700"
-              borderRadius="2xl"
-              boxShadow="md"
-            >
-              {isEditing ? 'Update User' : 'Create User'}
-            </Button>
-          </HStack>
-        </ModalFooter>
-      </ModalContent>
-    </Modal>
-  );
+				<ModalFooter bg="gray.50" borderTop="1px solid" borderColor="gray.100" px={8} py={5}>
+					<HStack spacing={3} w="full" justify="flex-end">
+						<Button variant="ghost" onClick={onClose} fontWeight="500">
+							Cancel
+						</Button>
+						<Button
+							bg="#D90404"
+							color="white"
+							_hover={{ bg: "#c00404" }}
+							onClick={handleSubmit}
+							isLoading={isSaving}
+							loadingText="Saving..."
+							px={8}
+							fontWeight="700"
+							borderRadius="xl"
+						>
+							{user ? "Update User" : "Create User"}
+						</Button>
+					</HStack>
+				</ModalFooter>
+			</ModalContent>
+		</Modal>
+	);
 }

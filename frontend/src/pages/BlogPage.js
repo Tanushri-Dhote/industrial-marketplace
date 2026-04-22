@@ -128,7 +128,7 @@ export default function BlogPage() {
       <Container maxW="container.xl" mt="-60px" position="relative" zIndex={3} pb={20}>
         <AnimatePresence mode="wait">
           <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} spacing={10}>
-            {data?.blogs.map((post, idx) => (
+            {data?.blogs?.map((post, idx) => (
               <MotionBox
                 key={post._id}
                 initial={{ opacity: 0, y: 20 }}

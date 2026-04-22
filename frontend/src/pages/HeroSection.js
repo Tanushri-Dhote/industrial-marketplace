@@ -152,6 +152,8 @@ export default function HeroSection({ category }) {
                   <HStack spacing={2}><Icon as={FaCheckCircle} color="green.400" /><Text fontWeight="500">Up to 50% Savings on Used & Recon Engines</Text></HStack>
                   <HStack spacing={2}><Icon as={FaCheckCircle} color="green.400" /><Text fontWeight="500">No Upfront Payment - You're In Control</Text></HStack>
                 </VStack>
+
+                {!isCategoryPage && <SupplierStats />}
               </VStack>
 
               {isCategoryPage && (
@@ -199,8 +201,11 @@ export default function HeroSection({ category }) {
             )}
           </Flex>
 
-          {!isCategoryPage && <SupplierStats />}
-
+          <Box>
+            <Text color="white" fontSize="sm" textDecoration="underline" cursor="pointer" _hover={{ color: "gray.300" }}>
+              Don't have reg? Click here
+            </Text>
+          </Box>
         </VStack>
       </Container>
     </Box>

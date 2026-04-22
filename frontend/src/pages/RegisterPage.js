@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Box,
   Container,
@@ -12,7 +12,6 @@ import {
   InputRightElement,
   Text,
   Link,
-  useToast,
   Divider,
   HStack,
   Icon,
@@ -27,10 +26,11 @@ import {
 import { ViewIcon, ViewOffIcon } from '@chakra-ui/icons';
 import { FaUserPlus, FaBuilding, FaMoneyBillWave } from 'react-icons/fa';
 import { MdBusiness, MdTimer, MdEmail, MdPhone } from 'react-icons/md';
-import { Link as RouterLink, useNavigate } from 'react-router-dom';
+import { Link as RouterLink, useNavigate, useSearchParams } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
+import { toast } from 'sonner';
 import API from "../services/api";
 
 const schema = yup.object({
@@ -41,7 +41,7 @@ const schema = yup.object({
     .oneOf([yup.ref('password'), null], 'Passwords must match')
     .required('Please confirm your password'),
   phone1: yup.string().required('Primary phone number is required').matches(/^[0-9]{10}$/, 'Phone number must be 10 digits'),
-  phone2: yup.string().matches(/^[0-9]{10}$/, 'Phone number must be 10 digits').optional(),
+  phone2: yup.string().matches(/^[0-9]{10}$/, { message: 'Phone number must be 10 digits', excludeEmptyString: true }).optional(),
   warranty: yup.string().required('Warranty period is required'),
   vatNumber: yup.string().optional(),
 }).required();
@@ -50,8 +50,20 @@ export default function RegisterPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const toast = useToast();
+  const [siteInfo, setSiteInfo] = useState(null);
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+
+  // Resolve site_id from URL param → env var → null
+  const siteId = searchParams.get('site') || process.env.REACT_APP_SITE_ID || null;
+
+  // Fetch site name to display in the badge
+  useEffect(() => {
+    if (!siteId) return;
+    API.get(`/websites/${siteId}/public`)
+      .then((res) => setSiteInfo(res.data.data))
+      .catch(() => setSiteInfo(null));
+  }, [siteId]);
 
   const { register, handleSubmit, formState: { errors } } = useForm({
     resolver: yupResolver(schema),
@@ -62,42 +74,27 @@ export default function RegisterPage() {
     try {
       setIsLoading(true);
 
-      // ✅ Send FULL backend-compatible data
       const payload = {
-        name: data.businessName,          // required
+        name: data.businessName,
         email: data.email,
         password: data.password,
         confirmPassword: data.confirmPassword,
-        business_name: data.businessName, // required
+        business_name: data.businessName,
         phone1: data.phone1,
-        phone2: data.phone2 || "",
+        phone2: data.phone2 || '',
         warranty: data.warranty,
-        vat_number: data.vatNumber || "",
-        role: "admin", // or "super_admin" if needed
+        vat_number: data.vatNumber || '',
+        role: 'admin',
+        // Send the resolved site_id so the backend links the user to the right tenant
+        site_id: siteId || undefined,
       };
 
-      const res = await API.post("/auth/register", payload);
-
-      toast({
-        title: "Registration Successful!",
-        description: res.data.message,
-        status: "success",
-        duration: 3000,
-        isClosable: true,
-        position: "top-right",
-      });
-
-      navigate("/login");
+      const res = await API.post('/auth/register', payload);
+      toast.success('Registration successful! Please check your email to verify.');
+      navigate('/login');
 
     } catch (error) {
-      toast({
-        title: "Registration Failed",
-        description:
-          error.response?.data?.message || "Something went wrong",
-        status: "error",
-        duration: 3000,
-        isClosable: true,
-      });
+      toast.error(error.response?.data?.message || 'Registration failed. Please try again.');
     } finally {
       setIsLoading(false);
     }
@@ -160,6 +157,30 @@ export default function RegisterPage() {
                 Enter your business details carefully to continue.
               </Text>
             </VStack>
+
+            {/* Site Badge */}
+            {siteInfo && (
+              <Box
+                bg="blue.50"
+                border="1px solid"
+                borderColor="blue.200"
+                borderRadius="lg"
+                px={4}
+                py={3}
+              >
+                <HStack spacing={2}>
+                  <Text fontSize="14px">📍</Text>
+                  <VStack align="flex-start" spacing={0}>
+                    <Text fontSize="12px" fontWeight="700" color="blue.700">
+                      Registering for: {siteInfo.name}
+                    </Text>
+                    {siteInfo.domain && (
+                      <Text fontSize="11px" color="blue.500">{siteInfo.domain}</Text>
+                    )}
+                  </VStack>
+                </HStack>
+              </Box>
+            )}
 
             <form onSubmit={handleSubmit(onSubmit)} style={{ width: '100%' }}>
               <VStack spacing={3}>

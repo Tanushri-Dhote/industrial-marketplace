@@ -97,8 +97,8 @@ const PriceRow = ({ label, value, isTotal, color = "gray.600" }) => (
 );
 
 const fetchProduct = async (id) => {
-  const { data } = await API.get(`/products/${id}`);
-  return data;
+  const res = await API.get(`/products/${id}`);
+  return res.data.data || res.data;
 };
 
 export default function ProductDetailPage() {

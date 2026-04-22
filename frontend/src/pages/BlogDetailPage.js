@@ -32,8 +32,8 @@ import {
 import API from '../services/api';
 
 const fetchBlogBySlug = async (slug) => {
-  const { data } = await API.get(`/blogs/${slug}`);
-  return data;
+  const res = await API.get(`/blogs/${slug}`);
+  return res.data.data || res.data;
 };
 
 export default function BlogDetailPage() {
