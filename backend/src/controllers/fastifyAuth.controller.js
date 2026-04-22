@@ -6,22 +6,54 @@ const sendEmail = require("../utils/sendEmail");
 
 exports.register = async (request, reply) => {
 	try {
-		const { name, email, password, confirmPassword, business_name, phone1, phone2, warranty, vat_number, role } = request.body;
-		if (!name || !email || !password || !confirmPassword) return reply.status(400).send({ message: "Basic fields missing" });
-		if (password !== confirmPassword) return reply.status(400).send({ message: "Passwords do not match" });
+		const {
+			name,
+			email,
+			password,
+			confirmPassword,
+			business_name,
+			phone1,
+			phone2,
+			warranty,
+			vat_number,
+			role,
+		} = request.body;
+		if (!name || !email || !password || !confirmPassword)
+			return reply.status(400).send({ message: "Basic fields missing" });
+		if (password !== confirmPassword)
+			return reply.status(400).send({ message: "Passwords do not match" });
 		const existingUser = await User.findOne({ email });
 		if (existingUser) return reply.status(409).send({ message: "User already exists" });
 		const hashedPassword = await bcrypt.hash(password, 10);
 		if (role === "super_admin") {
-			const user = await User.create({ name, email, password: hashedPassword, role: "super_admin" });
+			const user = await User.create({
+				name,
+				email,
+				password: hashedPassword,
+				role: "super_admin",
+			});
 			return reply.status(201).send({ message: "Super admin created", data: user });
 		}
-		if (!business_name || !phone1 || !warranty) return reply.status(400).send({ message: "Business fields required" });
+		if (!business_name || !phone1 || !warranty)
+			return reply.status(400).send({ message: "Business fields required" });
 		const website = await Website.create({ name: business_name });
-		const user = await User.create({ name, email, password: hashedPassword, business_name, phone1, phone2, warranty, vat_number, role: role || "admin", website_id: website._id });
+		const user = await User.create({
+			name,
+			email,
+			password: hashedPassword,
+			business_name,
+			phone1,
+			phone2,
+			warranty,
+			vat_number,
+			role: role || "admin",
+			website_id: website._id,
+		});
 		website.owner = user._id;
 		await website.save();
-		return reply.status(201).send({ message: "Business account created", data: user, website_id: website._id });
+		return reply
+			.status(201)
+			.send({ message: "Business account created", data: user, website_id: website._id });
 	} catch (error) {
 		reply.status(500).send({ message: error.message });
 	}
@@ -50,7 +82,10 @@ exports.login = async (request, reply) => {
 exports.verifyLogin = async (request, reply) => {
 	try {
 		const { token } = request.body;
-		let user = await User.findOne({ loginVerifyToken: token, loginVerifyExpires: { $gt: Date.now() } });
+		let user = await User.findOne({
+			loginVerifyToken: token,
+			loginVerifyExpires: { $gt: Date.now() },
+		});
 		if (!user) return reply.status(400).send({ message: "Invalid or expired token" });
 		const jwtToken = reply.jwtSign({ id: user._id, role: user.role, website_id: user.website_id });
 		user.loginVerifyToken = undefined;
@@ -84,7 +119,10 @@ exports.forgotPassword = async (request, reply) => {
 exports.resetPassword = async (request, reply) => {
 	try {
 		const { token, newPassword } = request.body;
-		const user = await User.findOne({ resetPasswordToken: token, resetPasswordExpires: { $gt: Date.now() } });
+		const user = await User.findOne({
+			resetPasswordToken: token,
+			resetPasswordExpires: { $gt: Date.now() },
+		});
 		if (!user) return reply.status(400).send({ message: "Invalid or expired token" });
 		user.password = await bcrypt.hash(newPassword, 10);
 		user.resetPasswordToken = undefined;
