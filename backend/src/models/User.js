@@ -61,7 +61,7 @@ const userSchema = new mongoose.Schema(
     // ================= SYSTEM =================
     role: {
       type: String,
-      enum: ["super_admin", "admin", "sales_manager", "viewer"],
+      enum: ["super_admin", "admin", "sales_manager","website_manager", "viewer"],
       default: "viewer",
     },
 

@@ -97,81 +97,6 @@ export default function Header() {
   return (
     <Box as="header" position="sticky" top="0" zIndex="sticky">
 
-      {/* ==================== SMALL TOP HEADER (Footer Theme) ==================== */}
-      <Box bg="#0F172A" color="white" py={2} fontSize="13px">
-        <Container maxW="container.xl" px={{ base: 4, md: 6 }}>
-          <Flex align="center" justify="space-between" wrap="wrap" gap={3}>
-
-            {/* Left: Logo with Box */}
-            <HStack spacing={3}>
-
-              <Text color="gray.400" fontSize="11px" display={{ base: 'none', md: 'block' }}>
-                Rebuilt • Repair • Replacement • Reconditioned
-              </Text>
-            </HStack>
-
-            {/* Social Media Icons */}
-            <HStack spacing={2} display={{ base: 'none', md: 'flex' }}>
-              <IconButton
-                as="a"
-                href="https://facebook.com"
-                target="_blank"
-                icon={<FaFacebookF />}
-                aria-label="Facebook"
-                variant="ghost"
-                color="white"
-                size="sm"
-                _hover={{ bg: "whiteAlpha.200", color: accentColor }}
-              />
-              <IconButton
-                as="a"
-                href="https://twitter.com"
-                target="_blank"
-                icon={<FaTwitter />}
-                aria-label="Twitter"
-                variant="ghost"
-                color="white"
-                size="sm"
-                _hover={{ bg: "whiteAlpha.200", color: accentColor }}
-              />
-              <IconButton
-                as="a"
-                href="https://linkedin.com"
-                target="_blank"
-                icon={<FaLinkedin />}
-                aria-label="LinkedIn"
-                variant="ghost"
-                color="white"
-                size="sm"
-                _hover={{ bg: "whiteAlpha.200", color: accentColor }}
-              />
-              <IconButton
-                as="a"
-                href="https://instagram.com"
-                target="_blank"
-                icon={<FaInstagram />}
-                aria-label="Instagram"
-                variant="ghost"
-                color="white"
-                size="sm"
-                _hover={{ bg: "whiteAlpha.200", color: accentColor }}
-              />
-              <IconButton
-                as="a"
-                href="https://youtube.com"
-                target="_blank"
-                icon={<FaYoutube />}
-                aria-label="YouTube"
-                variant="ghost"
-                color="white"
-                size="sm"
-                _hover={{ bg: "whiteAlpha.200", color: accentColor }}
-              />
-            </HStack>
-
-          </Flex>
-        </Container>
-      </Box>
 
       {/* ==================== MAIN HEADER ==================== */}
       <Box
@@ -307,17 +232,19 @@ export default function Header() {
                 <Button
                   as={Link}
                   to="/login"
-                  leftIcon={<FaUserAlt />}
-                  bg={accentColor}
+                  bg="#001F3F"
                   color="white"
-                  _hover={{ bg: "#e55a00" }}
+                  _hover={{ bg: "#003366", transform: "translateY(-1px)" }}
+                  _active={{ transform: "translateY(0)" }}
                   fontWeight="600"
                   size="md"
                   height="40px"
+                  px={6}
                   fontSize="14px"
+                  borderRadius="full"
                   display={{ base: 'none', md: 'flex' }}
                 >
-                  Login
+                  Supplier Login
                 </Button>
               )}
 
