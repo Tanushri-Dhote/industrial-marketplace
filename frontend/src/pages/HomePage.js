@@ -28,11 +28,10 @@ export default function HomePage() {
       <HeroSection category={category} />
       <TrustBar />
       <EasyStepsSection />
-      <VehicleSelectorSection category={category} />
       <CarMakeSelectorSection />
+      <TopEnginesSection category={category} />
       <Areacbar />
       <ReviewsSection />
-      <TopEnginesSection category={category} />
       <FAQSection />
     </>
   );

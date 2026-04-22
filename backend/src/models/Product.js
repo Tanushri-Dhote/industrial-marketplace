@@ -40,6 +40,21 @@ const productSchema = new mongoose.Schema(
 		condition: {
 			type: String,
 		},
+		make: {
+			type: String,
+			index: true,
+		},
+		model: {
+			type: String,
+			index: true,
+		},
+		year: {
+			type: Number,
+			index: true,
+		},
+		engineType: {
+			type: String,
+		},
 		category: {
 			type: mongoose.Schema.Types.ObjectId,
 			ref: "Category",

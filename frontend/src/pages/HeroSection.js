@@ -7,177 +7,201 @@ import {
   Text,
   VStack,
   HStack,
-  SimpleGrid,
   Button,
   Icon,
   Input,
   InputGroup,
-  InputLeftElement,
+  Flex,
+  Badge,
 } from '@chakra-ui/react';
-import { FaArrowRight, FaCheckCircle, FaSearch } from 'react-icons/fa';
-import { Link } from 'react-router-dom';
+import { FaArrowRight, FaCheckCircle } from 'react-icons/fa';
+
+const SupplierStats = () => {
+  const stats = [
+    { type: 'Supply Only', delivery: 'Free delivery', warranty: '3-18 months', condition: 'Used & Recon', count: 162 },
+    { type: 'Supply & Fitted', recovery: 'Incl. recovery', warranty: '12-60 months', condition: 'Used & Recon', count: 72 },
+    { type: 'Rebuild or repair', recovery: 'Incl. Recovery', warranty: '12-24 months', condition: 'Repair', count: 49 },
+  ];
+
+  return (
+    <VStack w="full" spacing={0} bg="white" borderRadius="md" overflow="hidden" border="1px solid" borderColor="gray.100">
+      <Box w="full" py={2} bg="gray.50" textAlign="center" borderBottom="1px solid" borderColor="gray.200">
+        <Text fontSize="sm" fontWeight="bold" color="gray.700">Suppliers ready to quote you</Text>
+      </Box>
+      {stats.map((stat, index) => (
+        <Box key={index} w="full" px={4} py={2} borderBottom={index !== stats.length - 1 ? "1px solid" : "none"} borderColor="gray.100">
+          <Flex justify="space-between" align="center">
+            <VStack align="start" spacing={0} flex={1}>
+              <Text fontSize="xs" fontWeight="bold" color="gray.800">{stat.type}</Text>
+              <Text fontSize="10px" color="gray.500">{stat.delivery || stat.recovery}</Text>
+            </VStack>
+            <VStack align="center" spacing={0} flex={1}>
+              <Text fontSize="10px" fontWeight="600" color="gray.600">{stat.warranty}</Text>
+              <Text fontSize="10px" color="gray.400">warranty</Text>
+            </VStack>
+            <VStack align="center" spacing={0} flex={1}>
+              <Text fontSize="10px" fontWeight="600" color="gray.600">{stat.condition}</Text>
+            </VStack>
+            <HStack spacing={1} flex={1} justify="flex-end">
+              <Badge colorScheme="green" borderRadius="full" px={2} fontSize="10px">{stat.count}</Badge>
+              <Text fontSize="10px" color="gray.500">Suppliers</Text>
+            </HStack>
+          </Flex>
+        </Box>
+      ))}
+    </VStack>
+  );
+};
 
 export default function HeroSection({ category }) {
-  // Map display category to dropdown values if needed
+  const isCategoryPage = category && category !== 'Industrial Engines';
+
   const getDropdownValue = (cat) => {
     if (cat === 'Gearboxes') return 'spareparts';
     if (cat.includes('Engines')) return 'engines';
     return '';
   };
 
-  return (
-    <Box position="relative" minH={{ base: "85vh", lg: "720px" }} overflow="hidden">
+  const ManualSelector = () => (
+    <VStack spacing={3} w="full">
+      <HStack w="full" spacing={3}>
+        <select style={{ flex: 1, padding: '10px', borderRadius: '6px', fontSize: '14px', border: '1px solid #ddd' }}><option>Select Make</option></select>
+        <select style={{ flex: 1, padding: '10px', borderRadius: '6px', fontSize: '14px', border: '1px solid #ddd' }}><option>Select Model</option></select>
+      </HStack>
+      <HStack w="full" spacing={3}>
+        <select style={{ flex: 1, padding: '10px', borderRadius: '6px', fontSize: '14px', border: '1px solid #ddd' }}><option>Select Year</option></select>
+        <select style={{ flex: 1, padding: '10px', borderRadius: '6px', fontSize: '14px', border: '1px solid #ddd' }}><option>Select Type</option></select>
+      </HStack>
+      <select style={{ width: '100%', padding: '10px', borderRadius: '6px', fontSize: '14px', border: '1px solid #ddd' }}><option>Select Part</option></select>
+    </VStack>
+  );
 
-      {/* Background Image */}
+  return (
+    <Box position="relative" minH={{ base: "70vh", lg: "650px" }} overflow="hidden" display="flex" alignItems="center">
+
+      {/* Background Image with stronger overlay */}
       <Box
         position="absolute"
         inset={0}
-        bgImage="url('https://images.unsplash.com/photo-1581091226033-d5c48150dbaa?ixlib=rb-4.0.3')"
+        bgImage="url('/car-engine-banner.jpg')"
         bgSize="cover"
         bgPosition="center"
         bgRepeat="no-repeat"
-      />
+      >
+        <Box
+          position="absolute"
+          inset={0}
+          bg="linear-gradient(180deg, rgba(0,0,0,0.5) 0%, rgba(0,0,0,0.7) 100%)"
+        />
+      </Box>
 
-      {/* Dark Overlay */}
-      <Box
-        position="absolute"
-        inset={0}
-        bg="linear-gradient(135deg, rgba(0,0,0,0.82) 0%, rgba(0,0,0,0.65) 100%)"
-      />
-
-      <Container maxW="container.xl" position="relative" zIndex={2} h="full" py={{ base: 12, md: 16 }}>
-        <SimpleGrid columns={{ base: 1, lg: 2 }} gap={10} alignItems="center" h="full">
-
-          {/* Left Content */}
-          <VStack align="flex-start" spacing={6} color="white" maxW="lg">
-            <Text
-              fontSize="14px"
-              bg="#D90404"
-              color="white"
-              px={5}
-              py={1.5}
-              borderRadius="full"
-              fontWeight="600"
-            >
-              TRUSTED  All Engine 4 YouPLACE
-            </Text>
-
-            <Heading
-              fontSize={{ base: "36px", md: "48px", lg: "52px" }}
-              fontWeight="700"
-              lineHeight="1.15"
-            >
-              Quality {category},<br />
-              Generators & Machinery
-            </Heading>
-
-            <Text fontSize="18px" color="whiteAlpha.900">
-              New • Used • Reconditioned equipment from verified suppliers across India.
-            </Text>
-
-            <HStack spacing={8}>
-              <HStack spacing={2}>
-                <Icon as={FaCheckCircle} color="#D90404" boxSize={5} />
-                <Text>500+ Listings</Text>
-              </HStack>
-              <HStack spacing={2}>
-                <Icon as={FaCheckCircle} color="#D90404" boxSize={5} />
-                <Text>120+ Suppliers</Text>
-              </HStack>
-            </HStack>
-          </VStack>
-
-          {/* Right Side - Inquiry Card */}
-          <Box
-            bg="white"
-            borderRadius="xl"
-            boxShadow="2xl"
-            p={{ base: 6, md: 8 }}
-            maxW={{ base: "100%", lg: "460px" }}
-            ml={{ lg: "auto" }}
+      <Container maxW="container.xl" position="relative" zIndex={2} py={{ base: 6, md: 10 }}>
+        <VStack spacing={8} align="center" textAlign="center">
+          
+          {/* Dynamic Headline */}
+          <Heading
+            color="white"
+            fontSize={{ base: "26px", md: "38px", lg: "48px" }}
+            fontWeight="800"
+            lineHeight="1.2"
+            textShadow="0 2px 10px rgba(0,0,0,0.4)"
           >
-            <VStack spacing={6} align="stretch">
-              <Box textAlign="center">
-                <Heading size="lg" mb={1} color="gray.800">Get Best Prices Today</Heading>
-                <Text color="gray.600">Multiple suppliers will quote you directly</Text>
-              </Box>
+            {isCategoryPage ? `Find ${category} for Sale in the UK` : "Compare local car & van engine reconditioners & breakers"}
+          </Heading>
 
-              {/* Search Form */}
-              <VStack spacing={4}>
-                <InputGroup size="lg">
-                  <InputLeftElement pointerEvents="none" h="full" pl={4}>
-                    <FaSearch color="#D90404" />
-                  </InputLeftElement>
-                  <Input
-                    placeholder="Engine model, kVA, part number or keyword"
-                    fontSize="16px"
-                    borderColor="gray.300"
-                    _focus={{ borderColor: "#D90404", boxShadow: "0 0 0 3px rgba(255,107,0,0.15)" }}
-                  />
-                </InputGroup>
-
-                <Box w="full">
-                  <select
-                    value={getDropdownValue(category)}
-                    onChange={() => {}}
-                    style={{
-                      width: '100%',
-                      padding: '16px 16px',
-                      borderRadius: '8px',
-                      border: '1px solid #CBD5E0',
-                      fontSize: '16px',
-                      backgroundColor: 'white'
-                    }}
-                  >
-                    <option value="">Select Category</option>
-                    <option value="generators">Diesel Generators</option>
-                    <option value="engines">Industrial Engines</option>
-                    <option value="compressors">Air Compressors</option>
-                    <option value="machinery">Heavy Machinery</option>
-                    <option value="spareparts">Spare Parts</option>
-                  </select>
+          {/* Dual/Single Inquiry Card Container */}
+          <Flex 
+            direction={{ base: "column", lg: "row" }} 
+            align="stretch" 
+            justify="center" 
+            gap={isCategoryPage ? 0 : 8}
+            w="full"
+            maxW={isCategoryPage ? "1100px" : "550px"}
+          >
+            {/* Left Card: REG Search */}
+            <Box
+              bg="#001F3F"
+              borderRadius={isCategoryPage ? { base: "2xl", lg: "2xl 0 0 2xl" } : "2xl"}
+              boxShadow="xl"
+              flex="1"
+              p={{ base: 4, md: 6 }}
+              position="relative"
+            >
+              <VStack spacing={5} align="stretch">
+                <Box>
+                  <Flex bg="#FFD700" borderRadius="md" overflow="hidden" h="54px" align="stretch" border="2px solid" borderColor="#FFD700">
+                    <VStack bg="#003399" w="45px" justify="center" spacing={0} px={1}>
+                      <Text fontSize="10px" lineHeight="1">🇬🇧</Text>
+                      <Text color="white" fontSize="12px" fontWeight="bold">UK</Text>
+                    </VStack>
+                    <Input placeholder="ENTER YOUR REG" variant="unstyled" bg="transparent" color="#333" _placeholder={{ color: 'rgba(0,0,0,0.3)' }} h="full" fontSize="22px" fontWeight="800" textAlign="center" letterSpacing="1px" textTransform="uppercase" />
+                  </Flex>
                 </Box>
 
-                <Button
-                  w="full"
-                  size="lg"
-                  bg="#D90404"
-                  color="white"
-                  py={7}
-                  fontSize="16px"
-                  fontWeight="600"
-                  rightIcon={<FaArrowRight />}
-                  _hover={{ bg: "#e55a00" }}
-                >
-                  Get Free Quotes Now
+                <select value={getDropdownValue(category)} onChange={() => {}} style={{ padding: '12px', borderRadius: '8px', fontSize: '16px', fontWeight: '600' }}>
+                  <option value="engines">Engine</option>
+                  <option value="gearboxes">Gearbox</option>
+                </select>
+
+                <Button w="full" size="lg" bg="#D90404" color="white" h="56px" fontSize="18px" fontWeight="bold" rightIcon={<FaArrowRight />} _hover={{ bg: "#B70303" }}>
+                  Get Free Quotes
                 </Button>
+
+                <VStack align="start" spacing={2} color="white" fontSize="14px">
+                  <HStack spacing={2}><Icon as={FaCheckCircle} color="green.400" /><Text fontWeight="500">Trusted by 1,000s Across the UK</Text></HStack>
+                  <HStack spacing={2}><Icon as={FaCheckCircle} color="green.400" /><Text fontWeight="500">Up to 50% Savings on Used & Recon Engines</Text></HStack>
+                  <HStack spacing={2}><Icon as={FaCheckCircle} color="green.400" /><Text fontWeight="500">No Upfront Payment - You're In Control</Text></HStack>
+                </VStack>
               </VStack>
 
-              {/* Don't have reg? Click here */}
-              <Text textAlign="center" fontSize="14px" color="gray.500">
-                Don't have a specific model number?{' '}
-                <Text
-                  as="span"
-                  color="#D90404"
-                  fontWeight="600"
-                  cursor="pointer"
-                  _hover={{ textDecoration: "underline" }}
-                  onClick={() => window.location.href = '/products'}
+              {isCategoryPage && (
+                <Box 
+                  display={{ base: "none", lg: "flex" }} 
+                  position="absolute" 
+                  right="-15px" 
+                  top="50%" 
+                  transform="translateY(-50%)" 
+                  zIndex={3}
+                  bg="transparent"
+                  color="white"
+                  fontWeight="900"
+                  fontSize="20px"
                 >
-                  Click here
-                </Text>{' '}
-                to browse all listings
-              </Text>
+                  OR
+                </Box>
+              )}
+            </Box>
 
-              {/* Trust Points */}
-              <VStack align="flex-start" spacing={3} fontSize="14px">
-                <HStack><Icon as={FaCheckCircle} color="green.500" /><Text>Trusted by 1000+ Industries</Text></HStack>
-                <HStack><Icon as={FaCheckCircle} color="green.500" /><Text>Up to 40% savings on reconditioned units</Text></HStack>
-                <HStack><Icon as={FaCheckCircle} color="green.500" /><Text>Warranty on most equipment</Text></HStack>
-              </VStack>
-            </VStack>
-          </Box>
-        </SimpleGrid>
+            {/* Right Card: Manual Search (Only for Category Pages) */}
+            {isCategoryPage && (
+              <Box
+                bg="#002D5C" // Slightly different navy for contrast
+                borderRadius={{ base: "2xl", lg: "0 2xl 2xl 0" }}
+                boxShadow="xl"
+                flex="1"
+                p={{ base: 4, md: 6 }}
+                mt={{ base: 4, lg: 0 }}
+              >
+                <VStack spacing={5} align="stretch">
+                  <ManualSelector />
+
+                  <Button w="full" size="lg" bg="#D90404" color="white" h="56px" fontSize="18px" fontWeight="bold" rightIcon={<FaArrowRight />} _hover={{ bg: "#B70303" }}>
+                    Get Free Quotes
+                  </Button>
+
+                  <VStack align="start" spacing={2} color="white" fontSize="14px">
+                    <HStack spacing={2}><Icon as={FaCheckCircle} color="green.400" /><Text fontWeight="500">Supply and Fitting Offered</Text></HStack>
+                    <HStack spacing={2}><Icon as={FaCheckCircle} color="green.400" /><Text fontWeight="500">Unlimited Mileage Warranty*</Text></HStack>
+                    <HStack spacing={2}><Icon as={FaCheckCircle} color="green.400" /><Text fontWeight="500">It Only Takes a Minute</Text></HStack>
+                  </VStack>
+                </VStack>
+              </Box>
+            )}
+          </Flex>
+
+          {!isCategoryPage && <SupplierStats />}
+
+        </VStack>
       </Container>
     </Box>
   );
