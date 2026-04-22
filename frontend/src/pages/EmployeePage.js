@@ -12,14 +12,13 @@ import {
   AddIcon, SearchIcon, EditIcon, DeleteIcon, EmailIcon, LockIcon, CheckIcon,
 } from '@chakra-ui/icons';
 import {
-  FiUsers, FiUserCheck, FiShield, FiBriefcase,
+  FiUsers, FiUserCheck, FiShield, FiBriefcase, FiSearch,
 } from 'react-icons/fi';
 import { useNavigate } from 'react-router-dom';
 import API from "../services/api";
 
-const ROLES = ['Super Admin', 'Website Admin', 'Sales Manager', 'Viewer'];
+const ROLES = ['Super Admin', 'Admin', 'Website Admin', 'Sales Manager', 'Viewer'];
 const SITES = [
-  'Global',
   'SITE-101 (Engine City)',
   'SITE-102 (Marine Parts)',
   'SITE-103 (Truck Solutions)'
@@ -66,6 +65,7 @@ export default function EmployeePage() {
   const currentRole = currentUser.role || 'Super Admin';
   const isSuperAdmin = currentRole === 'Super Admin';
 
+
   const [employees, setEmployees] = useState([]);
   const [search, setSearch] = useState('');
   const [filterRole, setFilterRole] = useState('All');
@@ -95,13 +95,7 @@ export default function EmployeePage() {
   }).length;
   const sales = employees.filter(e => e.role?.toLowerCase().includes('sales')).length;
 
-  const filtered = employees.filter(e => {
-    const matchSearch = e.name?.toLowerCase().includes(search.toLowerCase()) ||
-      e.email?.toLowerCase().includes(search.toLowerCase());
-    const matchRole = filterRole === 'All' || e.role === filterRole;
-    const matchStatus = filterStatus === 'All' || e.status === filterStatus;
-    return matchSearch && matchRole && matchStatus;
-  });
+  const filtered = employees;
 
   const handleSave = (data) => {
     if (editing) {
@@ -145,19 +139,24 @@ export default function EmployeePage() {
 
   useEffect(() => {
     fetchEmployees();
-  }, []);
+  }, [search, filterRole, filterStatus]);
 
   const fetchEmployees = async () => {
     try {
-      const res = await API.get("/employees");
+      const res = await API.get("/employees", {
+        params: {
+          search,
+          role: filterRole,
+          status: filterStatus,
+        }
+      });
 
-      // Keep role exactly as from backend
       const mappedData = res.data.data.map((u) => ({
         id: u._id,
         name: u.name,
         email: u.email,
         phone: u.phone1,
-        role: u.role, // Keep original role from backend
+        role: u.role,
         website: u.business_name,
         status: u.isActive ? "Active" : "Inactive",
         joinDate: new Date(u.createdAt).toISOString().split("T")[0],
@@ -168,6 +167,32 @@ export default function EmployeePage() {
 
     } catch (error) {
       console.error("Error fetching employees:", error);
+    }
+  };
+
+  useEffect(() => {
+    const delay = setTimeout(() => {
+      fetchEmployees();
+    }, 500);
+
+    return () => clearTimeout(delay);
+  }, [search, filterRole, filterStatus]);
+
+
+  const mapRoleToBackend = (role) => {
+    switch (role) {
+      case "Super Admin":
+        return "super_admin";
+      case "Admin":
+        return "admin";
+      case "Website Admin":
+        return "website_manager";
+      case "Sales Manager":
+        return "sales_manager";
+      case "Viewer":
+        return "viewer";
+      default:
+        return "";
     }
   };
 
@@ -267,57 +292,87 @@ export default function EmployeePage() {
                 </Tr>
               </Thead>
               <Tbody>
-                {filtered.map((emp) => {
-                  const RoleIcon = roleIcon(emp.role);
-                  const colorScheme = roleColor(emp.role);
-                  return (
-                    <Tr key={emp.id} _hover={{ bg: useColorModeValue('gray.50', 'gray.700') }} transition="background 0.2s">
-                      <Td>
-                        <HStack spacing={3}>
-                          <Avatar name={emp.name} size="sm" bg={`${colorScheme}.500`} color="white" />
-                          <VStack align="flex-start" spacing={0}>
-                            <Text fontWeight="800" fontSize="15px">{emp.name}</Text>
-                            <Text fontSize="12px" color={textColor}>Joined {emp.joinDate}</Text>
-                          </VStack>
-                        </HStack>
-                      </Td>
-                      <Td>
-                        <VStack align="flex-start" spacing={0}>
-                          <Text fontSize="14px">{emp.email}</Text>
-                          <Text fontSize="12px" color={textColor}>{emp.phone}</Text>
-                        </VStack>
-                      </Td>
-                      <Td>
-                        <Badge colorScheme={colorScheme} fontSize="12px" px={3} py={1} borderRadius="full" display="flex" alignItems="center" gap={1}>
-                          <Box as={RoleIcon} mr={1} /> {emp.role}
-                        </Badge>
-                      </Td>
-                      <Td>
-                        <Badge colorScheme="teal" variant="outline" fontSize="12px" px={3} borderRadius="full">{emp.website}</Badge>
-                      </Td>
-                      <Td>
-                        <HStack spacing={2}>
-                          <Switch isChecked={emp.status === 'Active'} onChange={() => isSuperAdmin && toggleStatus(emp.id)} colorScheme="green" isDisabled={!isSuperAdmin} size="sm" />
-                          <Badge colorScheme={emp.status === 'Active' ? 'green' : 'red'} fontSize="11px" borderRadius="full" px={2}>{emp.status}</Badge>
-                        </HStack>
-                      </Td>
-                      <Td fontSize="13px" color={textColor}>{emp.lastLogin}</Td>
-                      <Td>
-                        <HStack spacing={1}>
+                {filtered.length === 0 ? (
+                  <Tr>
+                    <Td colSpan={7}>
+                      <Box py={16} textAlign="center">
+                        <VStack spacing={4}>
+                          <Box as={FiSearch} fontSize="64px" color={useColorModeValue('gray.300', 'gray.600')} />
+                          <Heading size="md" color={textColor} fontWeight="600">No employees found</Heading>
+                          <Text color={textColor}>
+                            {search || filterRole !== 'All' || filterStatus !== 'All' 
+                              ? "Try adjusting your search or filters"
+                              : "No employees added yet"}
+                          </Text>
                           {isSuperAdmin && (
-                            <>
-                              <Tooltip label="Edit" hasArrow><IconButton icon={<EditIcon />} size="sm" variant="ghost" colorScheme="blue" onClick={() => { setEditing(emp); onOpen(); }} /></Tooltip>
-                              <Tooltip label="Reset Password" hasArrow><IconButton icon={<LockIcon />} size="sm" variant="ghost" colorScheme="orange" onClick={() => { setResetTarget(emp); setNewPw(''); onPwOpen(); }} /></Tooltip>
-                              <Tooltip label="Send Invite" hasArrow><IconButton icon={<EmailIcon />} size="sm" variant="ghost" colorScheme="green" onClick={() => toast({ title: `Invite sent to ${emp.email}`, status: 'success' })} /></Tooltip>
-                              <Tooltip label="Delete" hasArrow><IconButton icon={<DeleteIcon />} size="sm" variant="ghost" colorScheme="red" onClick={() => handleDelete(emp.id)} /></Tooltip>
-                            </>
+                            <Button
+                              leftIcon={<AddIcon />}
+                              bg={accentColor}
+                              color="white"
+                              _hover={{ bg: '#c00404' }}
+                              onClick={() => { setEditing(null); onOpen(); }}
+                              mt={4}
+                            >
+                              Add your first employee
+                            </Button>
                           )}
-                          {!isSuperAdmin && <Badge colorScheme="gray" fontSize="11px">Read Only</Badge>}
-                        </HStack>
-                      </Td>
-                    </Tr>
-                  );
-                })}
+                        </VStack>
+                      </Box>
+                    </Td>
+                  </Tr>
+                ) : (
+                  filtered.map((emp) => {
+                    const RoleIcon = roleIcon(emp.role);
+                    const colorScheme = roleColor(emp.role);
+                    return (
+                      <Tr key={emp.id} _hover={{ bg: useColorModeValue('gray.50', 'gray.700') }} transition="background 0.2s">
+                        <Td>
+                          <HStack spacing={3}>
+                            <Avatar name={emp.name} size="sm" bg={`${colorScheme}.500`} color="white" />
+                            <VStack align="flex-start" spacing={0}>
+                              <Text fontWeight="800" fontSize="15px">{emp.name}</Text>
+                              <Text fontSize="12px" color={textColor}>Joined {emp.joinDate}</Text>
+                            </VStack>
+                          </HStack>
+                        </Td>
+                        <Td>
+                          <VStack align="flex-start" spacing={0}>
+                            <Text fontSize="14px">{emp.email}</Text>
+                            <Text fontSize="12px" color={textColor}>{emp.phone}</Text>
+                          </VStack>
+                        </Td>
+                        <Td>
+                          <Badge colorScheme={colorScheme} fontSize="12px" px={3} py={1} borderRadius="full" display="flex" alignItems="center" gap={1}>
+                            <Box as={RoleIcon} mr={1} /> {emp.role}
+                          </Badge>
+                        </Td>
+                        <Td>
+                          <Badge colorScheme="teal" variant="outline" fontSize="12px" px={3} borderRadius="full">{emp.website}</Badge>
+                        </Td>
+                        <Td>
+                          <HStack spacing={2}>
+                            <Switch isChecked={emp.status === 'Active'} onChange={() => isSuperAdmin && toggleStatus(emp.id)} colorScheme="green" isDisabled={!isSuperAdmin} size="sm" />
+                            <Badge colorScheme={emp.status === 'Active' ? 'green' : 'red'} fontSize="11px" borderRadius="full" px={2}>{emp.status}</Badge>
+                          </HStack>
+                        </Td>
+                        <Td fontSize="13px" color={textColor}>{emp.lastLogin}</Td>
+                        <Td>
+                          <HStack spacing={1}>
+                            {isSuperAdmin && (
+                              <>
+                                <Tooltip label="Edit" hasArrow><IconButton icon={<EditIcon />} size="sm" variant="ghost" colorScheme="blue" onClick={() => { setEditing(emp); onOpen(); }} /></Tooltip>
+                                <Tooltip label="Reset Password" hasArrow><IconButton icon={<LockIcon />} size="sm" variant="ghost" colorScheme="orange" onClick={() => { setResetTarget(emp); setNewPw(''); onPwOpen(); }} /></Tooltip>
+                                <Tooltip label="Send Invite" hasArrow><IconButton icon={<EmailIcon />} size="sm" variant="ghost" colorScheme="green" onClick={() => toast({ title: `Invite sent to ${emp.email}`, status: 'success' })} /></Tooltip>
+                                <Tooltip label="Delete" hasArrow><IconButton icon={<DeleteIcon />} size="sm" variant="ghost" colorScheme="red" onClick={() => handleDelete(emp.id)} /></Tooltip>
+                              </>
+                            )}
+                            {!isSuperAdmin && <Badge colorScheme="gray" fontSize="11px">Read Only</Badge>}
+                          </HStack>
+                        </Td>
+                      </Tr>
+                    );
+                  })
+                )}
               </Tbody>
             </Table>
           </Box>
@@ -352,7 +407,7 @@ export default function EmployeePage() {
 
 // ==================== MODERN EMPLOYEE MODAL ====================
 function EmployeeModal({ isOpen, onClose, onSave, employee }) {
-  const empty = { name: '', email: '', phone: '', role: 'Viewer', website: 'Global', status: 'Active' };
+  const empty = { name: '', email: '', phone: '', role: 'Viewer', website: '', status: 'Active' };
   const [form, setForm] = useState(empty);
 
   React.useEffect(() => {
@@ -412,6 +467,7 @@ function EmployeeModal({ isOpen, onClose, onSave, employee }) {
               <FormControl isRequired>
                 <FormLabel fontWeight="700" fontSize="14px" color="gray.600">ASSIGNED WEBSITE</FormLabel>
                 <Select size="lg" h="56px" borderRadius="2xl" value={form.website} onChange={(e) => updateField('website', e.target.value)}>
+                  <option value="">Select a Website</option>
                   {SITES.map(s => <option key={s} value={s.split(' ')[0]}>{s}</option>)}
                 </Select>
               </FormControl>

@@ -1,28 +1,101 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Table, Thead, Tbody, Tr, Th, Td, Button, IconButton, HStack,
   Modal, ModalOverlay, ModalContent, ModalHeader, ModalFooter,
   ModalBody, ModalCloseButton, FormControl, FormLabel, Input,
   useDisclosure, useToast, Badge, InputGroup, InputLeftElement,
-  Box, Text, Select, VStack, Icon, SimpleGrid,
+  Box, Text, Select, VStack, Icon, SimpleGrid, Spinner, Center,
 } from '@chakra-ui/react';
 import { AddIcon, EditIcon, DeleteIcon, SearchIcon } from '@chakra-ui/icons';
 import { FiUsers } from 'react-icons/fi';
 import ModuleFrame from './ModuleFrame';
+import API from '../../services/api';
 
-const initialUsers = [
-  { id: 1, name: 'System Root', email: 'super@hq.com', role: 'Super Admin', status: 'Active', website: 'Global' },
-  { id: 2, name: 'Main Tenant', email: 'admin@site101.com', role: 'Website Admin', status: 'Active', website: 'SITE-101' },
-  { id: 3, name: 'Sales Lead', email: 'sales@site101.com', role: 'Sales Manager', status: 'Active', website: 'SITE-101' },
-  { id: 4, name: 'Auditor', email: 'view@hq.com', role: 'Viewer', status: 'Active', website: 'Global' },
-];
 
-export default function UsersModule() {
-  const [users, setUsers] = useState(initialUsers);
+
+
+
+const mapRoleToUI = (role) => {
+  switch (role) {
+    case "super_admin":
+      return "Super Admin";
+    case "admin":
+      return "Admin";
+    case "website_manager":
+      return "Website Admin";
+    case "sales_manager":
+      return "Sales Manager";
+    case "viewer":
+      return "Viewer";
+    default:
+      return role;
+  }
+};
+
+const mapRoleToBackend = (role) => {
+  switch (role) {
+    case "Super Admin":
+      return "super_admin";
+    case "Admin":
+      return "admin";
+    case "Website Admin":
+      return "website_manager";
+    case "Sales Manager":
+      return "sales_manager";
+    case "Viewer":
+      return "viewer";
+    default:
+      return role;
+  }
+};
+
+export default function UsersModule({ dashboardUser, role }) {
+  const [users, setUsers] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [editingUser, setEditingUser] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
   const { isOpen, onOpen, onClose } = useDisclosure();
   const toast = useToast();
+
+  useEffect(() => {
+    fetchUsers();
+  }, [searchTerm]);
+
+  const fetchUsers = async () => {
+    setIsLoading(true);
+    try {
+      const res = await API.get("/employees", {
+        params: {
+          search: searchTerm,
+        }
+      });
+
+      const mappedData = res.data.data.map((u) => ({
+        id: u._id,
+        name: u.name,
+        email: u.email,
+        phone: u.phone1,
+        role: mapRoleToUI(u.role),
+        website: u.business_name,
+        status: u.isActive ? "Active" : "Inactive",
+        joinDate: new Date(u.createdAt).toISOString().split("T")[0],
+        lastLogin: "—",
+      }));
+
+      setUsers(mappedData);
+    } catch (error) {
+      console.error("Error fetching users:", error);
+      toast({
+        title: 'Error fetching users',
+        description: error.response?.data?.message || 'Something went wrong',
+        status: 'error',
+        duration: 3000,
+        isClosable: true,
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   // RBAC: get current logged-in user context
   const currentUser = JSON.parse(localStorage.getItem('user') || '{}');
@@ -38,20 +111,73 @@ export default function UsersModule() {
     }
   };
 
-  const handleSave = (userData) => {
-    if (editingUser) {
-      setUsers(users.map(u => u.id === editingUser.id ? { ...userData, id: editingUser.id } : u));
-      toast({ title: 'User updated', status: 'success', duration: 2000 });
-    } else {
-      setUsers([...users, { ...userData, id: Date.now() }]);
-      toast({ title: 'User added', status: 'success', duration: 2000 });
+  const handleSave = async (userData) => {
+    try {
+      if (editingUser) {
+        // ✅ CALL UPDATE API
+        await API.put(`/employees/${editingUser.id}`, {
+          name: userData.name,
+          email: userData.email,
+          role: mapRoleToBackend(userData.role),
+          isActive: userData.status === "Active",
+          business_name: userData.website,
+        });
+
+        toast({ title: 'User updated', status: 'success', duration: 2000 });
+      } else {
+        // (Optional) Create API if you have
+        toast({ title: 'Create API not implemented', status: 'info' });
+      }
+
+      fetchUsers(); // ✅ refresh list
+      onClose();
+
+    } catch (error) {
+      console.error("UPDATE ERROR:", error.response?.data || error.message);
+      toast({
+        title: 'Update failed',
+        description: error.response?.data?.message || "Server error",
+        status: 'error',
+        duration: 3000
+      });
     }
-    onClose();
   };
 
-  const handleDelete = (id) => {
-    setUsers(users.filter(u => u.id !== id));
-    toast({ title: 'User deleted', status: 'info', duration: 2000 });
+  const handleDelete = async (id) => {
+    try {
+      await API.delete(`/employees/${id}`);
+
+      toast({ title: 'User deleted', status: 'success', duration: 2000 });
+
+      fetchUsers(); // ✅ refresh
+
+    } catch (error) {
+      toast({
+        title: 'Delete failed',
+        status: 'error'
+      });
+    }
+  };
+
+  const handleToggleStatus = async (id) => {
+    try {
+      await API.patch(`/employees/${id}/toggle-status`);
+
+      toast({
+        title: 'Status updated',
+        status: 'success',
+        duration: 2000,
+      });
+
+      fetchUsers(); // refresh list
+
+    } catch (error) {
+      toast({
+        title: 'Failed to update status',
+        status: 'error',
+        duration: 2000,
+      });
+    }
   };
 
   const filteredUsers = users.filter(u =>
@@ -107,49 +233,78 @@ export default function UsersModule() {
             </Tr>
           </Thead>
           <Tbody>
-            {filteredUsers.map((user) => (
-              <Tr key={user.id}>
-                <Td fontSize="12px" fontWeight="600">{user.name}</Td>
-                <Td fontSize="12px">{user.email}</Td>
-                <Td fontSize="12px">
-                  <Badge
-                    variant="subtle"
-                    colorScheme={roleColorScheme(user.role)}
-                    fontSize="12px"
-                    borderRadius="full"
-                    px={3}
-                  >
-                    {user.role}
-                  </Badge>
-                </Td>
-                <Td fontSize="12px" fontWeight="600" color="gray.600">
-                  {user.website || 'Global'}
-                </Td>
-                <Td>
-                  <Badge colorScheme={user.status === 'Active' ? 'green' : 'red'} fontSize="12px" borderRadius="full" px={3}>
-                    {user.status}
-                  </Badge>
-                </Td>
-                <Td>
-                  <IconButton
-                    icon={<EditIcon />}
-                    size="sm"
-                    variant="ghost"
-                    mr={2}
-                    onClick={() => { setEditingUser(user); onOpen(); }}
-                    aria-label="Edit User"
-                  />
-                  <IconButton
-                    icon={<DeleteIcon />}
-                    size="sm"
-                    variant="ghost"
-                    colorScheme="red"
-                    onClick={() => handleDelete(user.id)}
-                    aria-label="Delete User"
-                  />
+            {isLoading ? (
+              <Tr>
+                <Td colSpan={6}>
+                  <Center py={10}>
+                    <VStack spacing={4}>
+                      <Spinner color="#D90404" size="xl" thickness="4px" />
+                      <Text fontWeight="bold" color="gray.500">Loading team members...</Text>
+                    </VStack>
+                  </Center>
                 </Td>
               </Tr>
-            ))}
+            ) : filteredUsers.length === 0 ? (
+              <Tr>
+                <Td colSpan={6}>
+                  <Center py={10}>
+                    <Text color="gray.500">No users found</Text>
+                  </Center>
+                </Td>
+              </Tr>
+            ) : (
+              filteredUsers.map((user) => (
+                <Tr key={user.id}>
+                  <Td fontSize="12px" fontWeight="600">{user.name}</Td>
+                  <Td fontSize="12px">{user.email}</Td>
+                  <Td fontSize="12px">
+                    <Badge
+                      variant="subtle"
+                      colorScheme={roleColorScheme(user.role)}
+                      fontSize="12px"
+                      borderRadius="full"
+                      px={3}
+                    >
+                      {user.role}
+                    </Badge>
+                  </Td>
+                  <Td fontSize="12px" fontWeight="600" color="gray.600">
+                    {user.website || '---'}
+                  </Td>
+                  <Td>
+                    <Badge
+                      colorScheme={user.status === 'Active' ? 'green' : 'red'}
+                      fontSize="12px"
+                      borderRadius="full"
+                      px={3}
+                      cursor="pointer"
+                      onClick={() => handleToggleStatus(user.id)}
+                      _hover={{ opacity: 0.8 }}
+                    >
+                      {user.status}
+                    </Badge>
+                  </Td>
+                  <Td>
+                    <IconButton
+                      icon={<EditIcon />}
+                      size="sm"
+                      variant="ghost"
+                      mr={2}
+                      onClick={() => { setEditingUser(user); onOpen(); }}
+                      aria-label="Edit User"
+                    />
+                    <IconButton
+                      icon={<DeleteIcon />}
+                      size="sm"
+                      variant="ghost"
+                      colorScheme="red"
+                      onClick={() => handleDelete(user.id)}
+                      aria-label="Delete User"
+                    />
+                  </Td>
+                </Tr>
+              ))
+            )}
           </Tbody>
         </Table>
       </Box>
@@ -165,7 +320,7 @@ function UserModal({ isOpen, onClose, onSave, user }) {
     email: '',
     role: 'Viewer',
     status: 'Active',
-    website: 'Global'
+    website: ''
   });
 
   React.useEffect(() => {
@@ -177,10 +332,11 @@ function UserModal({ isOpen, onClose, onSave, user }) {
         email: '',
         role: 'Viewer',
         status: 'Active',
-        website: 'Global'
+        website: ''
       });
     }
   }, [user]);
+
 
   const isEditing = !!user;
 
@@ -276,10 +432,10 @@ function UserModal({ isOpen, onClose, onSave, user }) {
                   onChange={(e) => setFormData({ ...formData, role: e.target.value })}
                   _focus={{ borderColor: "#D90404" }}
                 >
-                  <option value="Super Admin">Super Admin — Full Access</option>
-                  <option value="Website Admin">Website Admin — Site & User Management</option>
-                  <option value="Sales Manager">Sales Manager — Orders & Customers</option>
-                  <option value="Viewer">Viewer — Read Only Access</option>
+                  <option value="Super Admin">Super Admin </option>
+                  <option value="Website Admin">Website Admin </option>
+                  <option value="Sales Manager">Sales Manager </option>
+                  <option value="Viewer">Viewer </option>
                 </Select>
               </FormControl>
 
@@ -294,7 +450,7 @@ function UserModal({ isOpen, onClose, onSave, user }) {
                   onChange={(e) => setFormData({ ...formData, website: e.target.value })}
                   _focus={{ borderColor: "#D90404" }}
                 >
-                  <option value="Global">Global (All Websites)</option>
+                  <option value="">Select a Website</option>
                   <option value="SITE-101">SITE-101 - Engine City</option>
                   <option value="SITE-102">SITE-102 - Marine Parts</option>
                   <option value="SITE-103">SITE-103 - Truck Solutions</option>
@@ -312,9 +468,9 @@ function UserModal({ isOpen, onClose, onSave, user }) {
                   onChange={(e) => setFormData({ ...formData, status: e.target.value })}
                   _focus={{ borderColor: "#D90404" }}
                 >
-                  <option value="Active">Active - Can login and access system</option>
-                  <option value="Inactive">Inactive - Login disabled</option>
-                  <option value="Suspended">Suspended - Temporarily blocked</option>
+                  <option value="Active">Active </option>
+                  <option value="Inactive">Inactive </option>
+                  <option value="Suspended">Suspended</option>
                 </Select>
               </FormControl>
             </VStack>
