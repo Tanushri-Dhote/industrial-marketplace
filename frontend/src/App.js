@@ -23,58 +23,80 @@ import { Toaster } from 'sonner';
 import ProtectedRoute from './components/common/ProtectedRoute';
 import VerifyLoginPage from './pages/VerifyLoginPage';
 import { UserProvider } from './context/UserContext';
+import CheckoutPage from './pages/CheckoutPage';
+import ThankYouPage from './pages/ThankYouPage';
+import CallSellerPage from './pages/CallSellerPage';
+
+
 
 function App() {
   return (
-     <UserProvider>
-      <Toaster position="top-center" richColors />
-    <Box minH="100vh" display="flex" flexDirection="column">
-      <Header />
-      <Box flex="1">
-        <Routes>
-          <Route path="/" element={<HomePage />} />
-          <Route path="/car-engines" element={<HomePage />} />
-          <Route path="/used-engines" element={<HomePage />} />
-          <Route path="/reconditioned-engines" element={<HomePage />} />
-          <Route path="/gearboxes" element={<HomePage />} />
-          <Route path="/about" element={<AboutPage />} />
-          <Route path="/contact" element={<ContactPage />} />
-          <Route path="terms-and-conditions" element={<TermsPage />} />
-          <Route path="/privacy-policy" element={<PrivacyPage />} />
-          <Route path="/login" element={<LoginPage />} />
-          <Route path="/register" element={<RegisterPage />} />
-          <Route path="/blog" element={<BlogPage />} />
-          <Route path="/blog/:slug" element={<BlogDetailPage />} />
-          <Route path="/forgot-password" element={<ForgotPasswordPage />} />
-          <Route path="/reset-password" element={<ResetPasswordPage />} />
-          <Route path="/products/:id" element={<ProductDetailPage />} />
-          <Route path="/verify-login" element={<VerifyLoginPage />} />
-          <Route path="/dashboard" element={
-            <ProtectedRoute>
-              <DashboardPage />
-            </ProtectedRoute>
-          } />
-          <Route path="/account" element={
-            <ProtectedRoute>
-              <AccountPage />
-            </ProtectedRoute>
-          } />
-          <Route path="/create-quote" element={
-            <ProtectedRoute>
-              <CreateQuotePage />
-            </ProtectedRoute>
-          } />
-          <Route path="/employee" element={
-            <ProtectedRoute>
-              <EmployeePage />
-            </ProtectedRoute>
-          } />
-        </Routes>
+    <UserProvider>
+      <Box minH="100vh" display="flex" flexDirection="column">
+
+        <Header />
+
+        <Box flex="1">
+          <Routes>
+            <Route path="/" element={<HomePage />} />
+            <Route path="/car-engines" element={<HomePage />} />
+            <Route path="/used-engines" element={<HomePage />} />
+            <Route path="/reconditioned-engines" element={<HomePage />} />
+            <Route path="/gearboxes" element={<HomePage />} />
+
+            <Route path="/about" element={<AboutPage />} />
+            <Route path="/contact" element={<ContactPage />} />
+            <Route path="/terms-and-conditions" element={<TermsPage />} />
+            <Route path="/privacy-policy" element={<PrivacyPage />} />
+
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="/register" element={<RegisterPage />} />
+            <Route path="/verify-login" element={<VerifyLoginPage />} />
+
+            <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+            <Route path="/reset-password" element={<ResetPasswordPage />} />
+
+            <Route path="/blog" element={<BlogPage />} />
+            <Route path="/blog/:slug" element={<BlogDetailPage />} />
+
+            <Route path="/products/:id" element={<ProductDetailPage />} />
+
+            <Route path="/dashboard" element={
+              <ProtectedRoute>
+                <DashboardPage />
+              </ProtectedRoute>
+            } />
+
+            <Route path="/account" element={
+              <ProtectedRoute>
+                <AccountPage />
+              </ProtectedRoute>
+            } />
+
+            <Route path="/create-quote" element={
+              <ProtectedRoute>
+                <CreateQuotePage />
+              </ProtectedRoute>
+            } />
+
+            <Route path="/employee" element={
+              <ProtectedRoute>
+                <EmployeePage />
+              </ProtectedRoute>
+            } />
+
+            <Route path="/checkout" element={<CheckoutPage />} />
+            <Route path="/thank-you" element={<ThankYouPage />} />
+            <Route path="/call-seller" element={<CallSellerPage />} />
+          </Routes>
+        </Box>
+
+        <Footer />
+        <Toaster position="top-center" richColors />
       </Box>
-      <Footer />
-    </Box>
     </UserProvider>
   );
 }
+
 
 export default App;

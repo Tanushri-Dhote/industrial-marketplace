@@ -51,10 +51,17 @@ export default function Header() {
 
   // Scroll Effect
   useEffect(() => {
+    let ticking = false;
     const handleScroll = () => {
-      setScrolled(window.scrollY > 80);
+      if (!ticking) {
+        window.requestAnimationFrame(() => {
+          setScrolled(window.scrollY > 20);
+          ticking = false;
+        });
+        ticking = true;
+      }
     };
-    window.addEventListener('scroll', handleScroll);
+    window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
@@ -95,17 +102,25 @@ export default function Header() {
   }
 
   return (
-    <Box as="header" position="sticky" top="0" zIndex="sticky">
+    <Box 
+      as="header" 
+      position="sticky" 
+      top="0" 
+      zIndex="1000"
+      transform="translateZ(0)"
+      backfaceVisibility="hidden"
+    >
 
 
       {/* ==================== MAIN HEADER ==================== */}
       <Box
         bg="white"
-        boxShadow={scrolled ? "0 4px 20px rgba(0,0,0,0.12)" : "0 2px 12px rgba(0,0,0,0.08)"}
+        boxShadow={scrolled ? "0 4px 25px rgba(0,0,0,0.15)" : "0 2px 15px rgba(0,0,0,0.08)"}
         borderBottom="1px solid"
         borderColor="gray.100"
-        py={scrolled ? 3 : 4}
-        transition="all 0.3s ease"
+        py={scrolled ? 2 : 4}
+        transition="padding 0.4s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.4s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.4s ease"
+        willChange="padding, box-shadow"
       >
         <Container maxW="container.xl" px={{ base: 4, md: 6 }}>
           <Flex align="center" justify="space-between" gap={4}>
@@ -113,19 +128,21 @@ export default function Header() {
             {/* Logo with Box */}
             <Link to="/">
               <HStack spacing={2}>
-                <Box
-                  h={scrolled ? "36px" : "50px"}
-                  transition="all 0.3s ease"
-                >
-                  <img
-                    src="/logo_engine.PNG"
-                    alt="All Engines Logo"
-                    style={{
-                      height: "100%",
-                      objectFit: "contain"
-                    }}
-                  />
-                </Box>
+                  <Box
+                    h={scrolled ? "32px" : "50px"}
+                    transition="height 0.4s cubic-bezier(0.4, 0, 0.2, 1)"
+                    willChange="height"
+                  >
+                    <img
+                      src="/logo_engine.PNG"
+                      alt="All Engines Logo"
+                      style={{
+                        height: "100%",
+                        objectFit: "contain",
+                        display: "block"
+                      }}
+                    />
+                  </Box>
             
               </HStack>
             </Link>

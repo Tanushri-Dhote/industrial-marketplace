@@ -29,17 +29,18 @@ import {
   useColorModeValue,
   Spinner,
   Center,
+  useDisclosure,
 } from '@chakra-ui/react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useQuery } from 'react-query';
 import { motion, AnimatePresence } from 'framer-motion';
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
-import { 
-  FaChevronRight, 
-  FaCheckCircle, 
-  FaShippingFast, 
-  FaShieldAlt, 
+import {
+  FaChevronRight,
+  FaCheckCircle,
+  FaShippingFast,
+  FaShieldAlt,
   FaTools,
   FaArrowLeft,
   FaArrowRight,
@@ -51,29 +52,30 @@ import {
 } from 'react-icons/fa';
 import API from '../services/api';
 
+import ConfirmProdutModel from "../components/common/ConfirmProdutModel";
+
 // --- Animated Wrapper ---
 const MotionBox = motion(Box);
 
 const ProductCard = ({ product }) => (
-  <MotionBox 
+  <MotionBox
     as={Link}
-    to={`/products/${product._id}`}
+    to={`/products/${product.slug || product._id}`}
     whileHover={{ y: -5 }}
-    bg="white" 
-    borderRadius="xl" 
-    overflow="hidden" 
-    boxShadow="sm" 
-    border="1px solid" 
+    bg="white"
+    borderRadius="xl"
+    overflow="hidden"
+    boxShadow="sm"
+    border="1px solid"
     borderColor="gray.100"
     p={4}
     minW="220px"
     cursor="pointer"
-    _hover={{ textDecoration: 'none', boxShadow: 'md' }}
-    display="block"
+    _hover={{ textDecoration: 'none' }}
   >
     <Image src={product.images?.[0]} borderRadius="lg" mb={4} h="140px" w="full" objectFit="cover" />
     <VStack align="start" spacing={1}>
-      <Text fontSize="xs" fontWeight="bold" noOfLines={1} color="brand.600" textTransform="uppercase">{product.name}</Text>
+      <Text fontSize="xs" fontWeight="bold" noOfLines={1} color="#D90404" textTransform="uppercase">{product.name}</Text>
       <Badge colorScheme="blue" variant="subtle" fontSize="9px">{product.condition}</Badge>
       <Text fontSize="lg" fontWeight="800">£{product.price?.toLocaleString()}</Text>
       <HStack spacing={1}>
@@ -86,9 +88,9 @@ const ProductCard = ({ product }) => (
 const PriceRow = ({ label, value, isTotal, color = "gray.600" }) => (
   <Flex justify="space-between" align="center" py={isTotal ? 4 : 2}>
     <Text fontWeight={isTotal ? "800" : "600"} fontSize={isTotal ? "lg" : "md"} color={color}>{label}</Text>
-    <Text 
-      fontWeight={isTotal ? "900" : "700"} 
-      fontSize={isTotal ? "3xl" : "md"} 
+    <Text
+      fontWeight={isTotal ? "900" : "700"}
+      fontSize={isTotal ? "3xl" : "md"}
       color={isTotal ? "red.600" : "gray.900"}
     >
       £{value}
@@ -104,12 +106,18 @@ const fetchProduct = async (id) => {
 export default function ProductDetailPage() {
   const { id } = useParams();
   const [selectedImage, setSelectedImage] = useState(0);
-
+  const { isOpen, onOpen, onClose } = useDisclosure();
   const { data: product, isLoading, error } = useQuery(['product', id], () => fetchProduct(id), {
     enabled: !!id,
     retry: 1,
     onSuccess: () => window.scrollTo(0, 0),
   });
+
+  const navigate = useNavigate();
+
+  const handleBuyItNow = () => {
+    navigate('/checkout', { state: { product } });
+  };
 
   const bgColor = "white";
 
@@ -171,17 +179,17 @@ export default function ProductDetailPage() {
 
       <Container maxW="container.xl" py={10}>
         <Grid templateColumns={{ base: "1fr", lg: "repeat(12, 1fr)" }} gap={16}>
-          
+
           {/* LEFT CONTENT */}
           <GridItem colSpan={{ base: 1, lg: 8 }}>
             <VStack spacing={12} align="stretch">
-              
+
               {/* Product Header Refined */}
               <VStack align="start" spacing={5}>
                 <Heading fontSize={{ base: "2xl", md: "4xl" }} fontWeight="900" lineHeight="1.1" color="gray.800">
                   {product.name} With Warranty Supply And Fit Engine
                 </Heading>
-                
+
                 <HStack spacing={8}>
                   <VStack align="start" spacing={0}>
                     <Text fontSize="4xl" fontWeight="900" color="gray.900">
@@ -197,7 +205,7 @@ export default function ProductDetailPage() {
                     </VStack>
                     <VStack align="start" spacing={0}>
                       <Text fontSize="xs" color="gray.400" fontWeight="bold">COMPATIBILITY</Text>
-                      <ChakraLink color="brand.600" fontWeight="800" fontSize="sm">Check Vehicles</ChakraLink>
+                      <ChakraLink color="#D90404" fontWeight="800" fontSize="sm">Check Vehicles</ChakraLink>
                     </VStack>
                   </HStack>
                 </HStack>
@@ -206,14 +214,14 @@ export default function ProductDetailPage() {
               {/* Gallery Section - Cleaner */}
               <Box position="relative">
                 <AnimatePresence mode="wait">
-                  <MotionBox 
+                  <MotionBox
                     key={selectedImage}
                     initial={{ opacity: 0, scale: 0.95 }}
                     animate={{ opacity: 1, scale: 1 }}
                     exit={{ opacity: 0, scale: 0.95 }}
                     transition={{ duration: 0.3 }}
-                    borderRadius="2xl" 
-                    overflow="hidden" 
+                    borderRadius="2xl"
+                    overflow="hidden"
                     boxShadow="2xl"
                   >
                     <Image src={product.images?.[selectedImage]} w="full" h={{ base: "300px", md: "520px" }} objectFit="cover" />
@@ -221,10 +229,10 @@ export default function ProductDetailPage() {
                 </AnimatePresence>
                 <HStack spacing={4} mt={6} justify="start">
                   {product.images?.map((img, idx) => (
-                    <Box 
-                      key={idx} 
-                      cursor="pointer" 
-                      border="3px solid" 
+                    <Box
+                      key={idx}
+                      cursor="pointer"
+                      border="3px solid"
                       borderColor={selectedImage === idx ? 'brand.500' : 'transparent'}
                       borderRadius="xl"
                       overflow="hidden"
@@ -251,8 +259,8 @@ export default function ProductDetailPage() {
                   {product.similarProducts?.map((p, idx) => (
                     <ProductCard key={idx} product={p} />
                   )) || (
-                    <Text fontSize="sm" color="gray.400">Loading similar items...</Text>
-                  )}
+                      <Text fontSize="sm" color="gray.400">Loading similar items...</Text>
+                    )}
                 </HStack>
               </Box>
 
@@ -287,7 +295,7 @@ export default function ProductDetailPage() {
                             <Td fontWeight="600">{item.model}</Td>
                             <Td color="gray.500" fontSize="sm">{item.variant}</Td>
                             <Td fontWeight="700">{item.year}</Td>
-                            <Td color="brand.600" fontWeight="bold" fontSize="xs">{item.engine}</Td>
+                            <Td color="#D90404" fontWeight="bold" fontSize="xs">{item.engine}</Td>
                           </Tr>
                         ))}
                       </Tbody>
@@ -313,7 +321,7 @@ export default function ProductDetailPage() {
                         <HStack><Icon as={FaInfoCircle} /><Text>Quote includes core exchange basis</Text></HStack>
                       </VStack>
                     </VStack>
-                    
+
                     <VStack align="stretch" spacing={6}>
                       <Box>
                         <PriceRow label="Subtotal" value={(product.pricingBreakdown?.item + product.pricingBreakdown?.delivery)?.toLocaleString()} />
@@ -336,29 +344,53 @@ export default function ProductDetailPage() {
           <GridItem colSpan={{ base: 1, lg: 4 }}>
             <Box position="sticky" top="40px">
               <VStack spacing={8} align="stretch">
-                
+
                 {/* Main Action Buttons */}
                 <VStack spacing={4}>
-                  <Button 
-                    bg="brand.600" 
-                    color="white" 
-                    h="75px" 
-                    w="full" 
+                  <Button
+                    bg="#D90404"
+                    color="white"
+                    h="75px"
+                    w="full"
                     _hover={{ bg: "brand.700", transform: "translateY(-2px)", boxShadow: "xl" }}
                     borderRadius="2xl"
                     fontSize="lg"
                     fontWeight="900"
                     boxShadow="lg"
                     as={Link}
-                    to="/create-quote"
                     transition="all 0.3s"
+                    onClick={onOpen}
                   >
                     Confirm car for Custom Quote
                   </Button>
-                  <Button variant="outline" borderColor="gray.200" h="55px" w="full" _hover={{ bg: "gray.50" }} fontWeight="800" borderRadius="xl">Buy It Now</Button>
-                  <Button variant="outline" borderColor="gray.200" h="55px" w="full" _hover={{ bg: "gray.50" }} fontWeight="800" borderRadius="xl">Add to Cart</Button>
-                  <Button variant="outline" borderColor="gray.200" h="55px" w="full" _hover={{ bg: "gray.50" }} fontWeight="800" borderRadius="xl" leftIcon={<FaPhoneAlt />}>Call Seller</Button>
-                </VStack>
+                  <Button
+                    onClick={handleBuyItNow}
+                    variant="outline"
+                    h="55px"
+                    w="full"
+                  >
+                    Buy It Now
+                  </Button>
+                  <Button
+                    onClick={handleBuyItNow}
+                    variant="outline"
+                    h="55px"
+                    w="full"
+                    _hover={{ bg: "gray.50" }}
+                    fontWeight="800"
+                  >Add to Cart</Button>
+                  <Button
+                    variant="outline"
+                    h="55px"
+                    w="full"
+                    _hover={{ bg: "gray.50" }}
+                    fontWeight="800"
+                    leftIcon={<FaPhoneAlt />}
+                    as={Link}
+                    to="/call-seller"
+                  >
+                    Call Seller
+                  </Button>                </VStack>
 
                 {/* Trust & Activity Card */}
                 <Box p={8} borderRadius="2xl" border="1px solid" borderColor="gray.100" bg="white" boxShadow="sm">
@@ -389,7 +421,7 @@ export default function ProductDetailPage() {
 
                 {/* Offer Notice - More Subtle */}
                 <Box border="2px dashed" borderColor="red.200" bg="red.50" p={5} borderRadius="2xl" textAlign="center">
-                   <Text color="red.700" fontWeight="900" fontSize="sm">LIMITED OFFER: 30 days left</Text>
+                  <Text color="red.700" fontWeight="900" fontSize="sm">LIMITED OFFER: 30 days left</Text>
                 </Box>
 
                 {/* Meta Details */}
@@ -404,7 +436,7 @@ export default function ProductDetailPage() {
                   </Flex>
                   <Flex justify="space-between">
                     <Text fontSize="xs" color="gray.400" fontWeight="bold">RETURNS</Text>
-                    <Text fontSize="xs" fontWeight="900" color="brand.600">ACCEPTED</Text>
+                    <Text fontSize="xs" fontWeight="900" color="#D90404">ACCEPTED</Text>
                   </Flex>
                 </VStack>
               </VStack>
@@ -413,6 +445,10 @@ export default function ProductDetailPage() {
 
         </Grid>
       </Container>
+
+
+      {/*  */}
+      <ConfirmProdutModel isOpen={isOpen} onClose={onClose} />
     </Box>
   );
 }
