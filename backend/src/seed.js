@@ -6,7 +6,8 @@ const Category = require("./models/Category");
 const Website = require("./models/Website");
 
 dns.setServers(["1.1.1.1"]);
-dotenv.config();
+const path = require("path");
+dotenv.config({ path: path.resolve(__dirname, "../.env") });
 
 const engines = [
 	{
