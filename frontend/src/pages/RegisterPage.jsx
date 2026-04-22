@@ -55,7 +55,7 @@ export default function RegisterPage() {
   const [searchParams] = useSearchParams();
 
   // Resolve site_id from URL param → env var → null
-  const siteId = searchParams.get('site') || process.env.REACT_APP_SITE_ID || null;
+  const siteId = searchParams.get('site') || import.meta.env.VITE_SITE_ID || null;
 
   // Fetch site name to display in the badge
   useEffect(() => {
