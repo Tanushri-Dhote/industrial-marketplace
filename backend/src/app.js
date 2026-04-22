@@ -4,7 +4,12 @@ const cors = require("cors");
 const app = express();
 
 // middleware
-app.use(cors());
+app.use(
+	cors({
+		origin: process.env.CORS_ORIGIN || "*",
+		credentials: true,
+	}),
+);
 app.use(express.json());
 
 // 🔥 ADD THIS (import routes)
@@ -19,7 +24,7 @@ app.use("/api/blogs", blogRoutes);
 
 // test route
 app.get("/", (req, res) => {
-  res.send("API is running...");
+	res.send("API is running...");
 });
 
 module.exports = app;
