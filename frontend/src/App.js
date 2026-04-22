@@ -19,9 +19,11 @@ import EmployeePage from './pages/EmployeePage';
 import ProductDetailPage from './pages/ProductDetailPage';
 import ProtectedRoute from './components/common/ProtectedRoute';
 import VerifyLoginPage from './pages/VerifyLoginPage';
+import { UserProvider } from './context/UserContext';
 
 function App() {
   return (
+     <UserProvider>
     <Box minH="100vh" display="flex" flexDirection="column">
       <Header />
       <Box flex="1">
@@ -65,6 +67,7 @@ function App() {
       </Box>
       <Footer />
     </Box>
+    </UserProvider>
   );
 }
 

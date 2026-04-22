@@ -60,27 +60,18 @@ export default function DashboardPage() {
 
   const allModules = [
     {
-      id: 'overview', name: 'Overview', icon: FiServer, component: () => (
-        <VStack spacing={6} w="full">
-          {showExpiredNotice && <MembershipExpiredCard />}
-          {!showExpiredNotice && (
-            <ModuleFrame
-              icon={FiServer}
-              title={`Welcome ${user.name || 'Admin'}`}
-              description={`System Role: ${role} | Business: ${user.businessName || 'N/A'}`}
-            >
-              <Box textAlign="center" py={10}>
-                <Text color={secTextColor} fontSize="18px" fontWeight="600">
-                  You are currently viewing the system overview as a {role}.
-                  {role === 'Super Admin' ? ' You have full diagnostic access across all tenants.' : ' You are managing access for your assigned website.'}
-                </Text>
-              </Box>
-            </ModuleFrame>
-          )}
-        </VStack>
+      id: 'users',
+      name: 'Users / Admins',
+      icon: FiUsers,
+      roles: ['Super Admin'],
+      component: (props) => (
+        <UsersModule
+          {...props}
+          dashboardUser={user}
+          role={role}
+        />
       )
     },
-    { id: 'users', name: 'Users / Admins', icon: FiUsers, component: UsersModule, roles: ['Super Admin'] },
     { id: 'websites', name: 'Websites / Tenants', icon: FiServer, component: WebsitesModule, roles: ['Super Admin'] },
     { id: 'engines', name: 'Products / Engines', icon: FiPackage, component: EnginesModule, roles: ['Super Admin', 'Website Admin', 'Viewer'] },
     { id: 'blogs', name: 'Blogs / Content', icon: FiBookOpen, component: BlogsModule, roles: ['Super Admin', 'Website Admin', 'Viewer'] },
@@ -235,8 +226,12 @@ export default function DashboardPage() {
           </GridItem>
 
           <GridItem>
-            <Box minH="600px" transition="all 0.4s">
-              <ActiveComponent />
+            <Box minH="600px">
+              {typeof ActiveComponent === "function" ? (
+                <ActiveComponent user={user} role={role} />
+              ) : (
+                <ActiveComponent />
+              )}
             </Box>
           </GridItem>
         </Grid>
