@@ -9,7 +9,6 @@ COPY . .
 
 RUN npm run build
 
-# install caddy (since you’re using it)
-RUN apk add --no-cache caddy
-
-CMD ["caddy", "run", "--config", "/app/Caddyfile", "--adapter", "caddyfile"]
+# Remove Caddy and use a simple preview or custom CMD if needed
+EXPOSE 3000
+CMD ["npm", "run", "preview"]
