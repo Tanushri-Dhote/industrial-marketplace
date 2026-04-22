@@ -14,6 +14,7 @@ import {
   Center,
 } from '@chakra-ui/react';
 import { FaCheckCircle, FaTruck } from 'react-icons/fa';
+import { Link } from 'react-router-dom';
 import API from '../services/api';
 
 export default function TopEnginesSection({ category }) {
@@ -128,7 +129,9 @@ export default function TopEnginesSection({ category }) {
           {engines.length > 0 ? (
             <SimpleGrid columns={{ base: 1, sm: 2, md: 3, lg: 5 }} spacing={4} w="full">
               {engines.map((engine) => (
-                <EngineCard key={engine._id} engine={engine} />
+                <Box as={Link} to={`/products/${engine.slug || engine._id}`} key={engine._id} _hover={{ textDecoration: 'none' }}>
+                  <EngineCard engine={engine} />
+                </Box>
               ))}
             </SimpleGrid>
           ) : (

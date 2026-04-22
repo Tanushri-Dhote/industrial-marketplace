@@ -29,12 +29,14 @@ require("./models/Website");
 require("./models/User");
 require("./models/Blog");
 require("./models/Permission");
+require("./models/Registration");
 
 // Register Routes
 fastify.register(require("./routes/fastify/auth.routes"), { prefix: "/api/auth" });
 fastify.register(require("./routes/fastify/product.routes"), { prefix: "/api/products" });
 fastify.register(require("./routes/fastify/blog.routes"), { prefix: "/api/blogs" });
 fastify.register(require("./routes/fastify/employee.routes"), { prefix: "/api/employees" });
+fastify.register(require("./routes/fastify/registration.routes"), { prefix: "/api" });
 
 // Root route
 fastify.get("/", async (request, reply) => {
