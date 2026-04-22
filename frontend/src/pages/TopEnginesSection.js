@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { Link as RouterLink } from 'react-router-dom';
 import {
   Box,
   Container,
@@ -12,6 +12,7 @@ import {
   Image,
   Spinner,
   Center,
+  Link,
 } from '@chakra-ui/react';
 import { FaCheckCircle, FaTruck } from 'react-icons/fa';
 import API from '../services/api';
@@ -27,9 +28,6 @@ export default function TopEnginesSection({ category }) {
         setLoading(true);
         const { data } = await API.get('/products');
         
-        // Filter by category if needed
-        // Assuming backend returns products with category.name or similar
-        // For now, filtering based on matching the 'category' prop if it's not 'Industrial Engines'
         let filtered = data;
         if (category && category !== 'Industrial Engines') {
           filtered = data.filter(p => 
@@ -52,6 +50,8 @@ export default function TopEnginesSection({ category }) {
 
   const EngineCard = ({ engine }) => (
     <VStack 
+      as={RouterLink}
+      to={`/products/${engine._id}`}
       align="start" 
       spacing={2} 
       bg="white" 
@@ -60,8 +60,10 @@ export default function TopEnginesSection({ category }) {
       boxShadow="sm" 
       border="1px solid" 
       borderColor="gray.100" 
-      _hover={{ boxShadow: "md", borderColor: "blue.200" }}
+      _hover={{ boxShadow: "md", borderColor: "blue.200", textDecoration: "none" }}
       transition="all 0.2s"
+      cursor="pointer"
+      w="full"
     >
       <Box w="full" h="120px" borderRadius="md" overflow="hidden" bg="gray.50">
         <Image 
