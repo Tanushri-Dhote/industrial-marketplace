@@ -4,10 +4,23 @@ const Product = require("../models/Product");
 exports.getProducts = async (request, reply) => {
 	try {
 		const filter = {};
+		const { make, limit } = request.query || {};
+
+		if (make) {
+			filter.make = make;
+		}
+
 		if (request.tenantId) {
 			filter.website_id = request.tenantId;
 		}
-		const products = await Product.find(filter).populate("category");
+
+		let query = Product.find(filter).populate("category").sort({ price: 1, createdAt: -1 });
+
+		if (limit) {
+			query = query.limit(Number(limit));
+		}
+
+		const products = await query;
 		return { success: true, data: products };
 	} catch (error) {
 		reply.status(500).send({ message: error.message });

@@ -34,6 +34,7 @@ require("./models/Permission");
 require("./models/Registration");
 require("./models/Lead");
 require("./models/PartType");
+require("./models/Brand");
 require("./models/ContactSubmission");
 
 // Register Routes
@@ -48,6 +49,7 @@ fastify.register(require("./routes/fastify/contact.routes"), { prefix: "/api/con
 fastify.register(require("./routes/fastify/stats.routes"), { prefix: "/api/stats" });
 fastify.register(require("./routes/fastify/admin.routes"), { prefix: "/api" });
 fastify.register(require("./routes/fastify/partType.routes"), { prefix: "/api/part-types" });
+fastify.register(require("./routes/fastify/brand.routes"), { prefix: "/api/brands" });
 
 // Root route
 fastify.get("/", async (request, reply) => {

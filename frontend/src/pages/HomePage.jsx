@@ -1,38 +1,39 @@
 // src/pages/HomePage.jsx
-import React from 'react';
-import { useLocation } from 'react-router-dom';
-import HeroSection from './HeroSection';
-import ReviewsSection from './ReviewsSection';
-import TrustBar from './TrustBar';
-import EasyStepsSection from './EasyStepsSection';
-import VehicleSelectorSection from './VehicleSelectorSection';
-import CarMakeSelectorSection from './CarMakeSelectorSection';
-import Areacbar from './Areabar';
-import TopEnginesSection from './TopEnginesSection';
-import FAQSection from './FAQSection';
+import React from "react";
+import { useLocation, useSearchParams } from "react-router-dom";
+import HeroSection from "./HeroSection";
+import ReviewsSection from "./ReviewsSection";
+import TrustBar from "./TrustBar";
+import EasyStepsSection from "./EasyStepsSection";
+import VehicleSelectorSection from "./VehicleSelectorSection";
+import CarMakeSelectorSection from "./CarMakeSelectorSection";
+import Areacbar from "./Areabar";
+import TopEnginesSection from "./TopEnginesSection";
+import FAQSection from "./FAQSection";
 
 export default function HomePage() {
-  const location = useLocation();
-  
-  const categoryMap = {
-    '/car-engines': 'Car Engines',
-    '/used-engines': 'Used Engines',
-    '/reconditioned-engines': 'Reconditioned Engines',
-    '/gearboxes': 'Gearboxes'
-  };
+	const location = useLocation();
+	const [searchParams] = useSearchParams();
 
-  const category = categoryMap[location.pathname] || 'Industrial Engines';
+	const categoryMap = {
+		"/car-engines": "Car Engines",
+		"/used-engines": "Used Engines",
+		"/reconditioned-engines": "Reconditioned Engines",
+		"/gearboxes": "Gearboxes",
+	};
 
-  return (
-    <>
-      <HeroSection category={category} />
-      <TrustBar />
-      <EasyStepsSection />
-      <CarMakeSelectorSection />
-      <TopEnginesSection category={category} />
-      <Areacbar />
-      <ReviewsSection />
-      <FAQSection />
-    </>
-  );
+	const category = categoryMap[location.pathname] || "Industrial Engines";
+
+	return (
+		<>
+			<HeroSection category={category} />
+			<TrustBar />
+			<EasyStepsSection />
+			<CarMakeSelectorSection />
+			{!searchParams.get("brand") && <TopEnginesSection category={category} />}
+			<Areacbar />
+			<ReviewsSection />
+			<FAQSection />
+		</>
+	);
 }

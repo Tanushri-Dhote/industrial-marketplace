@@ -5,6 +5,8 @@ const Product = require("./models/Product");
 const Category = require("./models/Category");
 const Website = require("./models/Website");
 const PartType = require("./models/PartType");
+const Brand = require("./models/Brand");
+const { buildBrandDocs, buildBrandProducts } = require("./data/brandCatalog");
 
 dns.setServers(["1.1.1.1"]);
 const path = require("path");
@@ -162,8 +164,10 @@ async function seed() {
 
 		// Clear collections
 		await Product.deleteMany({});
+		await Brand.deleteMany({});
 		await Category.deleteMany({});
 		await Website.deleteMany({});
+		await PartType.deleteMany({});
 		console.log("Cleared existing data...");
 
 		// Create Website
@@ -180,6 +184,10 @@ async function seed() {
 		});
 		console.log("Created Category:", category.name);
 
+		const brandDocs = buildBrandDocs();
+		await Brand.insertMany(brandDocs);
+		console.log("Created Brands:", brandDocs.length);
+
 		const partTypeData = partTypes.map((pt) => ({
 			...pt,
 			slug: pt.name.toLowerCase().replace(/ /g, "-"),
@@ -188,32 +196,42 @@ async function seed() {
 		await PartType.insertMany(partTypeData);
 		console.log("Created Part Types:", partTypeData.length);
 
+		const brandProducts = buildBrandProducts({ categoryId: category._id, websiteId: website._id });
+
 		// Seed Products
-		const productData = engines.map((engine) => ({
-			...engine,
-			slug: engine.name.toLowerCase().replace(/ /g, "-").replace(/[^\w-]+/g, ""),
-			category: category._id,
-			website_id: website._id,
-			seller: {
-				name: "Premium Engine Suppliers",
-				rating: "4.8",
-				icon: "https://example.com/seller-icon.png",
-			},
-			images: ["https://images.unsplash.com/photo-1486006920555-c77dcf18193c?auto=format&fit=crop&w=800&q=80"],
-			shipping: {
-				location: "United Kingdom",
-				delivery: "2-3 Working Days",
-				returns: "30 Days Returns",
-			},
-			pricingBreakdown: {
-				item: engine.price,
-				delivery: 50,
-				vatRate: 0.2,
-			},
-		}));
+		const productData = [
+			...engines.map((engine) => ({
+				...engine,
+				slug: engine.name
+					.toLowerCase()
+					.replace(/ /g, "-")
+					.replace(/[^\w-]+/g, ""),
+				category: category._id,
+				website_id: website._id,
+				seller: {
+					name: "Premium Engine Suppliers",
+					rating: "4.8",
+					icon: "https://example.com/seller-icon.png",
+				},
+				images: [
+					"https://images.unsplash.com/photo-1486006920555-c77dcf18193c?auto=format&fit=crop&w=800&q=80",
+				],
+				shipping: {
+					location: "United Kingdom",
+					delivery: "2-3 Working Days",
+					returns: "30 Days Returns",
+				},
+				pricingBreakdown: {
+					item: engine.price,
+					delivery: 50,
+					vatRate: 0.2,
+				},
+			})),
+			...brandProducts,
+		];
 
 		await Product.insertMany(productData);
-		console.log(`Successfully seeded 10 engine products!`);
+		console.log(`Successfully seeded ${productData.length} engine products!`);
 
 		await mongoose.disconnect();
 		process.exit(0);
