@@ -9,6 +9,10 @@ import {
 	Button,
 	IconButton,
 	HStack,
+	Menu,
+	MenuButton,
+	MenuList,
+	MenuItem,
 	Modal,
 	ModalOverlay,
 	ModalContent,
@@ -31,9 +35,10 @@ import {
 	SimpleGrid,
 	Spinner,
 	Center,
+	Portal,
 } from "@chakra-ui/react";
-import { AddIcon, EditIcon, DeleteIcon, SearchIcon } from "@chakra-ui/icons";
-import { Users } from "lucide-react";
+import { AddIcon, EditIcon, DeleteIcon, SearchIcon, LockIcon, EmailIcon } from "@chakra-ui/icons";
+import { Users, ShieldCheck, Settings } from "lucide-react";
 import { toast } from "sonner";
 import ModuleFrame from "./ModuleFrame";
 import API from "../../services/api";
@@ -68,19 +73,28 @@ const roleColorScheme = (role) =>
 
 // ─── Main Component ───────────────────────────────────────────────────────────
 export default function UsersModule({ moduleId }) {
+	const currentUser = JSON.parse(localStorage.getItem("user") || "{}");
+	const isSuperAdmin = currentUser.role === "super_admin";
+
 	const [users, setUsers] = useState([]);
 	const [websites, setWebsites] = useState([]);
 	const [isLoading, setIsLoading] = useState(true);
 	const [editingUser, setEditingUser] = useState(null);
 	const [searchTerm, setSearchTerm] = useState("");
+	const [statusFilter, setStatusFilter] = useState("All");
+
 	const { isOpen, onOpen, onClose } = useDisclosure();
+	const { isOpen: isPwOpen, onOpen: onPwOpen, onClose: onPwClose } = useDisclosure();
+	const [resetTarget, setResetTarget] = useState(null);
+	const [newPw, setNewPw] = useState("");
 
 	useEffect(() => {
 		fetchWebsites();
 	}, []);
+
 	useEffect(() => {
 		fetchUsers();
-	}, [searchTerm, moduleId]);
+	}, [searchTerm, moduleId, statusFilter]);
 
 	const fetchWebsites = async () => {
 		try {
@@ -97,10 +111,15 @@ export default function UsersModule({ moduleId }) {
 			const res = await API.get("/employees", { params: { search: searchTerm } });
 			const adminRoles = ["super_admin", "admin", "website_manager", "sales_manager"];
 
-			const filtered = res.data.data.filter((u) => {
+			let filtered = res.data.data.filter((u) => {
 				const isAdmin = adminRoles.includes(u.role);
 				return moduleId === "admins" ? isAdmin : !isAdmin;
 			});
+
+			if (statusFilter !== "All") {
+				const targetActive = statusFilter === "Active";
+				filtered = filtered.filter((u) => u.isActive === targetActive);
+			}
 
 			const mappedData = filtered.map((u) => ({
 				id: u._id,
@@ -112,7 +131,10 @@ export default function UsersModule({ moduleId }) {
 				website_id: u.website_id?._id || u.website_id || "",
 				websiteName: u.website_id?.name || "—",
 				status: u.isActive ? "Active" : "Inactive",
-				joinDate: new Date(u.createdAt).toISOString().split("T")[0],
+				verified: Boolean(u.loginVerified),
+				joinDate: u.createdAt ? new Date(u.createdAt).toISOString().split("T")[0] : "—",
+				lastLogin: u.lastLogin ? new Date(u.lastLogin).toLocaleString() : "Never",
+				lastIp: u.lastIp || "—",
 			}));
 			setUsers(mappedData);
 		} catch (error) {
@@ -135,12 +157,48 @@ export default function UsersModule({ moduleId }) {
 				});
 				toast.success("User updated successfully");
 			} else {
-				toast.info("Use the registration page to add new users.");
+				// Use the new invite system
+				await API.post("/admin/invite-staff", {
+					email: userData.email,
+					role: mapRoleToBackend(userData.role),
+					website_id: userData.website_id || null,
+				});
+				toast.success(`Invitation sent to ${userData.email}`);
 			}
 			fetchUsers();
 			onClose();
 		} catch (error) {
-			toast.error(error.response?.data?.message || "Update failed");
+			toast.error(error.response?.data?.message || "Operation failed");
+		}
+	};
+
+	const handleResetPassword = async () => {
+		if (newPw.length < 6) {
+			toast.error("Password must be at least 6 characters");
+			return;
+		}
+		try {
+			await API.post("/admin/reset-password", {
+				userId: resetTarget.id,
+				newPassword: newPw,
+			});
+			toast.success(`Password reset for ${resetTarget.name}`);
+			setNewPw("");
+			onPwClose();
+		} catch (error) {
+			toast.error(error.response?.data?.message || "Reset failed");
+		}
+	};
+
+	const handleSendInvite = async (user) => {
+		try {
+			await API.post("/admin/invite-staff", {
+				email: user.email,
+				role: mapRoleToBackend(user.role),
+			});
+			toast.success(`Invite resent to ${user.email}`);
+		} catch (error) {
+			toast.error("Failed to send invite");
 		}
 	};
 
@@ -165,11 +223,7 @@ export default function UsersModule({ moduleId }) {
 		}
 	};
 
-	const filteredUsers = users.filter(
-		(u) =>
-			u.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-			u.email.toLowerCase().includes(searchTerm.toLowerCase()),
-	);
+	const filteredUsers = users; // Already filtered in fetchUsers now
 
 	const isAdminsMode = moduleId === "admins";
 
@@ -183,36 +237,52 @@ export default function UsersModule({ moduleId }) {
 					: "View and manage registered customers and marketplace members assigned to specific sites."
 			}
 		>
-			<HStack justify="space-between" mb={6}>
-				<InputGroup maxW="300px">
-					<InputLeftElement pointerEvents="none">
-						<SearchIcon color="gray.300" />
-					</InputLeftElement>
-					<Input
-						placeholder="Search users..."
-						value={searchTerm}
-						onChange={(e) => setSearchTerm(e.target.value)}
-						fontSize="14px"
+			<HStack justify="space-between" mb={6} spacing={4}>
+				<HStack spacing={4} flex="1">
+					<InputGroup maxW="300px">
+						<InputLeftElement pointerEvents="none">
+							<SearchIcon color="gray.300" />
+						</InputLeftElement>
+						<Input
+							placeholder="Search users..."
+							value={searchTerm}
+							onChange={(e) => setSearchTerm(e.target.value)}
+							fontSize="14px"
+							h="42px"
+							borderRadius="lg"
+						/>
+					</InputGroup>
+					<Select
+						maxW="180px"
 						h="42px"
 						borderRadius="lg"
-					/>
-				</InputGroup>
-				<Button
-					leftIcon={<AddIcon />}
-					bg="#D90404"
-					color="white"
-					_hover={{ bg: "#c74848" }}
-					onClick={() => {
-						setEditingUser(null);
-						onOpen();
-					}}
-					fontSize="14px"
-					px={6}
-					h="42px"
-					borderRadius="lg"
-				>
-					Add User
-				</Button>
+						fontSize="14px"
+						value={statusFilter}
+						onChange={(e) => setStatusFilter(e.target.value)}
+					>
+						<option value="All">All Status</option>
+						<option value="Active">Active</option>
+						<option value="Inactive">Inactive</option>
+					</Select>
+				</HStack>
+				{isSuperAdmin && (
+					<Button
+						leftIcon={<AddIcon />}
+						bg="#D90404"
+						color="white"
+						_hover={{ bg: "#c74848" }}
+						onClick={() => {
+							setEditingUser(null);
+							onOpen();
+						}}
+						fontSize="14px"
+						px={6}
+						h="42px"
+						borderRadius="lg"
+					>
+						{isAdminsMode ? "Invite Staff" : "Add User"}
+					</Button>
+				)}
 			</HStack>
 
 			<Box overflowX="auto">
@@ -220,19 +290,22 @@ export default function UsersModule({ moduleId }) {
 					<Thead>
 						<Tr>
 							<Th fontSize="11px" fontWeight="800" textTransform="uppercase" letterSpacing="1px">
-								Name
-							</Th>
-							<Th fontSize="11px" fontWeight="800" textTransform="uppercase" letterSpacing="1px">
-								Email
+								User
 							</Th>
 							<Th fontSize="11px" fontWeight="800" textTransform="uppercase" letterSpacing="1px">
 								Role
 							</Th>
 							<Th fontSize="11px" fontWeight="800" textTransform="uppercase" letterSpacing="1px">
-								Business
+								Tenant/Site
 							</Th>
 							<Th fontSize="11px" fontWeight="800" textTransform="uppercase" letterSpacing="1px">
-								Site
+								Joined
+							</Th>
+							<Th fontSize="11px" fontWeight="800" textTransform="uppercase" letterSpacing="1px">
+								Last Login & IP
+							</Th>
+							<Th fontSize="11px" fontWeight="800" textTransform="uppercase" letterSpacing="1px">
+								Verified
 							</Th>
 							<Th fontSize="11px" fontWeight="800" textTransform="uppercase" letterSpacing="1px">
 								Status
@@ -245,12 +318,12 @@ export default function UsersModule({ moduleId }) {
 					<Tbody>
 						{isLoading ? (
 							<Tr>
-								<Td colSpan={7}>
+								<Td colSpan={8}>
 									<Center py={10}>
 										<VStack spacing={3}>
 											<Spinner color="#D90404" size="lg" thickness="4px" />
 											<Text fontWeight="600" color="gray.500" fontSize="14px">
-												Loading users...
+												Loading records...
 											</Text>
 										</VStack>
 									</Center>
@@ -258,12 +331,12 @@ export default function UsersModule({ moduleId }) {
 							</Tr>
 						) : filteredUsers.length === 0 ? (
 							<Tr>
-								<Td colSpan={7}>
+								<Td colSpan={8}>
 									<Center py={10}>
 										<VStack spacing={2}>
 											<Icon as={Users} boxSize={8} color="gray.300" />
 											<Text color="gray.500" fontWeight="600">
-												No users found
+												No records found
 											</Text>
 										</VStack>
 									</Center>
@@ -272,11 +345,20 @@ export default function UsersModule({ moduleId }) {
 						) : (
 							filteredUsers.map((user) => (
 								<Tr key={user.id} _hover={{ bg: "gray.50" }}>
-									<Td fontSize="13px" fontWeight="700">
-										{user.name}
-									</Td>
-									<Td fontSize="12px" color="gray.600">
-										{user.email}
+									<Td>
+										<VStack align="start" spacing={0.5}>
+											<HStack spacing={2}>
+												<Text fontSize="13px" fontWeight="700">
+													{user.name}
+												</Text>
+												{user.role === "Super Admin" && (
+													<Icon as={ShieldCheck} color="red.500" boxSize={3} />
+												)}
+											</HStack>
+											<Text fontSize="12px" color="gray.600">
+												{user.email}
+											</Text>
+										</VStack>
 									</Td>
 									<Td>
 										<Badge
@@ -289,11 +371,34 @@ export default function UsersModule({ moduleId }) {
 											{user.role}
 										</Badge>
 									</Td>
-									<Td fontSize="12px" color="gray.500">
-										{user.business_name}
-									</Td>
 									<Td fontSize="12px" fontWeight="600" color="gray.700">
-										{user.websiteName}
+										<Badge variant="outline" fontSize="10px" borderRadius="full">
+											{user.websiteName}
+										</Badge>
+									</Td>
+									<Td fontSize="12px" color="gray.500">
+										{user.joinDate}
+									</Td>
+									<Td>
+										<VStack align="start" spacing={0.5}>
+											<Text fontSize="12px" color="gray.500" isTruncated maxW="180px">
+												{user.lastLogin}
+											</Text>
+											<Text fontSize="11px" color="gray.400" isTruncated maxW="180px">
+												IP: {user.lastIp}
+											</Text>
+										</VStack>
+									</Td>
+									<Td>
+										<Badge
+											colorScheme={user.verified ? "green" : "yellow"}
+											variant={user.verified ? "subtle" : "outline"}
+											fontSize="11px"
+											borderRadius="full"
+											px={3}
+										>
+											{user.verified ? "Verified" : "Unverified"}
+										</Badge>
 									</Td>
 									<Td>
 										<Badge
@@ -301,34 +406,76 @@ export default function UsersModule({ moduleId }) {
 											fontSize="11px"
 											borderRadius="full"
 											px={3}
-											cursor="pointer"
-											onClick={() => handleToggleStatus(user.id)}
-											_hover={{ opacity: 0.7 }}
+											cursor={isSuperAdmin ? "pointer" : "default"}
+											onClick={() => isSuperAdmin && handleToggleStatus(user.id)}
+											_hover={isSuperAdmin ? { opacity: 0.7 } : {}}
 										>
 											{user.status}
 										</Badge>
 									</Td>
 									<Td>
-										<HStack spacing={1}>
-											<IconButton
-												icon={<EditIcon />}
+										<Menu placement="bottom-end" isLazy>
+											<MenuButton
+												as={IconButton}
+												icon={<Settings size={14} />}
 												size="sm"
 												variant="ghost"
-												onClick={() => {
-													setEditingUser(user);
-													onOpen();
+												aria-label="User actions"
+												_hover={{
+													bg: "gray.100",
+													"& svg": { transform: "rotate(90deg)" },
 												}}
-												aria-label="Edit User"
+												sx={{
+													"& svg": {
+														transition: "transform 0.2s ease",
+													},
+												}}
 											/>
-											<IconButton
-												icon={<DeleteIcon />}
-												size="sm"
-												variant="ghost"
-												colorScheme="red"
-												onClick={() => handleDelete(user.id)}
-												aria-label="Delete User"
-											/>
-										</HStack>
+											<Portal>
+												<MenuList fontSize="13px">
+													<MenuItem
+														icon={<EditIcon />}
+														onClick={() => {
+															setEditingUser(user);
+															onOpen();
+														}}
+													>
+														Edit user
+													</MenuItem>
+													{isSuperAdmin && (
+														<MenuItem
+															icon={<LockIcon />}
+															onClick={() => handleToggleStatus(user.id)}
+														>
+															{user.status === "Active" ? "Deactivate user" : "Activate user"}
+														</MenuItem>
+													)}
+													{isSuperAdmin && isAdminsMode && (
+														<MenuItem
+															icon={<LockIcon />}
+															onClick={() => {
+																setResetTarget(user);
+																onPwOpen();
+															}}
+														>
+															Reset password
+														</MenuItem>
+													)}
+													{isSuperAdmin && isAdminsMode && (
+														<MenuItem icon={<EmailIcon />} onClick={() => handleSendInvite(user)}>
+															Resend invite
+														</MenuItem>
+													)}
+													<MenuItem
+														icon={<DeleteIcon />}
+														color="red.600"
+														onClick={() => handleDelete(user.id)}
+													>
+														Delete user
+													</MenuItem>
+												</MenuList>
+											</Portal>
+										</Menu>
 									</Td>
 								</Tr>
 							))
@@ -343,13 +490,55 @@ export default function UsersModule({ moduleId }) {
 				onSave={handleSave}
 				user={editingUser}
 				websites={websites}
+				isAdminsMode={isAdminsMode}
 			/>
+
+			{/* Password Reset Modal */}
+			<Modal isOpen={isPwOpen} onClose={onPwClose} isCentered size="sm">
+				<ModalOverlay backdropFilter="blur(5px)" />
+				<ModalContent borderRadius="2xl">
+					<ModalHeader fontSize="18px">Reset Password</ModalHeader>
+					<ModalCloseButton />
+					<ModalBody>
+						<VStack align="stretch" spacing={4}>
+							<Text fontSize="14px">
+								Set a new password for <br />
+								<strong>{resetTarget?.name}</strong>
+							</Text>
+							<FormControl>
+								<FormLabel fontSize="12px">New Password</FormLabel>
+								<Input
+									type="password"
+									value={newPw}
+									onChange={(e) => setNewPw(e.target.value)}
+									placeholder="Min 6 characters"
+									borderRadius="xl"
+								/>
+							</FormControl>
+						</VStack>
+					</ModalBody>
+					<ModalFooter>
+						<Button variant="ghost" mr={3} onClick={onPwClose} fontSize="14px">
+							Cancel
+						</Button>
+						<Button
+							bg="#D90404"
+							color="white"
+							_hover={{ bg: "#c74848" }}
+							onClick={handleResetPassword}
+							fontSize="14px"
+						>
+							Reset Password
+						</Button>
+					</ModalFooter>
+				</ModalContent>
+			</Modal>
 		</ModuleFrame>
 	);
 }
 
 // ─── User Modal ───────────────────────────────────────────────────────────────
-function UserModal({ isOpen, onClose, onSave, user, websites }) {
+function UserModal({ isOpen, onClose, onSave, user, websites, isAdminsMode }) {
 	const [formData, setFormData] = useState({
 		name: "",
 		email: "",
@@ -398,10 +587,14 @@ function UserModal({ isOpen, onClose, onSave, user, websites }) {
 						<Icon as={Users} boxSize={7} />
 						<VStack align="flex-start" spacing={0}>
 							<ModalHeader fontSize="22px" fontWeight="800" p={0}>
-								{user ? "Edit User" : "Add Team Member"}
+								{user ? "Edit User" : isAdminsMode ? "Invite Staff" : "Add User"}
 							</ModalHeader>
 							<Text opacity={0.7} fontSize="13px">
-								{user ? "Update user info, role, and site assignment" : "Create a new user account"}
+								{user
+									? "Update user info, role, and site assignment"
+									: isAdminsMode
+										? "Send an entry invitation to a new staff member"
+										: "Manually add a new marketplace customer"}
 							</Text>
 						</VStack>
 					</HStack>
@@ -414,21 +607,7 @@ function UserModal({ isOpen, onClose, onSave, user, websites }) {
 						<VStack spacing={5} align="stretch">
 							<FormControl isRequired>
 								<FormLabel fontSize="12px" fontWeight="700" color="gray.600">
-									FULL NAME
-								</FormLabel>
-								<Input
-									value={formData.name}
-									onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-									placeholder="John Smith"
-									h="44px"
-									borderRadius="xl"
-									fontSize="14px"
-									_focus={{ borderColor: "#D90404", boxShadow: "0 0 0 3px rgba(217,4,4,0.1)" }}
-								/>
-							</FormControl>
-							<FormControl isRequired>
-								<FormLabel fontSize="12px" fontWeight="700" color="gray.600">
-									EMAIL ADDRESS
+									{isAdminsMode && !user ? "RECIPIENT EMAIL" : "EMAIL ADDRESS"}
 								</FormLabel>
 								<Input
 									type="email"
@@ -438,12 +617,31 @@ function UserModal({ isOpen, onClose, onSave, user, websites }) {
 									h="44px"
 									borderRadius="xl"
 									fontSize="14px"
+									isDisabled={!!user} // Email often shouldn't change easily
 									_focus={{ borderColor: "#D90404", boxShadow: "0 0 0 3px rgba(217,4,4,0.1)" }}
 								/>
 							</FormControl>
+
+							{(!isAdminsMode || user) && (
+								<FormControl isRequired={!isAdminsMode}>
+									<FormLabel fontSize="12px" fontWeight="700" color="gray.600">
+										FULL NAME
+									</FormLabel>
+									<Input
+										value={formData.name}
+										onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+										placeholder="John Smith"
+										h="44px"
+										borderRadius="xl"
+										fontSize="14px"
+										_focus={{ borderColor: "#D90404", boxShadow: "0 0 0 3px rgba(217,4,4,0.1)" }}
+									/>
+								</FormControl>
+							)}
+
 							<FormControl>
 								<FormLabel fontSize="12px" fontWeight="700" color="gray.600">
-									BUSINESS NAME
+									BUSINESS/COMPANY
 								</FormLabel>
 								<Input
 									value={formData.business_name}
@@ -461,7 +659,7 @@ function UserModal({ isOpen, onClose, onSave, user, websites }) {
 						<VStack spacing={5} align="stretch">
 							<FormControl isRequired>
 								<FormLabel fontSize="12px" fontWeight="700" color="gray.600">
-									ROLE
+									ASSIGNED ROLE
 								</FormLabel>
 								<Select
 									value={formData.role}
@@ -471,16 +669,23 @@ function UserModal({ isOpen, onClose, onSave, user, websites }) {
 									fontSize="14px"
 									_focus={{ borderColor: "#D90404" }}
 								>
-									<option value="Super Admin">Super Admin</option>
-									<option value="Admin">Admin</option>
-									<option value="Website Admin">Website Admin</option>
-									<option value="Sales Manager">Sales Manager</option>
-									<option value="Viewer">Viewer</option>
+									{isAdminsMode ? (
+										<>
+											<option value="Super Admin">Super Admin</option>
+											<option value="Admin">Admin</option>
+											<option value="Website Admin">Website Admin</option>
+											<option value="Sales Manager">Sales Manager</option>
+										</>
+									) : (
+										<>
+											<option value="Viewer">Customer/Viewer</option>
+										</>
+									)}
 								</Select>
 							</FormControl>
 							<FormControl>
 								<FormLabel fontSize="12px" fontWeight="700" color="gray.600">
-									ASSIGNED SITE
+									ASSIGNED SITE (TENANT)
 								</FormLabel>
 								<Select
 									value={formData.website_id}
@@ -490,7 +695,7 @@ function UserModal({ isOpen, onClose, onSave, user, websites }) {
 									fontSize="14px"
 									_focus={{ borderColor: "#D90404" }}
 								>
-									<option value="">— No site assigned —</option>
+									<option value="">— Global / No Site —</option>
 									{websites.map((w) => (
 										<option key={w._id} value={w._id}>
 											{w.name}
@@ -498,9 +703,10 @@ function UserModal({ isOpen, onClose, onSave, user, websites }) {
 									))}
 								</Select>
 							</FormControl>
-							<FormControl isRequired>
+
+							<FormControl>
 								<FormLabel fontSize="12px" fontWeight="700" color="gray.600">
-									STATUS
+									ACCOUNT STATUS
 								</FormLabel>
 								<Select
 									value={formData.status}
@@ -518,23 +724,22 @@ function UserModal({ isOpen, onClose, onSave, user, websites }) {
 					</SimpleGrid>
 				</ModalBody>
 
-				<ModalFooter bg="gray.50" borderTop="1px solid" borderColor="gray.100" px={8} py={5}>
+				<ModalFooter bg="gray.50" py={6} px={8}>
 					<HStack spacing={3} w="full" justify="flex-end">
-						<Button variant="ghost" onClick={onClose} fontWeight="500">
+						<Button variant="ghost" onClick={onClose} h="44px" px={6}>
 							Cancel
 						</Button>
 						<Button
 							bg="#D90404"
 							color="white"
-							_hover={{ bg: "#c00404" }}
-							onClick={handleSubmit}
-							isLoading={isSaving}
-							loadingText="Saving..."
+							_hover={{ bg: "#c74848" }}
+							h="44px"
 							px={8}
-							fontWeight="700"
 							borderRadius="xl"
+							isLoading={isSaving}
+							onClick={handleSubmit}
 						>
-							{user ? "Update User" : "Create User"}
+							{user ? "Update User" : isAdminsMode ? "Send Invitation" : "Create User"}
 						</Button>
 					</HStack>
 				</ModalFooter>

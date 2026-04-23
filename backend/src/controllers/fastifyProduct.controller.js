@@ -31,11 +31,9 @@ exports.getProductById = async (request, reply) => {
 // ================= CREATE PRODUCT =================
 exports.createProduct = async (request, reply) => {
 	try {
-		const { name, description, price } = request.body;
+		const { name, description, price, make, model, year, condition, category } = request.body;
 		const product = await Product.create({
-			name,
-			description,
-			price,
+			...request.body,
 			website_id: request.tenantId,
 			createdBy: request.user.id,
 		});
@@ -52,7 +50,7 @@ exports.updateProduct = async (request, reply) => {
 		const product = await Product.findOneAndUpdate(
 			{ _id: id, website_id: request.tenantId },
 			request.body,
-			{ new: true }
+			{ new: true },
 		);
 		if (!product) return reply.status(404).send({ message: "Product not found" });
 		return product;

@@ -5,7 +5,9 @@ const fastify = require("fastify")({
 			target: "pino-pretty",
 		},
 	},
-	ignoreTrailingSlash: true,
+	routerOptions: {
+		ignoreTrailingSlash: true,
+	},
 });
 
 // Plugins
@@ -30,6 +32,7 @@ require("./models/User");
 require("./models/Blog");
 require("./models/Permission");
 require("./models/Registration");
+require("./models/Lead");
 
 // Register Routes
 fastify.register(require("./routes/fastify/auth.routes"), { prefix: "/api/auth" });
@@ -38,7 +41,9 @@ fastify.register(require("./routes/fastify/blog.routes"), { prefix: "/api/blogs"
 fastify.register(require("./routes/fastify/employee.routes"), { prefix: "/api/employees" });
 fastify.register(require("./routes/fastify/registration.routes"), { prefix: "/api" });
 fastify.register(require("./routes/fastify/website.routes"), { prefix: "/api/websites" });
-
+fastify.register(require("./routes/fastify/lead.routes"), { prefix: "/api/leads" });
+fastify.register(require("./routes/fastify/stats.routes"), { prefix: "/api/stats" });
+fastify.register(require("./routes/fastify/admin.routes"), { prefix: "/api" });
 
 // Root route
 fastify.get("/", async (request, reply) => {

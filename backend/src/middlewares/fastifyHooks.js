@@ -31,15 +31,61 @@ const tenantHook = async (request, reply) => {
 	}
 };
 
+const rolePermissions = {
+	admin: {
+		products: ["create", "read", "update", "delete"],
+		employees: ["create", "read", "update", "delete"],
+		leads: ["create", "read", "update", "delete"],
+		categories: ["create", "read", "update", "delete"],
+		websites: ["read"],
+		blogs: ["create", "read", "update", "delete"],
+	},
+	website_manager: {
+		products: ["create", "read", "update", "delete"],
+		employees: ["read"],
+		leads: ["create", "read", "update"],
+		categories: ["create", "read", "update", "delete"],
+		websites: ["read"],
+		blogs: ["create", "read", "update", "delete"],
+	},
+	sales_manager: {
+		products: ["read"],
+		employees: ["read"],
+		leads: ["create", "read", "update"],
+		categories: ["read"],
+		websites: ["read"],
+		blogs: ["read"],
+	},
+	viewer: {
+		products: ["read"],
+		employees: ["read"],
+		leads: ["read"],
+		categories: ["read"],
+		websites: ["read"],
+		blogs: ["read"],
+	},
+};
+
 const permissionHook = (resource, action) => {
 	return async (request, reply) => {
-		// Simplified permission check for now
-		// In a real app, you would check request.user.permissions
+		if (!request.user || !request.user.role) {
+			return reply.status(401).send({ message: "Role information missing" });
+		}
+
 		if (request.user.role === "super_admin") return;
-		
-		// For now, allow if they have a website_id (tenant access)
+
+		// Require a bound website_id for any other role
 		if (!request.user.website_id) {
-			return reply.status(403).send({ message: "Permission denied" });
+			return reply.status(403).send({ message: "Tenant access denied" });
+		}
+
+		const userRole = request.user.role;
+		const allowedActions = rolePermissions[userRole] && rolePermissions[userRole][resource];
+
+		if (!allowedActions || !allowedActions.includes(action)) {
+			return reply.status(403).send({
+				message: `Permission denied. Role '${userRole}' cannot '${action}' resource '${resource}'`,
+			});
 		}
 	};
 };
