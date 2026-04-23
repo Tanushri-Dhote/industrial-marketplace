@@ -25,6 +25,7 @@ import { UserProvider } from "./context/UserContext";
 import CheckoutPage from "./pages/CheckoutPage";
 import ThankYouPage from "./pages/ThankYouPage";
 import CallSellerPage from "./pages/CallSellerPage";
+import RefreshPopUp from "./components/common/RefreshPopUp";
 
 function App() {
 	const { pathname } = useLocation();
@@ -34,6 +35,7 @@ function App() {
 	return (
 		<UserProvider>
 			<Box minH="100vh" display="flex" flexDirection="column">
+			   {!hideGlobalLayout && <RefreshPopUp />}
 				{!hideGlobalLayout && <Header />}
 
 				<Box flex="1">
