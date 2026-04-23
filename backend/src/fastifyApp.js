@@ -34,6 +34,7 @@ require("./models/Permission");
 require("./models/Registration");
 require("./models/Lead");
 require("./models/PartType");
+require("./models/ContactSubmission");
 
 // Register Routes
 fastify.register(require("./routes/fastify/auth.routes"), { prefix: "/api/auth" });
@@ -43,6 +44,7 @@ fastify.register(require("./routes/fastify/employee.routes"), { prefix: "/api/em
 fastify.register(require("./routes/fastify/registration.routes"), { prefix: "/api" });
 fastify.register(require("./routes/fastify/website.routes"), { prefix: "/api/websites" });
 fastify.register(require("./routes/fastify/lead.routes"), { prefix: "/api/leads" });
+fastify.register(require("./routes/fastify/contact.routes"), { prefix: "/api/contacts" });
 fastify.register(require("./routes/fastify/stats.routes"), { prefix: "/api/stats" });
 fastify.register(require("./routes/fastify/admin.routes"), { prefix: "/api" });
 fastify.register(require("./routes/fastify/partType.routes"), { prefix: "/api/part-types" });
