@@ -32,7 +32,9 @@ import {
 	Package,
 	BookOpen,
 	MessageSquare,
+	Mail,
 	DollarSign,
+	Tags,
 	Menu,
 	RefreshCcw,
 	LogOut,
@@ -54,6 +56,7 @@ import WebsitesModule from "../components/dashboard/WebsitesModule";
 import EnginesModule from "../components/dashboard/EnginesModule";
 import BlogsModule from "../components/dashboard/BlogsModule";
 import LeadsModule from "../components/dashboard/LeadsModule";
+import ContactsModule from "../components/dashboard/ContactsModule";
 import QuotesModule from "../components/dashboard/QuotesModule";
 
 // ─── Constants ─────────────────────────────────────────────────────────────
@@ -131,9 +134,23 @@ const ALL_MODULES = [
 		component: LeadsModule,
 	},
 	{
+		id: "contacts",
+		name: "Contact Inbox",
+		icon: Mail,
+		roles: ["super_admin", "admin", "website_manager", "sales_manager"],
+		component: ContactsModule,
+	},
+	{
 		id: "quotes",
 		name: "Quotes",
 		icon: DollarSign,
+		roles: ["super_admin", "admin", "website_manager", "sales_manager", "viewer"],
+		component: QuotesModule,
+	},
+	{
+		id: "part-types",
+		name: "Part Types",
+		icon: Tags,
 		roles: ["super_admin", "admin", "website_manager", "sales_manager", "viewer"],
 		component: QuotesModule,
 	},
