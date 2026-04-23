@@ -4,6 +4,7 @@ const dotenv = require("dotenv");
 const Product = require("./models/Product");
 const Category = require("./models/Category");
 const Website = require("./models/Website");
+const PartType = require("./models/PartType");
 
 dns.setServers(["1.1.1.1"]);
 const path = require("path");
@@ -112,6 +113,48 @@ const engines = [
 	},
 ];
 
+const partTypes = [
+	{
+		name: "Engine",
+		description: "Complete car engine units",
+	},
+	{
+		name: "Gearbox",
+		description: "Manual and automatic gearboxes",
+	},
+	{
+		name: "Turbocharger",
+		description: "Turbo units for diesel and petrol engines",
+	},
+	{
+		name: "Cylinder Head",
+		description: "Engine cylinder heads and components",
+	},
+	{
+		name: "Fuel Injector",
+		description: "Fuel injection systems and injectors",
+	},
+	{
+		name: "Alternator",
+		description: "Vehicle alternators and charging systems",
+	},
+	{
+		name: "Starter Motor",
+		description: "Starter motors for engine ignition",
+	},
+	{
+		name: "Radiator",
+		description: "Cooling systems and radiators",
+	},
+	{
+		name: "ECU",
+		description: "Engine control units and electronics",
+	},
+	{
+		name: "Clutch Kit",
+		description: "Clutch plates, pressure plates, and kits",
+	},
+];
 async function seed() {
 	try {
 		await mongoose.connect(process.env.MONGO_URI);
@@ -136,6 +179,14 @@ async function seed() {
 			description: "High quality new, used and reconditioned car engines.",
 		});
 		console.log("Created Category:", category.name);
+
+		const partTypeData = partTypes.map((pt) => ({
+			...pt,
+			slug: pt.name.toLowerCase().replace(/ /g, "-"),
+		}));
+
+		await PartType.insertMany(partTypeData);
+		console.log("Created Part Types:", partTypeData.length);
 
 		// Seed Products
 		const productData = engines.map((engine) => ({
