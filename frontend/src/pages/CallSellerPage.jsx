@@ -6,33 +6,49 @@ import {
     Text,
     Grid,
     VStack,
+    HStack,
     Button,
     Input,
     InputGroup,
     InputLeftElement,
     Textarea,
     Center,
-    List,
-    ListItem,
-    Table,
-    Thead,
-    Tbody,
-    Tr,
-    Th,
-    Td,
-    Link,
     Badge,
+    Icon,
+    Divider,
+    SimpleGrid,
+    useToast,
 } from "@chakra-ui/react";
+import { 
+    CheckCircleIcon, 
+    ChevronRightIcon, 
+    ChevronLeftIcon,
+    EmailIcon, 
+    PhoneIcon,
+} from "@chakra-ui/icons";
+import { 
+    MapPin, 
+    Settings, 
+    Package, 
+    User, 
+    MessageSquare,
+    Truck,
+    ShieldCheck
+} from "lucide-react";
+import { useLocation, useNavigate } from "react-router-dom";
 
-import { CheckCircleIcon, ChevronRightIcon, EmailIcon, PhoneIcon } from "@chakra-ui/icons";
-import { useLocation } from "react-router-dom";
+const DARK = "#0F172A";
+const RED = "#D90404";
 
 export default function CallSellerPage() {
     const [step, setStep] = useState(1);
     const [engineOptions, setEngineOptions] = useState([]);
     const [fittingOptions, setFittingOptions] = useState([]);
     const location = useLocation();
-    const { vrm, category } = location.state || {};
+    const navigate = useNavigate();
+    const toast = useToast();
+
+    const { vrm, category, brand, model, year, type, searchType } = location.state || {};
 
     const [form, setForm] = useState({
         postcode: "",
@@ -43,33 +59,26 @@ export default function CallSellerPage() {
     });
 
     const handleEngineSelect = (value) => {
-        setEngineOptions(prev => {
-            if (prev.includes(value)) {
-                return prev.filter(item => item !== value);
-            } else {
-                return [...prev, value];
-            }
-        });
+        setEngineOptions(prev => prev.includes(value) ? prev.filter(item => item !== value) : [...prev, value]);
     };
 
     const handleFittingSelect = (value) => {
-        setFittingOptions(prev => {
-            if (prev.includes(value)) {
-                return prev.filter(item => item !== value);
-            } else {
-                return [...prev, value];
-            }
-        });
+        setFittingOptions(prev => prev.includes(value) ? prev.filter(item => item !== value) : [...prev, value]);
     };
 
     const handleNext = () => {
-        if (step === 1 && engineOptions.length === 0) return;
-        if (step === 2 && fittingOptions.length === 0) return;
+        if (step === 1) {
+            if (engineOptions.length === 0) return toast({ title: "Please select a condition", status: "warning" });
+            if (fittingOptions.length === 0) return toast({ title: "Please select a fitting option", status: "warning" });
+            if (!form.postcode) return toast({ title: "Postcode is required", status: "warning" });
+        }
         setStep(step + 1);
+        window.scrollTo(0, 0);
     };
 
     const handleBack = () => {
         setStep(step - 1);
+        window.scrollTo(0, 0);
     };
 
     const API = import.meta.env.VITE_API_URL;
@@ -78,11 +87,13 @@ export default function CallSellerPage() {
         try {
             const res = await fetch(`${API}/validate-vrm`, {
                 method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
+                headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
                     vrm,
+                    brand,
+                    model,
+                    year,
+                    engineType: type,
                     category,
                     engineOptions,
                     fittingOptions,
@@ -91,415 +102,285 @@ export default function CallSellerPage() {
             });
 
             const data = await res.json();
-
-            if (!res.ok || !data.success) {
-                throw new Error(data.message || "Something went wrong");
-            }
-
-            setStep(5);
-
+            if (!res.ok || !data.success) throw new Error(data.message || "Something went wrong");
+            setStep(3);
         } catch (err) {
-            console.error(err);
-            alert(err.message); 
+            toast({ title: "Error", description: err.message, status: "error" });
         }
     };
 
-    const ProgressIndicator = () => (
-        <Box display="flex" justifyContent="center" mb={8} gap={2}>
-            {[1, 2, 3, 4].map((s) => (
-                <React.Fragment key={s}>
-                    <Box
-                        w={8}
-                        h={8}
-                        borderRadius="full"
-                        bg={step >= s ? "#0F172A" : "gray.200"}
-                        color={step >= s ? "white" : "gray.500"}
-                        display="flex"
-                        alignItems="center"
-                        justifyContent="center"
-                        fontWeight="bold"
-                    >
-                        {s}
-                    </Box>
-                    {s < 4 && <ChevronRightIcon color="gray.400" mt={2} />}
-                </React.Fragment>
-            ))}
+    const VehicleSummary = () => (
+        <Box bg="white" borderRadius="2xl" p={6} mb={8} border="1px solid" borderColor="gray.200" boxShadow="sm">
+            <HStack spacing={4} align="center">
+                <Box bg={DARK} color="white" p={3} borderRadius="xl">
+                    <Settings size={24} />
+                </Box>
+                <VStack align="flex-start" spacing={0}>
+                    <Text fontSize="xs" fontWeight="800" color="gray.400" textTransform="uppercase" letterSpacing="wider">
+                        Vehicle Selected
+                    </Text>
+                    <Heading size="md" color={DARK}>
+                        {vrm ? vrm : `${brand} ${model} ${year}`}
+                    </Heading>
+                    <HStack spacing={2} mt={1}>
+                        <Badge colorScheme="red" variant="subtle" px={2} borderRadius="md">{category}</Badge>
+                        {type && <Badge colorScheme="blue" variant="subtle" px={2} borderRadius="md">{type}</Badge>}
+                    </HStack>
+                </VStack>
+            </HStack>
         </Box>
     );
 
+    const Progress = () => (
+        <HStack w="full" spacing={2} mb={8}>
+            {[1, 2, 3].map(i => (
+                <Box 
+                    key={i} 
+                    flex={1} 
+                    h="6px" 
+                    bg={step >= i ? RED : "gray.200"} 
+                    borderRadius="full" 
+                    transition="all 0.3s"
+                />
+            ))}
+        </HStack>
+    );
+
     return (
-        <Box bg="gray.100" minH="100vh" py={10}>
-            <Container maxW="container.lg">
-                <ProgressIndicator />
+        <Box bg="#F8FAFC" minH="100vh" py={{ base: 6, md: 12 }}>
+            <Container maxW="container.md">
+                <Progress />
+                <VehicleSummary />
 
-                {/* STEP 1 */}
+                {/* STEP 1: OPTIONS & LOCATION */}
                 {step === 1 && (
-                    <Box>
-                        <Heading textAlign="center" mb={2} size="lg">
-                            Choose the option that suits you
-                        </Heading>
-                        <Text textAlign="center" color="gray.600" mb={4}>
-                            Select one or more options below
-                        </Text>
-                        <Text textAlign="center" fontSize="sm" color="green.600" mb={8}>
-                            ✓ You can select multiple options
-                        </Text>
+                    <VStack spacing={8} align="stretch">
+                        <Box>
+                            <Heading size="lg" mb={2} color={DARK}>1. Request Details</Heading>
+                            <Text color="gray.500">Tailor your request to get the most accurate quotes.</Text>
+                        </Box>
 
-                        <Grid templateColumns={{ base: "1fr", md: "repeat(4,1fr)" }} gap={5}>
-                            {[
-                                { title: "Reconditioned/Rebuild", desc: "Ready to fit, with up to 5 years warranty", icon: "🔧" },
-                                { title: "Used (low mileage)", desc: "Budget-friendly – up to 18 months warranty.", icon: "📉" },
-                                { title: "New", desc: "Brand-new engines with manufacturer cover.", icon: "✨" },
-                                { title: "Will consider all", desc: "Keep all options open.", icon: "🔍" },
-                            ].map((item) => {
-                                const isSelected = engineOptions.includes(item.title);
-                                return (
-                                    <Box
-                                        key={item.title}
-                                        p={5}
-                                        bg="white"
-                                        borderRadius="lg"
-                                        textAlign="center"
-                                        cursor="pointer"
-                                        position="relative"
-                                        border="2px solid"
-                                        borderColor={isSelected ? "#0F172A" : "gray.200"}
-                                        boxShadow={isSelected ? "0 0 0 1px green" : "none"}
-                                        _hover={{ borderColor: "green.300", boxShadow: "md" }}
-                                        transition="all 0.2s"
-                                        onClick={() => handleEngineSelect(item.title)}
-                                    >
-                                        {isSelected && (
-                                            <Badge
-                                                position="absolute"
-                                                top="-10px"
-                                                right="10px"
-                                                colorScheme="green"
-                                                borderRadius="full"
-                                                px={2}
-                                                fontSize="xs"
-                                            >
-                                                ✓ SELECTED
-                                            </Badge>
-                                        )}
-                                        <Box fontSize="3xl" mb={2}>
-                                            {item.icon}
-                                        </Box>
-                                        <Text fontWeight="bold" mb={2}>
-                                            {item.title}
-                                        </Text>
-                                        <Text fontSize="sm" color="gray.500">
-                                            {item.desc}
-                                        </Text>
-                                        {isSelected && (
-                                            <Box mt={3}>
-                                                <CheckCircleIcon color="#0F172A" boxSize={5} />
+                        <Box>
+                            <Text fontWeight="800" mb={4} fontSize="sm" color="gray.600" textTransform="uppercase">What condition do you need?</Text>
+                            <SimpleGrid columns={{ base: 1, sm: 2 }} gap={4}>
+                                {[
+                                    { title: "Reconditioned/Rebuild", desc: "Premium quality", icon: ShieldCheck },
+                                    { title: "Used (low mileage)", desc: "Best value", icon: Package },
+                                    { title: "New", desc: "Manufacturer standard", icon: CheckCircleIcon },
+                                    { title: "Will consider all", desc: "Show me all options", icon: MessageSquare },
+                                ].map((item) => {
+                                    const isSelected = engineOptions.includes(item.title);
+                                    return (
+                                        <HStack
+                                            key={item.title}
+                                            p={4}
+                                            bg="white"
+                                            borderRadius="xl"
+                                            cursor="pointer"
+                                            border="2px solid"
+                                            borderColor={isSelected ? RED : "white"}
+                                            boxShadow="sm"
+                                            onClick={() => handleEngineSelect(item.title)}
+                                            transition="all 0.2s"
+                                            _hover={{ boxShadow: "md", transform: "translateY(-2px)" }}
+                                        >
+                                            <Box color={isSelected ? RED : "gray.400"}>
+                                                <Icon as={item.icon} boxSize={5} />
                                             </Box>
-                                        )}
-                                    </Box>
-                                );
-                            })}
-                        </Grid>
+                                            <VStack align="flex-start" spacing={0}>
+                                                <Text fontWeight="700" fontSize="14px">{item.title}</Text>
+                                                <Text fontSize="12px" color="gray.500">{item.desc}</Text>
+                                            </VStack>
+                                        </HStack>
+                                    );
+                                })}
+                            </SimpleGrid>
+                        </Box>
 
-                        <Center mt={10}>
-                            <Button
-                                size="lg"
-                                colorScheme="green"
-                                onClick={handleNext}
-                                isDisabled={engineOptions.length === 0}
-                                rightIcon={<ChevronRightIcon />}
-                                px={8}
-                            >
-                                {/* Next ({engineOptions.length} selected) */}
-                                Next
-                            </Button>
-                        </Center>
-                    </Box>
+                        <Box>
+                            <Text fontWeight="800" mb={4} fontSize="sm" color="gray.600" textTransform="uppercase">Supply & Fitting</Text>
+                            <SimpleGrid columns={{ base: 1, sm: 3 }} gap={4}>
+                                {[
+                                    { title: "Supplied & Fitted", icon: Settings },
+                                    { title: "Supplied Only", icon: Truck },
+                                    { title: "Will consider both", icon: Package },
+                                ].map((item) => {
+                                    const isSelected = fittingOptions.includes(item.title);
+                                    return (
+                                        <VStack
+                                            key={item.title}
+                                            p={4}
+                                            bg="white"
+                                            borderRadius="xl"
+                                            cursor="pointer"
+                                            border="2px solid"
+                                            borderColor={isSelected ? RED : "white"}
+                                            boxShadow="sm"
+                                            onClick={() => handleFittingSelect(item.title)}
+                                            transition="all 0.2s"
+                                            _hover={{ boxShadow: "md" }}
+                                        >
+                                            <Box color={isSelected ? RED : "gray.400"}>
+                                                <Icon as={item.icon} boxSize={5} />
+                                            </Box>
+                                            <Text fontWeight="700" fontSize="13px" textAlign="center">{item.title}</Text>
+                                        </VStack>
+                                    );
+                                })}
+                            </SimpleGrid>
+                        </Box>
+
+                        <Box bg="white" p={6} borderRadius="2xl" boxShadow="sm">
+                            <Text fontWeight="800" mb={4} fontSize="sm" color="gray.600" textTransform="uppercase">Location & Additional Notes</Text>
+                            <VStack spacing={4}>
+                                <InputGroup size="lg">
+                                    <InputLeftElement color="gray.400"><MapPin size={20} /></InputLeftElement>
+                                    <Input 
+                                        placeholder="Your Postcode (e.g. SW1A 1AA)" 
+                                        borderRadius="xl" 
+                                        bg="gray.50"
+                                        border="none"
+                                        _focus={{ bg: "white", boxShadow: "0 0 0 2px " + RED }}
+                                        value={form.postcode}
+                                        onChange={(e) => setForm({...form, postcode: e.target.value.toUpperCase()})}
+                                    />
+                                </InputGroup>
+                                <Textarea 
+                                    placeholder="Any specific requirements or engine codes?" 
+                                    borderRadius="xl" 
+                                    bg="gray.50"
+                                    border="none"
+                                    _focus={{ bg: "white", boxShadow: "0 0 0 2px " + RED }}
+                                    rows={3}
+                                    value={form.notes}
+                                    onChange={(e) => setForm({...form, notes: e.target.value})}
+                                />
+                            </VStack>
+                        </Box>
+
+                        <Button 
+                            size="lg" 
+                            bg={RED} 
+                            color="white" 
+                            h="60px" 
+                            fontSize="18px" 
+                            fontWeight="800"
+                            borderRadius="xl"
+                            rightIcon={<ChevronRightIcon />}
+                            onClick={handleNext}
+                            _hover={{ bg: "#B70303", transform: "scale(1.02)" }}
+                            transition="all 0.2s"
+                        >
+                            Continue
+                        </Button>
+                    </VStack>
                 )}
 
-                {/* STEP 2 */}
+                {/* STEP 2: CONTACT DETAILS */}
                 {step === 2 && (
-                    <Box>
-                        <Heading textAlign="center" mb={2} size="lg">
-                            Choose the option that suits you
-                        </Heading>
-                        <Text textAlign="center" color="gray.600" mb={4}>
-                            Select one or more options below
-                        </Text>
-                        <Text textAlign="center" fontSize="sm" color="green.600" mb={8}>
-                            ✓ You can select multiple options
-                        </Text>
+                    <VStack spacing={8} align="stretch">
+                        <Box>
+                            <Button leftIcon={<ChevronLeftIcon />} variant="ghost" onClick={handleBack} mb={4} color="gray.500">Back</Button>
+                            <Heading size="lg" mb={2} color={DARK}>2. Contact Information</Heading>
+                            <Text color="gray.500">Suppliers will use these details to send your quotes.</Text>
+                        </Box>
 
-                        <Grid templateColumns={{ base: "1fr", md: "repeat(3,1fr)" }} gap={5}>
-                            {[
-                                { title: "Supplied & Fitted", desc: "Recommended if you need engine + installation.", icon: "🔧" },
-                                { title: "Supplied", desc: "If you arrange fitting yourself.", icon: "📦" },
-                                { title: "Will consider both", desc: "Keep all options open!", icon: "🤝" },
-                            ].map((item) => {
-                                const isSelected = fittingOptions.includes(item.title);
-                                return (
-                                    <Box
-                                        key={item.title}
-                                        p={5}
-                                        bg="white"
-                                        borderRadius="lg"
-                                        textAlign="center"
-                                        cursor="pointer"
-                                        position="relative"
-                                        border="2px solid"
-                                        borderColor={isSelected ? "#0F172A" : "gray.200"}
-                                        _hover={{ borderColor: "green.300", boxShadow: "md" }}
-                                        transition="all 0.2s"
-                                        onClick={() => handleFittingSelect(item.title)}
-                                    >
-                                        {isSelected && (
-                                            <Badge
-                                                position="absolute"
-                                                top="-10px"
-                                                right="10px"
-                                                colorScheme="green"
-                                                borderRadius="full"
-                                                px={2}
-                                                fontSize="xs"
-                                            >
-                                                ✓ SELECTED
-                                            </Badge>
-                                        )}
-                                        <Box fontSize="3xl" mb={2}>
-                                            {item.icon}
-                                        </Box>
-                                        <Text fontWeight="bold" mb={2}>
-                                            {item.title}
-                                        </Text>
-                                        <Text fontSize="sm" color="gray.500">
-                                            {item.desc}
-                                        </Text>
-                                        {isSelected && (
-                                            <Box mt={3}>
-                                                <CheckCircleIcon color="#0F172A" boxSize={5} />
-                                            </Box>
-                                        )}
-                                    </Box>
-                                );
-                            })}
-                        </Grid>
-
-                        <Center mt={10} gap={4}>
-                            <Button size="lg" variant="outline" onClick={handleBack} px={8}>
-                                Back
-                            </Button>
-                            <Button
-                                size="lg"
-                                colorScheme="green"
-                                onClick={handleNext}
-                                isDisabled={fittingOptions.length === 0}
-                                rightIcon={<ChevronRightIcon />}
-                                px={8}
-                            >
-                                Next
-                            </Button>
-                        </Center>
-                    </Box>
-                )}
-
-                {/* STEP 3 */}
-                {step === 3 && (
-                    <Box bg="white" borderRadius="2xl" p={8} shadow="md" maxW="2xl" mx="auto">
-                        <Heading textAlign="center" mb={2} size="lg">
-                            Almost there! Share your location
-                        </Heading>
-                        <Text textAlign="center" color="gray.600" mb={8}>
-                            We'll find the best deals near you
-                        </Text>
-
-                        <VStack spacing={5}>
+                        <VStack spacing={4} bg="white" p={8} borderRadius="2xl" boxShadow="md">
                             <InputGroup size="lg">
-                                <InputLeftElement pointerEvents="none" color="gray.500" fontSize="xl">
-                                    📍
-                                </InputLeftElement>
-                                <Input
-                                    placeholder="Postcode (e.g. SW1A 1AA)"
-                                    value={form.postcode}
-                                    onChange={(e) => setForm({ ...form, postcode: e.target.value })}
-                                />
-                            </InputGroup>
-
-                            <Textarea
-                                size="lg"
-                                placeholder="Notes (e.g., car model, engine size, any specific requirements)"
-                                value={form.notes}
-                                onChange={(e) => setForm({ ...form, notes: e.target.value })}
-                                rows={4}
-                            />
-
-                            <Center gap={4} pt={4}>
-                                <Button size="lg" variant="outline" onClick={handleBack} px={8}>
-                                    Back
-                                </Button>
-                                <Button size="lg" colorScheme="green" onClick={handleNext} rightIcon={<ChevronRightIcon />} px={8}>
-                                    Next
-                                </Button>
-                            </Center>
-                        </VStack>
-                    </Box>
-                )}
-
-                {/* STEP 4 - WITH ICONS */}
-                {step === 4 && (
-                    <Box bg="white" borderRadius="2xl" p={8} shadow="md" maxW="2xl" mx="auto">
-                        <Heading textAlign="center" mb={2} size="lg">
-                            Great news! Get your quotes
-                        </Heading>
-                        <Text textAlign="center" color="gray.600" mb={8}>
-                            Enter your details to receive the best offers
-                        </Text>
-
-                        <VStack spacing={5}>
-                            {/* Name Input with Icon */}
-                            <InputGroup size="lg">
-                                <InputLeftElement pointerEvents="none" color="#0F172A" fontSize="xl">
-                                    👤
-                                </InputLeftElement>
-                                <Input
-                                    placeholder="Full Name"
+                                <InputLeftElement color={DARK}><User size={20} /></InputLeftElement>
+                                <Input 
+                                    placeholder="Full Name" 
+                                    borderRadius="xl"
                                     value={form.name}
-                                    onChange={(e) => setForm({ ...form, name: e.target.value })}
+                                    onChange={(e) => setForm({...form, name: e.target.value})}
                                 />
                             </InputGroup>
 
-                            {/* Email Input with Icon */}
                             <InputGroup size="lg">
-                                <InputLeftElement pointerEvents="none" color="#0F172A">
-                                    <EmailIcon />
-                                </InputLeftElement>
-                                <Input
-                                    placeholder="Email Address"
+                                <InputLeftElement color={DARK}><EmailIcon /></InputLeftElement>
+                                <Input 
                                     type="email"
+                                    placeholder="Email Address" 
+                                    borderRadius="xl"
                                     value={form.email}
-                                    onChange={(e) => setForm({ ...form, email: e.target.value })}
+                                    onChange={(e) => setForm({...form, email: e.target.value})}
                                 />
                             </InputGroup>
 
-                            {/* Phone Input with Icon */}
                             <InputGroup size="lg">
-                                <InputLeftElement pointerEvents="none" color="#0F172A">
-                                    <PhoneIcon />
-                                </InputLeftElement>
-                                <Input
-                                    placeholder="Phone Number"
+                                <InputLeftElement color={DARK}><PhoneIcon /></InputLeftElement>
+                                <Input 
                                     type="tel"
+                                    placeholder="Phone Number" 
+                                    borderRadius="xl"
                                     value={form.phone}
-                                    onChange={(e) => setForm({ ...form, phone: e.target.value })}
+                                    onChange={(e) => setForm({...form, phone: e.target.value})}
                                 />
                             </InputGroup>
 
-                            <Center gap={4} pt={4}>
-                                <Button size="lg" variant="outline" onClick={handleBack} px={8}>
-                                    Back
-                                </Button>
-                                <Button
-                                    size="lg"
-                                    colorScheme="green"
-                                    onClick={handleGetQuote}
-                                    isDisabled={!form.name || !form.email || !form.phone}
-                                    px={8}
-                                >
-                                    Get Quote
-                                </Button>
-                            </Center>
+                            <Divider py={4} />
+
+                            <VStack align="start" w="full" spacing={1}>
+                                <Text fontSize="xs" color="gray.500">By clicking below, you agree to our Terms and allow verified suppliers to contact you regarding your request.</Text>
+                            </VStack>
+
+                            <Button 
+                                w="full"
+                                size="lg" 
+                                bg={RED} 
+                                color="white" 
+                                h="60px" 
+                                fontSize="18px" 
+                                fontWeight="800"
+                                borderRadius="xl"
+                                onClick={handleGetQuote}
+                                isDisabled={!form.name || !form.email || !form.phone}
+                                _hover={{ bg: "#B70303" }}
+                            >
+                                Get My Free Quotes
+                            </Button>
                         </VStack>
-                    </Box>
+                    </VStack>
                 )}
 
-                {/* STEP 5 - THANK YOU */}
-                {step === 5 && (
-                    <Box bg="white" borderRadius="2xl" p={8} shadow="md">
-                        <Box textAlign="center" mb={6}>
-                            <Box fontSize="5xl" mb={3}>✅</Box>
-                            <Heading color="green.600" mb={2}>
-                                Thank You — Your Request Has Been Sent
-                            </Heading>
-                            <Text color="gray.600">
-                                We've received your details and securely shared them with our network of engine suppliers.
-                            </Text>
+                {/* STEP 3: THANK YOU */}
+                {step === 3 && (
+                    <VStack spacing={8} textAlign="center" py={10}>
+                        <Box bg="green.500" color="white" p={6} borderRadius="full">
+                            <CheckCircleIcon boxSize={12} />
+                        </Box>
+                        <Box>
+                            <Heading size="xl" mb={4}>Request Received!</Heading>
+                            <Text fontSize="lg" color="gray.600">We've securely shared your request with our network of specialists.</Text>
                         </Box>
 
-                        <Box bg="gray.50" p={4} borderRadius="lg" mb={6}>
-                            <Heading size="sm" mb={3}>Your Selected Options:</Heading>
-                            <Grid templateColumns={{ base: "1fr", md: "repeat(2,1fr)" }} gap={4}>
-                                <Box>
-                                    <Text fontWeight="bold" fontSize="sm" color="green.600">Engine Type:</Text>
-                                    <List spacing={1} mt={1}>
-                                        {engineOptions.map(opt => (
-                                            <ListItem key={opt} fontSize="sm">✓ {opt}</ListItem>
-                                        ))}
-                                    </List>
-                                </Box>
-                                <Box>
-                                    <Text fontWeight="bold" fontSize="sm" color="green.600">Fitting Option:</Text>
-                                    <List spacing={1} mt={1}>
-                                        {fittingOptions.map(opt => (
-                                            <ListItem key={opt} fontSize="sm">✓ {opt}</ListItem>
-                                        ))}
-                                    </List>
-                                </Box>
-                            </Grid>
-                        </Box>
+                        <SimpleGrid columns={{ base: 1, md: 3 }} gap={4} w="full">
+                            <Box p={6} bg="white" borderRadius="2xl" boxShadow="sm">
+                                <Text fontSize="24px" mb={2}>📞</Text>
+                                <Text fontWeight="700" mb={1}>Step 1</Text>
+                                <Text fontSize="sm" color="gray.500">Suppliers contact you via phone or email.</Text>
+                            </Box>
+                            <Box p={6} bg="white" borderRadius="2xl" boxShadow="sm">
+                                <Text fontSize="24px" mb={2}>💰</Text>
+                                <Text fontWeight="700" mb={1}>Step 2</Text>
+                                <Text fontSize="sm" color="gray.500">Compare multiple offers and warranties.</Text>
+                            </Box>
+                            <Box p={6} bg="white" borderRadius="2xl" boxShadow="sm">
+                                <Text fontSize="24px" mb={2}>✅</Text>
+                                <Text fontWeight="700" mb={1}>Step 3</Text>
+                                <Text fontSize="sm" color="gray.500">Choose the best deal and save up to 50%.</Text>
+                            </Box>
+                        </SimpleGrid>
 
-                        <Box borderTop="1px solid" borderColor="gray.200" pt={6}>
-                            <Heading size="md" mb={4}>What Happens Next</Heading>
-                            <Grid templateColumns={{ base: "1fr", md: "repeat(3,1fr)" }} gap={4} mb={8}>
-                                <Box p={4} bg="blue.50" borderRadius="lg">
-                                    <Text fontWeight="bold" mb={2}>📞 Supplier contact</Text>
-                                    <Text fontSize="sm">One or more engine suppliers will contact you by phone or email to confirm your requirements and send tailored quotes.</Text>
-                                </Box>
-                                <Box p={4} bg="green.50" borderRadius="lg">
-                                    <Text fontWeight="bold" mb={2}>💰 Receive multiple offers</Text>
-                                    <Text fontSize="sm">You'll receive a range of quotes so you can compare price, quality, warranty and delivery times.</Text>
-                                </Box>
-                                <Box p={4} bg="purple.50" borderRadius="lg">
-                                    <Text fontWeight="bold" mb={2}>⭐ Review request</Text>
-                                    <Text fontSize="sm">Around 24 hours after your submission we may send a short request for feedback to help us maintain the highest standards.</Text>
-                                </Box>
-                            </Grid>
-                        </Box>
-
-                        <Box mb={6}>
-                            <Heading size="md" mb={3}>How to Choose with Confidence</Heading>
-                            <Text fontSize="sm" color="gray.600" mb={3}>
-                                We're a comparison platform — not a supplier. Any purchase, warranty or work is provided directly by the supplier you choose. Please read the supplier's terms carefully. (<Link href="#" color="#0F172A">Full Terms & Conditions</Link>)
-                            </Text>
-
-                            <Grid templateColumns={{ base: "1fr", md: "repeat(2,1fr)" }} gap={3} mb={4}>
-                                <Text fontSize="sm">✓ Check your details: We pass the information you provide to suppliers exactly as submitted.</Text>
-                                <Text fontSize="sm">✓ Research suppliers: Look for independent reviews, check their website and ask questions.</Text>
-                                <Text fontSize="sm">✓ Look beyond price: The cheapest quote may carry hidden costs or lower quality.</Text>
-                                <Text fontSize="sm">✓ Pay securely: Paying by credit card typically offers greater protection for consumers in the UK.</Text>
-                                <Text fontSize="sm">✓ Avoid off-platform deals: Only accept offers from verifiedAll Engine 4 You channels.</Text>
-                                <Text fontSize="sm">✓ We're not liable for supplier faults: Any disputes should be raised directly with the supplier.</Text>
-                            </Grid>
-                        </Box>
-
-                        <Box bg="gray.50" p={5} borderRadius="lg" mb={6}>
-                            <Heading size="sm" mb={3}>Quick Reminders</Heading>
-                            <Table variant="unstyled" size="sm">
-                                <Tbody>
-                                    <Tr><Td py={1} width="60px">1.</Td><Td py={1}>Stay accessible — Keep your phone and email handy for supplier contact.</Td></Tr>
-                                    <Tr><Td py={1}>2.</Td><Td py={1}>Compare — Consider time, cost, quality and warranty together.</Td></Tr>
-                                    <Tr><Td py={1}>3.</Td><Td py={1}>Use secure payment — Prefer credit card for additional buyer protection.</Td></Tr>
-                                    <Tr><Td py={1}>4.</Td><Td py={1}>Verify — Only communicate throughAll Engine 4 You verified channels.</Td></Tr>
-                                    <Tr><Td py={1}>5.</Td><Td py={1}>Feedback — We'll ask for a short review — your experience helps us improve.</Td></Tr>
-                                </Tbody>
-                            </Table>
-                            <Text fontSize="sm" fontStyle="italic" mt={3}>
-                                Tip: Responding quickly to supplier outreach helps secure the best offers and avoids delays.
-                            </Text>
-                        </Box>
-
-                        <Text fontSize="xs" color="gray.400" textAlign="center" mb={6}>
-                            All Engine 4 You is a comparison platform. For details on liability, data use and complaints please review our Terms & Conditions and Privacy Policy.
-                        </Text>
-                    </Box>
+                        <Button 
+                            variant="link" 
+                            color={DARK} 
+                            onClick={() => navigate("/")}
+                            textDecoration="underline"
+                        >
+                            Return to Homepage
+                        </Button>
+                    </VStack>
                 )}
             </Container>
         </Box>

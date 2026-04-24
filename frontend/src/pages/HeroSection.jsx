@@ -1,127 +1,105 @@
 // src/components/HeroSection.jsx
-import React, { useState, useEffect } from "react";
 import {
+  Badge,
   Box,
-  Container,
-  Heading,
-  Text,
-  VStack,
-  HStack,
   Button,
-  Icon,
-  Input,
+  Container,
   Flex,
-  Badge,  // ← ADD THIS IMPORT
+  Heading,
+  HStack,
+  Icon,
+  Image,
+  Input,
+  SimpleGrid,
+  Text,
+  useToast,
+  VStack
 } from '@chakra-ui/react';
-import { FaArrowRight, FaCheckCircle } from 'react-icons/fa';
-import { useToast } from "@chakra-ui/react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
+import { motion } from 'framer-motion';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import API from "../services/api";
+import { FaArrowRight, FaCar, FaCheckCircle, FaTools } from 'react-icons/fa';
 
-const SupplierStats = () => {
-  const stats = [
-    { type: 'Supply Only', delivery: 'Free delivery', warranty: '3-18 months', condition: 'Used & Recon', count: 162 },
-    { type: 'Supply & Fitted', recovery: 'Incl. recovery', warranty: '12-60 months', condition: 'Used & Recon', count: 72 },
-    { type: 'Rebuild or repair', recovery: 'Incl. Recovery', warranty: '12-24 months', condition: 'Repair', count: 49 },
-  ];
+const MotionBox = motion(Box);
+const MotionVStack = motion(VStack);
 
-  return (
-    <VStack w="full" spacing={0} bg="white" borderRadius="md" overflow="hidden" border="1px solid" borderColor="gray.100">
-      <Box w="full" py={2} bg="gray.50" textAlign="center" borderBottom="1px solid" borderColor="gray.200">
-        <Text fontSize="sm" fontWeight="bold" color="gray.700">Suppliers ready to quote you</Text>
-      </Box>
-      {stats.map((stat, index) => (
-        <Box key={index} w="full" px={4} py={2} borderBottom={index !== stats.length - 1 ? "1px solid" : "none"} borderColor="gray.100">
-          <Flex justify="space-between" align="center">
-            <VStack align="start" spacing={0} flex={1}>
-              <Text fontSize="xs" fontWeight="bold" color="gray.800">{stat.type}</Text>
-              <Text fontSize="10px" color="gray.500">{stat.delivery || stat.recovery}</Text>
-            </VStack>
-            <VStack align="center" spacing={0} flex={1}>
-              <Text fontSize="10px" fontWeight="600" color="gray.600">{stat.warranty}</Text>
-              <Text fontSize="10px" color="gray.400">warranty</Text>
-            </VStack>
-            <VStack align="center" spacing={0} flex={1}>
-              <Text fontSize="10px" fontWeight="600" color="gray.600">{stat.condition}</Text>
-            </VStack>
-            <HStack spacing={1} flex={1} justify="flex-end">
-              <Badge colorScheme="green" borderRadius="full" px={2} fontSize="10px">{stat.count}</Badge>
-              <Text fontSize="10px" color="gray.500">Suppliers</Text>
-            </HStack>
-          </Flex>
-        </Box>
-      ))}
-    </VStack>
-  );
+const fadeInUp = {
+  initial: { opacity: 0, y: 20 },
+  animate: { opacity: 1, y: 0 },
+  transition: { duration: 0.6 }
 };
+
+const staggerContainer = {
+  animate: { transition: { staggerChildren: 0.1 } }
+};
+
+const DARK = "#0F172A";
+const RED = "#D90404";
+const GOLD = "#FFD700";
+
+const POPULAR_BRANDS = [
+  { name: "Ford", slug: "ford" },
+  { name: "Volkswagen", slug: "volkswagen" },
+  { name: "BMW", slug: "bmw" },
+  { name: "Audi", slug: "audi" },
+  { name: "Mercedes-Benz", slug: "mercedes-benz" },
+  { name: "Vauxhall", slug: "vauxhall" },
+];
 
 export default function HeroSection({ category }) {
   const navigate = useNavigate();
   const toast = useToast();
-  const API = import.meta.env.VITE_API_URL;
+  const queryClient = useQueryClient();
 
   // Shared States
+  const [activeTab, setActiveTab] = useState("vrm"); // "vrm" or "manual"
   const [vrm, setVrm] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("");
-
-  // Manual Selector States
-  const [brands, setBrands] = useState([]);
+  
+  // Local states for dependent lookups
   const [models, setModels] = useState([]);
   const [years, setYears] = useState([]);
   const [types, setTypes] = useState([]);
-  const [partTypes, setPartTypes] = useState([]);  // ← Keep this for VRM card
 
   const [selectedBrand, setSelectedBrand] = useState("");
   const [selectedModel, setSelectedModel] = useState("");
   const [selectedYear, setSelectedYear] = useState("");
   const [selectedType, setSelectedType] = useState("");
-  const [allPartTypes, setAllPartTypes] = useState([]);   // for VRM card
-  const [loadingAllParts, setLoadingAllParts] = useState(false);
-  const [loadingParts, setLoadingParts] = useState(false);
-
+  
   const isCategoryPage = category && category !== 'Industrial Engines';
 
-  // Define fetchPartTypes function ← ADD THIS
-  const fetchPartTypes = async () => {
-    try {
-      setLoadingParts(true);
-      const res = await axios.get(`${API}/part-types`);
-      const data = res.data?.data || res.data || [];
-      setPartTypes(data);
-    } catch (error) {
-      console.error("Error fetching part types:", error);
-    } finally {
-      setLoadingParts(false);
-    }
-  };
+  // TanStack Queries
+  const { data: brands = [] } = useQuery({
+    queryKey: ['brands'],
+    queryFn: async () => {
+      const res = await API.get("/brands");
+      return res.data?.data || res.data || [];
+    },
+    staleTime: 1000 * 60 * 30, // 30 minutes
+  });
 
-  // Fetch data on mount
-  useEffect(() => {
-    fetchBrands();
-    fetchAllPartTypes();
-    fetchPartTypes();  // ← Now this function exists
-  }, []);
+  const { data: partTypes = [] } = useQuery({
+    queryKey: ['part-types'],
+    queryFn: async () => {
+      const res = await API.get("/part-types");
+      return res.data?.data || res.data || [];
+    },
+    staleTime: 1000 * 60 * 30,
+  });
 
-  const fetchBrands = async () => {
-    try {
-      const res = await axios.get(`${API}/brands`);
-      setBrands(res.data?.data || []);
-    } catch (error) {
-      console.error("Error fetching brands:", error);
-    }
-  };
-
-  const fetchAllPartTypes = async () => {
-    try {
-      setLoadingAllParts(true);
-      const res = await axios.get(`${API}/part-types`);
-      const data = res.data?.data || res.data || [];
-      setAllPartTypes(data);
-    } catch (error) {
-      console.error("Error fetching all part types:", error);
-    } finally {
-      setLoadingAllParts(false);
-    }
+  // Prefetching logic
+  const prefetchModels = (brandId) => {
+    if (!brandId) return;
+    queryClient.prefetchQuery({
+      queryKey: ['models', brandId],
+      queryFn: async () => {
+        const res = await API.get(`/models/${brandId}`);
+        return res.data?.data || [];
+      },
+      staleTime: 1000 * 60 * 5,
+    });
   };
 
   // Handlers
@@ -136,8 +114,16 @@ export default function HeroSection({ category }) {
 
     if (brandId) {
       try {
-        const res = await axios.get(`${API}/models/${brandId}`);
-        setModels(res.data?.data || []);
+        // We could also use useQuery here, but for simplicity of the dependent flow 
+        // in this specific complex UI, we'll fetch and set local state
+        const data = await queryClient.fetchQuery({
+          queryKey: ['models', brandId],
+          queryFn: async () => {
+            const res = await API.get(`/models/${brandId}`);
+            return res.data?.data || [];
+          }
+        });
+        setModels(data);
       } catch (error) {
         console.error(error);
       }
@@ -153,8 +139,9 @@ export default function HeroSection({ category }) {
 
     if (modelId) {
       try {
-        const res = await axios.get(`${API}/years/${modelId}`);
+        const res = await API.get(`/years/${modelId}`);
         setYears(res.data?.data || []);
+        // Prefetch types for first year maybe? Or just fetch years
       } catch (error) {
         console.error(error);
       }
@@ -168,7 +155,7 @@ export default function HeroSection({ category }) {
 
     if (year) {
       try {
-        const res = await axios.get(`${API}/types/${year}`);
+        const res = await API.get(`/types/${year}`);
         setTypes(res.data?.data || []);
       } catch (error) {
         console.error(error);
@@ -176,42 +163,28 @@ export default function HeroSection({ category }) {
     }
   };
 
-  // VRM Submit
   const handleVRMSubmit = () => {
-    if (!vrm.trim()) {
-      return toast({ title: "Enter registration number", status: "warning" });
-    }
+    if (!vrm.trim()) return toast({ title: "Enter registration number", status: "warning" });
+    if (!selectedCategory) return toast({ title: "Please select a part", status: "warning" });
 
     const cleanedVRM = vrm.replace(/\s+/g, "").toUpperCase();
-    const ukVrmRegex = /^[A-Z]{2}[0-9]{2}[A-Z]{3}$|^[A-Z]{1,2}[0-9]{1,4}[A-Z]{1,3}$/;
-
-    if (!ukVrmRegex.test(cleanedVRM)) {
-      return toast({ title: "Invalid Registration", description: "Please enter a valid UK number plate", status: "error" });
-    }
-
-    if (!selectedCategory) {
-      return toast({ title: "Please select a part", status: "warning" });
-    }
-
     navigate("/call-seller", {
       state: { vrm: cleanedVRM, category: selectedCategory, searchType: "vrm" },
     });
   };
 
-  // Manual Submit
   const handleManualSubmit = () => {
     if (!selectedBrand || !selectedModel || !selectedYear || !selectedType || !selectedCategory) {
-      return toast({
-        title: "Incomplete Selection",
-        description: "Please fill all fields: Make, Model, Year, Type & Part",
-        status: "warning",
-      });
+      return toast({ title: "Incomplete Selection", status: "warning" });
     }
+
+    const brandName = brands.find(b => b._id === selectedBrand)?.name || "";
+    const modelName = models.find(m => m._id === selectedModel)?.name || "";
 
     navigate("/call-seller", {
       state: {
-        brand: selectedBrand,
-        model: selectedModel,
+        brand: brandName,
+        model: modelName,
         year: selectedYear,
         type: selectedType,
         category: selectedCategory,
@@ -220,261 +193,291 @@ export default function HeroSection({ category }) {
     });
   };
 
-  // Manual Selector Component
-  const ManualSelector = () => (
-    <VStack spacing={3} w="full">
-      <HStack w="full" spacing={3}>
-        <select
-          style={{ flex: 1, padding: "12px", borderRadius: "6px", fontSize: "15px", border: "1px solid #ddd" }}
-          value={selectedBrand}
-          onChange={(e) => handleBrandChange(e.target.value)}
-        >
-          <option value="">Select Make</option>
-          {brands.map((brand) => (
-            <option key={brand._id} value={brand._id}>{brand.name}</option>
-          ))}
-        </select>
-
-        <select
-          style={{ flex: 1, padding: "12px", borderRadius: "6px", fontSize: "15px", border: "1px solid #ddd" }}
-          value={selectedModel}
-          onChange={(e) => handleModelChange(e.target.value)}
-        >
-          <option value="">Select Model</option>
-          {models.map((model) => (
-            <option key={model._id} value={model._id}>{model.name}</option>
-          ))}
-        </select>
-      </HStack>
-
-      <HStack w="full" spacing={3}>
-        <select
-          style={{ flex: 1, padding: "12px", borderRadius: "6px", fontSize: "15px", border: "1px solid #ddd" }}
-          value={selectedYear}
-          onChange={(e) => handleYearChange(e.target.value)}
-        >
-          <option value="">Select Year</option>
-          {years.map((item, i) => (
-            <option key={i} value={item.name}>{item.name}</option>
-          ))}
-        </select>
-
-        <select
-          style={{ flex: 1, padding: "12px", borderRadius: "6px", fontSize: "15px", border: "1px solid #ddd" }}
-          value={selectedType}
-          onChange={(e) => setSelectedType(e.target.value)}
-        >
-          <option value="">Select Type</option>
-          {types.map((item, i) => (
-            <option key={i} value={item.name}>{item.name}</option>
-          ))}
-        </select>
-      </HStack>
-
-      {/* Part Type Dropdown - using partTypes */}
-      <select
-        value={selectedCategory}
-        onChange={(e) => setSelectedCategory(e.target.value)}
-        style={{
-          padding: "12px",
-          borderRadius: "8px",
-          fontSize: "16px",
-          fontWeight: "600",
-          width: "100%",
-          backgroundColor: "#fff"
-        }}
-      >
-        {loadingAllParts ? (
-          <option>Loading parts...</option>
-        ) : allPartTypes.length === 0 ? (
-          <option>No parts available</option>
-        ) : (
-          <>
-            <option value="">Select Part</option>
-            {allPartTypes.map((item) => (
-              <option key={item._id || item.slug} value={item.slug}>
-                {item.name}
-              </option>
-            ))}
-          </>
-        )}
-      </select>
+  const BrandQuickSelect = () => (
+    <VStack align="stretch" spacing={3}>
+      <Text fontSize="xs" fontWeight="800" color="whiteAlpha.600" textTransform="uppercase">Popular Makes</Text>
+      <SimpleGrid columns={3} spacing={2}>
+        {POPULAR_BRANDS.map(b => {
+          const brandObj = brands.find(db => db.slug === b.slug);
+          return (
+            <Button
+              key={b.slug}
+              size="sm"
+              variant="outline"
+              color="white"
+              borderColor="whiteAlpha.300"
+              _hover={{ bg: "whiteAlpha.200", borderColor: "white" }}
+              fontSize="11px"
+              onClick={() => {
+                setActiveTab("manual");
+                if (brandObj) handleBrandChange(brandObj._id);
+              }}
+              onMouseEnter={() => {
+                if (brandObj) prefetchModels(brandObj._id);
+              }}
+            >
+              {b.name}
+            </Button>
+          );
+        })}
+      </SimpleGrid>
     </VStack>
   );
 
   return (
-    <Box position="relative" minH={{ base: "70vh", lg: "650px" }} overflow="hidden" display="flex" alignItems="center">
-      <Box
-        position="absolute"
-        inset={0}
-        bgImage="url('/car-engine-banner.jpg')"
-        bgSize="cover"
-        bgPosition="center"
-      >
-        <Box position="absolute" inset={0} bg="linear-gradient(180deg, rgba(0,0,0,0.5) 0%, rgba(0,0,0,0.7) 100%)" />
+    <Box position="relative" minH={{ base: "85vh", lg: "750px" }} display="flex" alignItems="center" overflow="hidden">
+      {/* Background */}
+      <Box position="absolute" inset={0} bg={DARK}>
+        <Image 
+          src="/car-engine-banner.jpg" 
+          alt="Banner" 
+          objectFit="cover" 
+          w="full" 
+          h="full" 
+          opacity={0.4} 
+          filter="grayscale(20%)"
+        />
+        <Box position="absolute" inset={0} bgGradient="linear(to-b, transparent, rgba(15, 23, 42, 0.9))" />
       </Box>
 
-      <Container maxW="container.xl" position="relative" zIndex={2} py={{ base: 6, md: 10 }}>
-        <VStack spacing={8} align="center" textAlign="center">
-          <Heading
-            color="white"
-            fontSize={{ base: "26px", md: "38px", lg: "48px" }}
-            fontWeight="800"
-            lineHeight="1.2"
-            textShadow="0 2px 10px rgba(0,0,0,0.4)"
+      <Container maxW="container.xl" position="relative" zIndex={2} py={12}>
+        <Flex direction={{ base: "column", lg: "row" }} align="center" justify="space-between" gap={12}>
+          
+          {/* Left Side: Copy */}
+          <MotionVStack 
+            align={{ base: "center", lg: "flex-start" }} 
+            spacing={6} 
+            flex={1.2} 
+            textAlign={{ base: "center", lg: "left" }}
+            variants={staggerContainer}
+            initial="initial"
+            animate="animate"
           >
-            {isCategoryPage ? `Find ${category} for Sale in the UK` : "Compare local car & van engine reconditioners & breakers"}
-          </Heading>
-
-          <Flex
-            direction={{ base: "column", lg: "row" }}
-            align="stretch"
-            justify="center"
-            gap={isCategoryPage ? 0 : 8}
-            w="full"
-            maxW={isCategoryPage ? "1100px" : "550px"}
-          >
-            {/* LEFT CARD - VRM */}
-            <Box
-              bg="#001F3F"
-              borderRadius={isCategoryPage ? { base: "2xl", lg: "2xl 0 0 2xl" } : "2xl"}
-              boxShadow="xl"
-              flex="1"
-              p={{ base: 4, md: 6 }}
-              position="relative"
-            >
-              <VStack spacing={5} align="stretch">
-                <Box>
-                  <Flex bg="#FFD700" borderRadius="md" overflow="hidden" h="54px" align="stretch" border="2px solid" borderColor="#FFD700">
-                    <VStack bg="#003399" w="45px" justify="center" spacing={0} px={1}>
-                      <Text fontSize="10px" lineHeight="1">🇬🇧</Text>
-                      <Text color="white" fontSize="12px" fontWeight="bold">UK</Text>
-                    </VStack>
-                    <Input
-                      placeholder="ENTER YOUR REG"
-                      value={vrm}
-                      onChange={(e) => setVrm(e.target.value.toUpperCase())}
-                      variant="unstyled"
-                      bg="transparent"
-                      color="#333"
-                      _placeholder={{ color: 'rgba(0,0,0,0.3)' }}
-                      h="full"
-                      fontSize="22px"
-                      fontWeight="800"
-                      textAlign="center"
-                      letterSpacing="1px"
-                    />
-                  </Flex>
-                </Box>
-
-                {/* Part Type Dropdown for VRM Card - using partTypes */}
-                <select
-                  value={selectedCategory}
-                  onChange={(e) => setSelectedCategory(e.target.value)}
-                  style={{
-                    padding: "12px",
-                    borderRadius: "8px",
-                    fontSize: "16px",
-                    fontWeight: "600",
-                    width: "100%",
-                    backgroundColor: "#fff"
-                  }}
-                >
-                  {loadingParts ? (
-                    <option>Loading parts...</option>
-                  ) : partTypes.length === 0 ? (
-                    <option>No parts available</option>
-                  ) : (
-                    <>
-                      <option value="">Select Part</option>
-                      {partTypes.map((item) => (
-                        <option key={item._id} value={item.slug}>
-                          {item.name}
-                        </option>
-                      ))}
-                    </>
-                  )}
-                </select>
-
-                <Button
-                  w="full"
-                  size="lg"
-                  bg="#D90404"
-                  color="white"
-                  h="56px"
-                  fontSize="18px"
-                  fontWeight="bold"
-                  rightIcon={<FaArrowRight />}
-                  _hover={{ bg: "#B70303" }}
-                  onClick={handleVRMSubmit}
-                >
-                  Get Free Quotes →
-                </Button>
-
-                <VStack align="start" spacing={2} color="white" fontSize="14px">
-                  <HStack spacing={2}><Icon as={FaCheckCircle} color="green.400" /><Text fontWeight="500">Trusted by 1,000s Across the UK</Text></HStack>
-                  <HStack spacing={2}><Icon as={FaCheckCircle} color="green.400" /><Text fontWeight="500">Up to 50% Savings on Used & Recon Engines</Text></HStack>
-                  <HStack spacing={2}><Icon as={FaCheckCircle} color="green.400" /><Text fontWeight="500">No Upfront Payment - You're In Control</Text></HStack>
-                </VStack>
-
-                {!isCategoryPage && <SupplierStats />}
-              </VStack>
-
-              {isCategoryPage && (
-                <Box
-                  display={{ base: "none", lg: "flex" }}
-                  position="absolute"
-                  right="-15px"
-                  top="50%"
-                  transform="translateY(-50%)"
-                  zIndex={3}
-                  color="white"
-                  fontWeight="900"
-                  fontSize="20px"
-                >
-                  OR
-                </Box>
-              )}
-            </Box>
-
-            {/* RIGHT CARD - MANUAL */}
-            {isCategoryPage && (
-              <Box
-                bg="#002D5C"
-                borderRadius={{ base: "2xl", lg: "0 2xl 2xl 0" }}
-                boxShadow="xl"
-                flex="1"
-                p={{ base: 4, md: 6 }}
-                mt={{ base: 4, lg: 0 }}
+            <MotionBox variants={fadeInUp}>
+              <Badge colorScheme="red" px={3} py={1} borderRadius="full" fontSize="xs" fontWeight="800" letterSpacing="widest">
+                UK'S #1 ENGINE NETWORK
+              </Badge>
+            </MotionBox>
+            
+            <MotionBox variants={fadeInUp}>
+              <Heading
+                color="white"
+                fontSize={{ base: "36px", md: "52px", lg: "64px" }}
+                fontWeight="900"
+                lineHeight="1.1"
               >
-                <VStack spacing={5} align="stretch">
-                  <ManualSelector />
+                {isCategoryPage ? `Find ${category} for Sale` : "Engine Replacement Made Easy."}
+              </Heading>
+            </MotionBox>
+
+            <MotionBox variants={fadeInUp}>
+              <Text color="whiteAlpha.800" fontSize={{ base: "lg", md: "xl" }} maxW="600px">
+                Compare quotes from 200+ verified reconditioners and breakers across the UK. Save up to 50% on used & reconditioned engines.
+              </Text>
+            </MotionBox>
+            
+            <MotionBox variants={fadeInUp}>
+              <SimpleGrid columns={{ base: 1, md: 2 }} gap={4} w="full" maxW="500px">
+                <HStack color="whiteAlpha.900"><Icon as={FaCheckCircle} color="green.400" /><Text fontWeight="600">Verified Suppliers Only</Text></HStack>
+                <HStack color="whiteAlpha.900"><Icon as={FaCheckCircle} color="green.400" /><Text fontWeight="600">Up to 5 Year Warranty</Text></HStack>
+                <HStack color="whiteAlpha.900"><Icon as={FaCheckCircle} color="green.400" /><Text fontWeight="600">Free Nationwide Delivery</Text></HStack>
+                <HStack color="whiteAlpha.900"><Icon as={FaCheckCircle} color="green.400" /><Text fontWeight="600">No Upfront Payment</Text></HStack>
+              </SimpleGrid>
+            </MotionBox>
+          </MotionVStack>
+
+          {/* Right Side: The Form Card */}
+          <MotionBox 
+            bg="rgba(15, 23, 42, 0.85)" 
+            backdropFilter="blur(20px)"
+            p={{ base: 6, md: 8 }} 
+            borderRadius="3xl" 
+            boxShadow="2xl" 
+            w="full" 
+            maxW="480px"
+            border="1px solid"
+            borderColor="whiteAlpha.200"
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+          >
+            {/* Tabs */}
+            <HStack bg="whiteAlpha.100" p={1} borderRadius="xl" mb={8}>
+              <Button 
+                flex={1} 
+                variant="ghost" 
+                size="sm" 
+                color={activeTab === 'vrm' ? DARK : "white"} 
+                bg={activeTab === 'vrm' ? GOLD : "transparent"}
+                _hover={{ bg: activeTab === 'vrm' ? GOLD : "whiteAlpha.200" }}
+                onClick={() => setActiveTab('vrm')}
+                leftIcon={<FaCar />}
+                fontWeight="800"
+              >
+                Registration
+              </Button>
+              <Button 
+                flex={1} 
+                variant="ghost" 
+                size="sm" 
+                color={activeTab === 'manual' ? DARK : "white"} 
+                bg={activeTab === 'manual' ? GOLD : "transparent"}
+                _hover={{ bg: activeTab === 'manual' ? GOLD : "whiteAlpha.200" }}
+                onClick={() => setActiveTab('manual')}
+                leftIcon={<FaTools />}
+                fontWeight="800"
+              >
+                Manual
+              </Button>
+            </HStack>
+
+            <VStack spacing={6} align="stretch">
+              {activeTab === 'vrm' ? (
+                <VStack spacing={4} align="stretch">
+                  <Box>
+                    <Flex bg={GOLD} borderRadius="xl" overflow="hidden" h="64px" align="stretch" border="3px solid" borderColor={GOLD} boxShadow="lg">
+                      <VStack bg="#003399" w="50px" justify="center" spacing={0}>
+                        <Text fontSize="10px" color="white" fontWeight="900">GB</Text>
+                        <Text color={GOLD} fontSize="12px">★</Text>
+                      </VStack>
+                      <Input
+                        placeholder="ENTER REG"
+                        value={vrm}
+                        onChange={(e) => setVrm(e.target.value.toUpperCase())}
+                        variant="unstyled"
+                        bg="white"
+                        color={DARK}
+                        _placeholder={{ color: 'gray.300' }}
+                        h="full"
+                        fontSize="28px"
+                        fontWeight="900"
+                        textAlign="center"
+                        letterSpacing="2px"
+                      />
+                    </Flex>
+                  </Box>
+
+                  <select
+                    value={selectedCategory}
+                    onChange={(e) => setSelectedCategory(e.target.value)}
+                    style={{
+                      padding: "16px",
+                      borderRadius: "12px",
+                      fontSize: "16px",
+                      fontWeight: "700",
+                      width: "100%",
+                      backgroundColor: "rgba(255,255,255,0.1)",
+                      color: "white",
+                      border: "1px solid rgba(255,255,255,0.2)"
+                    }}
+                  >
+                    <option value="" style={{color: DARK}}>Select Part Type</option>
+                    {partTypes.map(pt => (
+                      <option key={pt._id} value={pt.slug} style={{color: DARK}}>{pt.name}</option>
+                    ))}
+                  </select>
 
                   <Button
                     w="full"
-                    size="lg"
-                    bg="#D90404"
+                    h="64px"
+                    bg={RED}
                     color="white"
-                    h="56px"
                     fontSize="18px"
-                    fontWeight="bold"
+                    fontWeight="900"
+                    borderRadius="xl"
+                    onClick={handleVRMSubmit}
+                    _hover={{ bg: "#B70303", transform: "translateY(-2px)" }}
                     rightIcon={<FaArrowRight />}
-                    _hover={{ bg: "#B70303" }}
-                    onClick={handleManualSubmit}
                   >
-                    Get Free Quotes →
+                    Get Free Quotes
                   </Button>
-
-                  <VStack align="start" spacing={2} color="white" fontSize="14px">
-                    <HStack spacing={2}><Icon as={FaCheckCircle} color="green.400" /><Text fontWeight="500">Supply and Fitting Offered</Text></HStack>
-                    <HStack spacing={2}><Icon as={FaCheckCircle} color="green.400" /><Text fontWeight="500">Unlimited Mileage Warranty*</Text></HStack>
-                    <HStack spacing={2}><Icon as={FaCheckCircle} color="green.400" /><Text fontWeight="500">It Only Takes a Minute</Text></HStack>
-                  </VStack>
+                  
+                  <BrandQuickSelect />
                 </VStack>
-              </Box>
-            )}
-          </Flex>
-        </VStack>
+              ) : (
+                <VStack spacing={4} align="stretch">
+                  <SimpleGrid columns={2} spacing={3}>
+                    <select 
+                      value={selectedBrand} 
+                      onChange={(e) => handleBrandChange(e.target.value)}
+                      style={{ padding: "12px", borderRadius: "10px", fontSize: "14px", fontWeight: "600", background: "white" }}
+                    >
+                      <option value="">Make</option>
+                      {brands.map(b => <option key={b._id} value={b._id}>{b.name}</option>)}
+                    </select>
+                    <select 
+                      value={selectedModel} 
+                      onChange={(e) => handleModelChange(e.target.value)}
+                      style={{ padding: "12px", borderRadius: "10px", fontSize: "14px", fontWeight: "600", background: "white" }}
+                    >
+                      <option value="">Model</option>
+                      {models.map(m => <option key={m._id} value={m._id}>{m.name}</option>)}
+                    </select>
+                  </SimpleGrid>
+
+                  <SimpleGrid columns={2} spacing={3}>
+                    <select 
+                      value={selectedYear} 
+                      onChange={(e) => handleYearChange(e.target.value)}
+                      style={{ padding: "12px", borderRadius: "10px", fontSize: "14px", fontWeight: "600", background: "white" }}
+                    >
+                      <option value="">Year</option>
+                      {years.map((y, i) => <option key={i} value={y.name}>{y.name}</option>)}
+                    </select>
+                    <select 
+                      value={selectedType} 
+                      onChange={(e) => setSelectedType(e.target.value)}
+                      style={{ padding: "12px", borderRadius: "10px", fontSize: "14px", fontWeight: "600", background: "white" }}
+                    >
+                      <option value="">Type</option>
+                      {types.map((t, i) => <option key={i} value={t.name}>{t.name}</option>)}
+                    </select>
+                  </SimpleGrid>
+
+                  <select
+                    value={selectedCategory}
+                    onChange={(e) => setSelectedCategory(e.target.value)}
+                    style={{
+                      padding: "16px",
+                      borderRadius: "12px",
+                      fontSize: "16px",
+                      fontWeight: "700",
+                      width: "100%",
+                      backgroundColor: "rgba(255,255,255,0.1)",
+                      color: "white",
+                      border: "1px solid rgba(255,255,255,0.2)"
+                    }}
+                  >
+                    <option value="" style={{color: DARK}}>Select Part Type</option>
+                    {partTypes.map(pt => (
+                      <option key={pt._id} value={pt.slug} style={{color: DARK}}>{pt.name}</option>
+                    ))}
+                  </select>
+
+                  <Button
+                    w="full"
+                    h="64px"
+                    bg={RED}
+                    color="white"
+                    fontSize="18px"
+                    fontWeight="900"
+                    borderRadius="xl"
+                    onClick={handleManualSubmit}
+                    _hover={{ bg: "#B70303", transform: "translateY(-2px)" }}
+                    rightIcon={<FaArrowRight />}
+                  >
+                    Get Free Quotes
+                  </Button>
+                </VStack>
+              )}
+              
+              <Text textAlign="center" color="whiteAlpha.600" fontSize="xs">
+                By searching, you agree to our <Text as="span" textDecor="underline">Terms of Service</Text>.
+              </Text>
+            </VStack>
+          </MotionBox>
+
+        </Flex>
       </Container>
     </Box>
   );

@@ -4,10 +4,13 @@ const inquirySchema = new mongoose.Schema(
   {
     registrationNumber: {
       type: String,
-      required: true,
       uppercase: true,
       trim: true,
     },
+    brand: String,
+    model: String,
+    year: String,
+    engineType: String,
     category: String,
 
     engineOptions: [String],

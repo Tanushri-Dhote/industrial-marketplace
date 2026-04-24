@@ -6,7 +6,24 @@ const Category = require("./models/Category");
 const Website = require("./models/Website");
 const PartType = require("./models/PartType");
 const Brand = require("./models/Brand");
+const Model = require("./models/Model");
 const { buildBrandDocs, buildBrandProducts } = require("./data/brandCatalog");
+
+const brandModels = {
+	"Ford": ["Fiesta", "Focus", "Transit", "Mondeo", "Kuga", "Ranger"],
+	"Volkswagen": ["Golf", "Polo", "Transporter", "Passat", "Tiguan"],
+	"BMW": ["3 Series", "5 Series", "X5", "1 Series", "X3"],
+	"Audi": ["A3", "A4", "A6", "Q5", "TT"],
+	"Mercedes-Benz": ["C-Class", "E-Class", "A-Class", "Sprinter", "GLC"],
+	"Toyota": ["Hilux", "Yaris", "Corolla", "RAV4", "Land Cruiser"],
+	"Honda": ["Civic", "CR-V", "Jazz", "HR-V"],
+	"Nissan": ["Qashqai", "Juke", "Navara", "Micra"],
+	"Vauxhall": ["Corsa", "Astra", "Insignia", "Mokka"],
+	"Peugeot": ["208", "3008", "Partner", "2008"],
+	"Renault": ["Clio", "Captur", "Master", "Megane"],
+	"Land Rover": ["Defender", "Discovery", "Range Rover Sport"],
+	"Range Rover": ["Evoque", "Velar", "Vogue"],
+};
 
 dns.setServers(["1.1.1.1"]);
 const path = require("path");
@@ -309,6 +326,23 @@ async function seed() {
 			await Brand.findOneAndUpdate({ slug: brand.slug }, brand, { upsert: true });
 		}
 		console.log("Synced Brands:", brandDocs.length);
+
+		// Sync Models
+		const brandsInDb = await Brand.find();
+		let modelCount = 0;
+		for (const brand of brandsInDb) {
+			const models = brandModels[brand.name] || ["Other"];
+			for (const modelName of models) {
+				const modelSlug = modelName.toLowerCase().replace(/ /g, "-");
+				await Model.findOneAndUpdate(
+					{ brandId: brand._id, slug: modelSlug },
+					{ name: modelName, brandId: brand._id, slug: modelSlug },
+					{ upsert: true }
+				);
+				modelCount++;
+			}
+		}
+		console.log("Synced Models:", modelCount);
 
 		const partTypeData = partTypes.map((pt) => ({
 			...pt,

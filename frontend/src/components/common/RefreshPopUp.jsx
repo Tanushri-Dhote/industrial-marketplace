@@ -1,4 +1,6 @@
 import React, { useEffect, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import axios from "axios";
 import {
 	Modal,
 	ModalOverlay,
@@ -36,8 +38,14 @@ const RefreshPopUp = () => {
 	const [vrm, setVrm] = useState("");
 	const [vrmError, setVrmError] = useState("");
 	const [isChecking, setIsChecking] = useState(false);
-	const [partTypes, setPartTypes] = useState([]);
-	const [loadingPartTypes, setLoadingPartTypes] = useState(false);
+	const { data: partTypes = [], isLoading: loadingPartTypes } = useQuery({
+		queryKey: ['part-types'],
+		queryFn: async () => {
+			const res = await axios.get(`${import.meta.env.VITE_API_URL}/part-types`);
+			return res.data?.data || res.data || [];
+		},
+		staleTime: 1000 * 60 * 30,
+	});
 
 	// ✅ Routes where popup SHOULD show (landing page variants only)
 	const allowedRoutes = [
@@ -50,9 +58,21 @@ const RefreshPopUp = () => {
 
 	useEffect(() => {
 		const isAllowed = allowedRoutes.includes(location.pathname);
+		
+		// Check if popup was shown recently (within 24 hours)
+		const lastShown = localStorage.getItem("last_popup_shown");
+		const now = new Date().getTime();
+		const interval = 30 * 60 * 1000; // 30 minutes
+		
+		const shouldShow = !lastShown || (now - parseInt(lastShown) > interval);
 
-		if (isAllowed) {
-			onOpen();
+		if (isAllowed && shouldShow) {
+			const timer = setTimeout(() => {
+				onOpen();
+				localStorage.setItem("last_popup_shown", now.toString());
+			}, 5000); // 5 second delay
+
+			return () => clearTimeout(timer);
 		}
 	}, [location.pathname]); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -93,14 +113,14 @@ const RefreshPopUp = () => {
 	};
 
 	useEffect(() => {
-		if (!isOpen || loadingPartTypes || partTypes.length === 0) {
+		if (!isOpen || partTypes.length === 0) {
 			return;
 		}
 
 		if (!selectedPartType) {
 			setSelectedPartType(defaultPartTypeId || partTypes[0]._id);
 		}
-	}, [defaultPartTypeId, isOpen, loadingPartTypes, partTypes, selectedPartType]);
+	}, [defaultPartTypeId, isOpen, partTypes, selectedPartType]);
 
 	const validateVRM = (reg) => {
 		const vrmPattern =
@@ -344,29 +364,11 @@ const RefreshPopUp = () => {
 	};
 
 	useEffect(() => {
-		const fetchPartTypes = async () => {
-			try {
-				setLoadingPartTypes(true);
-
-				const res = await fetch(`${import.meta.env.VITE_API_URL}/part-types`);
-				const data = await res.json();
-
-				setPartTypes(data);
-
-				// ✅ set default using _id
-				if (data.length > 0) {
-					setDefaultPartTypeId(data[0]._id);
-					setSelectedPartType(data[0]._id);
-				}
-			} catch (error) {
-				console.error("Error fetching part types:", error);
-			} finally {
-				setLoadingPartTypes(false);
-			}
-		};
-
-		fetchPartTypes();
-	}, []);
+		if (partTypes.length > 0 && !defaultPartTypeId) {
+			setDefaultPartTypeId(partTypes[0]._id);
+			setSelectedPartType(partTypes[0]._id);
+		}
+	}, [partTypes, defaultPartTypeId]);
 
 	return (
 		<Modal

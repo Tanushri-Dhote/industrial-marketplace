@@ -17,42 +17,33 @@ import {
 import { useEffect, useState } from "react";
 import { FaArrowRight } from "react-icons/fa";
 import { Link as RouterLink } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
 import API from "../services/api";
 
 export default function TopEnginesSection({ category }) {
-	const [engines, setEngines] = useState([]);
-	const [loading, setLoading] = useState(true);
 	const accentColor = "#B50303";
 	const surfaceColor = "#F3F5F8";
 
-	useEffect(() => {
-		const fetchProducts = async () => {
-			try {
-				setLoading(true);
-				const res = await API.get("/products");
-				const products = res.data.data || res.data || [];
+	const { data: engines = [], isLoading: loading } = useQuery({
+		queryKey: ['products', { category }],
+		queryFn: async () => {
+			const res = await API.get("/products");
+			const products = res.data.data || res.data || [];
 
-				let filtered = products;
-				if (category && category !== "Industrial Engines") {
-					filtered = products.filter(
-						(p) =>
-							p.category?.name === category ||
-							(category === "Used Engines" && p.condition?.toLowerCase() === "used") ||
-							(category === "Reconditioned Engines" &&
-								p.condition?.toLowerCase() === "reconditioned"),
-					);
-				}
-
-				setEngines(filtered.slice(0, 10)); // Show top 10
-			} catch (error) {
-				console.error("Error fetching products:", error);
-			} finally {
-				setLoading(false);
+			let filtered = products;
+			if (category && category !== "Industrial Engines") {
+				filtered = products.filter(
+					(p) =>
+						p.category?.name === category ||
+						(category === "Used Engines" && p.condition?.toLowerCase() === "used") ||
+						(category === "Reconditioned Engines" &&
+							p.condition?.toLowerCase() === "reconditioned"),
+				);
 			}
-		};
-
-		fetchProducts();
-	}, [category]);
+			return filtered.slice(0, 10);
+		},
+		staleTime: 1000 * 60 * 5,
+	});
 
 	const EngineCard = ({ engine }) => (
 		<VStack

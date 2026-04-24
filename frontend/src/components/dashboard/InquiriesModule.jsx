@@ -30,6 +30,10 @@ function saveStatuses(s) { localStorage.setItem(STORAGE_KEY, JSON.stringify(s));
 const mapInquiryFromApi = (inquiry) => ({
 	id: inquiry._id,
 	registrationNumber: inquiry.registrationNumber || "—",
+	brand: inquiry.brand || "",
+	model: inquiry.model || "",
+	year: inquiry.year || "",
+	engineType: inquiry.engineType || "",
 	category: inquiry.category || "—",
 	engineOptions: inquiry.engineOptions || [],
 	fittingOptions: inquiry.fittingOptions || [],
@@ -517,25 +521,33 @@ function InquiryViewModal({ isOpen, onClose, inquiry, isViewer, onCreateQuote, o
 							<Icon as={Car} size={28} opacity={0.9} />
 							<VStack align="flex-start" spacing={0}>
 								<Text fontSize="22px" fontWeight="900">Inquiry Details</Text>
-								<Text opacity={0.7} fontSize="13px">VRM: {inquiry.registrationNumber}</Text>
+								<Text opacity={0.7} fontSize="13px">
+									{inquiry.registrationNumber !== "—" 
+										? `Reference: ${inquiry.refNumber}` 
+										: `${inquiry.brand} ${inquiry.model} ${inquiry.year}`.trim() || "Manual Selection"}
+								</Text>
 							</VStack>
 						</HStack>
-						<Flex
-							bg={PLATE_YELLOW}
-							border="2.5px solid #1a1a1a"
-							borderRadius="8px"
-							overflow="hidden"
-							h="36px"
-							align="center"
-						>
-							<Flex bg="#003399" h="100%" w="28px" flexDir="column" align="center" justify="center">
-								<Text color="white" fontSize="6px" fontWeight="900">GB</Text>
-								<Text color={PLATE_YELLOW} fontSize="9px">★</Text>
+						
+						{inquiry.registrationNumber !== "—" && (
+							<Flex
+								bg={PLATE_YELLOW}
+								border="2.5px solid #1a1a1a"
+								borderRadius="8px"
+								overflow="hidden"
+								h="36px"
+								align="center"
+								boxShadow="lg"
+							>
+								<Flex bg="#003399" h="100%" w="28px" flexDir="column" align="center" justify="center">
+									<Text color="white" fontSize="6px" fontWeight="900">GB</Text>
+									<Text color={PLATE_YELLOW} fontSize="9px">★</Text>
+								</Flex>
+								<Text px={3} fontSize="16px" fontWeight="900" letterSpacing="2px" color="#1a1a1a" fontFamily="'Arial Black', sans-serif">
+									{inquiry.registrationNumber}
+								</Text>
 							</Flex>
-							<Text px={3} fontSize="16px" fontWeight="900" letterSpacing="2px" color="#1a1a1a" fontFamily="'Arial Black', sans-serif">
-								{inquiry.registrationNumber}
-							</Text>
-						</Flex>
+						)}
 					</HStack>
 				</Box>
 				<ModalCloseButton color="white" top={6} right={6} />

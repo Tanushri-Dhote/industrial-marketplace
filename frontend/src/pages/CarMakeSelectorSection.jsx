@@ -1,4 +1,4 @@
-﻿import React, { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
 	Badge,
 	Box,
@@ -23,6 +23,7 @@ import {
 } from "@chakra-ui/react";
 import { FaArrowLeft, FaArrowRight } from "react-icons/fa";
 import { Link as RouterLink, useSearchParams } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
 import API from "../services/api";
 
 const accentColor = "#D90404";
@@ -126,74 +127,44 @@ function EngineProductCard({ engine }) {
 export default function CarMakeSelectorSection() {
 	const [searchParams, setSearchParams] = useSearchParams();
 	const selectedSlug = searchParams.get("brand");
-	const [brands, setBrands] = useState([]);
-	const [selectedBrand, setSelectedBrand] = useState(null);
-	const [brandProducts, setBrandProducts] = useState([]);
-	const [loadingBrands, setLoadingBrands] = useState(true);
-	const [loadingDetail, setLoadingDetail] = useState(false);
-	const [error, setError] = useState("");
 
-	useEffect(() => {
-		const fetchBrands = async () => {
-			try {
-				setLoadingBrands(true);
-				const res = await API.get("/brands");
-				const data = res.data?.data || res.data || [];
-				setBrands(data);
-			} catch (fetchError) {
-				console.error("Error fetching brands:", fetchError);
-				setError("Unable to load brand list right now.");
-			} finally {
-				setLoadingBrands(false);
-			}
-		};
+	// Fetch all brands
+	const { data: brands = [], isLoading: loadingBrands } = useQuery({
+		queryKey: ['brands'],
+		queryFn: async () => {
+			const res = await API.get("/brands");
+			return res.data?.data || res.data || [];
+		},
+		staleTime: 1000 * 60 * 30,
+	});
 
-		fetchBrands();
-	}, []);
+	// Find basic brand info from the list
+	const fallbackBrand = brands.find((brand) => brand.slug === selectedSlug);
 
-	useEffect(() => {
-		if (!selectedSlug) {
-			setSelectedBrand(null);
-			setBrandProducts([]);
-			setError("");
-			return;
-		}
+	// Fetch brand details if a slug is selected
+	const { data: selectedBrandData, isLoading: loadingBrandDetail } = useQuery({
+		queryKey: ['brands', selectedSlug],
+		queryFn: async () => {
+			const res = await API.get(`/brands/${selectedSlug}`);
+			return res.data?.data || res.data;
+		},
+		enabled: !!selectedSlug,
+		staleTime: 1000 * 60 * 10,
+	});
 
-		const fetchBrandDetail = async () => {
-			const fallbackBrand = brands.find((brand) => brand.slug === selectedSlug);
+	// Fetch products for the brand
+	const { data: brandProducts = [], isLoading: loadingProducts } = useQuery({
+		queryKey: ['products', { make: fallbackBrand?.productMake, limit: 8 }],
+		queryFn: async () => {
+			const res = await API.get("/products", { params: { make: fallbackBrand.productMake, limit: 8 } });
+			return res.data?.data || res.data || [];
+		},
+		enabled: !!fallbackBrand?.productMake,
+		staleTime: 1000 * 60 * 5,
+	});
 
-			if (!fallbackBrand) {
-				setError("Brand not found.");
-				setSelectedBrand(null);
-				setBrandProducts([]);
-				return;
-			}
-
-			try {
-				setLoadingDetail(true);
-				setError("");
-
-				const [brandRes, productsRes] = await Promise.all([
-					API.get(`/brands/${selectedSlug}`),
-					API.get("/products", { params: { make: fallbackBrand.productMake, limit: 8 } }),
-				]);
-
-				setSelectedBrand(brandRes.data?.data || brandRes.data || fallbackBrand);
-				setBrandProducts(productsRes.data?.data || productsRes.data || []);
-			} catch (fetchError) {
-				console.error("Error fetching brand detail:", fetchError);
-				setError("Unable to load brand detail right now.");
-				setSelectedBrand(fallbackBrand);
-				setBrandProducts([]);
-			} finally {
-				setLoadingDetail(false);
-			}
-		};
-
-		if (brands.length > 0) {
-			fetchBrandDetail();
-		}
-	}, [brands, selectedSlug]);
+	const selectedBrand = selectedBrandData || fallbackBrand;
+	const error = selectedSlug && !loadingBrands && !fallbackBrand ? "Brand not found." : "";
 
 	const openBrand = (brandSlug) => {
 		setSearchParams({ brand: brandSlug });
@@ -202,8 +173,8 @@ export default function CarMakeSelectorSection() {
 	const closeBrand = () => {
 		setSearchParams({});
 	};
-	const showDetailLoader =
-		loadingBrands || loadingDetail || (selectedSlug && !selectedBrand && !error);
+
+	const showDetailLoader = loadingBrands || loadingBrandDetail || (selectedSlug && !selectedBrand && !error);
 	const renderBrandGrid = () => {
 		if (loadingBrands) {
 			return (
