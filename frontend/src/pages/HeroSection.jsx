@@ -242,7 +242,7 @@ export default function HeroSection({ category }) {
         >
           <option value="">Select Model</option>
           {models.map((model) => (
-            <option key={model._id} value={model._id}>{model.modelName}</option>
+            <option key={model._id} value={model._id}>{model.name}</option>
           ))}
         </select>
       </HStack>
