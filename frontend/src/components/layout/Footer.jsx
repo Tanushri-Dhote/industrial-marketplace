@@ -19,11 +19,16 @@ import {
 import { FaArrowRight, FaCode, FaExternalLinkAlt } from 'react-icons/fa';
 import { MdLocationOn, MdPhone, MdEmail, MdAccessTime } from 'react-icons/md';
 import { Link as RouterLink } from 'react-router-dom';
+import { useNavigate } from "react-router-dom";
+import { useToast } from "@chakra-ui/react";
 
 export default function Footer() {
   const [email, setEmail] = useState('');
   const [subscribed, setSubscribed] = useState(false);
   const [regNumber, setRegNumber] = useState('');
+
+  const navigate = useNavigate();
+  const toast = useToast();
 
   const accentColor = "#D90404";
 
@@ -35,12 +40,47 @@ export default function Footer() {
     }
   };
 
+
   const handleGetQuotes = () => {
-    if (regNumber.trim()) {
-      window.location.href = `/search?reg=${encodeURIComponent(regNumber.trim())}`;
-    } else {
-      alert("Please enter your registration number");
+    if (!regNumber.trim()) {
+      return toast({
+        title: "Enter registration number",
+        status: "warning",
+        duration: 2500,
+        isClosable: true,
+        position: "top",
+      });
     }
+
+    const cleanedVRM = regNumber.replace(/\s+/g, "").toUpperCase();
+
+    const ukVrmRegex =
+      /^[A-Z]{2}[0-9]{2}[A-Z]{3}$|^[A-Z]{1,2}[0-9]{1,4}[A-Z]{1,3}$/;
+
+    if (!ukVrmRegex.test(cleanedVRM)) {
+      return toast({
+        title: "Invalid Registration",
+        description: "Enter valid UK number plate",
+        status: "error",
+        duration: 3000,
+        isClosable: true,
+        position: "top",
+      });
+    }
+
+    // clear input after success
+    setRegNumber("");
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
+
+    navigate("/call-seller", {
+      state: {
+        vrm: cleanedVRM,
+        category: "",
+      },
+    });
   };
 
   return (
@@ -61,17 +101,19 @@ export default function Footer() {
             <HStack spacing={3} flex="1" maxW={{ base: "100%", md: "520px" }}>
               {/* REG HERE Input Box */}
               <InputGroup size="lg">
+
                 <Input
                   placeholder="Enter Registration Number"
                   value={regNumber}
-                  onChange={(e) => setRegNumber(e.target.value)}
+                  onChange={(e) => setRegNumber(e.target.value.toUpperCase())}
+                  textTransform="uppercase"
                   bg="#FFCC00"
                   color="black"
                   fontWeight="600"
                   border="none"
                   borderRadius="md"
-                  _placeholder={{ color: "blackAlpha.700" }}
-                  onKeyPress={(e) => e.key === 'Enter' && handleGetQuotes()}
+                  _placeholder={{ color: "blackAlpha.700", textTransform: "none" }}
+                  onKeyDown={(e) => e.key === "Enter" && handleGetQuotes()}
                 />
                 <InputRightElement width="110px">
                   <Text
@@ -116,7 +158,7 @@ export default function Footer() {
           <Stack spacing={5}>
             <HStack spacing={3}>
               <Box
-                 h="100px"
+                h="100px"
               >
                 <img
                   src="/logo_engine.PNG"

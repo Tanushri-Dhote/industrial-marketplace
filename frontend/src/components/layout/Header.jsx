@@ -36,6 +36,7 @@ import {
 } from 'react-icons/fa';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import AdminHeader from './AdminHeader';
+import { useToast } from "@chakra-ui/react";
 
 export default function Header() {
   const { isOpen, onToggle } = useDisclosure();
@@ -44,6 +45,7 @@ export default function Header() {
   const [userName, setUserName] = useState('');
   const [scrolled, setScrolled] = useState(false);
   const [regNumber, setRegNumber] = useState('');
+  const toast = useToast();
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -92,9 +94,40 @@ export default function Header() {
   };
 
   const handleRegSubmit = () => {
-    if (regNumber.trim()) {
-      navigate(`/search?reg=${encodeURIComponent(regNumber.trim())}`);
+    if (!regNumber.trim()) {
+      return toast({
+        title: "Enter registration number",
+        status: "warning",
+        duration: 2500,
+        isClosable: true,
+        position: "top",
+      });
     }
+
+    const cleanedVRM = regNumber.replace(/\s+/g, "").toUpperCase();
+
+    const ukVrmRegex =
+      /^[A-Z]{2}[0-9]{2}[A-Z]{3}$|^[A-Z]{1,2}[0-9]{1,4}[A-Z]{1,3}$/;
+
+    if (!ukVrmRegex.test(cleanedVRM)) {
+      return toast({
+        title: "Invalid Registration",
+        description: "Enter valid UK number plate",
+        status: "error",
+        duration: 3000,
+        isClosable: true,
+        position: "top",
+      });
+    }
+
+    // clear input
+    setRegNumber("");
+    navigate("/call-seller", {
+      state: {
+        vrm: cleanedVRM,
+        category: "",
+      },
+    });
   };
 
   if (isLoggedIn) {
@@ -102,10 +135,10 @@ export default function Header() {
   }
 
   return (
-    <Box 
-      as="header" 
-      position="sticky" 
-      top="0" 
+    <Box
+      as="header"
+      position="sticky"
+      top="0"
       zIndex="1000"
       transform="translateZ(0)"
       backfaceVisibility="hidden"
@@ -128,22 +161,22 @@ export default function Header() {
             {/* Logo with Box */}
             <Link to="/">
               <HStack spacing={2}>
-                  <Box
-                    h={scrolled ? "32px" : "50px"}
-                    transition="height 0.4s cubic-bezier(0.4, 0, 0.2, 1)"
-                    willChange="height"
-                  >
-                    <img
-                      src="/logo_engine.PNG"
-                      alt="All Engines Logo"
-                      style={{
-                        height: "100%",
-                        objectFit: "contain",
-                        display: "block"
-                      }}
-                    />
-                  </Box>
-            
+                <Box
+                  h={scrolled ? "32px" : "50px"}
+                  transition="height 0.4s cubic-bezier(0.4, 0, 0.2, 1)"
+                  willChange="height"
+                >
+                  <img
+                    src="/logo_engine.PNG"
+                    alt="All Engines Logo"
+                    style={{
+                      height: "100%",
+                      objectFit: "contain",
+                      display: "block"
+                    }}
+                  />
+                </Box>
+
               </HStack>
             </Link>
 
@@ -151,19 +184,22 @@ export default function Header() {
             {scrolled ? (
               <Flex flex="1" maxW="480px" mx="auto">
                 <InputGroup size="md">
+
                   <Input
                     placeholder="Enter Registration Number (e.g. AB12 CDE)"
                     value={regNumber}
-                    onChange={(e) => setRegNumber(e.target.value)}
+                    onChange={(e) => setRegNumber(e.target.value.toUpperCase())}
+                    textTransform="uppercase"
                     bg="gray.50"
                     borderColor="gray.300"
                     height="42px"
                     fontSize="14px"
+                    _placeholder={{ textTransform: "none" }}
                     _focus={{
                       borderColor: accentColor,
                       boxShadow: `0 0 0 3px rgba(255,107,0,0.15)`
                     }}
-                    onKeyPress={(e) => e.key === 'Enter' && handleRegSubmit()}
+                    onKeyDown={(e) => e.key === "Enter" && handleRegSubmit()}
                   />
                   <InputRightElement width="70px" height="42px">
                     <Button
@@ -190,9 +226,9 @@ export default function Header() {
                 fontSize="15px"
                 fontWeight="500"
               >
-                <ChakraLink 
-                  as={Link} 
-                  to="/" 
+                <ChakraLink
+                  as={Link}
+                  to="/"
                   color={location.pathname === "/" ? accentColor : "inherit"}
                   borderBottom={location.pathname === "/" ? `2px solid ${accentColor}` : "none"}
                   pb={1}
@@ -200,9 +236,9 @@ export default function Header() {
                 >
                   Home
                 </ChakraLink>
-                <ChakraLink 
-                  as={Link} 
-                  to="/car-engines" 
+                <ChakraLink
+                  as={Link}
+                  to="/car-engines"
                   color={location.pathname === "/car-engines" ? accentColor : "inherit"}
                   borderBottom={location.pathname === "/car-engines" ? `2px solid ${accentColor}` : "none"}
                   pb={1}
@@ -210,9 +246,9 @@ export default function Header() {
                 >
                   Car Engines
                 </ChakraLink>
-                <ChakraLink 
-                  as={Link} 
-                  to="/used-engines" 
+                <ChakraLink
+                  as={Link}
+                  to="/used-engines"
                   color={location.pathname === "/used-engines" ? accentColor : "inherit"}
                   borderBottom={location.pathname === "/used-engines" ? `2px solid ${accentColor}` : "none"}
                   pb={1}
@@ -220,9 +256,9 @@ export default function Header() {
                 >
                   Used Engines
                 </ChakraLink>
-                <ChakraLink 
-                  as={Link} 
-                  to="/reconditioned-engines" 
+                <ChakraLink
+                  as={Link}
+                  to="/reconditioned-engines"
                   color={location.pathname === "/reconditioned-engines" ? accentColor : "inherit"}
                   borderBottom={location.pathname === "/reconditioned-engines" ? `2px solid ${accentColor}` : "none"}
                   pb={1}
@@ -230,9 +266,9 @@ export default function Header() {
                 >
                   Reconditioned Engines
                 </ChakraLink>
-                <ChakraLink 
-                  as={Link} 
-                  to="/gearboxes" 
+                <ChakraLink
+                  as={Link}
+                  to="/gearboxes"
                   color={location.pathname === "/gearboxes" ? accentColor : "inherit"}
                   borderBottom={location.pathname === "/gearboxes" ? `2px solid ${accentColor}` : "none"}
                   pb={1}
@@ -328,60 +364,60 @@ export default function Header() {
             <Collapse in={isOpen} animateOpacity>
               <Box pt={4} pb={6} borderTop="1px solid" borderColor="gray.100">
                 <Stack spacing={2}>
-                  <Button 
-                    variant="ghost" 
-                    justifyContent="flex-start" 
-                    as={Link} 
-                    to="/" 
-                    onClick={onToggle} 
+                  <Button
+                    variant="ghost"
+                    justifyContent="flex-start"
+                    as={Link}
+                    to="/"
+                    onClick={onToggle}
                     fontSize="14px"
                     color={location.pathname === "/" ? accentColor : "inherit"}
                     bg={location.pathname === "/" ? "orange.50" : "transparent"}
                   >
                     Home
                   </Button>
-                  <Button 
-                    variant="ghost" 
-                    justifyContent="flex-start" 
-                    as={Link} 
-                    to="/car-engines" 
-                    onClick={onToggle} 
+                  <Button
+                    variant="ghost"
+                    justifyContent="flex-start"
+                    as={Link}
+                    to="/car-engines"
+                    onClick={onToggle}
                     fontSize="14px"
                     color={location.pathname === "/car-engines" ? accentColor : "inherit"}
                     bg={location.pathname === "/car-engines" ? "orange.50" : "transparent"}
                   >
                     Car Engines
                   </Button>
-                  <Button 
-                    variant="ghost" 
-                    justifyContent="flex-start" 
-                    as={Link} 
-                    to="/used-engines" 
-                    onClick={onToggle} 
+                  <Button
+                    variant="ghost"
+                    justifyContent="flex-start"
+                    as={Link}
+                    to="/used-engines"
+                    onClick={onToggle}
                     fontSize="14px"
                     color={location.pathname === "/used-engines" ? accentColor : "inherit"}
                     bg={location.pathname === "/used-engines" ? "orange.50" : "transparent"}
                   >
                     Used Engines
                   </Button>
-                  <Button 
-                    variant="ghost" 
-                    justifyContent="flex-start" 
-                    as={Link} 
-                    to="/reconditioned-engines" 
-                    onClick={onToggle} 
+                  <Button
+                    variant="ghost"
+                    justifyContent="flex-start"
+                    as={Link}
+                    to="/reconditioned-engines"
+                    onClick={onToggle}
                     fontSize="14px"
                     color={location.pathname === "/reconditioned-engines" ? accentColor : "inherit"}
                     bg={location.pathname === "/reconditioned-engines" ? "orange.50" : "transparent"}
                   >
                     Reconditioned Engines
                   </Button>
-                  <Button 
-                    variant="ghost" 
-                    justifyContent="flex-start" 
-                    as={Link} 
-                    to="/gearboxes" 
-                    onClick={onToggle} 
+                  <Button
+                    variant="ghost"
+                    justifyContent="flex-start"
+                    as={Link}
+                    to="/gearboxes"
+                    onClick={onToggle}
                     fontSize="14px"
                     color={location.pathname === "/gearboxes" ? accentColor : "inherit"}
                     bg={location.pathname === "/gearboxes" ? "orange.50" : "transparent"}

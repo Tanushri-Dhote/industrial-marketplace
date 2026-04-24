@@ -1,5 +1,5 @@
 // src/components/HeroSection.jsx
-import React from 'react';
+import React, { useState, useEffect } from "react";
 import {
   Box,
   Container,
@@ -15,6 +15,9 @@ import {
   Badge,
 } from '@chakra-ui/react';
 import { FaArrowRight, FaCheckCircle } from 'react-icons/fa';
+import { useToast } from "@chakra-ui/react";
+import { useNavigate } from "react-router-dom";
+
 
 const SupplierStats = () => {
   const stats = [
@@ -54,6 +57,42 @@ const SupplierStats = () => {
 };
 
 export default function HeroSection({ category }) {
+
+  const [partTypes, setPartTypes] = useState([]);
+  const [loadingParts, setLoadingParts] = useState(false);
+  const API = import.meta.env.VITE_API_URL;
+
+
+  // inside HeroSection component add useEffect
+
+  useEffect(() => {
+    const fetchPartTypes = async () => {
+      try {
+        setLoadingParts(true);
+
+        const res = await fetch(`${API}/part-types`);
+        const data = await res.json();
+
+        if (Array.isArray(data)) {
+          const activeParts = data.filter((item) => item.isActive);
+
+          setPartTypes(activeParts);
+
+          // first item auto selected
+          if (activeParts.length > 0) {
+            setSelectedCategory(activeParts[0].slug);
+          }
+        }
+      } catch (error) {
+        console.error("Failed to load part types", error);
+      } finally {
+        setLoadingParts(false);
+      }
+    };
+
+    fetchPartTypes();
+  }, []);
+
   const isCategoryPage = category && category !== 'Industrial Engines';
 
   const getDropdownValue = (cat) => {
@@ -76,6 +115,42 @@ export default function HeroSection({ category }) {
     </VStack>
   );
 
+  const navigate = useNavigate();
+  const toast = useToast();
+  const [vrm, setVrm] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("engines");
+
+
+  const handleVRMSubmit = () => {
+    if (!vrm) {
+      return toast({
+        title: "Enter registration number",
+        status: "warning",
+      });
+    }
+
+    const cleanedVRM = vrm.replace(/\s+/g, "").toUpperCase();
+
+    const ukVrmRegex =
+      /^[A-Z]{2}[0-9]{2}[A-Z]{3}$|^[A-Z]{1,2}[0-9]{1,4}[A-Z]{1,3}$/;
+
+    if (!ukVrmRegex.test(cleanedVRM)) {
+      return toast({
+        title: "Invalid Registration",
+        description: "Enter valid UK number plate",
+        status: "error",
+      });
+    }
+
+    // ✅ ONLY NAVIGATE (NO API)
+    navigate("/call-seller", {
+      state: {
+        vrm: cleanedVRM,
+        category: selectedCategory,
+      },
+    });
+  };
+
   return (
     <Box position="relative" minH={{ base: "70vh", lg: "650px" }} overflow="hidden" display="flex" alignItems="center">
 
@@ -97,7 +172,7 @@ export default function HeroSection({ category }) {
 
       <Container maxW="container.xl" position="relative" zIndex={2} py={{ base: 6, md: 10 }}>
         <VStack spacing={8} align="center" textAlign="center">
-          
+
           {/* Dynamic Headline */}
           <Heading
             color="white"
@@ -110,10 +185,10 @@ export default function HeroSection({ category }) {
           </Heading>
 
           {/* Dual/Single Inquiry Card Container */}
-          <Flex 
-            direction={{ base: "column", lg: "row" }} 
-            align="stretch" 
-            justify="center" 
+          <Flex
+            direction={{ base: "column", lg: "row" }}
+            align="stretch"
+            justify="center"
             gap={isCategoryPage ? 0 : 8}
             w="full"
             maxW={isCategoryPage ? "1100px" : "550px"}
@@ -134,16 +209,58 @@ export default function HeroSection({ category }) {
                       <Text fontSize="10px" lineHeight="1">🇬🇧</Text>
                       <Text color="white" fontSize="12px" fontWeight="bold">UK</Text>
                     </VStack>
-                    <Input placeholder="ENTER YOUR REG" variant="unstyled" bg="transparent" color="#333" _placeholder={{ color: 'rgba(0,0,0,0.3)' }} h="full" fontSize="22px" fontWeight="800" textAlign="center" letterSpacing="1px" textTransform="uppercase" />
+                    {/* <Input placeholder="ENTER YOUR REG" variant="unstyled" bg="transparent" color="#333" _placeholder={{ color: 'rgba(0,0,0,0.3)' }} h="full" fontSize="22px" fontWeight="800" textAlign="center" letterSpacing="1px" textTransform="uppercase" /> */}
+
+                    <Input
+                      placeholder="ENTER YOUR REG"
+                      value={vrm}
+                      onChange={(e) => setVrm(e.target.value.toUpperCase())}
+                      variant="unstyled"
+                      bg="transparent"
+                      color="#333"
+                      _placeholder={{ color: 'rgba(0,0,0,0.3)' }}
+                      h="full"
+                      fontSize="22px"
+                      fontWeight="800"
+                      textAlign="center"
+                      letterSpacing="1px"
+                    />
                   </Flex>
                 </Box>
-
-                <select value={getDropdownValue(category)} onChange={() => {}} style={{ padding: '12px', borderRadius: '8px', fontSize: '16px', fontWeight: '600' }}>
-                  <option value="engines">Engine</option>
-                  <option value="gearboxes">Gearbox</option>
+                <select
+                  value={selectedCategory}
+                  onChange={(e) => setSelectedCategory(e.target.value)}
+                  style={{
+                    padding: "12px",
+                    borderRadius: "8px",
+                    fontSize: "16px",
+                    fontWeight: "600",
+                  }}
+                >
+                  {loadingParts ? (
+                    <option>Loading...</option>
+                  ) : (
+                    partTypes.map((item) => (
+                      <option key={item._id} value={item.slug}>
+                        {item.name}
+                      </option>
+                    ))
+                  )}
                 </select>
 
-                <Button w="full" size="lg" bg="#D90404" color="white" h="56px" fontSize="18px" fontWeight="bold" rightIcon={<FaArrowRight />} _hover={{ bg: "#B70303" }}>
+                <Button
+                  w="full"
+                  size="lg"
+                  bg="#D90404"
+                  color="white"
+                  h="56px"
+                  fontSize="18px"
+                  fontWeight="bold"
+                  rightIcon={<FaArrowRight />}
+                  _hover={{ bg: "#B70303" }}
+
+                  onClick={handleVRMSubmit}
+                >
                   Get Free Quotes
                 </Button>
 
@@ -157,12 +274,12 @@ export default function HeroSection({ category }) {
               </VStack>
 
               {isCategoryPage && (
-                <Box 
-                  display={{ base: "none", lg: "flex" }} 
-                  position="absolute" 
-                  right="-15px" 
-                  top="50%" 
-                  transform="translateY(-50%)" 
+                <Box
+                  display={{ base: "none", lg: "flex" }}
+                  position="absolute"
+                  right="-15px"
+                  top="50%"
+                  transform="translateY(-50%)"
                   zIndex={3}
                   bg="transparent"
                   color="white"
