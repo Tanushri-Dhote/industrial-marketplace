@@ -39,23 +39,22 @@ const RefreshPopUp = () => {
 	const [partTypes, setPartTypes] = useState([]);
 	const [loadingPartTypes, setLoadingPartTypes] = useState(false);
 
-	// ❌ Routes where popup should NOT show
-	const excludedRoutes = [
-		"/privacy-policy",
-		"/terms-and-conditions",
-		"/about",
-		"/contact",
-		"/blog",
-		"/call-seller",
+	// ✅ Routes where popup SHOULD show (landing page variants only)
+	const allowedRoutes = [
+		"/",
+		"/car-engines",
+		"/used-engines",
+		"/reconditioned-engines",
+		"/gearboxes",
 	];
 
 	useEffect(() => {
-		const isExcluded = excludedRoutes.some((route) => location.pathname.startsWith(route));
+		const isAllowed = allowedRoutes.includes(location.pathname);
 
-		if (!isExcluded) {
+		if (isAllowed) {
 			onOpen();
 		}
-	}, [location.pathname, onOpen]);
+	}, [location.pathname]); // eslint-disable-line react-hooks/exhaustive-deps
 
 	// Reset state when modal closes
 	const handleClose = () => {

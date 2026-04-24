@@ -58,6 +58,8 @@ import BlogsModule from "../components/dashboard/BlogsModule";
 import LeadsModule from "../components/dashboard/LeadsModule";
 import ContactsModule from "../components/dashboard/ContactsModule";
 import QuotesModule from "../components/dashboard/QuotesModule";
+import InquiriesModule from "../components/dashboard/InquiriesModule";
+import PartTypesModule from "../components/dashboard/PartTypesModule";
 
 // ─── Constants ─────────────────────────────────────────────────────────────
 const ACCENT = "#D90404";
@@ -134,6 +136,13 @@ const ALL_MODULES = [
 		component: LeadsModule,
 	},
 	{
+		id: "inquiries",
+		name: "Inquiries",
+		icon: Mail,
+		roles: ["super_admin", "admin", "website_manager", "sales_manager", "viewer"],
+		component: InquiriesModule,
+	},
+	{
 		id: "contacts",
 		name: "Contact Inbox",
 		icon: Mail,
@@ -145,14 +154,14 @@ const ALL_MODULES = [
 		name: "Quotes",
 		icon: DollarSign,
 		roles: ["super_admin", "admin", "website_manager", "sales_manager", "viewer"],
-		component: QuotesModule,
+		component: InquiriesModule,
 	},
 	{
 		id: "part-types",
-		name: "Part Types",
+		name: "Parts",
 		icon: Tags,
 		roles: ["super_admin", "admin", "website_manager", "sales_manager", "viewer"],
-		component: QuotesModule,
+		component: PartTypesModule,
 	},
 ];
 
@@ -447,16 +456,6 @@ export default function DashboardPage({ defaultModule }) {
 			icon: Users,
 		},
 		{
-			label: "Leads",
-			value: statsLoading ? "..." : (stats?.leads ?? "0"),
-			change: statsLoading
-				? null
-				: `${stats?.statusCounts?.new ?? 0} New / ${stats?.statusCounts?.contacted ?? 0} Contacted`,
-			color: "#D90404",
-			module: "leads",
-			icon: Activity,
-		},
-		{
 			label: "Websites",
 			value: statsLoading ? "..." : (stats?.websites ?? "0"),
 			change: statsLoading ? null : "Managed tenants",
@@ -479,6 +478,14 @@ export default function DashboardPage({ defaultModule }) {
 			color: "#F59E0B",
 			module: "blogs",
 			icon: BookOpen,
+		},
+		{
+			label: "Inquiries",
+			value: statsLoading ? "..." : (stats?.inquiries ?? "0"),
+			change: statsLoading ? null : "Vehicle lookups",
+			color: "#EC4899",
+			module: "inquiries",
+			icon: Mail,
 		},
 	];
 

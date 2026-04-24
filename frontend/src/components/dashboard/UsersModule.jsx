@@ -1,47 +1,47 @@
-import React, { useState, useEffect } from "react";
+import { AddIcon, DeleteIcon, EditIcon, EmailIcon, LockIcon, SearchIcon } from "@chakra-ui/icons";
 import {
-	Table,
-	Thead,
-	Tbody,
-	Tr,
-	Th,
-	Td,
+	Badge,
+	Box,
 	Button,
-	IconButton,
-	HStack,
-	Menu,
-	MenuButton,
-	MenuList,
-	MenuItem,
-	Modal,
-	ModalOverlay,
-	ModalContent,
-	ModalHeader,
-	ModalFooter,
-	ModalBody,
-	ModalCloseButton,
+	Center,
 	FormControl,
 	FormLabel,
+	HStack,
+	Icon,
+	IconButton,
 	Input,
-	useDisclosure,
-	Badge,
 	InputGroup,
 	InputLeftElement,
-	Box,
-	Text,
+	Menu,
+	MenuButton,
+	MenuItem,
+	MenuList,
+	Modal,
+	ModalBody,
+	ModalCloseButton,
+	ModalContent,
+	ModalFooter,
+	ModalHeader,
+	ModalOverlay,
+	Portal,
 	Select,
-	VStack,
-	Icon,
 	SimpleGrid,
 	Spinner,
-	Center,
-	Portal,
+	Table,
+	Tbody,
+	Td,
+	Text,
+	Th,
+	Thead,
+	Tr,
+	useDisclosure,
+	VStack,
 } from "@chakra-ui/react";
-import { AddIcon, EditIcon, DeleteIcon, SearchIcon, LockIcon, EmailIcon } from "@chakra-ui/icons";
-import { Users, ShieldCheck, Settings } from "lucide-react";
+import { Settings, ShieldCheck, Users } from "lucide-react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import ModuleFrame from "./ModuleFrame";
 import API from "../../services/api";
+import ModuleFrame from "./ModuleFrame";
 
 // ─── Role mapping ─────────────────────────────────────────────────────────────
 const mapRoleToUI = (role) =>
@@ -128,8 +128,7 @@ export default function UsersModule({ moduleId }) {
 				phone: u.phone1,
 				role: mapRoleToUI(u.role),
 				business_name: u.business_name || "—",
-				website_id: u.website_id?._id || u.website_id || "",
-				websiteName: u.website_id?.name || "—",
+				website_id: u.website_id,
 				status: u.isActive ? "Active" : "Inactive",
 				verified: Boolean(u.loginVerified),
 				joinDate: u.createdAt ? new Date(u.createdAt).toISOString().split("T")[0] : "—",
@@ -373,7 +372,18 @@ export default function UsersModule({ moduleId }) {
 									</Td>
 									<Td fontSize="12px" fontWeight="600" color="gray.700">
 										<Badge variant="outline" fontSize="10px" borderRadius="full">
-											{user.websiteName}
+											{(() => {
+												const getStrId = (val) => {
+													if (!val) return null;
+													if (typeof val === "string") return val;
+													if (typeof val === "object") return val.$oid || val._id || null;
+													return null;
+												};
+												const userId = getStrId(user.website_id);
+												if (!userId) return "—";
+												const site = websites.find(w => getStrId(w._id) === userId);
+												return site?.name || "—";
+											})()}
 										</Badge>
 									</Td>
 									<Td fontSize="12px" color="gray.500">
@@ -558,7 +568,7 @@ function UserModal({ isOpen, onClose, onSave, user, websites, isAdminsMode }) {
 						role: user.role,
 						status: user.status,
 						business_name: user.business_name || "",
-						website_id: user.website_id || "",
+						website_id: user.website_id?.$oid || user.website_id?._id || user.website_id || "",
 					}
 				: {
 						name: "",
@@ -696,11 +706,15 @@ function UserModal({ isOpen, onClose, onSave, user, websites, isAdminsMode }) {
 									_focus={{ borderColor: "#D90404" }}
 								>
 									<option value="">— Global / No Site —</option>
-									{websites.map((w) => (
-										<option key={w._id} value={w._id}>
-											{w.name}
-										</option>
-									))}
+									{websites.map((w) => {
+										const siteId = w.$oid || w._id || w;
+										const siteName = w.name || "Unknown";
+										return (
+											<option key={siteId} value={siteId}>
+												{siteName}
+											</option>
+										);
+									})}
 								</Select>
 							</FormControl>
 

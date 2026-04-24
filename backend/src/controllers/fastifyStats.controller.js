@@ -4,6 +4,7 @@ const Website = require("../models/Website");
 const Registration = require("../models/Registration"); // if registrations differ from leads
 const User = require("../models/User");
 const Blog = require("../models/Blog");
+const Inquiry = require("../models/Inquiry");
 
 // GET DASHBOARD STATS
 exports.getStats = async (request, reply) => {
@@ -14,6 +15,7 @@ exports.getStats = async (request, reply) => {
 			websites: 0,
 			employees: 0,
 			blogs: 0,
+			inquiries: 0,
 			statusCounts: {
 				new: 0,
 				contacted: 0,
@@ -29,6 +31,7 @@ exports.getStats = async (request, reply) => {
 			result.websites = await Website.countDocuments();
 			result.employees = await User.countDocuments();
 			result.blogs = await Blog.countDocuments();
+			result.inquiries = await Inquiry.countDocuments();
 
 			const leadStatuses = await Lead.aggregate([
 				{ $group: { _id: "$status", count: { $sum: 1 } } },
@@ -56,6 +59,9 @@ exports.getStats = async (request, reply) => {
 
 			result.leads = await Lead.countDocuments(leadFilter);
 			result.blogs = await Blog.countDocuments(filter);
+			// Note: Inquiries currently don't have website_id, so we don't filter them yet.
+			// If they should be filtered, we need to add website_id to Inquiry model.
+			result.inquiries = 0; 
 
 			const leadStatuses = await Lead.aggregate([
 				{ $match: leadFilter },

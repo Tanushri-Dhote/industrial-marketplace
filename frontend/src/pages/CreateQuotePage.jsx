@@ -1,499 +1,861 @@
-import React, { useState, useEffect } from 'react';
+import { ArrowBackIcon, DownloadIcon } from "@chakra-ui/icons";
 import {
-  Box,
-  Container,
-  Grid,
-  GridItem,
-  VStack,
-  HStack,
-  Heading,
-  Text,
-  FormControl,
-  FormLabel,
-  Input,
-  Button,
-  IconButton,
-  Table,
-  Thead,
-  Tbody,
-  Tr,
-  Th,
-  Td,
-  Select,
-  NumberInput,
-  NumberInputField,
-  NumberInputStepper,
-  NumberIncrementStepper,
-  NumberDecrementStepper,
-  Divider,
-  useColorModeValue,
-  useToast,
-  Icon,
-  Badge,
-  Textarea,
-  SimpleGrid,
-  Modal,
-  ModalOverlay,
-  ModalContent,
-  ModalHeader,
-  ModalFooter,
-  ModalBody,
-  ModalCloseButton,
-  useDisclosure,
-  Flex,
-  Avatar,
-  Stack,
-} from '@chakra-ui/react';
-import { AddIcon, DeleteIcon, CheckIcon, DownloadIcon, EmailIcon, SearchIcon } from '@chakra-ui/icons';
-import { FiFileText, FiUser, FiPackage, FiInfo, FiTruck, FiShield, FiBriefcase, FiFlag } from 'react-icons/fi';
-import { useNavigate } from 'react-router-dom';
-import ModuleFrame from '../components/dashboard/ModuleFrame';
-import jsPDF from 'jspdf';
-import html2canvas from 'html2canvas';
+	Badge,
+	Box,
+	Button,
+	Checkbox,
+	Flex,
+	HStack,
+	Icon,
+	Input,
+	NumberInput,
+	NumberInputField,
+	Select,
+	SimpleGrid,
+	Text,
+	Textarea,
+	useToast,
+	VStack,
+} from "@chakra-ui/react";
+import html2canvas from "html2canvas";
+import jsPDF from "jspdf";
+import { FileText, Send, User, Wrench } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 
-// Mock Data for integration (In a real app, these would come from an API/Context)
-const mockLeads = [
-  { id: 101, name: 'John Smith', email: 'john@smith-engineering.com', phone: '+44 7700 900077', company: 'Smith Engineering', address: '12 Industrial Park, Manchester, UK' },
-  { id: 102, name: 'Sarah Johnson', email: 'sarah.j@globalbuild.com', phone: '+44 7700 900088', company: 'Global Build Ltd', address: '88 Construction Way, London, UK' },
-];
+const DARK = "#0F172A";
+const RED = "#D90404";
+const PLATE_YELLOW = "#F5C518";
 
-const mockInventory = [
-  { id: 501, name: 'Caterpillar C32 Diesel Engine', price: 45000, category: 'Marine' },
-  { id: 502, name: 'Cummins QSK60 Generator', price: 120000, category: 'Industrial' },
-  { id: 503, name: 'Perkins 1106D-E70TA', price: 15500, category: 'Agriculture' },
-];
+function UKPlate({ vrm }) {
+	return (
+		<Flex
+			align="center"
+			bg={PLATE_YELLOW}
+			border="2.5px solid"
+			borderColor={DARK}
+			borderRadius="8px"
+			overflow="hidden"
+			h="42px"
+			boxShadow="0 4px 12px rgba(0,0,0,0.2)"
+		>
+			<Flex bg={DARK} h="100%" w="34px" flexDir="column" align="center" justify="center" px={1}>
+				<Text color="white" fontSize="7px" fontWeight="900" letterSpacing="0.5px">
+					GB
+				</Text>
+				<Text color={PLATE_YELLOW} fontSize="10px">
+					★
+				</Text>
+			</Flex>
+			<Text
+				px={4}
+				fontSize="20px"
+				fontWeight="900"
+				letterSpacing="2px"
+				color={DARK}
+				fontFamily="'Arial Black', sans-serif"
+			>
+				{vrm || "— — — —"}
+			</Text>
+		</Flex>
+	);
+}
+
+function LineRow({
+	label,
+	sublabel,
+	value,
+	onChange,
+	hasTBC,
+	tbcVal,
+	onTBC,
+	hasVAT,
+	vatVal,
+	onVAT,
+}) {
+	return (
+		<Flex
+			align="center"
+			px={6}
+			py={3}
+			borderBottom="1px solid"
+			borderColor="gray.100"
+			_hover={{ bg: "rgba(217,4,4,0.03)" }}
+			transition="background 0.15s"
+			gap={4}
+		>
+			<Box flex={1}>
+				<Text
+					fontSize="13px"
+					fontWeight="700"
+					color={DARK}
+					textTransform="uppercase"
+					letterSpacing="0.5px"
+				>
+					{label}
+				</Text>
+				{sublabel && (
+					<Text fontSize="11px" color="gray.400">
+						{sublabel}
+					</Text>
+				)}
+			</Box>
+
+			<HStack spacing={3}>
+				{hasTBC && (
+					<HStack spacing={1} opacity={0.7}>
+						<Checkbox
+							size="sm"
+							isChecked={tbcVal}
+							onChange={(e) => onTBC(e.target.checked)}
+							colorScheme="red"
+						/>
+						<Text fontSize="11px" fontWeight="600" color="gray.500">
+							TBC
+						</Text>
+					</HStack>
+				)}
+				{hasVAT && (
+					<HStack spacing={1} opacity={0.7}>
+						<Checkbox
+							size="sm"
+							isChecked={vatVal}
+							onChange={(e) => onVAT(e.target.checked)}
+							colorScheme="red"
+						/>
+						<Text fontSize="11px" fontWeight="600" color="gray.500">
+							Auto
+						</Text>
+					</HStack>
+				)}
+			</HStack>
+
+			<HStack spacing={2} minW="140px" justify="flex-end">
+				<Text fontWeight="700" color="gray.500" fontSize="14px">
+					£
+				</Text>
+				<NumberInput
+					value={value}
+					onChange={(_, v) => onChange(isNaN(v) ? 0 : v)}
+					min={0}
+					precision={2}
+					w="100px"
+				>
+					<NumberInputField
+						h="36px"
+						textAlign="right"
+						fontSize="15px"
+						fontWeight="700"
+						bg="gray.50"
+						border="1.5px solid"
+						borderColor="gray.200"
+						borderRadius="lg"
+						px={3}
+						color={DARK}
+						_focus={{ borderColor: RED, bg: "white", boxShadow: `0 0 0 3px rgba(217,4,4,0.1)` }}
+					/>
+				</NumberInput>
+			</HStack>
+		</Flex>
+	);
+}
 
 export default function CreateQuotePage() {
-  const quoteRef = React.useRef();
-  const toast = useToast();
-  const navigate = useNavigate();
-  const { isOpen: isLeadOpen, onOpen: onLeadOpen, onClose: onLeadClose } = useDisclosure();
-  const { isOpen: isInventoryOpen, onOpen: onInventoryOpen, onClose: onInventoryClose } = useDisclosure();
-  
-  const accentColor = "#D90404";
-  const darkBlue = "#0F172A";
-  const bgColor = useColorModeValue("gray.50", "gray.900");
-  const cardBg = useColorModeValue("white", "gray.800");
-  const borderColor = useColorModeValue("gray.200", "gray.700");
+	const pdfRef = useRef();
+	const importedRef = useRef(false);
+	const toast = useToast();
+	const navigate = useNavigate();
+	const location = useLocation();
 
-  const [isGenerating, setIsGenerating] = useState(false);
-  const [user, setUser] = useState(null);
-  
-  const [customer, setCustomer] = useState({
-    name: '',
-    email: '',
-    phone: '',
-    company: '',
-    address: ''
-  });
+	const [isGenerating, setIsGenerating] = useState(false);
+	const [user, setUser] = useState(null);
 
-  const [items, setItems] = useState([
-    { id: Date.now(), description: '', quantity: 1, unitPrice: 0 }
-  ]);
+	const [meta, setMeta] = useState({
+		refNumber: `AE4U-${Math.floor(800000 + Math.random() * 99999)}`,
+		vrm: "",
+		vehicleDesc: "",
+		engineCode: "",
+	});
 
-  const [details, setDetails] = useState({
-    warranty: '12 Months',
-    leadTime: '3-5 Working Days',
-    shippingMethod: 'Express Freight',
-    taxRate: 20,
-    shippingCost: 0,
-    notes: '',
-    refNumber: `SITE-${Math.floor(1000 + Math.random() * 9000)}`
-  });
+	const [customer, setCustomer] = useState({ name: "", phone: "", postcode: "" });
 
-  const [totals, setTotals] = useState({
-    subtotal: 0,
-    taxAmount: 0,
-    grandTotal: 0
-  });
+	const [lines, setLines] = useState({
+		engine: 0,
+		exchange: 0,
+		delivery: 0,
+		recovery: 0,
+		fitting: 0,
+		vatManual: 0,
+	});
+	const [recoveryTBC, setRecoveryTBC] = useState(false);
+	const [autoVAT, setAutoVAT] = useState(false);
 
-  // Load User context for multi-tenancy
-  useEffect(() => {
-    const storedUser = localStorage.getItem('user');
-    if (storedUser) {
-      const userData = JSON.parse(storedUser);
-      setUser(userData);
-      // Redirect if role is Viewer (Read-only security)
-      if (userData.role === 'Viewer') {
-        toast({ title: "Access Denied", description: "Viewers cannot create quotes.", status: "error" });
-        navigate('/dashboard');
-      }
-    }
-  }, [navigate, toast]);
+	const [warranty, setWarranty] = useState("6 Months");
+	const [condition, setCondition] = useState("Reconditioned");
+	const [mileage, setMileage] = useState("");
+	const [notes, setNotes] = useState("");
 
-  useEffect(() => {
-    const subtotal = items.reduce((acc, item) => acc + (item.quantity * item.unitPrice), 0);
-    const taxAmount = (subtotal * details.taxRate) / 100;
-    const grandTotal = subtotal + taxAmount + Number(details.shippingCost);
-    
-    setTotals({
-      subtotal,
-      taxAmount,
-      grandTotal
-    });
-  }, [items, details]);
+	const subtotal = lines.engine + lines.exchange + lines.delivery + lines.recovery + lines.fitting;
+	const vatAmount = autoVAT ? subtotal * 0.2 : lines.vatManual;
+	const total = subtotal + vatAmount;
 
-  const addItem = () => {
-    setItems([...items, { id: Date.now(), description: '', quantity: 1, unitPrice: 0 }]);
-  };
+	const setLine = (k, v) => setLines((p) => ({ ...p, [k]: v }));
 
-  const removeItem = (id) => {
-    if (items.length > 1) {
-      setItems(items.filter(item => item.id !== id));
-    }
-  };
+	useEffect(() => {
+		const stored = localStorage.getItem("user");
+		if (stored) setUser(JSON.parse(stored));
 
-  const updateItem = (id, field, value) => {
-    setItems(items.map(item => item.id === id ? { ...item, [field]: value } : item));
-  };
+		const s = location.state;
+		if (s?.fromInquiry && s?.customer && !importedRef.current) {
+			importedRef.current = true;
+			setCustomer({
+				name: s.customer.name || "",
+				phone: s.customer.phone || "",
+				postcode: s.customer.address || "",
+			});
+			if (s.inquiryMeta) {
+				setMeta((p) => ({
+					...p,
+					vrm: s.inquiryMeta.vrm || "",
+					vehicleDesc: s.inquiryMeta.vehicleDescription || "",
+					engineCode: s.inquiryMeta.engineCode || "",
+				}));
+			}
+			if (s.quoteNotes) setNotes(s.quoteNotes);
+			toast({
+				title: "Inquiry imported",
+				description: "Customer details pre-filled.",
+				status: "success",
+				duration: 2500,
+				position: "top-right",
+			});
+		}
+	}, [navigate, toast]); // eslint-disable-line
 
-  const importLead = (lead) => {
-    setCustomer({
-      name: lead.name,
-      email: lead.email,
-      phone: lead.phone,
-      company: lead.company,
-      address: lead.address
-    });
-    onLeadClose();
-    toast({ title: "Lead Imported", status: "success", duration: 2000 });
-  };
+	const handlePDF = async () => {
+		if (!customer.name) {
+			toast({ title: "Customer name required", status: "warning", position: "top-right" });
+			return;
+		}
+		setIsGenerating(true);
+		try {
+			const canvas = await html2canvas(pdfRef.current, {
+				scale: 2,
+				useCORS: true,
+				backgroundColor: "#ffffff",
+			});
+			const img = canvas.toDataURL("image/png");
+			const pdf = new jsPDF("p", "mm", "a4");
+			const w = pdf.internal.pageSize.getWidth();
+			pdf.addImage(img, "PNG", 0, 0, w, (canvas.height * w) / canvas.width);
+			pdf.save(`Quote_${meta.refNumber}_${customer.name.replace(/\s+/g, "_")}.pdf`);
+			toast({ title: "PDF downloaded", status: "success", duration: 2000, position: "top-right" });
+		} catch {
+			toast({ title: "PDF error", status: "error" });
+		} finally {
+			setIsGenerating(false);
+		}
+	};
 
-  const importProduct = (product) => {
-    // If first item is empty, replace it, otherwise add new
-    if (items.length === 1 && !items[0].description) {
-      setItems([{ id: Date.now(), description: product.name, quantity: 1, unitPrice: product.price }]);
-    } else {
-      setItems([...items, { id: Date.now(), description: product.name, quantity: 1, unitPrice: product.price }]);
-    }
-    onInventoryClose();
-    toast({ title: "Product Added", status: "success", duration: 2000 });
-  };
+	return (
+		<Box bg="#F8FAFC" minH="100vh">
+			{/* ── Top Bar ── */}
+			<Box
+				bg={DARK}
+				px={8}
+				py={4}
+				position="sticky"
+				top={0}
+				zIndex={10}
+				boxShadow="0 4px 20px rgba(0,0,0,0.3)"
+			>
+				<Flex align="center" justify="space-between" maxW="1400px" mx="auto">
+					<HStack spacing={4}>
+						<Button
+							leftIcon={<ArrowBackIcon />}
+							variant="ghost"
+							color="whiteAlpha.700"
+							_hover={{ color: "white", bg: "whiteAlpha.100" }}
+							size="sm"
+							onClick={() => navigate(-1)}
+						>
+							Back
+						</Button>
+						<Box w="1px" h="20px" bg="whiteAlpha.200" />
+						<HStack spacing={3}>
+							<Icon as={FileText} color={RED} size={18} />
+							<Text color="white" fontWeight="800" fontSize="16px">
+								Create Quotation
+							</Text>
+						</HStack>
+						<Badge
+							bg="rgba(217,4,4,0.2)"
+							color={RED}
+							px={3}
+							py={1}
+							borderRadius="full"
+							fontSize="12px"
+							fontWeight="700"
+						>
+							Ref: {meta.refNumber}
+						</Badge>
+					</HStack>
 
-  const handleDownloadPDF = async () => {
-    if (!customer.name) {
-      toast({ title: "Customer Name Required", status: "warning" });
-      return;
-    }
+					<HStack spacing={3}>
+						<Button
+							leftIcon={<DownloadIcon />}
+							variant="outline"
+							borderColor="whiteAlpha.300"
+							color="white"
+							_hover={{ bg: "whiteAlpha.100" }}
+							size="sm"
+							onClick={handlePDF}
+							isLoading={isGenerating}
+							loadingText="Generating..."
+						>
+							Download PDF
+						</Button>
+						<Button
+							leftIcon={<Icon as={Send} size={14} />}
+							bg={RED}
+							color="white"
+							_hover={{
+								bg: "#c00404",
+								transform: "translateY(-1px)",
+								boxShadow: "0 4px 15px rgba(217,4,4,0.4)",
+							}}
+							transition="all 0.2s"
+							size="sm"
+							px={6}
+							onClick={() =>
+								toast({
+									title: `Quote ${meta.refNumber} sent!`,
+									status: "success",
+									duration: 3000,
+									position: "top-right",
+								})
+							}
+						>
+							Send Quote
+						</Button>
+					</HStack>
+				</Flex>
+			</Box>
 
-    setIsGenerating(true);
-    const element = quoteRef.current;
-    
-    try {
-      const canvas = await html2canvas(element, {
-        scale: 2,
-        logging: false,
-        useCORS: true,
-        backgroundColor: "#ffffff"
-      });
-      
-      const imgData = canvas.toDataURL('image/png');
-      const pdf = new jsPDF('p', 'mm', 'a4');
-      const pageWidth = pdf.internal.pageSize.getWidth();
-      
-      const imgWidth = pageWidth;
-      const imgHeight = (canvas.height * imgWidth) / canvas.width;
-      
-      pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
-      pdf.save(`Quote_${details.refNumber}_${customer.name.replace(/\s+/g, '_')}.pdf`);
-      
-      toast({
-        title: "PDF Generated Successfully",
-        description: `Ref: ${details.refNumber}`,
-        status: "success",
-        duration: 3000,
-        position: 'top-right'
-      });
-    } catch (error) {
-      console.error('PDF Error:', error);
-      toast({ title: "Error generating PDF", status: "error" });
-    } finally {
-      setIsGenerating(false);
-    }
-  };
+			<Box maxW="1400px" mx="auto" px={8} py={8}>
+				<Box ref={pdfRef}>
+					{/* ── Vehicle Hero ── */}
+					<Box
+						bg={DARK}
+						borderRadius="2xl"
+						p={6}
+						mb={6}
+						bgGradient={`linear(135deg, ${DARK} 0%, #1E293B 100%)`}
+						boxShadow="0 8px 32px rgba(15,23,42,0.3)"
+						border="1px solid rgba(255,255,255,0.07)"
+					>
+						<Flex align="center" justify="space-between" flexWrap="wrap" gap={4}>
+							<HStack spacing={6} flex={1}>
+								<Box>
+									<Text
+										fontSize="11px"
+										color="whiteAlpha.500"
+										fontWeight="700"
+										textTransform="uppercase"
+										letterSpacing="1px"
+										mb={1}
+									>
+										Registration
+									</Text>
+									<Input
+										value={meta.vrm}
+										onChange={(e) => setMeta((p) => ({ ...p, vrm: e.target.value.toUpperCase() }))}
+										placeholder="AB12 CDE"
+										size="sm"
+										w="120px"
+										bg="whiteAlpha.100"
+										border="1px solid"
+										borderColor="whiteAlpha.200"
+										color="white"
+										fontWeight="800"
+										textTransform="uppercase"
+										letterSpacing="2px"
+										_placeholder={{ color: "whiteAlpha.300" }}
+										_focus={{ borderColor: RED, bg: "whiteAlpha.200" }}
+										borderRadius="lg"
+									/>
+								</Box>
+								<Box flex={1}>
+									<Text
+										fontSize="11px"
+										color="whiteAlpha.500"
+										fontWeight="700"
+										textTransform="uppercase"
+										letterSpacing="1px"
+										mb={1}
+									>
+										Vehicle Description
+									</Text>
+									<Input
+										value={meta.vehicleDesc}
+										onChange={(e) => setMeta((p) => ({ ...p, vehicleDesc: e.target.value }))}
+										placeholder="e.g. VOLVO XC60 SE 2.4D 2010 DIESEL 2400CC"
+										size="sm"
+										bg="whiteAlpha.100"
+										border="1px solid"
+										borderColor="whiteAlpha.200"
+										color="white"
+										fontWeight="600"
+										_placeholder={{ color: "whiteAlpha.300" }}
+										_focus={{ borderColor: RED, bg: "whiteAlpha.200" }}
+										borderRadius="lg"
+									/>
+								</Box>
+								<Box w="130px">
+									<Text
+										fontSize="11px"
+										color="whiteAlpha.500"
+										fontWeight="700"
+										textTransform="uppercase"
+										letterSpacing="1px"
+										mb={1}
+									>
+										Engine Code
+									</Text>
+									<Input
+										value={meta.engineCode}
+										onChange={(e) =>
+											setMeta((p) => ({ ...p, engineCode: e.target.value.toUpperCase() }))
+										}
+										placeholder="D5244T"
+										size="sm"
+										bg="whiteAlpha.100"
+										border="1px solid"
+										borderColor="whiteAlpha.200"
+										color="white"
+										fontWeight="700"
+										textTransform="uppercase"
+										_placeholder={{ color: "whiteAlpha.300" }}
+										_focus={{ borderColor: RED, bg: "whiteAlpha.200" }}
+										borderRadius="lg"
+									/>
+								</Box>
+							</HStack>
+							<UKPlate vrm={meta.vrm} />
+						</Flex>
+					</Box>
 
-  const handleSave = () => {
-    toast({
-      title: "Quote Saved to Database",
-      description: `Reference: ${details.refNumber} | Website ID: ${user?.websiteId || 'DEFAULT'}`,
-      status: "success",
-      duration: 5000,
-      isClosable: true,
-      position: 'top-right'
-    });
-    // Record Audit Log (Mock)
-    console.log("Audit Log: Quote created", { 
-      user: user?.name, 
-      websiteId: user?.websiteId, 
-      ref: details.refNumber,
-      total: totals.grandTotal 
-    });
-    setTimeout(() => navigate('/dashboard'), 2000);
-  };
+					{/* ── Customer + Quote side by side ── */}
+					<SimpleGrid columns={{ base: 1, lg: 3 }} spacing={6} mb={6}>
+						{/* Customer card */}
+						<Box
+							bg="white"
+							borderRadius="2xl"
+							p={6}
+							boxShadow="0 4px 20px rgba(0,0,0,0.06)"
+							border="1px solid"
+							borderColor="gray.100"
+						>
+							<HStack spacing={2} mb={5}>
+								<Box bg={`${RED}15`} p={2} borderRadius="lg">
+									<Icon as={User} color={RED} size={16} />
+								</Box>
+								<Text fontWeight="800" fontSize="15px" color={DARK}>
+									Customer Details
+								</Text>
+							</HStack>
+							<VStack spacing={4} align="stretch">
+								<Box>
+									<Text
+										fontSize="11px"
+										fontWeight="700"
+										color="gray.500"
+										textTransform="uppercase"
+										letterSpacing="0.5px"
+										mb={1.5}
+									>
+										Full Name
+									</Text>
+									<Input
+										value={customer.name}
+										onChange={(e) => setCustomer((p) => ({ ...p, name: e.target.value }))}
+										placeholder="John Smith"
+										size="md"
+										borderRadius="xl"
+										borderColor="gray.200"
+										_focus={{ borderColor: RED, boxShadow: "0 0 0 3px rgba(217,4,4,0.1)" }}
+										fontWeight="600"
+									/>
+								</Box>
+								<Box>
+									<Text
+										fontSize="11px"
+										fontWeight="700"
+										color="gray.500"
+										textTransform="uppercase"
+										letterSpacing="0.5px"
+										mb={1.5}
+									>
+										Phone Number
+									</Text>
+									<Input
+										value={customer.phone}
+										onChange={(e) => setCustomer((p) => ({ ...p, phone: e.target.value }))}
+										placeholder="+44 7700 900000"
+										size="md"
+										borderRadius="xl"
+										borderColor="gray.200"
+										_focus={{ borderColor: RED, boxShadow: "0 0 0 3px rgba(217,4,4,0.1)" }}
+									/>
+								</Box>
+								<Box>
+									<Text
+										fontSize="11px"
+										fontWeight="700"
+										color="gray.500"
+										textTransform="uppercase"
+										letterSpacing="0.5px"
+										mb={1.5}
+									>
+										Postcode / Address
+									</Text>
+									<Input
+										value={customer.postcode}
+										onChange={(e) => setCustomer((p) => ({ ...p, postcode: e.target.value }))}
+										placeholder="SW1A 1AA"
+										size="md"
+										borderRadius="xl"
+										borderColor="gray.200"
+										_focus={{ borderColor: RED, boxShadow: "0 0 0 3px rgba(217,4,4,0.1)" }}
+									/>
+								</Box>
+							</VStack>
+						</Box>
 
-  return (
-    <Box bg={bgColor} minH="100vh" py={8}>
-      <Container maxW="container.xl">
-        <HStack mb={8} justify="space-between">
-          <VStack align="flex-start" spacing={0}>
-            <Heading fontSize="32px" fontWeight="900" letterSpacing="-1px" color={darkBlue}>
-              Create Own Quote
-            </Heading>
-            <HStack color="gray.500" fontSize="16px" mt={1}>
-              <Icon as={FiFlag} color={accentColor} />
-              <Text fontWeight="700">Multi-Tenant System:</Text>
-              <Text>{user?.businessName || 'Industrial Marketplace'}</Text>
-            </HStack>
-          </VStack>
-          <HStack spacing={4}>
-            <Button variant="ghost" onClick={() => navigate('/dashboard')}>Cancel</Button>
-            <Button 
-               bg={accentColor} 
-               color="white" 
-               px={8} 
-               h="45px" 
-               borderRadius="full" 
-               _hover={{ bg: "#c74848", transform: "translateY(-2px)" }}
-               onClick={handleSave}
-               leftIcon={<CheckIcon />}
-            >
-              Save Quote
-            </Button>
-          </HStack>
-        </HStack>
+						{/* Terms card */}
+						<Box
+							bg="white"
+							borderRadius="2xl"
+							p={6}
+							boxShadow="0 4px 20px rgba(0,0,0,0.06)"
+							border="1px solid"
+							borderColor="gray.100"
+						>
+							<HStack spacing={2} mb={5}>
+								<Box bg={`${RED}15`} p={2} borderRadius="lg">
+									<Icon as={Wrench} color={RED} size={16} />
+								</Box>
+								<Text fontWeight="800" fontSize="15px" color={DARK}>
+									Terms & Condition
+								</Text>
+							</HStack>
+							<VStack spacing={4} align="stretch">
+								<Box>
+									<Text
+										fontSize="11px"
+										fontWeight="700"
+										color="gray.500"
+										textTransform="uppercase"
+										letterSpacing="0.5px"
+										mb={1.5}
+									>
+										Warranty
+									</Text>
+									<Select
+										value={warranty}
+										onChange={(e) => setWarranty(e.target.value)}
+										borderRadius="xl"
+										borderColor="gray.200"
+										_focus={{ borderColor: RED }}
+									>
+										<option>None</option>
+										<option>3 Months</option>
+										<option>6 Months</option>
+										<option>12 Months</option>
+										<option>24 Months</option>
+									</Select>
+								</Box>
+								<Box>
+									<Text
+										fontSize="11px"
+										fontWeight="700"
+										color="gray.500"
+										textTransform="uppercase"
+										letterSpacing="0.5px"
+										mb={1.5}
+									>
+										Condition
+									</Text>
+									<Select
+										value={condition}
+										onChange={(e) => setCondition(e.target.value)}
+										borderRadius="xl"
+										borderColor="gray.200"
+										_focus={{ borderColor: RED }}
+									>
+										<option>Used</option>
+										<option>New</option>
+										<option>Reconditioned</option>
+										<option>Remanufactured</option>
+									</Select>
+								</Box>
+								<Box>
+									<Text
+										fontSize="11px"
+										fontWeight="700"
+										color="gray.500"
+										textTransform="uppercase"
+										letterSpacing="0.5px"
+										mb={1.5}
+									>
+										Mileage
+									</Text>
+									<Input
+										value={mileage}
+										onChange={(e) => setMileage(e.target.value)}
+										placeholder="e.g. 45000"
+										borderRadius="xl"
+										borderColor="gray.200"
+										_focus={{ borderColor: RED, boxShadow: "0 0 0 3px rgba(217,4,4,0.1)" }}
+									/>
+								</Box>
+							</VStack>
+						</Box>
 
-        <Grid templateColumns={{ base: "1fr", lg: "1fr 380px" }} gap={8} align={ "start" }>
-          <GridItem ref={quoteRef} bg="white" p={8} borderRadius="xl" border="1px solid" borderColor={borderColor}>
-            <VStack spacing={8} w="full" align="stretch">
-              
-              {/* Tenant Branding Section (PDF Vision) */}
-              <Flex justify="space-between" align="center" pb={6} borderBottom="2px solid" borderColor="gray.100">
-                <HStack spacing={4}>
-                  <Avatar name={user?.businessName} size="lg" bg={accentColor} color="white" icon={<FiBriefcase fontSize="1.5rem" />} />
-                  <VStack align="flex-start" spacing={0}>
-                    <Text fontSize="24px" fontWeight="900" color={darkBlue} lineHeight="1">{user?.businessName || 'INDUSTRIAL CORP'}</Text>
-                    <Text fontSize="12px" color="gray.500" fontWeight="700" letterSpacing="1px">TENANT ID: {user?.websiteId || 'GEN-IND-001'}</Text>
-                  </VStack>
-                </HStack>
-                <VStack align="flex-end" spacing={0}>
-                  <Text fontWeight="800" fontSize="18px" color={accentColor}>QUOTATION</Text>
-                  <Text fontSize="14px" fontWeight="700">Ref: {details.refNumber}</Text>
-                  <Text fontSize="12px" color="gray.500">{new Date().toLocaleDateString()}</Text>
-                </VStack>
-              </Flex>
+						{/* Notes card */}
+						<Box
+							bg="white"
+							borderRadius="2xl"
+							p={6}
+							boxShadow="0 4px 20px rgba(0,0,0,0.06)"
+							border="1px solid"
+							borderColor="gray.100"
+						>
+							<HStack spacing={2} mb={5}>
+								<Box bg={`${RED}15`} p={2} borderRadius="lg">
+									<Icon as={FileText} color={RED} size={16} />
+								</Box>
+								<Text fontWeight="800" fontSize="15px" color={DARK}>
+									Quote Notes
+								</Text>
+							</HStack>
+							<Textarea
+								value={notes}
+								onChange={(e) => setNotes(e.target.value)}
+								placeholder="Additional notes, terms, or special conditions for this quotation..."
+								h="calc(100% - 48px)"
+								minH="160px"
+								borderRadius="xl"
+								borderColor="gray.200"
+								fontSize="13px"
+								resize="none"
+								_focus={{ borderColor: RED, boxShadow: "0 0 0 3px rgba(217,4,4,0.1)" }}
+							/>
+						</Box>
+					</SimpleGrid>
 
-              {/* Customer Information */}
-              <Box position="relative">
-                <Button 
-                  position="absolute" 
-                  top="0" 
-                  right="0" 
-                  size="sm" 
-                  leftIcon={<SearchIcon />} 
-                  colorScheme="blue" 
-                  variant="ghost" 
-                  onClick={onLeadOpen}
-                  zIndex={1}
-                >
-                  Import from Leads
-                </Button>
-                <ModuleFrame 
-                  icon={FiUser} 
-                  title="Customer Information" 
-                  description="Pre-fill from Leads module or enter manually."
-                >
-                  <SimpleGrid columns={{ base: 1, md: 2 }} spacing={6}>
-                    <FormControl isRequired>
-                      <FormLabel fontWeight="700">Customer Name</FormLabel>
-                      <Input placeholder="e.g. John Smith" value={customer.name} onChange={(e) => setCustomer({...customer, name: e.target.value})} />
-                    </FormControl>
-                    <FormControl>
-                      <FormLabel fontWeight="700">Company Name</FormLabel>
-                      <Input placeholder="e.g. ABC Ltd" value={customer.company} onChange={(e) => setCustomer({...customer, company: e.target.value})} />
-                    </FormControl>
-                    <FormControl isRequired>
-                      <FormLabel fontWeight="700">Email Address</FormLabel>
-                      <Input type="email" placeholder="john@example.com" value={customer.email} onChange={(e) => setCustomer({...customer, email: e.target.value})} />
-                    </FormControl>
-                    <FormControl>
-                      <FormLabel fontWeight="700">Phone Number</FormLabel>
-                      <Input placeholder="+44 77..." value={customer.phone} onChange={(e) => setCustomer({...customer, phone: e.target.value})} />
-                    </FormControl>
-                    <GridItem colSpan={{ base: 1, md: 2 }}>
-                      <FormControl>
-                        <FormLabel fontWeight="700">Billing Address</FormLabel>
-                        <Textarea placeholder="Full address..." value={customer.address} onChange={(e) => setCustomer({...customer, address: e.target.value})} />
-                      </FormControl>
-                    </GridItem>
-                  </SimpleGrid>
-                </ModuleFrame>
-              </Box>
+					{/* ── Line Items Card ── */}
+					<Box
+						bg="white"
+						borderRadius="2xl"
+						boxShadow="0 4px 20px rgba(0,0,0,0.06)"
+						border="1px solid"
+						borderColor="gray.100"
+						overflow="hidden"
+						mb={6}
+					>
+						{/* Table header */}
+						<Flex bg={DARK} px={6} py={4} align="center" justify="space-between">
+							<Text color="white" fontWeight="800" fontSize="15px" letterSpacing="0.5px">
+								Price Breakdown
+							</Text>
+							<Text color="whiteAlpha.500" fontSize="12px">
+								Enter amounts in GBP (£)
+							</Text>
+						</Flex>
 
-              {/* Quote Items */}
-              <Box position="relative">
-                <Button 
-                  position="absolute" 
-                  top="0" 
-                  right="0" 
-                  size="sm" 
-                  leftIcon={<SearchIcon />} 
-                  colorScheme="blue" 
-                  variant="ghost" 
-                  onClick={onInventoryOpen}
-                  zIndex={1}
-                >
-                  Add from Inventory
-                </Button>
-                <ModuleFrame 
-                  icon={FiPackage} 
-                  title="Quote Items" 
-                  description="Select products from your tenant engine inventory."
-                >
-                  <Table variant="simple" mb={4}>
-                    <Thead bg="gray.50">
-                      <Tr>
-                        <Th w="40%">Description</Th>
-                        <Th w="15%">Qty</Th>
-                        <Th w="20%">Unit Price ($)</Th>
-                        <Th w="20%" isNumeric>Total</Th>
-                        <Th w="5%"></Th>
-                      </Tr>
-                    </Thead>
-                    <Tbody>
-                      {items.map((item) => (
-                        <Tr key={item.id}>
-                          <Td>
-                            <Input size="sm" placeholder="Search engines..." value={item.description} onChange={(e) => updateItem(item.id, 'description', e.target.value)} />
-                          </Td>
-                          <Td>
-                             <NumberInput size="sm" min={1} value={item.quantity} onChange={(_, val) => updateItem(item.id, 'quantity', val)}>
-                              <NumberInputField />
-                            </NumberInput>
-                          </Td>
-                          <Td>
-                            <NumberInput size="sm" min={0} value={item.unitPrice} onChange={(_, val) => updateItem(item.id, 'unitPrice', val)}>
-                              <NumberInputField />
-                            </NumberInput>
-                          </Td>
-                          <Td isNumeric fontWeight="700">${(item.quantity * item.unitPrice).toLocaleString()}</Td>
-                          <Td>
-                            <IconButton icon={<DeleteIcon />} size="sm" variant="ghost" colorScheme="red" onClick={() => removeItem(item.id)} isDisabled={items.length === 1} aria-label="Remove item" />
-                          </Td>
-                        </Tr>
-                      ))}
-                    </Tbody>
-                  </Table>
-                  <Button leftIcon={<AddIcon />} variant="outline" size="sm" onClick={addItem} colorScheme="blue">Add Custom Item</Button>
-                </ModuleFrame>
-              </Box>
+						{/* Column labels */}
+						<Flex px={6} py={2} bg="gray.50" borderBottom="1px solid" borderColor="gray.100">
+							<Text
+								flex={1}
+								fontSize="11px"
+								fontWeight="700"
+								color="gray.400"
+								textTransform="uppercase"
+								letterSpacing="1px"
+							>
+								Item
+							</Text>
+							<Text
+								minW="140px"
+								textAlign="right"
+								fontSize="11px"
+								fontWeight="700"
+								color="gray.400"
+								textTransform="uppercase"
+								letterSpacing="1px"
+							>
+								Amount
+							</Text>
+						</Flex>
 
-              {/* Terms & Conditions (PDF Ready) */}
-              <ModuleFrame icon={FiInfo} title="Terms & Details" description="Tenant-specific terms and lead time settings.">
-                <SimpleGrid columns={{ base: 1, md: 2 }} spacing={6}>
-                   <FormControl>
-                    <FormLabel fontWeight="700"><Icon as={FiShield} mr={1} color={accentColor}/> Warranty</FormLabel>
-                    <Select value={details.warranty} onChange={(e) => setDetails({...details, warranty: e.target.value})}>
-                      <option>None</option>
-                      <option>12 Months</option>
-                      <option>24 Months</option>
-                    </Select>
-                  </FormControl>
-                  <FormControl>
-                    <FormLabel fontWeight="700"><Icon as={FiTruck} mr={1} color={accentColor}/> Lead Time</FormLabel>
-                    <Input value={details.leadTime} onChange={(e) => setDetails({...details, leadTime: e.target.value})} />
-                  </FormControl>
-                  <GridItem colSpan={{ base: 1, md: 2 }}>
-                    <FormControl>
-                      <FormLabel fontWeight="700">Internal Notes / Quotation Terms</FormLabel>
-                      <Textarea rows={3} placeholder="Standard terms apply..." value={details.notes} onChange={(e) => setDetails({...details, notes: e.target.value})} />
-                    </FormControl>
-                  </GridItem>
-                </SimpleGrid>
-              </ModuleFrame>
+						<LineRow label="Engine" value={lines.engine} onChange={(v) => setLine("engine", v)} />
+						<LineRow
+							label="Exchange Surcharge"
+							sublabel="Refundable deposit"
+							value={lines.exchange}
+							onChange={(v) => setLine("exchange", v)}
+						/>
+						<LineRow
+							label="Delivery Charges"
+							value={lines.delivery}
+							onChange={(v) => setLine("delivery", v)}
+						/>
+						<LineRow
+							label="Recovery / Pickup"
+							value={lines.recovery}
+							onChange={(v) => setLine("recovery", v)}
+							hasTBC
+							tbcVal={recoveryTBC}
+							onTBC={setRecoveryTBC}
+						/>
+						<LineRow
+							label="Fitting"
+							value={lines.fitting}
+							onChange={(v) => setLine("fitting", v)}
+						/>
+						<LineRow
+							label="VAT"
+							sublabel={autoVAT ? "Auto-calculated at 20%" : "Manual entry"}
+							value={autoVAT ? parseFloat(vatAmount.toFixed(2)) : lines.vatManual}
+							onChange={(v) => {
+								if (!autoVAT) setLine("vatManual", v);
+							}}
+							hasVAT
+							vatVal={autoVAT}
+							onVAT={(v) => {
+								setAutoVAT(v);
+								if (!v) setLine("vatManual", 0);
+							}}
+						/>
 
-              {/* Totals Section for PDF */}
-              <Flex justify="flex-end" pt={4}>
-                 <VStack align="stretch" spacing={2} minW="250px" p={4} bg="gray.50" borderRadius="lg">
-                    <HStack justify="space-between"><Text fontWeight="700">Subtotal:</Text><Text fontSize="18px">${totals.subtotal.toLocaleString()}</Text></HStack>
-                    <HStack justify="space-between"><Text fontWeight="700">Tax ({details.taxRate}%):</Text><Text fontSize="18px">${totals.taxAmount.toLocaleString()}</Text></HStack>
-                    <HStack justify="space-between" color={accentColor}><Text fontWeight="900" fontSize="20px">Total Cost:</Text><Text fontWeight="900" fontSize="22px">${totals.grandTotal.toLocaleString()}</Text></HStack>
-                 </VStack>
-              </Flex>
-            </VStack>
-          </GridItem>
+						{/* Totals */}
+						<Box bg="gray.50" borderTop="2px solid" borderColor="gray.100">
+							<Flex
+								px={6}
+								py={3}
+								align="center"
+								justify="space-between"
+								borderBottom="1px solid"
+								borderColor="gray.100"
+							>
+								<Text fontSize="13px" fontWeight="600" color="gray.500">
+									Subtotal
+								</Text>
+								<Text fontSize="14px" fontWeight="700" color={DARK}>
+									£ {subtotal.toFixed(2)}
+								</Text>
+							</Flex>
+							<Flex
+								px={6}
+								py={3}
+								align="center"
+								justify="space-between"
+								borderBottom="1px solid"
+								borderColor="gray.100"
+							>
+								<Text fontSize="13px" fontWeight="600" color="gray.500">
+									VAT {autoVAT ? "(20%)" : ""}
+								</Text>
+								<Text fontSize="14px" fontWeight="700" color={DARK}>
+									£ {vatAmount.toFixed(2)}
+								</Text>
+							</Flex>
+							<Flex px={6} py={4} align="center" justify="space-between">
+								<Text
+									fontSize="16px"
+									fontWeight="800"
+									color={DARK}
+									textTransform="uppercase"
+									letterSpacing="0.5px"
+								>
+									Total Amount
+								</Text>
+								<Box
+									bg={RED}
+									px={6}
+									py={2}
+									borderRadius="xl"
+									boxShadow="0 4px 15px rgba(217,4,4,0.3)"
+								>
+									<Text fontSize="22px" fontWeight="900" color="white" letterSpacing="-0.5px">
+										£ {total.toFixed(2)}
+									</Text>
+								</Box>
+							</Flex>
+						</Box>
+					</Box>
 
-          {/* Sidebar Tools */}
-          <GridItem>
-            <Box position="sticky" top="100px" bg={cardBg} p={6} borderRadius="2xl" boxShadow="2xl" border="1px solid" borderColor={borderColor}>
-              <Heading fontSize="20px" mb={6} display="flex" alignItems="center">
-                <Icon as={FiFileText} mr={3} color={accentColor} /> Project Actions
-              </Heading>
-              
-              <VStack spacing={4} align="stretch">
-                <Badge colorScheme={user?.role === 'Admin' ? 'purple' : 'blue'} p={2} borderRadius="md" textAlign="center">
-                  USER ROLE: {user?.role || 'SALES MANAGER'}
-                </Badge>
-                
-                <Divider />
-                
-                <VStack spacing={3} mt={2}>
-                  <Button w="full" h="50px" borderRadius="xl" bg="#0F172A" color="white" _hover={{ bg: "#1e293b" }} leftIcon={<DownloadIcon />} onClick={handleDownloadPDF} isLoading={isGenerating}>Download PDF</Button>
-                  <Button w="full" h="50px" borderRadius="xl" variant="outline" borderColor={darkBlue} color={darkBlue} _hover={{ bg: "gray.50" }} leftIcon={<EmailIcon />}>Email Customer</Button>
-                  <Text fontSize="11px" color="gray.500" textAlign="center">All actions are logged in the audit trail for tenant: {user?.websiteId}</Text>
-                </VStack>
-              </VStack>
-            </Box>
-          </GridItem>
-        </Grid>
-      </Container>
-
-      {/* Leads Selector Modal */}
-      <Modal isOpen={isLeadOpen} onClose={onLeadClose} size="xl">
-        <ModalOverlay />
-        <ModalContent borderRadius="2xl">
-          <ModalHeader>Select Lead to Import</ModalHeader>
-          <ModalCloseButton />
-          <ModalBody pb={6}>
-            <Stack spacing={4}>
-              {mockLeads.map(lead => (
-                <Box key={lead.id} p={4} borderWidth="1px" borderRadius="xl" cursor="pointer" _hover={{ bg: "gray.50", borderColor: accentColor }} onClick={() => importLead(lead)}>
-                  <HStack justify="space-between">
-                    <VStack align="flex-start" spacing={0}>
-                      <Text fontWeight="800" fontSize="16px">{lead.name}</Text>
-                      <Text color="gray.500" fontSize="13px">{lead.company}</Text>
-                    </VStack>
-                    <Badge colorScheme="blue">SELECT</Badge>
-                  </HStack>
-                </Box>
-              ))}
-            </Stack>
-          </ModalBody>
-        </ModalContent>
-      </Modal>
-
-      {/* Inventory Selector Modal */}
-      <Modal isOpen={isInventoryOpen} onClose={onInventoryClose} size="xl">
-        <ModalOverlay />
-        <ModalContent borderRadius="2xl">
-          <ModalHeader>Select Engine from Inventory</ModalHeader>
-          <ModalCloseButton />
-          <ModalBody pb={6}>
-            <Stack spacing={4}>
-              {mockInventory.map(product => (
-                <Box key={product.id} p={4} borderWidth="1px" borderRadius="xl" cursor="pointer" _hover={{ bg: "gray.50", borderColor: accentColor }} onClick={() => importProduct(product)}>
-                  <HStack justify="space-between">
-                    <VStack align="flex-start" spacing={0}>
-                      <Text fontWeight="800" fontSize="16px">{product.name}</Text>
-                      <Text color="gray.500" fontSize="13px">Category: {product.category}</Text>
-                    </VStack>
-                    <Text fontWeight="900" color={accentColor}>${product.price.toLocaleString()}</Text>
-                  </HStack>
-                </Box>
-              ))}
-            </Stack>
-          </ModalBody>
-        </ModalContent>
-      </Modal>
-    </Box>
-  );
+					{/* ── Action Row ── */}
+					<Flex justify="flex-end" gap={3}>
+						<Button
+							variant="outline"
+							borderColor="gray.300"
+							color="gray.600"
+							_hover={{ bg: "gray.50" }}
+							borderRadius="xl"
+							px={8}
+							h="48px"
+							onClick={() => navigate(-1)}
+						>
+							Cancel
+						</Button>
+						<Button
+							leftIcon={<DownloadIcon />}
+							variant="outline"
+							borderColor={DARK}
+							color={DARK}
+							_hover={{ bg: DARK, color: "white" }}
+							transition="all 0.2s"
+							borderRadius="xl"
+							px={8}
+							h="48px"
+							fontWeight="700"
+							onClick={handlePDF}
+							isLoading={isGenerating}
+						>
+							Download PDF
+						</Button>
+						<Button
+							leftIcon={<Icon as={Send} size={16} />}
+							bg={RED}
+							color="white"
+							_hover={{
+								bg: "#c00404",
+								transform: "translateY(-2px)",
+								boxShadow: "0 8px 25px rgba(217,4,4,0.4)",
+							}}
+							transition="all 0.2s"
+							borderRadius="xl"
+							px={10}
+							h="48px"
+							fontWeight="800"
+							fontSize="15px"
+							letterSpacing="0.5px"
+							onClick={() =>
+								toast({
+									title: `Quote ${meta.refNumber} sent!`,
+									status: "success",
+									duration: 3000,
+									position: "top-right",
+								})
+							}
+						>
+							Send Quote
+						</Button>
+					</Flex>
+				</Box>
+			</Box>
+		</Box>
+	);
 }

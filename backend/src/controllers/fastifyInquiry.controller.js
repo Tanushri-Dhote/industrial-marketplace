@@ -75,6 +75,41 @@ const validateVRM = async (req, reply) => {
   }
 };
 
+const getInquiries = async (req, reply) => {
+  try {
+    const inquiries = await Inquiry.find().sort({ createdAt: -1 });
+    return reply.send({
+      success: true,
+      data: inquiries,
+    });
+  } catch (error) {
+    console.error("GET_INQUIRIES_ERROR:", error);
+    return reply.status(500).send({
+      success: false,
+      message: "Failed to fetch inquiries",
+    });
+  }
+};
+
+const deleteInquiry = async (req, reply) => {
+  try {
+    const { id } = req.params;
+    await Inquiry.findByIdAndDelete(id);
+    return reply.send({
+      success: true,
+      message: "Inquiry deleted successfully",
+    });
+  } catch (error) {
+    console.error("DELETE_INQUIRY_ERROR:", error);
+    return reply.status(500).send({
+      success: false,
+      message: "Failed to delete inquiry",
+    });
+  }
+};
+
 module.exports = {
   validateVRM,
+  getInquiries,
+  deleteInquiry,
 };

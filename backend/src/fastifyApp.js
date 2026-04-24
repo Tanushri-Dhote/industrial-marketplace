@@ -51,7 +51,7 @@ fastify.register(require("./routes/fastify/stats.routes"), { prefix: "/api/stats
 fastify.register(require("./routes/fastify/admin.routes"), { prefix: "/api" });
 fastify.register(require("./routes/fastify/partType.routes"), { prefix: "/api/part-types" });
 fastify.register(require("./routes/fastify/brand.routes"), { prefix: "/api/brands" });
-fastify.register(require("./routes/fastify/inquiry.routes"), {prefix: "/api",});
+fastify.register(require("./routes/fastify/inquiry.routes"), { prefix: "/api" });
 
 // Root route
 fastify.get("/", async (request, reply) => {
