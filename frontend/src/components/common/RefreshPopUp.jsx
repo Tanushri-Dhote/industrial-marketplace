@@ -46,6 +46,7 @@ const RefreshPopUp = () => {
 		"/about",
 		"/contact",
 		"/blog",
+		"/call-seller",
 	];
 
 	useEffect(() => {

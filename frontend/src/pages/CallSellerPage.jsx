@@ -23,12 +23,16 @@ import {
     Link,
     Badge,
 } from "@chakra-ui/react";
+
 import { CheckCircleIcon, ChevronRightIcon, EmailIcon, PhoneIcon } from "@chakra-ui/icons";
+import { useLocation } from "react-router-dom";
 
 export default function CallSellerPage() {
     const [step, setStep] = useState(1);
     const [engineOptions, setEngineOptions] = useState([]);
     const [fittingOptions, setFittingOptions] = useState([]);
+    const location = useLocation();
+    const { vrm, category } = location.state || {};
 
     const [form, setForm] = useState({
         postcode: "",
@@ -68,9 +72,36 @@ export default function CallSellerPage() {
         setStep(step - 1);
     };
 
-    const handleGetQuote = () => {
-        if (!form.name || !form.email || !form.phone) return;
-        setStep(5);
+    const API = import.meta.env.VITE_API_URL;
+
+    const handleGetQuote = async () => {
+        try {
+            const res = await fetch(`${API}/validate-vrm`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    vrm,
+                    category,
+                    engineOptions,
+                    fittingOptions,
+                    ...form,
+                }),
+            });
+
+            const data = await res.json();
+
+            if (!res.ok || !data.success) {
+                throw new Error(data.message || "Something went wrong");
+            }
+
+            setStep(5);
+
+        } catch (err) {
+            console.error(err);
+            alert(err.message); 
+        }
     };
 
     const ProgressIndicator = () => (
@@ -265,7 +296,7 @@ export default function CallSellerPage() {
                                 rightIcon={<ChevronRightIcon />}
                                 px={8}
                             >
-                                Next 
+                                Next
                             </Button>
                         </Center>
                     </Box>
@@ -468,17 +499,6 @@ export default function CallSellerPage() {
                         <Text fontSize="xs" color="gray.400" textAlign="center" mb={6}>
                             All Engine 4 You is a comparison platform. For details on liability, data use and complaints please review our Terms & Conditions and Privacy Policy.
                         </Text>
-
-                        <Center>
-                            <Button colorScheme="green" onClick={() => {
-                                setStep(1);
-                                setEngineOptions([]);
-                                setFittingOptions([]);
-                                setForm({ postcode: "", notes: "", name: "", email: "", phone: "" });
-                            }}>
-                                Back to Start
-                            </Button>
-                        </Center>
                     </Box>
                 )}
             </Container>

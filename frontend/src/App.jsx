@@ -26,6 +26,7 @@ import CheckoutPage from "./pages/CheckoutPage";
 import ThankYouPage from "./pages/ThankYouPage";
 import CallSellerPage from "./pages/CallSellerPage";
 import RefreshPopUp from "./components/common/RefreshPopUp";
+import ScrollToTop from "./components/layout/ScrollToTop";
 
 function App() {
 	const { pathname } = useLocation();
@@ -37,6 +38,7 @@ function App() {
 			<Box minH="100vh" display="flex" flexDirection="column">
 			   {!hideGlobalLayout && <RefreshPopUp />}
 				{!hideGlobalLayout && <Header />}
+				<ScrollToTop />
 
 				<Box flex="1">
 					<Routes>
