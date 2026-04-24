@@ -37,6 +37,7 @@ require("./models/PartType");
 require("./models/Brand");
 require("./models/ContactSubmission");
 require("./models/Inquiry");
+require("./models/Model");
 
 // Register Routes
 fastify.register(require("./routes/fastify/auth.routes"), { prefix: "/api/auth" });
@@ -52,6 +53,9 @@ fastify.register(require("./routes/fastify/admin.routes"), { prefix: "/api" });
 fastify.register(require("./routes/fastify/partType.routes"), { prefix: "/api/part-types" });
 fastify.register(require("./routes/fastify/brand.routes"), { prefix: "/api/brands" });
 fastify.register(require("./routes/fastify/inquiry.routes"), {prefix: "/api",});
+fastify.register(require("./routes/fastify/model.routes"), {prefix: "/api/models",});
+fastify.register(require("./routes/fastify/year.routes"), {prefix: "/api",});
+fastify.register(require("./routes/fastify/filterRoutes"), {prefix: "/api",});
 
 // Root route
 fastify.get("/", async (request, reply) => {

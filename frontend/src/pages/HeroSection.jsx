@@ -10,14 +10,13 @@ import {
   Button,
   Icon,
   Input,
-  InputGroup,
   Flex,
-  Badge,
+  Badge,  // ← ADD THIS IMPORT
 } from '@chakra-ui/react';
 import { FaArrowRight, FaCheckCircle } from 'react-icons/fa';
 import { useToast } from "@chakra-ui/react";
 import { useNavigate } from "react-router-dom";
-
+import axios from "axios";
 
 const SupplierStats = () => {
   const stats = [
@@ -57,123 +56,266 @@ const SupplierStats = () => {
 };
 
 export default function HeroSection({ category }) {
-
-  const [partTypes, setPartTypes] = useState([]);
-  const [loadingParts, setLoadingParts] = useState(false);
+  const navigate = useNavigate();
+  const toast = useToast();
   const API = import.meta.env.VITE_API_URL;
 
+  // Shared States
+  const [vrm, setVrm] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("");
 
-  // inside HeroSection component add useEffect
+  // Manual Selector States
+  const [brands, setBrands] = useState([]);
+  const [models, setModels] = useState([]);
+  const [years, setYears] = useState([]);
+  const [types, setTypes] = useState([]);
+  const [partTypes, setPartTypes] = useState([]);  // ← Keep this for VRM card
 
-  useEffect(() => {
-    const fetchPartTypes = async () => {
-      try {
-        setLoadingParts(true);
-
-        const res = await fetch(`${API}/part-types`);
-        const data = await res.json();
-
-        if (Array.isArray(data)) {
-          const activeParts = data.filter((item) => item.isActive);
-
-          setPartTypes(activeParts);
-
-          // first item auto selected
-          if (activeParts.length > 0) {
-            setSelectedCategory(activeParts[0].slug);
-          }
-        }
-      } catch (error) {
-        console.error("Failed to load part types", error);
-      } finally {
-        setLoadingParts(false);
-      }
-    };
-
-    fetchPartTypes();
-  }, []);
+  const [selectedBrand, setSelectedBrand] = useState("");
+  const [selectedModel, setSelectedModel] = useState("");
+  const [selectedYear, setSelectedYear] = useState("");
+  const [selectedType, setSelectedType] = useState("");
+  const [allPartTypes, setAllPartTypes] = useState([]);   // for VRM card
+  const [loadingAllParts, setLoadingAllParts] = useState(false);
+  const [loadingParts, setLoadingParts] = useState(false);
 
   const isCategoryPage = category && category !== 'Industrial Engines';
 
-  const getDropdownValue = (cat) => {
-    if (cat === 'Gearboxes') return 'spareparts';
-    if (cat.includes('Engines')) return 'engines';
-    return '';
+  // Define fetchPartTypes function ← ADD THIS
+  const fetchPartTypes = async () => {
+    try {
+      setLoadingParts(true);
+      const res = await axios.get(`${API}/part-types`);
+      const data = res.data?.data || res.data || [];
+      setPartTypes(data);
+    } catch (error) {
+      console.error("Error fetching part types:", error);
+    } finally {
+      setLoadingParts(false);
+    }
   };
 
-  const ManualSelector = () => (
-    <VStack spacing={3} w="full">
-      <HStack w="full" spacing={3}>
-        <select style={{ flex: 1, padding: '10px', borderRadius: '6px', fontSize: '14px', border: '1px solid #ddd' }}><option>Select Make</option></select>
-        <select style={{ flex: 1, padding: '10px', borderRadius: '6px', fontSize: '14px', border: '1px solid #ddd' }}><option>Select Model</option></select>
-      </HStack>
-      <HStack w="full" spacing={3}>
-        <select style={{ flex: 1, padding: '10px', borderRadius: '6px', fontSize: '14px', border: '1px solid #ddd' }}><option>Select Year</option></select>
-        <select style={{ flex: 1, padding: '10px', borderRadius: '6px', fontSize: '14px', border: '1px solid #ddd' }}><option>Select Type</option></select>
-      </HStack>
-      <select style={{ width: '100%', padding: '10px', borderRadius: '6px', fontSize: '14px', border: '1px solid #ddd' }}><option>Select Part</option></select>
-    </VStack>
-  );
+  // Fetch data on mount
+  useEffect(() => {
+    fetchBrands();
+    fetchAllPartTypes();
+    fetchPartTypes();  // ← Now this function exists
+  }, []);
 
-  const navigate = useNavigate();
-  const toast = useToast();
-  const [vrm, setVrm] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState("engines");
+  const fetchBrands = async () => {
+    try {
+      const res = await axios.get(`${API}/brands`);
+      setBrands(res.data?.data || []);
+    } catch (error) {
+      console.error("Error fetching brands:", error);
+    }
+  };
 
+  const fetchAllPartTypes = async () => {
+    try {
+      setLoadingAllParts(true);
+      const res = await axios.get(`${API}/part-types`);
+      const data = res.data?.data || res.data || [];
+      setAllPartTypes(data);
+    } catch (error) {
+      console.error("Error fetching all part types:", error);
+    } finally {
+      setLoadingAllParts(false);
+    }
+  };
 
+  // Handlers
+  const handleBrandChange = async (brandId) => {
+    setSelectedBrand(brandId);
+    setSelectedModel(""); 
+    setSelectedYear(""); 
+    setSelectedType("");
+    setModels([]); 
+    setYears([]); 
+    setTypes([]);
+
+    if (brandId) {
+      try {
+        const res = await axios.get(`${API}/models/${brandId}`);
+        setModels(res.data?.data || []);
+      } catch (error) {
+        console.error(error);
+      }
+    }
+  };
+
+  const handleModelChange = async (modelId) => {
+    setSelectedModel(modelId);
+    setSelectedYear(""); 
+    setSelectedType("");
+    setYears([]); 
+    setTypes([]);
+
+    if (modelId) {
+      try {
+        const res = await axios.get(`${API}/years/${modelId}`);
+        setYears(res.data?.data || []);
+      } catch (error) {
+        console.error(error);
+      }
+    }
+  };
+
+  const handleYearChange = async (year) => {
+    setSelectedYear(year);
+    setSelectedType("");
+    setTypes([]);
+
+    if (year) {
+      try {
+        const res = await axios.get(`${API}/types/${year}`);
+        setTypes(res.data?.data || []);
+      } catch (error) {
+        console.error(error);
+      }
+    }
+  };
+
+  // VRM Submit
   const handleVRMSubmit = () => {
-    if (!vrm) {
+    if (!vrm.trim()) {
+      return toast({ title: "Enter registration number", status: "warning" });
+    }
+
+    const cleanedVRM = vrm.replace(/\s+/g, "").toUpperCase();
+    const ukVrmRegex = /^[A-Z]{2}[0-9]{2}[A-Z]{3}$|^[A-Z]{1,2}[0-9]{1,4}[A-Z]{1,3}$/;
+
+    if (!ukVrmRegex.test(cleanedVRM)) {
+      return toast({ title: "Invalid Registration", description: "Please enter a valid UK number plate", status: "error" });
+    }
+
+    if (!selectedCategory) {
+      return toast({ title: "Please select a part", status: "warning" });
+    }
+
+    navigate("/call-seller", {
+      state: { vrm: cleanedVRM, category: selectedCategory, searchType: "vrm" },
+    });
+  };
+
+  // Manual Submit
+  const handleManualSubmit = () => {
+    if (!selectedBrand || !selectedModel || !selectedYear || !selectedType || !selectedCategory) {
       return toast({
-        title: "Enter registration number",
+        title: "Incomplete Selection",
+        description: "Please fill all fields: Make, Model, Year, Type & Part",
         status: "warning",
       });
     }
 
-    const cleanedVRM = vrm.replace(/\s+/g, "").toUpperCase();
-
-    const ukVrmRegex =
-      /^[A-Z]{2}[0-9]{2}[A-Z]{3}$|^[A-Z]{1,2}[0-9]{1,4}[A-Z]{1,3}$/;
-
-    if (!ukVrmRegex.test(cleanedVRM)) {
-      return toast({
-        title: "Invalid Registration",
-        description: "Enter valid UK number plate",
-        status: "error",
-      });
-    }
-
-    // ✅ ONLY NAVIGATE (NO API)
     navigate("/call-seller", {
       state: {
-        vrm: cleanedVRM,
+        brand: selectedBrand,
+        model: selectedModel,
+        year: selectedYear,
+        type: selectedType,
         category: selectedCategory,
+        searchType: "manual",
       },
     });
   };
 
+  // Manual Selector Component
+  const ManualSelector = () => (
+    <VStack spacing={3} w="full">
+      <HStack w="full" spacing={3}>
+        <select
+          style={{ flex: 1, padding: "12px", borderRadius: "6px", fontSize: "15px", border: "1px solid #ddd" }}
+          value={selectedBrand}
+          onChange={(e) => handleBrandChange(e.target.value)}
+        >
+          <option value="">Select Make</option>
+          {brands.map((brand) => (
+            <option key={brand._id} value={brand._id}>{brand.name}</option>
+          ))}
+        </select>
+
+        <select
+          style={{ flex: 1, padding: "12px", borderRadius: "6px", fontSize: "15px", border: "1px solid #ddd" }}
+          value={selectedModel}
+          onChange={(e) => handleModelChange(e.target.value)}
+        >
+          <option value="">Select Model</option>
+          {models.map((model) => (
+            <option key={model._id} value={model._id}>{model.modelName}</option>
+          ))}
+        </select>
+      </HStack>
+
+      <HStack w="full" spacing={3}>
+        <select
+          style={{ flex: 1, padding: "12px", borderRadius: "6px", fontSize: "15px", border: "1px solid #ddd" }}
+          value={selectedYear}
+          onChange={(e) => handleYearChange(e.target.value)}
+        >
+          <option value="">Select Year</option>
+          {years.map((item, i) => (
+            <option key={i} value={item.name}>{item.name}</option>
+          ))}
+        </select>
+
+        <select
+          style={{ flex: 1, padding: "12px", borderRadius: "6px", fontSize: "15px", border: "1px solid #ddd" }}
+          value={selectedType}
+          onChange={(e) => setSelectedType(e.target.value)}
+        >
+          <option value="">Select Type</option>
+          {types.map((item, i) => (
+            <option key={i} value={item.name}>{item.name}</option>
+          ))}
+        </select>
+      </HStack>
+
+      {/* Part Type Dropdown - using partTypes */}
+      <select
+        value={selectedCategory}
+        onChange={(e) => setSelectedCategory(e.target.value)}
+        style={{
+          padding: "12px",
+          borderRadius: "8px",
+          fontSize: "16px",
+          fontWeight: "600",
+          width: "100%",
+          backgroundColor: "#fff"
+        }}
+      >
+        {loadingAllParts ? (
+          <option>Loading parts...</option>
+        ) : allPartTypes.length === 0 ? (
+          <option>No parts available</option>
+        ) : (
+          <>
+            <option value="">Select Part</option>
+            {allPartTypes.map((item) => (
+              <option key={item._id || item.slug} value={item.slug}>
+                {item.name}
+              </option>
+            ))}
+          </>
+        )}
+      </select>
+    </VStack>
+  );
+
   return (
     <Box position="relative" minH={{ base: "70vh", lg: "650px" }} overflow="hidden" display="flex" alignItems="center">
-
-      {/* Background Image with stronger overlay */}
       <Box
         position="absolute"
         inset={0}
         bgImage="url('/car-engine-banner.jpg')"
         bgSize="cover"
         bgPosition="center"
-        bgRepeat="no-repeat"
       >
-        <Box
-          position="absolute"
-          inset={0}
-          bg="linear-gradient(180deg, rgba(0,0,0,0.5) 0%, rgba(0,0,0,0.7) 100%)"
-        />
+        <Box position="absolute" inset={0} bg="linear-gradient(180deg, rgba(0,0,0,0.5) 0%, rgba(0,0,0,0.7) 100%)" />
       </Box>
 
       <Container maxW="container.xl" position="relative" zIndex={2} py={{ base: 6, md: 10 }}>
         <VStack spacing={8} align="center" textAlign="center">
-
-          {/* Dynamic Headline */}
           <Heading
             color="white"
             fontSize={{ base: "26px", md: "38px", lg: "48px" }}
@@ -184,7 +326,6 @@ export default function HeroSection({ category }) {
             {isCategoryPage ? `Find ${category} for Sale in the UK` : "Compare local car & van engine reconditioners & breakers"}
           </Heading>
 
-          {/* Dual/Single Inquiry Card Container */}
           <Flex
             direction={{ base: "column", lg: "row" }}
             align="stretch"
@@ -193,7 +334,7 @@ export default function HeroSection({ category }) {
             w="full"
             maxW={isCategoryPage ? "1100px" : "550px"}
           >
-            {/* Left Card: REG Search */}
+            {/* LEFT CARD - VRM */}
             <Box
               bg="#001F3F"
               borderRadius={isCategoryPage ? { base: "2xl", lg: "2xl 0 0 2xl" } : "2xl"}
@@ -209,8 +350,6 @@ export default function HeroSection({ category }) {
                       <Text fontSize="10px" lineHeight="1">🇬🇧</Text>
                       <Text color="white" fontSize="12px" fontWeight="bold">UK</Text>
                     </VStack>
-                    {/* <Input placeholder="ENTER YOUR REG" variant="unstyled" bg="transparent" color="#333" _placeholder={{ color: 'rgba(0,0,0,0.3)' }} h="full" fontSize="22px" fontWeight="800" textAlign="center" letterSpacing="1px" textTransform="uppercase" /> */}
-
                     <Input
                       placeholder="ENTER YOUR REG"
                       value={vrm}
@@ -227,6 +366,8 @@ export default function HeroSection({ category }) {
                     />
                   </Flex>
                 </Box>
+
+                {/* Part Type Dropdown for VRM Card - using partTypes */}
                 <select
                   value={selectedCategory}
                   onChange={(e) => setSelectedCategory(e.target.value)}
@@ -235,16 +376,23 @@ export default function HeroSection({ category }) {
                     borderRadius: "8px",
                     fontSize: "16px",
                     fontWeight: "600",
+                    width: "100%",
+                    backgroundColor: "#fff"
                   }}
                 >
                   {loadingParts ? (
-                    <option>Loading...</option>
+                    <option>Loading parts...</option>
+                  ) : partTypes.length === 0 ? (
+                    <option>No parts available</option>
                   ) : (
-                    partTypes.map((item) => (
-                      <option key={item._id} value={item.slug}>
-                        {item.name}
-                      </option>
-                    ))
+                    <>
+                      <option value="">Select Part</option>
+                      {partTypes.map((item) => (
+                        <option key={item._id} value={item.slug}>
+                          {item.name}
+                        </option>
+                      ))}
+                    </>
                   )}
                 </select>
 
@@ -258,10 +406,9 @@ export default function HeroSection({ category }) {
                   fontWeight="bold"
                   rightIcon={<FaArrowRight />}
                   _hover={{ bg: "#B70303" }}
-
                   onClick={handleVRMSubmit}
                 >
-                  Get Free Quotes
+                  Get Free Quotes →
                 </Button>
 
                 <VStack align="start" spacing={2} color="white" fontSize="14px">
@@ -281,7 +428,6 @@ export default function HeroSection({ category }) {
                   top="50%"
                   transform="translateY(-50%)"
                   zIndex={3}
-                  bg="transparent"
                   color="white"
                   fontWeight="900"
                   fontSize="20px"
@@ -291,10 +437,10 @@ export default function HeroSection({ category }) {
               )}
             </Box>
 
-            {/* Right Card: Manual Search (Only for Category Pages) */}
+            {/* RIGHT CARD - MANUAL */}
             {isCategoryPage && (
               <Box
-                bg="#002D5C" // Slightly different navy for contrast
+                bg="#002D5C"
                 borderRadius={{ base: "2xl", lg: "0 2xl 2xl 0" }}
                 boxShadow="xl"
                 flex="1"
@@ -304,8 +450,19 @@ export default function HeroSection({ category }) {
                 <VStack spacing={5} align="stretch">
                   <ManualSelector />
 
-                  <Button w="full" size="lg" bg="#D90404" color="white" h="56px" fontSize="18px" fontWeight="bold" rightIcon={<FaArrowRight />} _hover={{ bg: "#B70303" }}>
-                    Get Free Quotes
+                  <Button
+                    w="full"
+                    size="lg"
+                    bg="#D90404"
+                    color="white"
+                    h="56px"
+                    fontSize="18px"
+                    fontWeight="bold"
+                    rightIcon={<FaArrowRight />}
+                    _hover={{ bg: "#B70303" }}
+                    onClick={handleManualSubmit}
+                  >
+                    Get Free Quotes →
                   </Button>
 
                   <VStack align="start" spacing={2} color="white" fontSize="14px">
@@ -317,12 +474,6 @@ export default function HeroSection({ category }) {
               </Box>
             )}
           </Flex>
-
-          <Box>
-            <Text color="white" fontSize="sm" textDecoration="underline" cursor="pointer" _hover={{ color: "gray.300" }}>
-              Don't have reg? Click here
-            </Text>
-          </Box>
         </VStack>
       </Container>
     </Box>
