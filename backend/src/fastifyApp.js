@@ -37,21 +37,25 @@ require("./models/PartType");
 require("./models/Brand");
 require("./models/ContactSubmission");
 require("./models/Inquiry");
+require("./models/Model");
 
 // Register Routes
-fastify.register(require("./routes/fastify/auth.routes"), { prefix: "/api/auth" });
-fastify.register(require("./routes/fastify/product.routes"), { prefix: "/api/products" });
-fastify.register(require("./routes/fastify/blog.routes"), { prefix: "/api/blogs" });
-fastify.register(require("./routes/fastify/employee.routes"), { prefix: "/api/employees" });
-fastify.register(require("./routes/fastify/registration.routes"), { prefix: "/api" });
-fastify.register(require("./routes/fastify/website.routes"), { prefix: "/api/websites" });
-fastify.register(require("./routes/fastify/lead.routes"), { prefix: "/api/leads" });
-fastify.register(require("./routes/fastify/contact.routes"), { prefix: "/api/contacts" });
-fastify.register(require("./routes/fastify/stats.routes"), { prefix: "/api/stats" });
 fastify.register(require("./routes/fastify/admin.routes"), { prefix: "/api" });
-fastify.register(require("./routes/fastify/partType.routes"), { prefix: "/api/part-types" });
+fastify.register(require("./routes/fastify/auth.routes"), { prefix: "/api/auth" });
+fastify.register(require("./routes/fastify/blog.routes"), { prefix: "/api/blogs" });
 fastify.register(require("./routes/fastify/brand.routes"), { prefix: "/api/brands" });
+fastify.register(require("./routes/fastify/contact.routes"), { prefix: "/api/contacts" });
+fastify.register(require("./routes/fastify/employee.routes"), { prefix: "/api/employees" });
+fastify.register(require("./routes/fastify/filterRoutes"), { prefix: "/api" });
 fastify.register(require("./routes/fastify/inquiry.routes"), { prefix: "/api" });
+fastify.register(require("./routes/fastify/lead.routes"), { prefix: "/api/leads" });
+fastify.register(require("./routes/fastify/model.routes"), { prefix: "/api/models" });
+fastify.register(require("./routes/fastify/partType.routes"), { prefix: "/api/part-types" });
+fastify.register(require("./routes/fastify/product.routes"), { prefix: "/api/products" });
+fastify.register(require("./routes/fastify/registration.routes"), { prefix: "/api" });
+fastify.register(require("./routes/fastify/stats.routes"), { prefix: "/api/stats" });
+fastify.register(require("./routes/fastify/website.routes"), { prefix: "/api/websites" });
+fastify.register(require("./routes/fastify/year.routes"), { prefix: "/api" });
 
 // Root route
 fastify.get("/", async (request, reply) => {
