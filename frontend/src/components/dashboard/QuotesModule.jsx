@@ -176,7 +176,10 @@ export default function QuotesModule() {
 									Status
 								</Th>
 								<Th fontSize="12px" fontWeight="800" textTransform="uppercase" letterSpacing="1px">
-									Date
+									Site
+								</Th>
+								<Th fontSize="12px" fontWeight="800" textTransform="uppercase" letterSpacing="1px">
+									Admin
 								</Th>
 								<Th fontSize="12px" fontWeight="800" textTransform="uppercase" letterSpacing="1px">
 									Actions
@@ -198,7 +201,7 @@ export default function QuotesModule() {
 										</Td>
 										<Td fontSize="13px">{productLabel}</Td>
 										<Td fontSize="13px" fontWeight="700">
-											${amount.toLocaleString()}
+											£{amount.toLocaleString()}
 										</Td>
 										<Td>
 											<Select
@@ -218,6 +221,14 @@ export default function QuotesModule() {
 										</Td>
 										<Td fontSize="13px" color={textMuted}>
 											{new Date(quote.createdAt).toISOString().slice(0, 10)}
+										</Td>
+										<Td fontSize="12px">
+											<Badge variant="subtle" colorScheme="blue">
+												{quote.website_id?.name || "Main Site"}
+											</Badge>
+										</Td>
+										<Td fontSize="13px" fontWeight="500">
+											{quote.createdBy?.name || "System"}
 										</Td>
 										<Td>
 											<HStack spacing={1}>
@@ -489,7 +500,7 @@ function QuoteViewModal({ isOpen, onClose, quote }) {
 								AMOUNT
 							</Text>
 							<Text fontSize="28px" fontWeight="800" color="#D90404">
-								${amount.toLocaleString()}
+								£{amount.toLocaleString()}
 							</Text>
 						</Box>
 					</VStack>

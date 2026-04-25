@@ -16,10 +16,18 @@ import {
 	Textarea,
 	useToast,
 	VStack,
+	Modal,
+	ModalOverlay,
+	ModalContent,
+	ModalHeader,
+	ModalBody,
+	ModalFooter,
+	ModalCloseButton,
+	useDisclosure,
 } from "@chakra-ui/react";
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
-import { FileText, Send, User, Wrench } from "lucide-react";
+import { CheckCircle, FileText, Send, User, Wrench } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
@@ -168,6 +176,8 @@ export default function CreateQuotePage() {
 	const toast = useToast();
 	const navigate = useNavigate();
 	const location = useLocation();
+	const { isOpen: isSuccessOpen, onOpen: onSuccessOpen, onClose: onSuccessClose } = useDisclosure();
+	const [successData, setSuccessData] = useState(null);
 
 	const [user, setUser] = useState(null);
 	const isSuperAdmin = user?.role === "super_admin";
@@ -331,17 +341,11 @@ export default function CreateQuotePage() {
 				status: "Sent",
 			};
 
-			await API.post("/quotes", payload);
+			const res = await API.post("/quotes", payload);
+			setSuccessData({ ...payload, _id: res.data?.data?._id || res.data?._id });
 
-			toast({
-				title: `Quote ${meta.refNumber} created`,
-				description: "Redirecting to quote history.",
-				status: "success",
-				duration: 2500,
-				position: "top-right",
-			});
+			onSuccessOpen();
 
-			navigate("/quotes", { replace: true });
 		} catch (error) {
 			toast({
 				title: "Failed to create quote",
@@ -352,6 +356,11 @@ export default function CreateQuotePage() {
 		} finally {
 			setIsSubmitting(false);
 		}
+	};
+
+	const handleSuccessClose = () => {
+		onSuccessClose();
+		navigate("/dashboard", { state: { defaultModule: "inquiries" }, replace: true });
 	};
 
 	return (
@@ -989,6 +998,70 @@ export default function CreateQuotePage() {
 					</Flex>
 				</Box>
 			</Box>
+
+			{/* Success Modal */}
+			<Modal
+				isOpen={isSuccessOpen}
+				onClose={handleSuccessClose}
+				isCentered
+				size="md"
+				closeOnOverlayClick={false}
+			>
+				<ModalOverlay backdropFilter="blur(8px)" bg="blackAlpha.700" />
+				<ModalContent borderRadius="3xl" overflow="hidden" boxShadow="2xl">
+					<ModalBody p={10}>
+						<VStack spacing={6}>
+							<Box bg="green.50" p={5} borderRadius="full">
+								<Icon as={CheckCircle} color="green.500" size={48} />
+							</Box>
+							<VStack spacing={2} textAlign="center">
+								<Text fontSize="24px" fontWeight="900" color={DARK}>
+									Quote Created!
+								</Text>
+								<Text color="gray.500" fontSize="15px">
+									Reference:{" "}
+									<Text as="span" fontWeight="800" color={RED}>
+										{successData?.refNumber}
+									</Text>
+								</Text>
+								<Text color="gray.500" fontSize="14px">
+									The quotation has been saved and is now visible in the history.
+								</Text>
+							</VStack>
+
+							<VStack w="full" spacing={3} pt={4}>
+								<Button
+									w="full"
+									h="54px"
+									borderRadius="2xl"
+									bg={DARK}
+									color="white"
+									_hover={{ bg: "#1e293b", transform: "translateY(-2px)" }}
+									onClick={handleSuccessClose}
+									fontWeight="800"
+								>
+									Go to Inquiries
+								</Button>
+								<Button
+									w="full"
+									h="54px"
+									borderRadius="2xl"
+									variant="outline"
+									borderColor="gray.200"
+									color="gray.600"
+									onClick={() => {
+										onSuccessClose();
+										window.location.reload();
+									}}
+									fontWeight="700"
+								>
+									Create Another Quote
+								</Button>
+							</VStack>
+						</VStack>
+					</ModalBody>
+				</ModalContent>
+			</Modal>
 		</Box>
 	);
 }

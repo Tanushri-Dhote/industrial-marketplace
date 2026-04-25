@@ -94,6 +94,27 @@ const getGreeting = () => {
 // ─── All Module Definitions ─────────────────────────────────────────────────
 const ALL_MODULES = [
 	{
+		id: "inquiries",
+		name: "Inquiries",
+		icon: Mail,
+		roles: ["super_admin", "admin", "website_manager", "sales_manager", "viewer"],
+		component: InquiriesModule,
+	},
+	{
+		id: "quotes",
+		name: "Quotes",
+		icon: DollarSign,
+		roles: ["super_admin", "admin", "website_manager", "sales_manager", "viewer"],
+		component: QuotesModule,
+	},
+	{
+		id: "leads",
+		name: "Leads",
+		icon: MessageSquare,
+		roles: ["super_admin", "admin", "website_manager", "sales_manager", "viewer"],
+		component: LeadsModule,
+	},
+	{
 		id: "admins",
 		name: "Admins & Staff",
 		icon: Users,
@@ -129,32 +150,11 @@ const ALL_MODULES = [
 		component: BlogsModule,
 	},
 	{
-		id: "leads",
-		name: "Leads",
-		icon: MessageSquare,
-		roles: ["super_admin", "admin", "website_manager", "sales_manager", "viewer"],
-		component: LeadsModule,
-	},
-	{
-		id: "inquiries",
-		name: "Inquiries",
-		icon: Mail,
-		roles: ["super_admin", "admin", "website_manager", "sales_manager", "viewer"],
-		component: InquiriesModule,
-	},
-	{
 		id: "contacts",
 		name: "Contact Inbox",
 		icon: Mail,
 		roles: ["super_admin", "admin", "website_manager", "sales_manager"],
 		component: ContactsModule,
-	},
-	{
-		id: "quotes",
-		name: "Quotes",
-		icon: DollarSign,
-		roles: ["super_admin", "admin", "website_manager", "sales_manager", "viewer"],
-		component: QuotesModule,
 	},
 	{
 		id: "part-types",
@@ -382,7 +382,7 @@ function Sidebar({ modules, activeModule, onSelect, user, userRole, onLogout }) 
 export default function DashboardPage({ defaultModule }) {
 	const { user, setUser } = useUser();
 	const navigate = useNavigate();
-	const [activeModule, setActiveModule] = useState(defaultModule || "users");
+	const [activeModule, setActiveModule] = useState(defaultModule || "inquiries");
 	const [stats, setStats] = useState(null);
 	const [statsLoading, setStatsLoading] = useState(true);
 	const { isOpen: isMobileOpen, onOpen: onMobileOpen, onClose: onMobileClose } = useDisclosure();
@@ -448,20 +448,12 @@ export default function DashboardPage({ defaultModule }) {
 
 	const statsData = [
 		{
-			label: "Employees",
-			value: statsLoading ? "..." : (stats?.employees ?? "0"),
-			change: statsLoading ? null : "Tenant scoped",
-			color: "#6366F1",
-			module: "admins",
-			icon: Users,
-		},
-		{
-			label: "Websites",
-			value: statsLoading ? "..." : (stats?.websites ?? "0"),
-			change: statsLoading ? null : "Managed tenants",
-			color: "#10B981",
-			module: "websites",
-			icon: Server,
+			label: "Inquiries",
+			value: statsLoading ? "..." : (stats?.inquiries ?? "0"),
+			change: statsLoading ? null : "Vehicle lookups",
+			color: "#EC4899",
+			module: "inquiries",
+			icon: Mail,
 		},
 		{
 			label: "Products",
@@ -472,20 +464,28 @@ export default function DashboardPage({ defaultModule }) {
 			icon: Package,
 		},
 		{
+			label: "Websites",
+			value: statsLoading ? "..." : (stats?.websites ?? "0"),
+			change: statsLoading ? null : "Managed tenants",
+			color: "#10B981",
+			module: "websites",
+			icon: Server,
+		},
+		{
+			label: "Employees",
+			value: statsLoading ? "..." : (stats?.employees ?? "0"),
+			change: statsLoading ? null : "Tenant scoped",
+			color: "#6366F1",
+			module: "admins",
+			icon: Users,
+		},
+		{
 			label: "Blogs",
 			value: statsLoading ? "..." : (stats?.blogs ?? "0"),
 			change: statsLoading ? null : "Articles published",
 			color: "#F59E0B",
 			module: "blogs",
 			icon: BookOpen,
-		},
-		{
-			label: "Inquiries",
-			value: statsLoading ? "..." : (stats?.inquiries ?? "0"),
-			change: statsLoading ? null : "Vehicle lookups",
-			color: "#EC4899",
-			module: "inquiries",
-			icon: Mail,
 		},
 	];
 
