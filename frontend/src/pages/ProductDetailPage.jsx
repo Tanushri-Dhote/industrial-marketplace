@@ -105,18 +105,18 @@ const PriceRow = ({ label, value, isTotal, color = "gray.600" }) => {
 	const formattedAmount = Number.isFinite(amount) ? amount.toLocaleString("en-GB") : "0";
 
 	return (
-	<Flex justify="space-between" align="center" py={isTotal ? 4 : 2}>
-		<Text fontWeight={isTotal ? "800" : "600"} fontSize={isTotal ? "lg" : "md"} color={color}>
-			{label}
-		</Text>
-		<Text
-			fontWeight={isTotal ? "900" : "700"}
-			fontSize={isTotal ? "3xl" : "md"}
-			color={isTotal ? "red.600" : "gray.900"}
-		>
-			£{formattedAmount}
-		</Text>
-	</Flex>
+		<Flex justify="space-between" align="center" py={isTotal ? 4 : 2}>
+			<Text fontWeight={isTotal ? "800" : "600"} fontSize={isTotal ? "lg" : "md"} color={color}>
+				{label}
+			</Text>
+			<Text
+				fontWeight={isTotal ? "900" : "700"}
+				fontSize={isTotal ? "3xl" : "md"}
+				color={isTotal ? "red.600" : "gray.900"}
+			>
+				£{formattedAmount}
+			</Text>
+		</Flex>
 	);
 };
 
