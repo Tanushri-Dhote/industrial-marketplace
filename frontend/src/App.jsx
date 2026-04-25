@@ -113,7 +113,7 @@ function App() {
 							path="/admin"
 							element={
 								<ProtectedRoute>
-									<DashboardPage defaultModule="admins" />
+									<DashboardPage defaultModule="inquiries" />
 								</ProtectedRoute>
 							}
 						/>
@@ -121,7 +121,7 @@ function App() {
 							path="/employee"
 							element={
 								<ProtectedRoute>
-									<DashboardPage defaultModule="admins" />
+									<DashboardPage defaultModule="inquiries" />
 								</ProtectedRoute>
 							}
 						/>

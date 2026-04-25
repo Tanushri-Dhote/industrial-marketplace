@@ -41,6 +41,7 @@ const rolePermissions = {
 		categories: ["create", "read", "update", "delete"],
 		websites: ["read"],
 		blogs: ["create", "read", "update", "delete"],
+		inquiries: ["create", "read", "update", "delete"],
 	},
 	website_manager: {
 		products: ["create", "read", "update", "delete"],
@@ -51,6 +52,7 @@ const rolePermissions = {
 		categories: ["create", "read", "update", "delete"],
 		websites: ["read"],
 		blogs: ["create", "read", "update", "delete"],
+		inquiries: ["create", "read", "update", "delete"],
 	},
 	sales_manager: {
 		products: ["read"],
@@ -61,6 +63,7 @@ const rolePermissions = {
 		categories: ["read"],
 		websites: ["read"],
 		blogs: ["read"],
+		inquiries: ["read", "update"],
 	},
 	viewer: {
 		products: ["read"],
@@ -71,6 +74,7 @@ const rolePermissions = {
 		categories: ["read"],
 		websites: ["read"],
 		blogs: ["read"],
+		inquiries: ["read"],
 	},
 };
 
