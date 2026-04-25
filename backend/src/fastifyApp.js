@@ -18,6 +18,8 @@ fastify.register(require("@fastify/compress"));
 fastify.register(require("@fastify/formbody"));
 fastify.register(require("@fastify/cors"), {
 	origin: process.env.CORS_ORIGIN || "*",
+	methods: ["GET", "PUT", "POST", "DELETE", "OPTIONS", "PATCH"],
+	allowedHeaders: ["Content-Type", "Authorization", "x-tenant-id", "Accept", "Origin", "X-Requested-With"],
 	credentials: true,
 });
 fastify.register(require("@fastify/jwt"), {
@@ -39,6 +41,15 @@ require("./models/ContactSubmission");
 require("./models/Inquiry");
 require("./models/Model");
 require("./models/Quote");
+
+// Log all requests for debugging CORS/Network issues
+fastify.addHook("onRequest", async (request, reply) => {
+	fastify.log.info({
+		method: request.method,
+		url: request.url,
+		headers: request.headers,
+	}, "Incoming Request");
+});
 
 // Register Routes
 fastify.register(require("./routes/fastify/admin.routes"), { prefix: "/api" });
@@ -68,7 +79,14 @@ fastify.get("/", async (request, reply) => {
 fastify.setErrorHandler((error, request, reply) => {
 	fastify.log.error(error);
 	console.error(error);
+
+	// Ensure CORS headers are present even on error
+	reply.header("Access-Control-Allow-Origin", process.env.CORS_ORIGIN || "*");
+	reply.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+	reply.header("Access-Control-Allow-Credentials", "true");
+
 	reply.status(error.statusCode || 500).send({
+		success: false,
 		message: error.message || "Internal Server Error",
 		error: process.env.NODE_ENV === "development" ? error.stack : undefined,
 	});
