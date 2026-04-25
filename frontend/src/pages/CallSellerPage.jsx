@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
     Box,
     Container,
@@ -50,6 +50,19 @@ export default function CallSellerPage() {
 
     const { vrm, category, brand, model, year, type, searchType } = location.state || {};
 
+    useEffect(() => {
+        if (!location.state) {
+            toast({
+                title: "Start from the quote form",
+                description: "Please begin on the homepage so we can capture your vehicle details.",
+                status: "warning",
+                position: "top-right",
+                duration: 3000,
+            });
+            navigate("/", { replace: true });
+        }
+    }, [location.state, navigate, toast]);
+
     const [form, setForm] = useState({
         postcode: "",
         notes: "",
@@ -84,6 +97,17 @@ export default function CallSellerPage() {
     const API = import.meta.env.VITE_API_URL;
 
     const handleGetQuote = async () => {
+        if (!location.state) {
+            toast({
+                title: "Missing vehicle details",
+                description: "Please start from the homepage quote form.",
+                status: "warning",
+                position: "top-right",
+            });
+            navigate("/", { replace: true });
+            return;
+        }
+
         try {
             const res = await fetch(`${API}/validate-vrm`, {
                 method: "POST",

@@ -59,9 +59,9 @@ exports.getStats = async (request, reply) => {
 
 			result.leads = await Lead.countDocuments(leadFilter);
 			result.blogs = await Blog.countDocuments(filter);
-			// Note: Inquiries currently don't have website_id, so we don't filter them yet.
-			// If they should be filtered, we need to add website_id to Inquiry model.
-			result.inquiries = 0; 
+			// Inquiries do not currently carry website_id, so report the total count
+			// instead of forcing an incorrect zero value for tenant dashboards.
+			result.inquiries = await Inquiry.countDocuments();
 
 			const leadStatuses = await Lead.aggregate([
 				{ $match: leadFilter },

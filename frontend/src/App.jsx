@@ -30,13 +30,13 @@ import ScrollToTop from "./components/layout/ScrollToTop";
 
 function App() {
 	const { pathname } = useLocation();
-	const adminShellHiddenRoutes = ["/dashboard", "/admin", "/employee", "/leads"];
+	const adminShellHiddenRoutes = ["/dashboard", "/admin", "/employee", "/leads", "/quotes"];
 	const hideGlobalLayout = adminShellHiddenRoutes.some((route) => pathname.startsWith(route));
 
 	return (
 		<UserProvider>
 			<Box minH="100vh" display="flex" flexDirection="column">
-			   {!hideGlobalLayout && <RefreshPopUp />}
+				{!hideGlobalLayout && <RefreshPopUp />}
 				{!hideGlobalLayout && <Header />}
 				<ScrollToTop />
 
@@ -98,6 +98,14 @@ function App() {
 							element={
 								<ProtectedRoute>
 									<DashboardPage defaultModule="leads" />
+								</ProtectedRoute>
+							}
+						/>
+						<Route
+							path="/quotes"
+							element={
+								<ProtectedRoute>
+									<DashboardPage defaultModule="quotes" />
 								</ProtectedRoute>
 							}
 						/>

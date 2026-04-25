@@ -22,6 +22,8 @@ import jsPDF from "jspdf";
 import { FileText, Send, User, Wrench } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
+import API from "../services/api";
 
 const DARK = "#0F172A";
 const RED = "#D90404";
@@ -167,8 +169,21 @@ export default function CreateQuotePage() {
 	const navigate = useNavigate();
 	const location = useLocation();
 
-	const [isGenerating, setIsGenerating] = useState(false);
 	const [user, setUser] = useState(null);
+	const isSuperAdmin = user?.role === "super_admin";
+	const [selectedWebsiteId, setSelectedWebsiteId] = useState("");
+
+	const [isGenerating, setIsGenerating] = useState(false);
+	const [isSubmitting, setIsSubmitting] = useState(false);
+
+	const { data: websites = [] } = useQuery({
+		queryKey: ["websites", "quote-create"],
+		queryFn: async () => {
+			const res = await API.get("/websites");
+			return res.data?.data || [];
+		},
+		enabled: isSuperAdmin,
+	});
 
 	const [meta, setMeta] = useState({
 		refNumber: `AE4U-${Math.floor(800000 + Math.random() * 99999)}`,
@@ -203,7 +218,13 @@ export default function CreateQuotePage() {
 
 	useEffect(() => {
 		const stored = localStorage.getItem("user");
-		if (stored) setUser(JSON.parse(stored));
+		if (stored) {
+			const parsedUser = JSON.parse(stored);
+			setUser(parsedUser);
+			if (parsedUser.website_id) {
+				setSelectedWebsiteId(parsedUser.website_id);
+			}
+		}
 
 		const s = location.state;
 		if (s?.fromInquiry && s?.customer && !importedRef.current) {
@@ -254,6 +275,82 @@ export default function CreateQuotePage() {
 			toast({ title: "PDF error", status: "error" });
 		} finally {
 			setIsGenerating(false);
+		}
+	};
+
+	const handleSendQuote = async () => {
+		if (!customer.name?.trim()) {
+			toast({
+				title: "Customer name required",
+				status: "warning",
+				position: "top-right",
+			});
+			return;
+		}
+
+		if (isSuperAdmin && !selectedWebsiteId) {
+			toast({
+				title: "Select a website first",
+				status: "warning",
+				position: "top-right",
+			});
+			return;
+		}
+
+		setIsSubmitting(true);
+		try {
+			const payload = {
+				website_id: selectedWebsiteId || user?.website_id,
+				refNumber: meta.refNumber,
+				customer: {
+					name: customer.name,
+					phone: customer.phone,
+					postcode: customer.postcode,
+				},
+				vehicle: {
+					vrm: meta.vrm,
+					vehicleDesc: meta.vehicleDesc,
+					engineCode: meta.engineCode,
+				},
+				pricing: {
+					engine: lines.engine,
+					exchange: lines.exchange,
+					delivery: lines.delivery,
+					recovery: lines.recovery,
+					fitting: lines.fitting,
+					vat: vatAmount,
+					subtotal,
+					total,
+					autoVAT,
+					recoveryTBC,
+				},
+				warranty,
+				condition,
+				mileage,
+				notes,
+				status: "Sent",
+			};
+
+			await API.post("/quotes", payload);
+
+			toast({
+				title: `Quote ${meta.refNumber} created`,
+				description: "Redirecting to quote history.",
+				status: "success",
+				duration: 2500,
+				position: "top-right",
+			});
+
+			navigate("/quotes", { replace: true });
+		} catch (error) {
+			toast({
+				title: "Failed to create quote",
+				description: error.response?.data?.message || "Please try again",
+				status: "error",
+				position: "top-right",
+			});
+		} finally {
+			setIsSubmitting(false);
 		}
 	};
 
@@ -327,14 +424,9 @@ export default function CreateQuotePage() {
 							transition="all 0.2s"
 							size="sm"
 							px={6}
-							onClick={() =>
-								toast({
-									title: `Quote ${meta.refNumber} sent!`,
-									status: "success",
-									duration: 3000,
-									position: "top-right",
-								})
-							}
+							onClick={handleSendQuote}
+							isLoading={isSubmitting}
+							loadingText="Sending..."
 						>
 							Send Quote
 						</Button>
@@ -344,6 +436,44 @@ export default function CreateQuotePage() {
 
 			<Box maxW="1400px" mx="auto" px={8} py={8}>
 				<Box ref={pdfRef}>
+					{isSuperAdmin && (
+						<Box
+							bg="white"
+							borderRadius="2xl"
+							p={6}
+							mb={6}
+							boxShadow="0 4px 20px rgba(0,0,0,0.06)"
+							border="1px solid"
+							borderColor="gray.100"
+						>
+							<HStack spacing={2} mb={4}>
+								<Box bg={`${RED}15`} p={2} borderRadius="lg">
+									<Icon as={User} color={RED} size={16} />
+								</Box>
+								<Text fontWeight="800" fontSize="15px" color={DARK}>
+									Quote Website
+								</Text>
+							</HStack>
+							<Text fontSize="11px" fontWeight="700" color="gray.500" textTransform="uppercase" letterSpacing="0.5px" mb={1.5}>
+								Assign Quote To Website
+							</Text>
+							<Select
+								value={selectedWebsiteId}
+								onChange={(e) => setSelectedWebsiteId(e.target.value)}
+								placeholder="Select a website"
+								borderRadius="xl"
+								borderColor="gray.200"
+								_focus={{ borderColor: RED, boxShadow: "0 0 0 3px rgba(217,4,4,0.1)" }}
+							>
+								{websites.map((site) => (
+									<option key={site._id} value={site._id}>
+										{site.name}{site.domain ? ` (${site.domain})` : ""}
+									</option>
+								))}
+							</Select>
+						</Box>
+					)}
+
 					{/* ── Vehicle Hero ── */}
 					<Box
 						bg={DARK}
@@ -842,14 +972,9 @@ export default function CreateQuotePage() {
 							fontWeight="800"
 							fontSize="15px"
 							letterSpacing="0.5px"
-							onClick={() =>
-								toast({
-									title: `Quote ${meta.refNumber} sent!`,
-									status: "success",
-									duration: 3000,
-									position: "top-right",
-								})
-							}
+							onClick={handleSendQuote}
+							isLoading={isSubmitting}
+							loadingText="Sending..."
 						>
 							Send Quote
 						</Button>

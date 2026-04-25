@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import {
 	Table,
 	Thead,
@@ -36,12 +36,12 @@ import {
 import { AddIcon, EditIcon, DeleteIcon, SearchIcon } from "@chakra-ui/icons";
 import { BookOpen, Edit3, FileText } from "lucide-react";
 import { toast } from "sonner";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import ModuleFrame from "./ModuleFrame";
 import API from "../../services/api";
 
 export default function BlogsModule() {
-	const [blogs, setBlogs] = useState([]);
-	const [isLoading, setIsLoading] = useState(true);
+	const queryClient = useQueryClient();
 	const [searchTerm, setSearchTerm] = useState("");
 	const [editingBlog, setEditingBlog] = useState(null);
 	const { isOpen, onOpen, onClose } = useDisclosure();
@@ -50,47 +50,50 @@ export default function BlogsModule() {
 	const role = user.role || "viewer";
 	const isViewer = role === "viewer";
 
-	const fetchBlogs = async () => {
-		setIsLoading(true);
-		try {
+	const { data: blogs = [], isLoading } = useQuery({
+		queryKey: ["blogs"],
+		queryFn: async () => {
 			const res = await API.get("/blogs");
-			setBlogs(res.data.data || []);
-		} catch (err) {
-			toast.error(err.response?.data?.message || "Failed to load blogs");
-		} finally {
-			setIsLoading(false);
-		}
-	};
+			return res.data.data || [];
+		},
+	});
 
-	useEffect(() => {
-		fetchBlogs();
-	}, []);
-
-	const handleSave = async (data) => {
-		try {
+	const saveMutation = useMutation({
+		mutationFn: async (payload) => {
 			if (editingBlog) {
-				await API.put(`/blogs/${editingBlog._id}`, data);
-				toast.success("Blog updated successfully");
+				return API.put(`/blogs/${editingBlog._id}`, payload);
 			} else {
-				await API.post("/blogs", data);
-				toast.success("Blog published successfully");
+				return API.post("/blogs", payload);
 			}
-			fetchBlogs();
+		},
+		onSuccess: () => {
+			queryClient.invalidateQueries({ queryKey: ["blogs"] });
+			toast.success(editingBlog ? "Blog updated successfully" : "Blog published successfully");
 			onClose();
-		} catch (err) {
+		},
+		onError: (err) => {
 			toast.error(err.response?.data?.message || "Operation failed");
-		}
+		},
+	});
+
+	const deleteMutation = useMutation({
+		mutationFn: async (id) => API.delete(`/blogs/${id}`),
+		onSuccess: () => {
+			queryClient.invalidateQueries({ queryKey: ["blogs"] });
+			toast.success("Blog deleted");
+		},
+		onError: (err) => {
+			toast.error(err.response?.data?.message || "Delete failed");
+		},
+	});
+
+	const handleSave = (data) => {
+		saveMutation.mutate(data);
 	};
 
-	const handleDelete = async (id) => {
+	const handleDelete = (id) => {
 		if (!window.confirm("Are you sure you want to delete this blog post?")) return;
-		try {
-			await API.delete(`/blogs/${id}`);
-			toast.success("Blog deleted");
-			fetchBlogs();
-		} catch (err) {
-			toast.error(err.response?.data?.message || "Delete failed");
-		}
+		deleteMutation.mutate(id);
 	};
 
 	const filteredBlogs = blogs.filter(

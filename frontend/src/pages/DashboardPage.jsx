@@ -154,7 +154,7 @@ const ALL_MODULES = [
 		name: "Quotes",
 		icon: DollarSign,
 		roles: ["super_admin", "admin", "website_manager", "sales_manager", "viewer"],
-		component: InquiriesModule,
+		component: QuotesModule,
 	},
 	{
 		id: "part-types",

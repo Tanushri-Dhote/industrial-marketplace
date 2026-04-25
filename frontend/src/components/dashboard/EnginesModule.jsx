@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import {
 	Table,
 	Thead,
@@ -36,12 +36,12 @@ import {
 import { AddIcon, EditIcon, DeleteIcon, SearchIcon } from "@chakra-ui/icons";
 import { Package } from "lucide-react";
 import { toast } from "sonner";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import ModuleFrame from "./ModuleFrame";
 import API from "../../services/api";
 
 export default function EnginesModule() {
-	const [products, setProducts] = useState([]);
-	const [isLoading, setIsLoading] = useState(true);
+	const queryClient = useQueryClient();
 	const [searchTerm, setSearchTerm] = useState("");
 	const [editingProduct, setEditingProduct] = useState(null);
 	const { isOpen, onOpen, onClose } = useDisclosure();
@@ -50,48 +50,50 @@ export default function EnginesModule() {
 	const role = user.role || "viewer";
 	const isViewer = role === "viewer";
 
-	const fetchProducts = async () => {
-		setIsLoading(true);
-		try {
+	const { data: products = [], isLoading } = useQuery({
+		queryKey: ["products"],
+		queryFn: async () => {
 			const res = await API.get("/products");
-			const data = Array.isArray(res.data) ? res.data : res.data.data || [];
-			setProducts(data);
-		} catch (err) {
-			toast.error(err.response?.data?.message || "Failed to load products");
-		} finally {
-			setIsLoading(false);
-		}
-	};
+			return Array.isArray(res.data) ? res.data : res.data.data || [];
+		},
+	});
 
-	useEffect(() => {
-		fetchProducts();
-	}, []);
-
-	const handleSave = async (data) => {
-		try {
+	const saveMutation = useMutation({
+		mutationFn: async (payload) => {
 			if (editingProduct) {
-				await API.put(`/products/${editingProduct._id}`, data);
-				toast.success("Product updated");
+				return API.put(`/products/${editingProduct._id}`, payload);
 			} else {
-				await API.post("/products", data);
-				toast.success("Product added");
+				return API.post("/products", payload);
 			}
-			fetchProducts();
+		},
+		onSuccess: () => {
+			queryClient.invalidateQueries({ queryKey: ["products"] });
+			toast.success(editingProduct ? "Product updated" : "Product added");
 			onClose();
-		} catch (err) {
+		},
+		onError: (err) => {
 			toast.error(err.response?.data?.message || "Operation failed");
-		}
+		},
+	});
+
+	const deleteMutation = useMutation({
+		mutationFn: async (id) => API.delete(`/products/${id}`),
+		onSuccess: () => {
+			queryClient.invalidateQueries({ queryKey: ["products"] });
+			toast.success("Product deleted");
+		},
+		onError: (err) => {
+			toast.error(err.response?.data?.message || "Delete failed");
+		},
+	});
+
+	const handleSave = (data) => {
+		saveMutation.mutate(data);
 	};
 
-	const handleDelete = async (id) => {
+	const handleDelete = (id) => {
 		if (!window.confirm("Are you sure you want to delete this product?")) return;
-		try {
-			await API.delete(`/products/${id}`);
-			toast.success("Product deleted");
-			fetchProducts();
-		} catch (err) {
-			toast.error(err.response?.data?.message || "Delete failed");
-		}
+		deleteMutation.mutate(id);
 	};
 
 	const filteredProducts = products.filter(

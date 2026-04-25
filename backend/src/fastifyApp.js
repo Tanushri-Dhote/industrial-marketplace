@@ -38,6 +38,7 @@ require("./models/Brand");
 require("./models/ContactSubmission");
 require("./models/Inquiry");
 require("./models/Model");
+require("./models/Quote");
 
 // Register Routes
 fastify.register(require("./routes/fastify/admin.routes"), { prefix: "/api" });
@@ -52,6 +53,7 @@ fastify.register(require("./routes/fastify/lead.routes"), { prefix: "/api/leads"
 fastify.register(require("./routes/fastify/model.routes"), { prefix: "/api/models" });
 fastify.register(require("./routes/fastify/partType.routes"), { prefix: "/api/part-types" });
 fastify.register(require("./routes/fastify/product.routes"), { prefix: "/api/products" });
+fastify.register(require("./routes/fastify/quote.routes"), { prefix: "/api/quotes" });
 fastify.register(require("./routes/fastify/registration.routes"), { prefix: "/api" });
 fastify.register(require("./routes/fastify/stats.routes"), { prefix: "/api/stats" });
 fastify.register(require("./routes/fastify/website.routes"), { prefix: "/api/websites" });
