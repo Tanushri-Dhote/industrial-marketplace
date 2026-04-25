@@ -54,7 +54,7 @@ exports.getStats = async (request, reply) => {
 			// For sales_manager, maybe scope the lead counts to just theirs
 			let leadFilter = { website_id: request.tenantId };
 			if (request.user.role === "sales_manager") {
-				leadFilter.assigned_to = request.user._id;
+				leadFilter.assigned_to = request.user.id;
 			}
 
 			result.leads = await Lead.countDocuments(leadFilter);

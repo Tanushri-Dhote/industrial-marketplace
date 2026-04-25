@@ -176,6 +176,9 @@ export default function QuotesModule() {
 									Status
 								</Th>
 								<Th fontSize="12px" fontWeight="800" textTransform="uppercase" letterSpacing="1px">
+									Date
+								</Th>
+								<Th fontSize="12px" fontWeight="800" textTransform="uppercase" letterSpacing="1px">
 									Site
 								</Th>
 								<Th fontSize="12px" fontWeight="800" textTransform="uppercase" letterSpacing="1px">

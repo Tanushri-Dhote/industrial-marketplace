@@ -16,7 +16,7 @@ exports.getLeads = async (request, reply) => {
 			if (request.user && request.user.role === "sales_manager") {
 				// Either unassigned or assigned specifically to them
 				filter.$or = [
-					{ assigned_to: request.user._id },
+					{ assigned_to: request.user.id },
 					{ assigned_to: null },
 					{ assigned_to: { $exists: false } },
 				];
@@ -102,7 +102,7 @@ exports.updateLead = async (request, reply) => {
 			request.tenantId &&
 			request.user.role === "sales_manager" &&
 			lead.assigned_to &&
-			lead.assigned_to.toString() !== request.user._id.toString()
+			lead.assigned_to.toString() !== request.user.id.toString()
 		) {
 			return reply.status(403).send({ message: "Lead is already assigned to someone else" });
 		}

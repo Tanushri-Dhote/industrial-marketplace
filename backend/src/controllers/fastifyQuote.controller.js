@@ -62,7 +62,7 @@ exports.createQuote = async (request, reply) => {
 		const quote = await Quote.create({
 			...payload,
 			website_id: websiteId,
-			createdBy: request.user?._id,
+			createdBy: request.user?.id,
 			status: payload.status || "Sent",
 		});
 
