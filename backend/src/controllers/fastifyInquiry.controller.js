@@ -18,24 +18,33 @@ const validateVRM = async (req, reply) => {
       phone,
     } = req.body;
 
-    // Step 1: Validation (Only if VRM is provided)
+    // Step 1: Validation
     if (vrm) {
       vrm = vrm.replace(/\s+/g, "").toUpperCase();
       const ukVrmRegex = /^[A-Z]{2}[0-9]{2}[A-Z]{3}$|^[A-Z]{1,2}[0-9]{1,4}[A-Z]{1,3}$/;
       if (!ukVrmRegex.test(vrm)) {
-        return reply.status(400).send({
-          success: false,
-          message: "Invalid UK registration number",
-        });
+        return reply.status(400).send({ success: false, message: "Invalid UK registration number" });
       }
-    } else if (!brand || !model) {
-      // If no VRM, we must have brand/model for it to be a valid inquiry
+    }
+
+    if (postcode) {
+      const ukPostcodeRegex = /^[A-Z]{1,2}[0-9][A-Z0-9]? ?[0-9][A-Z]{2}$/i;
+      if (!ukPostcodeRegex.test(postcode)) {
+        return reply.status(400).send({ success: false, message: "Invalid UK postcode" });
+      }
+    }
+
+    if (phone) {
+      // UK Phone Regex (Mobiles starting with 07, Landlines 01/02)
+      const ukPhoneRegex = /^(?:(?:\+44\s?|0)7\d{3}\s?\d{6}|(?:\+44\s?|0)1\d{2}\s?\d{7}|(?:\+44\s?|0)2\d{1}\s?\d{8})$/;
+      if (!ukPhoneRegex.test(phone.replace(/\s+/g, ""))) {
+        return reply.status(400).send({ success: false, message: "Invalid UK phone number" });
+      }
+    }
+
+    if (!vrm && (!brand || !model)) {
       if (name && email && phone) {
-         // This is a final submission but missing identification
-         return reply.status(400).send({
-           success: false,
-           message: "Registration number or vehicle details are required",
-         });
+         return reply.status(400).send({ success: false, message: "Vehicle details are required" });
       }
     }
 

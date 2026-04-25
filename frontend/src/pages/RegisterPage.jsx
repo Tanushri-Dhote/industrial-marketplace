@@ -40,8 +40,20 @@ const schema = yup.object({
   confirmPassword: yup.string()
     .oneOf([yup.ref('password'), null], 'Passwords must match')
     .required('Please confirm your password'),
-  phone1: yup.string().required('Primary phone number is required').matches(/^[0-9]{10}$/, 'Phone number must be 10 digits'),
-  phone2: yup.string().matches(/^[0-9]{10}$/, { message: 'Phone number must be 10 digits', excludeEmptyString: true }).optional(),
+  phone1: yup.string()
+    .required('Primary phone number is required')
+    .test('is-uk-phone', 'Invalid UK phone number', (value) => {
+      if (!value) return false;
+      const cleaned = value.replace(/\s+/g, '');
+      return /^(?:(?:\+44\s?|0)7\d{3}\s?\d{6}|(?:\+44\s?|0)1\d{2}\s?\d{7}|(?:\+44\s?|0)2\d{1}\s?\d{8})$/.test(cleaned);
+    }),
+  phone2: yup.string()
+    .test('is-uk-phone-optional', 'Invalid UK phone number', (value) => {
+      if (!value) return true; // Optional
+      const cleaned = value.replace(/\s+/g, '');
+      return /^(?:(?:\+44\s?|0)7\d{3}\s?\d{6}|(?:\+44\s?|0)1\d{2}\s?\d{7}|(?:\+44\s?|0)2\d{1}\s?\d{8})$/.test(cleaned);
+    })
+    .optional(),
   warranty: yup.string().required('Warranty period is required'),
   vatNumber: yup.string().optional(),
 }).required();

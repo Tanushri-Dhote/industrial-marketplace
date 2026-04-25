@@ -12,10 +12,25 @@ const leadSchema = new mongoose.Schema(
 			type: String,
 			lowercase: true,
 			trim: true,
+			validate: {
+				validator: function (v) {
+					return /^\S+@\S+\.\S+$/.test(v);
+				},
+				message: (props) => `${props.value} is not a valid email!`,
+			},
 		},
 		customer_phone: {
 			type: String,
 			trim: true,
+			validate: {
+				validator: function (v) {
+					const cleaned = v.replace(/\s+/g, "");
+					return /^(?:(?:\+44\s?|0)7\d{3}\s?\d{6}|(?:\+44\s?|0)1\d{2}\s?\d{7}|(?:\+44\s?|0)2\d{1}\s?\d{8})$/.test(
+						cleaned,
+					);
+				},
+				message: (props) => `${props.value} is not a valid UK phone number!`,
+			},
 		},
 
 		// Inquiry specifics

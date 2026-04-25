@@ -290,12 +290,25 @@ export default function CreateQuotePage() {
 
 	const handleSendQuote = async () => {
 		if (!customer.name?.trim()) {
-			toast({
-				title: "Customer name required",
-				status: "warning",
-				position: "top-right",
-			});
+			toast({ title: "Customer name required", status: "warning", position: "top-right" });
 			return;
+		}
+
+		if (customer.phone) {
+			const cleanedPhone = customer.phone.replace(/\s+/g, "");
+			const ukPhoneRegex = /^(?:(?:\+44\s?|0)7\d{3}\s?\d{6}|(?:\+44\s?|0)1\d{2}\s?\d{7}|(?:\+44\s?|0)2\d{1}\s?\d{8})$/;
+			if (!ukPhoneRegex.test(cleanedPhone)) {
+				toast({ title: "Invalid UK phone number", status: "warning", position: "top-right" });
+				return;
+			}
+		}
+
+		if (customer.postcode) {
+			const ukPostcodeRegex = /^[A-Z]{1,2}[0-9][A-Z0-9]? ?[0-9][A-Z]{2}$/i;
+			if (!ukPostcodeRegex.test(customer.postcode)) {
+				toast({ title: "Invalid UK postcode", status: "warning", position: "top-right" });
+				return;
+			}
 		}
 
 		if (isSuperAdmin && !selectedWebsiteId) {

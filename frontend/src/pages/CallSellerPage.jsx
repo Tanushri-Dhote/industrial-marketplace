@@ -82,6 +82,10 @@ export default function CallSellerPage() {
 			if (fittingOptions.length === 0)
 				return toast({ title: "Please select a fitting option", status: "warning" });
 			if (!form.postcode) return toast({ title: "Postcode is required", status: "warning" });
+			const ukPostcodeRegex = /^[A-Z]{1,2}[0-9][A-Z0-9]? ?[0-9][A-Z]{2}$/i;
+			if (!ukPostcodeRegex.test(form.postcode)) {
+				return toast({ title: "Invalid UK postcode", status: "warning" });
+			}
 		}
 		setStep(step + 1);
 		window.scrollTo(0, 0);
@@ -429,7 +433,14 @@ export default function CallSellerPage() {
 								fontWeight="800"
 								borderRadius="xl"
 								onClick={handleGetQuote}
-								isDisabled={!form.name || !form.email || !form.phone}
+								isDisabled={
+									!form.name ||
+									!form.email ||
+									!form.phone ||
+									!/^(?:(?:\+44\s?|0)7\d{3}\s?\d{6}|(?:\+44\s?|0)1\d{2}\s?\d{7}|(?:\+44\s?|0)2\d{1}\s?\d{8})$/.test(
+										form.phone.replace(/\s+/g, ""),
+									)
+								}
 								_hover={{ bg: "#B70303" }}
 							>
 								Get My Free Quotes
