@@ -1,249 +1,230 @@
 import React, { useState } from "react";
 import {
-    Box,
-    Container,
-    Heading,
-    Table,
-    Thead,
-    Tbody,
-    Tr,
-    Th,
-    Td,
-    Button,
-    Input,
-    Grid,
-    VStack,
-    HStack,
-    Text,
-    Checkbox,
-    Radio,
-    RadioGroup,
-    Textarea,
-    Center,
+	Box,
+	Container,
+	Heading,
+	Table,
+	Thead,
+	Tbody,
+	Tr,
+	Th,
+	Td,
+	Button,
+	Input,
+	Grid,
+	VStack,
+	HStack,
+	Text,
+	Checkbox,
+	Radio,
+	RadioGroup,
+	Textarea,
+	Center,
 } from "@chakra-ui/react";
 import { useNavigate } from "react-router-dom";
 import { useLocation } from "react-router-dom";
 
-
 export default function CheckoutPage() {
-    const [qty, setQty] = useState(1);
-    const navigate = useNavigate();
-    const location = useLocation();
-    const [cart, setCart] = useState([]);
-    const product = location.state?.product;
-    if (!product) {
-        return (
-            <Center minH="100vh">
-                <VStack spacing={4}>
-                    <Heading size="lg">No Product Selected</Heading>
-                    <Text>Please select a product to checkout.</Text>
-                    <Button onClick={() => navigate('/')}>Return Home</Button>
-                </VStack>
-            </Center>
-        );
-    }
+	const navigate = useNavigate();
+	const location = useLocation();
+	const product = location.state?.product;
+	const [cart, setCart] = useState(() => (product ? [{ ...product, qty: 1 }] : []));
 
-    const price = product.price || 0;
-    const total = price * qty;
+	if (!product && cart.length === 0) {
+		return (
+			<Center minH="100vh">
+				<VStack spacing={4}>
+					<Heading size="lg">No Product Selected</Heading>
+					<Text>Please select a product to checkout.</Text>
+					<Button onClick={() => navigate("/")}>Return Home</Button>
+				</VStack>
+			</Center>
+		);
+	}
 
-    const addToCart = (product, quantity) => {
-        setCart((prev) => {
-            const existing = prev.find((item) => item._id === product._id);
+	const cartItemCount = cart.reduce((sum, item) => sum + (item.qty || 0), 0);
+	const total = cart.reduce(
+		(sum, item) => sum + Number(item.price || 0) * Number(item.qty || 0),
+		0,
+	);
 
-            if (existing) {
-                return prev.map((item) =>
-                    item._id === product._id
-                        ? { ...item, qty: quantity }
-                        : item
-                );
-            }
+	const updateQuantity = (productId, delta) => {
+		setCart((prev) =>
+			prev
+				.map((item) => {
+					if (item._id !== productId) {
+						return item;
+					}
 
-            return [...prev, { ...product, qty: quantity }];
-        });
-    };
+					const nextQty = Number(item.qty || 1) + delta;
+					return { ...item, qty: nextQty };
+				})
+				.filter((item) => item.qty > 0),
+		);
+	};
 
-    const removeFromCart = (productId) => {
-        setCart((prev) => prev.filter((item) => item._id !== productId));
-    };
+	const removeFromCart = (productId) => {
+		setCart((prev) => prev.filter((item) => item._id !== productId));
+	};
 
-    return (
-        <Box bg="gray.50" minH="100vh" py={10}>
-            <Container maxW="container.xl">
+	return (
+		<Box bg="gray.50" minH="100vh" py={10}>
+			<Container maxW="container.xl">
+				{/* Title */}
+				<HStack justify="space-between" mb={4}>
+					<Heading>Checkout</Heading>
 
-                {/* Title */}
-                <HStack justify="space-between" mb={4}>
-                    <Heading>Checkout</Heading>
+					<Button variant="outline">🛒 Cart ({cartItemCount})</Button>
+				</HStack>
 
-                    <Button variant="outline">
-                        🛒 Cart ({cart.length})
-                    </Button>
-                </HStack>
+				{/* CART TABLE */}
+				<Box bg="white" p={6} borderRadius="lg" boxShadow="sm">
+					<Table>
+						<Thead>
+							<Tr>
+								<Th>Product</Th>
+								<Th>Price</Th>
+								<Th>Qty</Th>
+								<Th>Total</Th>
+								<Th></Th>
+							</Tr>
+						</Thead>
 
-                {/* CART TABLE */}
-                <Box bg="white" p={6} borderRadius="lg" boxShadow="sm">
-                    <Table>
-                        <Thead>
-                            <Tr>
-                                <Th>Product</Th>
-                                <Th>Price</Th>
-                                <Th>Qty</Th>
-                                <Th>Total</Th>
-                                <Th></Th>
-                            </Tr>
-                        </Thead>
+						<Tbody>
+							{cart.map((item) => {
+								const price = Number(item.price || 0);
+								const lineTotal = price * Number(item.qty || 0);
 
-                        <Tbody>
-                            <Tr>
-                                <Td>
-                                    {product.name} {product.make} {product.model} {product.year}
-                                </Td>
-                                <Td>£{price?.toLocaleString()}</Td>
+								return (
+									<Tr key={item._id}>
+										<Td>
+											{item.name} {item.make} {item.model} {item.year}
+										</Td>
+										<Td>£{price.toLocaleString("en-GB")}</Td>
 
-                                <Td>
-                                    <HStack>
-                                        <Button
-                                            size="sm"
-                                            onClick={() => {
-                                                const newQty = qty - 1;
+										<Td>
+											<HStack>
+												<Button size="sm" onClick={() => updateQuantity(item._id, -1)}>
+													-
+												</Button>
+												<Box>{item.qty}</Box>
+												<Button size="sm" onClick={() => updateQuantity(item._id, 1)}>
+													+
+												</Button>
+											</HStack>
+										</Td>
 
-                                                if (newQty <= 0) {
-                                                    setQty(1);
-                                                    removeFromCart(product._id);
-                                                } else {
-                                                    setQty(newQty);
-                                                    addToCart(product, newQty);
-                                                }
-                                            }}
-                                        >
-                                            -
-                                        </Button>                                        <Box>{qty}</Box>
-                                        <Button
-                                            size="sm"
-                                            onClick={() => {
-                                                const newQty = qty + 1;
-                                                setQty(newQty);
-                                                addToCart(product, newQty);
-                                            }}
-                                        >
-                                            +
-                                        </Button>                                    </HStack>
-                                </Td>
+										<Td>£{lineTotal.toLocaleString("en-GB")}</Td>
 
-                                <Td>£{total}</Td>
+										<Td>
+											<Button colorScheme="red" size="sm" onClick={() => removeFromCart(item._id)}>
+												Remove
+											</Button>
+										</Td>
+									</Tr>
+								);
+							})}
 
-                                <Td>
-                                    <Button
-                                        colorScheme="red"
-                                        size="sm"
-                                        onClick={() => removeFromCart(product._id)}
-                                    >
-                                        Remove
-                                    </Button>
-                                </Td>
-                            </Tr>
+							<Tr bg="blue.50">
+								<Td colSpan={3} fontWeight="bold">
+									Total
+								</Td>
+								<Td fontWeight="bold">£{total?.toLocaleString()}</Td>
+							</Tr>
+						</Tbody>
+					</Table>
+				</Box>
 
-                            <Tr bg="blue.50">
-                                <Td colSpan={3} fontWeight="bold">Total</Td>
-                                <Td fontWeight="bold">£{total?.toLocaleString()}</Td>
-                            </Tr>
-                        </Tbody>
-                    </Table>
-                </Box>
+				{/* FORM SECTION */}
+				<Grid templateColumns={{ base: "1fr", md: "1fr 1fr" }} gap={6} mt={8}>
+					{/* LEFT SIDE */}
+					<VStack spacing={6} align="stretch">
+						{/* Service */}
+						<Box bg="white" p={5} borderRadius="lg">
+							<Text fontWeight="bold">1. Please select a service.</Text>
+							<HStack mt={2}>
+								<Checkbox>Supplied & Fitted</Checkbox>
+								<Checkbox defaultChecked>Supply Only</Checkbox>
+								<Checkbox>Will consider both</Checkbox>
+							</HStack>
+						</Box>
 
-                {/* FORM SECTION */}
-                <Grid templateColumns={{ base: "1fr", md: "1fr 1fr" }} gap={6} mt={8}>
+						{/* Condition */}
+						<Box bg="white" p={5} borderRadius="lg">
+							<Text fontWeight="bold">2. Select a condition</Text>
+							<HStack mt={2}>
+								<Checkbox defaultChecked>Reconditioned</Checkbox>
+								<Checkbox>Used</Checkbox>
+								<Checkbox>New</Checkbox>
+								<Checkbox>All</Checkbox>
+							</HStack>
+						</Box>
 
-                    {/* LEFT SIDE */}
-                    <VStack spacing={6} align="stretch">
+						{/* Postcode */}
+						<Box bg="white" p={5} borderRadius="lg">
+							<Text fontWeight="bold">3. Your postcode</Text>
+							<Input placeholder="e.g. OX11 2TX" mt={2} />
+						</Box>
 
-                        {/* Service */}
-                        <Box bg="white" p={5} borderRadius="lg">
-                            <Text fontWeight="bold">1. Please select a service.</Text>
-                            <HStack mt={2}>
-                                <Checkbox>Supplied & Fitted</Checkbox>
-                                <Checkbox defaultChecked>Supply Only</Checkbox>
-                                <Checkbox>Will consider both</Checkbox>
-                            </HStack>
-                        </Box>
+						{/* Extra */}
+						<Box bg="white" p={5} borderRadius="lg">
+							<Text fontWeight="bold">4. Additional information</Text>
 
-                        {/* Condition */}
-                        <Box bg="white" p={5} borderRadius="lg">
-                            <Text fontWeight="bold">2. Select a condition</Text>
-                            <HStack mt={2}>
-                                <Checkbox defaultChecked>Reconditioned</Checkbox>
-                                <Checkbox>Used</Checkbox>
-                                <Checkbox>New</Checkbox>
-                                <Checkbox>All</Checkbox>
-                            </HStack>
-                        </Box>
+							<HStack mt={3}>
+								<Text>Does vehicle drive?</Text>
+								<RadioGroup defaultValue="no">
+									<HStack>
+										<Radio value="yes">Yes</Radio>
+										<Radio value="no">No</Radio>
+									</HStack>
+								</RadioGroup>
+							</HStack>
 
-                        {/* Postcode */}
-                        <Box bg="white" p={5} borderRadius="lg">
-                            <Text fontWeight="bold">3. Your postcode</Text>
-                            <Input placeholder="e.g. OX11 2TX" mt={2} />
-                        </Box>
+							<Textarea mt={3} placeholder="Extra notes" />
+						</Box>
 
-                        {/* Extra */}
-                        <Box bg="white" p={5} borderRadius="lg">
-                            <Text fontWeight="bold">4. Additional information</Text>
+						{/* Payment */}
+						<Box bg="white" p={5} borderRadius="lg">
+							<Text fontWeight="bold">5. Payment Method</Text>
+							<RadioGroup defaultValue="card">
+								<HStack mt={2}>
+									<Radio value="card">Credit card</Radio>
+									<Radio value="debit">Debit card</Radio>
+									<Radio value="paypal">PayPal</Radio>
+								</HStack>
+							</RadioGroup>
+						</Box>
+					</VStack>
 
-                            <HStack mt={3}>
-                                <Text>Does vehicle drive?</Text>
-                                <RadioGroup defaultValue="no">
-                                    <HStack>
-                                        <Radio value="yes">Yes</Radio>
-                                        <Radio value="no">No</Radio>
-                                    </HStack>
-                                </RadioGroup>
-                            </HStack>
+					{/* RIGHT SIDE */}
+					<Box bg="white" p={6} borderRadius="lg">
+						<Heading size="md" mb={4}>
+							Confirm Your Details
+						</Heading>
 
-                            <Textarea mt={3} placeholder="Extra notes" />
-                        </Box>
+						<VStack spacing={4}>
+							<Input placeholder="Email address*" />
+							<Input placeholder="Name*" />
+							<Input placeholder="Phone Number*" />
 
-                        {/* Payment */}
-                        <Box bg="white" p={5} borderRadius="lg">
-                            <Text fontWeight="bold">5. Payment Method</Text>
-                            <RadioGroup defaultValue="card">
-                                <HStack mt={2}>
-                                    <Radio value="card">Credit card</Radio>
-                                    <Radio value="debit">Debit card</Radio>
-                                    <Radio value="paypal">PayPal</Radio>
-                                </HStack>
-                            </RadioGroup>
-                        </Box>
-                    </VStack>
+							<Button
+								bg="green.600"
+								color="white"
+								w="full"
+								h="50px"
+								_hover={{ bg: "green.700" }}
+								onClick={() => navigate("/thank-you")}
+							>
+								Proceed
+							</Button>
 
-                    {/* RIGHT SIDE */}
-                    <Box bg="white" p={6} borderRadius="lg">
-                        <Heading size="md" mb={4}>
-                            Confirm Your Details
-                        </Heading>
-
-                        <VStack spacing={4}>
-                            <Input placeholder="Email address*" />
-                            <Input placeholder="Name*" />
-                            <Input placeholder="Phone Number*" />
-
-                            <Button
-                                bg="green.600"
-                                color="white"
-                                w="full"
-                                h="50px"
-                                _hover={{ bg: "green.700" }}
-                                onClick={() => navigate("/thank-you")}
-                            >
-                                Proceed
-                            </Button>
-
-                            <Text fontSize="xs" color="gray.500">
-                                By clicking proceed you agree to terms & privacy policy.
-                            </Text>
-                        </VStack>
-                    </Box>
-
-                </Grid>
-
-            </Container>
-        </Box>
-    );
+							<Text fontSize="xs" color="gray.500">
+								By clicking proceed you agree to terms & privacy policy.
+							</Text>
+						</VStack>
+					</Box>
+				</Grid>
+			</Container>
+		</Box>
+	);
 }

@@ -23,11 +23,12 @@ import {
 	HStack,
 	Badge,
 } from "@chakra-ui/react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 
 const RefreshPopUp = () => {
 	const { isOpen, onOpen, onClose } = useDisclosure();
 	const location = useLocation();
+	const navigate = useNavigate();
 
 	// Step management
 	const [step, setStep] = useState(1);
@@ -39,7 +40,7 @@ const RefreshPopUp = () => {
 	const [vrmError, setVrmError] = useState("");
 	const [isChecking, setIsChecking] = useState(false);
 	const { data: partTypes = [], isLoading: loadingPartTypes } = useQuery({
-		queryKey: ['part-types'],
+		queryKey: ["part-types"],
 		queryFn: async () => {
 			const res = await axios.get(`${import.meta.env.VITE_API_URL}/part-types`);
 			return res.data?.data || res.data || [];
@@ -58,13 +59,13 @@ const RefreshPopUp = () => {
 
 	useEffect(() => {
 		const isAllowed = allowedRoutes.includes(location.pathname);
-		
+
 		// Check if popup was shown recently (within 24 hours)
 		const lastShown = localStorage.getItem("last_popup_shown");
 		const now = new Date().getTime();
 		const interval = 30 * 60 * 1000; // 30 minutes
-		
-		const shouldShow = !lastShown || (now - parseInt(lastShown) > interval);
+
+		const shouldShow = !lastShown || now - parseInt(lastShown) > interval;
 
 		if (isAllowed && shouldShow) {
 			const timer = setTimeout(() => {
@@ -142,10 +143,18 @@ const RefreshPopUp = () => {
 		setVrmError("");
 		setIsChecking(true);
 
-		setTimeout(() => {
-			setIsChecking(false);
-			console.log("Checking availability for:", vrm);
-		}, 1500);
+		const cleanedVRM = vrm.toUpperCase().replace(/\s+/g, "");
+		const selectedPart = partTypes.find((type) => type._id === selectedPartType);
+
+		setIsChecking(false);
+		handleClose();
+		navigate("/call-seller", {
+			state: {
+				vrm: cleanedVRM,
+				category: selectedPart?.name || "",
+				searchType: "vrm",
+			},
+		});
 	};
 
 	const renderStep = () => {

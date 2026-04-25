@@ -100,7 +100,11 @@ const ProductCard = ({ product }) => (
 	</MotionBox>
 );
 
-const PriceRow = ({ label, value, isTotal, color = "gray.600" }) => (
+const PriceRow = ({ label, value, isTotal, color = "gray.600" }) => {
+	const amount = Number(value || 0);
+	const formattedAmount = Number.isFinite(amount) ? amount.toLocaleString("en-GB") : "0";
+
+	return (
 	<Flex justify="space-between" align="center" py={isTotal ? 4 : 2}>
 		<Text fontWeight={isTotal ? "800" : "600"} fontSize={isTotal ? "lg" : "md"} color={color}>
 			{label}
@@ -110,10 +114,11 @@ const PriceRow = ({ label, value, isTotal, color = "gray.600" }) => (
 			fontSize={isTotal ? "3xl" : "md"}
 			color={isTotal ? "red.600" : "gray.900"}
 		>
-			£{value}
+			£{formattedAmount}
 		</Text>
 	</Flex>
-);
+	);
+};
 
 const fetchProduct = async (id) => {
 	const res = await API.get(`/products/${id}`);
@@ -173,11 +178,17 @@ export default function ProductDetailPage() {
 		);
 	}
 
-	const vatAmount =
-		(product.pricingBreakdown?.item + product.pricingBreakdown?.delivery) *
-		(product.pricingBreakdown?.vatRate || 0.2);
-	const totalAmount =
-		product.pricingBreakdown?.item + product.pricingBreakdown?.delivery + vatAmount;
+	const itemPrice = Number.isFinite(Number(product.pricingBreakdown?.item ?? product.price ?? 0))
+		? Number(product.pricingBreakdown?.item ?? product.price ?? 0)
+		: 0;
+	const deliveryPrice = Number.isFinite(Number(product.pricingBreakdown?.delivery ?? 0))
+		? Number(product.pricingBreakdown?.delivery ?? 0)
+		: 0;
+	const vatRate = Number.isFinite(Number(product.pricingBreakdown?.vatRate ?? 0.2))
+		? Number(product.pricingBreakdown?.vatRate ?? 0.2)
+		: 0.2;
+	const vatAmount = (itemPrice + deliveryPrice) * vatRate;
+	const totalAmount = itemPrice + deliveryPrice + vatAmount;
 
 	return (
 		<Box bg={bgColor} minH="100vh">
@@ -419,9 +430,7 @@ export default function ProductDetailPage() {
 												borderColor="gray.200"
 											>
 												<Text fontWeight="800">Exchange Engine</Text>
-												<Text fontWeight="800">
-													£{product.pricingBreakdown?.item?.toLocaleString()}.00
-												</Text>
+												<Text fontWeight="800">£{itemPrice.toLocaleString("en-GB")}.00</Text>
 											</Flex>
 											<Flex
 												justify="space-between"
@@ -430,9 +439,7 @@ export default function ProductDetailPage() {
 												borderColor="gray.200"
 											>
 												<Text fontWeight="800">Standard Delivery</Text>
-												<Text fontWeight="800">
-													£{product.pricingBreakdown?.delivery?.toLocaleString()}.00
-												</Text>
+												<Text fontWeight="800">£{deliveryPrice.toLocaleString("en-GB")}.00</Text>
 											</Flex>
 											<VStack align="start" spacing={3} pt={4} color="gray.500" fontSize="sm">
 												<HStack>
@@ -448,19 +455,10 @@ export default function ProductDetailPage() {
 
 										<VStack align="stretch" spacing={6}>
 											<Box>
-												<PriceRow
-													label="Subtotal"
-													value={(
-														product.pricingBreakdown?.item + product.pricingBreakdown?.delivery
-													)?.toLocaleString()}
-												/>
-												<PriceRow label="VAT" value={vatAmount?.toLocaleString()} />
+												<PriceRow label="Subtotal" value={itemPrice + deliveryPrice} />
+												<PriceRow label="VAT" value={vatAmount} />
 												<Divider my={4} />
-												<PriceRow
-													label="Total Amount"
-													value={totalAmount?.toLocaleString()}
-													isTotal
-												/>
+												<PriceRow label="Total Amount" value={totalAmount} isTotal />
 											</Box>
 											<Button
 												colorScheme="brand"
@@ -520,8 +518,18 @@ export default function ProductDetailPage() {
 										_hover={{ bg: "gray.50" }}
 										fontWeight="800"
 										leftIcon={<FaPhoneAlt />}
-										as={Link}
-										to="/call-seller"
+										onClick={() =>
+											navigate("/call-seller", {
+												state: {
+													brand: product.make || product.brand,
+													model: product.model,
+													year: product.year,
+													type: product.engineType,
+													category: product.category?.name || "",
+													searchType: "manual",
+												},
+											})
+										}
 									>
 										Call Seller
 									</Button>{" "}
