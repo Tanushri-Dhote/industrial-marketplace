@@ -454,7 +454,14 @@ export default function CreateQuotePage() {
 									Quote Website
 								</Text>
 							</HStack>
-							<Text fontSize="11px" fontWeight="700" color="gray.500" textTransform="uppercase" letterSpacing="0.5px" mb={1.5}>
+							<Text
+								fontSize="11px"
+								fontWeight="700"
+								color="gray.500"
+								textTransform="uppercase"
+								letterSpacing="0.5px"
+								mb={1.5}
+							>
 								Assign Quote To Website
 							</Text>
 							<Select
@@ -467,7 +474,8 @@ export default function CreateQuotePage() {
 							>
 								{websites.map((site) => (
 									<option key={site._id} value={site._id}>
-										{site.name}{site.domain ? ` (${site.domain})` : ""}
+										{site.name}
+										{site.domain ? ` (${site.domain})` : ""}
 									</option>
 								))}
 							</Select>
