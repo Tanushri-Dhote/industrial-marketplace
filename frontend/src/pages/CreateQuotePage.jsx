@@ -202,7 +202,7 @@ export default function CreateQuotePage() {
 		engineCode: "",
 	});
 
-	const [customer, setCustomer] = useState({ name: "", phone: "", postcode: "" });
+	const [customer, setCustomer] = useState({ name: "", phone: "+44 ", postcode: "" });
 
 	const [lines, setLines] = useState({
 		engine: 0,
@@ -241,7 +241,7 @@ export default function CreateQuotePage() {
 			importedRef.current = true;
 			setCustomer({
 				name: s.customer.name || "",
-				phone: s.customer.phone || "",
+				phone: s.customer.phone || "+44 ",
 				postcode: s.customer.address || "",
 			});
 			if (s.inquiryMeta) {
@@ -660,13 +660,32 @@ export default function CreateQuotePage() {
 									</Text>
 									<Input
 										value={customer.phone}
-										onChange={(e) => setCustomer((p) => ({ ...p, phone: e.target.value }))}
+										onChange={(e) => {
+											let val = e.target.value.replace(/[^\d+]/g, "");
+											if (val.startsWith("0")) val = "+44" + val.substring(1);
+											if (val.length > 0 && !val.startsWith("+")) val = "+44" + val;
+											
+											let formatted = val;
+											if (val.startsWith("+44")) {
+												let rest = val.substring(3);
+												if (rest.length > 0) {
+													formatted = "+44 " + rest.substring(0, 4);
+													if (rest.length > 4) {
+														formatted += " " + rest.substring(4, 10);
+													}
+												}
+											}
+											setCustomer((p) => ({ ...p, phone: formatted }));
+										}}
 										placeholder="+44 7700 900000"
 										size="md"
 										borderRadius="xl"
 										borderColor="gray.200"
 										_focus={{ borderColor: RED, boxShadow: "0 0 0 3px rgba(217,4,4,0.1)" }}
 									/>
+									<Text fontSize="10px" color="gray.400" mt={1} ml={1} fontWeight="600">
+										Format: +44 7XXX XXXXXX
+									</Text>
 								</Box>
 								<Box>
 									<Text

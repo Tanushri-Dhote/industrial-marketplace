@@ -60,7 +60,7 @@ export default function CallSellerPage() {
 		notes: "",
 		name: "",
 		email: "",
-		phone: "",
+		phone: "+44 ",
 	});
 
 	const handleEngineSelect = (value) => {
@@ -401,18 +401,39 @@ export default function CallSellerPage() {
 								/>
 							</InputGroup>
 
-							<InputGroup size="lg">
-								<InputLeftElement color={DARK}>
-									<PhoneIcon />
-								</InputLeftElement>
-								<Input
-									type="tel"
-									placeholder="Phone Number"
-									borderRadius="xl"
-									value={form.phone}
-									onChange={(e) => setForm({ ...form, phone: e.target.value })}
-								/>
-							</InputGroup>
+							<Box w="full">
+								<InputGroup size="lg">
+									<InputLeftElement color={DARK}>
+										<PhoneIcon />
+									</InputLeftElement>
+									<Input
+										type="tel"
+										placeholder="+44 7700 900000"
+										borderRadius="xl"
+										value={form.phone}
+										onChange={(e) => {
+											let val = e.target.value.replace(/[^\d+]/g, "");
+											if (val.startsWith("0")) val = "+44" + val.substring(1);
+											if (val.length > 0 && !val.startsWith("+")) val = "+44" + val;
+											
+											let formatted = val;
+											if (val.startsWith("+44")) {
+												let rest = val.substring(3);
+												if (rest.length > 0) {
+													formatted = "+44 " + rest.substring(0, 4);
+													if (rest.length > 4) {
+														formatted += " " + rest.substring(4, 10);
+													}
+												}
+											}
+											setForm({ ...form, phone: formatted });
+										}}
+									/>
+								</InputGroup>
+								<Text fontSize="10px" color="gray.400" mt={1} ml={1} fontWeight="600">
+									Format: +44 7XXX XXXXXX
+								</Text>
+							</Box>
 
 							<Divider py={4} />
 
