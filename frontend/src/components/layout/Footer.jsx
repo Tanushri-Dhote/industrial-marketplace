@@ -79,7 +79,11 @@ export default function Footer() {
       state: {
         vrm: cleanedVRM,
         category: "",
-      },
+        brand: "",
+        model: "",
+        year: "",
+        type: ""
+      }
     });
   };
 
