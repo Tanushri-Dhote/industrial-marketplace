@@ -102,7 +102,7 @@ export default function RegisterPage() {
       };
 
       const res = await API.post('/auth/register', payload);
-      toast.success('Registration successful! Please check your email to verify.');
+      toast.success('Registration successful! Please Login to continue.');
       navigate('/login');
 
     } catch (error) {

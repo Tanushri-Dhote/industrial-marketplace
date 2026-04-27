@@ -460,7 +460,7 @@ export default function ProductDetailPage() {
 												<Divider my={4} />
 												<PriceRow label="Total Amount" value={totalAmount} isTotal />
 											</Box>
-											<Button
+											{/* <Button
 												colorScheme="brand"
 												h="65px"
 												fontSize="lg"
@@ -468,7 +468,7 @@ export default function ProductDetailPage() {
 												boxShadow="0 10px 20px -5px rgba(21, 101, 192, 0.4)"
 											>
 												Request Fresh Quote
-											</Button>
+											</Button> */}
 										</VStack>
 									</Grid>
 								</Box>

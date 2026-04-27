@@ -40,7 +40,17 @@ export default function CallSellerPage() {
 	const navigate = useNavigate();
 	const toast = useToast();
 
+
 	const { vrm, category, brand, model, year, type, searchType } = location.state || {};
+
+
+	const safeVrm = (vrm || "").trim();
+	const safeBrand = (brand || "").trim();
+	const safeModel = (model || "").trim();
+	const safeYear = (year || "").trim();
+	const hasVehicle = !!(safeVrm || safeBrand || safeModel || safeYear);
+	const [manualVrm, setManualVrm] = useState(vrm || "");
+	const finalVehicleVrm = manualVrm.trim() || safeVrm || "";
 
 	useEffect(() => {
 		if (!location.state) {
@@ -76,6 +86,12 @@ export default function CallSellerPage() {
 	};
 
 	const handleNext = () => {
+		if (!finalVehicleVrm.trim() && !brand) {
+			return toast({
+				title: "Enter registration number",
+				status: "warning",
+			});
+		}
 		if (step === 1) {
 			if (engineOptions.length === 0)
 				return toast({ title: "Please select a condition", status: "warning" });
@@ -99,14 +115,13 @@ export default function CallSellerPage() {
 	const API = import.meta.env.VITE_API_URL;
 
 	const handleGetQuote = async () => {
-		if (!location.state) {
+
+		if (!finalVehicleVrm && !brand) {
 			toast({
-				title: "Missing vehicle details",
-				description: "Please start from the homepage quote form.",
+				title: "Enter registration number",
 				status: "warning",
 				position: "top-right",
 			});
-			navigate("/", { replace: true });
 			return;
 		}
 
@@ -115,7 +130,7 @@ export default function CallSellerPage() {
 				method: "POST",
 				headers: { "Content-Type": "application/json" },
 				body: JSON.stringify({
-					vrm,
+					vrm: finalVehicleVrm,
 					brand,
 					model,
 					year,
@@ -135,48 +150,129 @@ export default function CallSellerPage() {
 		}
 	};
 
-	const VehicleSummary = () => (
-		<Box
-			bg="white"
-			borderRadius="2xl"
-			p={6}
-			mb={8}
-			border="1px solid"
-			borderColor="gray.200"
-			boxShadow="sm"
-		>
-			<HStack spacing={4} align="center">
-				<Box bg={DARK} color="white" p={3} borderRadius="xl">
-					<Settings size={24} />
-				</Box>
-				<VStack align="flex-start" spacing={0}>
-					<Text
-						fontSize="xs"
-						fontWeight="800"
-						color="gray.400"
-						textTransform="uppercase"
-						letterSpacing="wider"
-					>
-						Vehicle Selected
-					</Text>
-					<Heading size="md" color={DARK}>
-						{vrm ? vrm : `${brand} ${model} ${year}`}
-					</Heading>
-					<HStack spacing={2} mt={1}>
-						<Badge colorScheme="red" variant="subtle" px={2} borderRadius="md">
-							{category}
-						</Badge>
-						{type && (
-							<Badge colorScheme="blue" variant="subtle" px={2} borderRadius="md">
-								{type}
-							</Badge>
-						)}
-					</HStack>
-				</VStack>
-			</HStack>
-		</Box>
-	);
+	// const VehicleSummary = () => {
+	// 	const hasVehicleData =
+	// 		!!safeVrm || !!safeBrand || !!safeModel || !!safeYear;
 
+	// 	return (
+	// 		<Box
+	// 			bg="white"
+	// 			borderRadius="2xl"
+	// 			p={6}
+	// 			mb={8}
+	// 			border="1px solid"
+	// 			borderColor="gray.200"
+	// 			boxShadow="sm"
+	// 		>
+	// 			<HStack spacing={4} align="start">
+	// 				<Box bg={DARK} color="white" p={3} borderRadius="xl">
+	// 					<Settings size={24} />
+	// 				</Box>
+
+	// 				<VStack align="flex-start" spacing={3} flex="1">
+	// 					<Text
+	// 						fontSize="xs"
+	// 						fontWeight="800"
+	// 						color="gray.400"
+	// 						textTransform="uppercase"
+	// 						letterSpacing="wider"
+	// 					>
+	// 						Vehicle Selected
+	// 					</Text>
+
+	// 					{hasVehicle ? (
+	// 						<Heading size="md" color={DARK}>
+	// 							{safeVrm || `${safeBrand} ${safeModel} ${safeYear}`}
+	// 						</Heading>
+	// 					) : (
+	// 						<Input
+	// 							placeholder="Enter Registration Number"
+	// 							value={manualVrm}
+	// 							onChange={(e) =>
+	// 								setManualVrm(
+	// 									e.target.value.toUpperCase().replace(/\s+/g, "")
+	// 								)
+	// 							}
+	// 							maxW="320px"
+	// 							bg="gray.50"
+	// 							borderColor="gray.300"
+	// 							_focus={{
+	// 								borderColor: RED,
+	// 								boxShadow: `0 0 0 1px ${RED}`,
+	// 							}}
+	// 						/>
+	// 					)}
+	// 				</VStack>
+	// 			</HStack>
+	// 		</Box>
+	// 	);
+	// };
+
+
+
+	function VehicleSummary({
+		hasVehicle,
+		safeVrm,
+		safeBrand,
+		safeModel,
+		safeYear,
+		manualVrm,
+		setManualVrm,
+	}) {
+		return (
+			<Box
+				bg="white"
+				borderRadius="2xl"
+				p={6}
+				mb={8}
+				border="1px solid"
+				borderColor="gray.200"
+				boxShadow="sm"
+			>
+				<HStack spacing={4} align="start">
+					<Box bg={DARK} color="white" p={3} borderRadius="xl">
+						<Settings size={24} />
+					</Box>
+
+					<VStack align="flex-start" spacing={3} flex="1">
+						<Text
+							fontSize="xs"
+							fontWeight="800"
+							color="gray.400"
+							textTransform="uppercase"
+							letterSpacing="wider"
+						>
+							Vehicle Selected
+						</Text>
+
+						{hasVehicle ? (
+							<Heading size="md" color={DARK}>
+								{safeVrm || `${safeBrand} ${safeModel} ${safeYear}`}
+							</Heading>
+						) : (
+							<Input
+								placeholder="Enter Registration Number"
+								value={manualVrm}
+								onChange={(e) =>
+									setManualVrm(
+										e.target.value.toUpperCase().replace(/\s+/g, "")
+									)
+								}
+								maxW="320px"
+								bg="gray.50"
+								borderColor="gray.300"
+								// autoFocus
+								_focus={{
+									borderColor: RED,
+									boxShadow: `0 0 0 1px ${RED}`,
+								}}
+							/>
+						)}
+					</VStack>
+				</HStack>
+			</Box>
+		);
+	}
 	const Progress = () => (
 		<HStack w="full" spacing={2} mb={8}>
 			{[1, 2, 3].map((i) => (
@@ -196,7 +292,16 @@ export default function CallSellerPage() {
 		<Box bg="#F8FAFC" minH="100vh" py={{ base: 6, md: 12 }}>
 			<Container maxW="container.md">
 				<Progress />
-				<VehicleSummary />
+				{/* <VehicleSummary /> */}
+				<VehicleSummary
+					hasVehicle={hasVehicle}
+					safeVrm={safeVrm}
+					safeBrand={safeBrand}
+					safeModel={safeModel}
+					safeYear={safeYear}
+					manualVrm={manualVrm}
+					setManualVrm={setManualVrm}
+				/>
 
 				{/* STEP 1: OPTIONS & LOCATION */}
 				{step === 1 && (
@@ -415,7 +520,7 @@ export default function CallSellerPage() {
 											let val = e.target.value.replace(/[^\d+]/g, "");
 											if (val.startsWith("0")) val = "+44" + val.substring(1);
 											if (val.length > 0 && !val.startsWith("+")) val = "+44" + val;
-											
+
 											let formatted = val;
 											if (val.startsWith("+44")) {
 												let rest = val.substring(3);

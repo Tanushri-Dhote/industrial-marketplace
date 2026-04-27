@@ -57,14 +57,24 @@ export default function Header() {
     const handleScroll = () => {
       if (!ticking) {
         window.requestAnimationFrame(() => {
-          setScrolled(window.scrollY > 20);
+          const y = window.scrollY;
+
+          setScrolled((prev) => {
+            if (!prev && y > 40) return true;   // activate
+            if (prev && y < 10) return false;   // deactivate
+            return prev;
+          });
+
           ticking = false;
         });
+
         ticking = true;
       }
     };
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
+
+    window.addEventListener("scroll", handleScroll, { passive: true });
+
+    return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
   // Auth Check
@@ -186,6 +196,7 @@ export default function Header() {
                 <InputGroup size="md">
 
                   <Input
+
                     placeholder="Enter Registration Number (e.g. AB12 CDE)"
                     value={regNumber}
                     onChange={(e) => setRegNumber(e.target.value.toUpperCase())}
@@ -201,7 +212,7 @@ export default function Header() {
                     }}
                     onKeyDown={(e) => e.key === "Enter" && handleRegSubmit()}
                   />
-                  <InputRightElement width="70px" height="42px">
+                  <InputRightElement width="70px" h="42px" pointerEvents="auto">
                     <Button
                       onClick={handleRegSubmit}
                       bg={accentColor}
@@ -209,7 +220,7 @@ export default function Header() {
                       h="34px"
                       w="60px"
                       borderLeftRadius="0"
-                      _hover={{ bg: "#e55a00" }}
+                      _hover={{ bg: "#B70303" }}
                       fontWeight="600"
                       fontSize="13px"
                     >

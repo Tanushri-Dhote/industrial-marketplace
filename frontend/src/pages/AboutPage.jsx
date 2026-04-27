@@ -1,14 +1,14 @@
 import React from 'react';
-import { 
-  Container, 
-  Heading, 
-  Text, 
-  VStack, 
-  SimpleGrid, 
-  Box, 
-  Image, 
-  List, 
-  ListItem, 
+import {
+  Container,
+  Heading,
+  Text,
+  VStack,
+  SimpleGrid,
+  Box,
+  Image,
+  List,
+  ListItem,
   ListIcon,
   Flex,
   Badge,
@@ -21,19 +21,19 @@ import {
   Button,
 } from '@chakra-ui/react';
 import { Helmet } from 'react-helmet-async';
-import { 
-  CheckCircleIcon, 
+import {
+  CheckCircleIcon,
   StarIcon,
   ViewIcon,
   TimeIcon,
   SearchIcon,
   RepeatIcon,
 } from '@chakra-ui/icons';
-import { 
-  FaIndustry, 
-  FaGlobe, 
-  FaUsers, 
-  FaTruck, 
+import {
+  FaIndustry,
+  FaGlobe,
+  FaUsers,
+  FaTruck,
   FaShieldAlt,
   FaHandshake,
   FaChartLine,
@@ -43,12 +43,14 @@ import {
   FaUserCheck,
 } from 'react-icons/fa';
 import { MdCompareArrows, MdMoneyOff, MdSpeed } from 'react-icons/md';
+import { useNavigate } from 'react-router-dom';
 
 export default function AboutPage() {
   const bgColor = useColorModeValue('white', 'gray.800');
   const borderColor = useColorModeValue('gray.100', 'gray.600');
   const cardBg = useColorModeValue('gray.50', 'gray.700');
   const accentColor = "#D90404";
+  const navigate = useNavigate();
 
   const features = [
     { icon: MdMoneyOff, title: 'Free Price Quotes', description: 'Our services are completely free for our users. We do not charge a penny for you to search a replacement engine for your vehicle.' },
@@ -93,8 +95,8 @@ export default function AboutPage() {
                   About  All Engine 4 You
                 </Heading>
                 <Text fontSize="16px" opacity={0.9} lineHeight="1.6">
-                  We are UK's first price comparison website that is focused on comparing used 
-                  and reconditioned engines and ancillaries. Once you enter your reg number, 
+                  We are UK's first price comparison website that is focused on comparing used
+                  and reconditioned engines and ancillaries. Once you enter your reg number,
                   we check our database and give you the cheapest online quotes in just a few clicks.
                 </Text>
                 <HStack spacing={4} pt={2}>
@@ -133,10 +135,10 @@ export default function AboutPage() {
             </Badge>
             <Heading fontSize="28px">How can  All Engine 4 You help me save on my car parts price comparison?</Heading>
             <Text fontSize="16px" color="gray.600" maxW="3xl" lineHeight="1.6">
-              Get multiple quotes from carefully vetted suppliers and get your engines and ancillaries 
-              within no time. Choose  All Engine 4 You as we only have trusted suppliers who don't compromise 
-              on quality. We offer an unbeatable engine and ancillaries price comparison service where 
-              you pay the cheapest price. Get free online quotes in a few clicks. Compare prices and 
+              Get multiple quotes from carefully vetted suppliers and get your engines and ancillaries
+              within no time. Choose  All Engine 4 You as we only have trusted suppliers who don't compromise
+              on quality. We offer an unbeatable engine and ancillaries price comparison service where
+              you pay the cheapest price. Get free online quotes in a few clicks. Compare prices and
               buy with confidence with  All Engine 4 You.
             </Text>
           </VStack>
@@ -150,8 +152,8 @@ export default function AboutPage() {
             </Badge>
             <Heading fontSize="28px">How we work?</Heading>
             <Text fontSize="16px" color="gray.600" maxW="2xl">
-              Being the UK's first quality engine price comparison website, we always focus on comparing 
-              reconditioned, rebuilt and used engine prices for you. In just a matter of minutes or less 
+              Being the UK's first quality engine price comparison website, we always focus on comparing
+              reconditioned, rebuilt and used engine prices for you. In just a matter of minutes or less
               you get the best deal from trusted engine suppliers.
             </Text>
           </VStack>
@@ -267,13 +269,13 @@ export default function AboutPage() {
                 </Badge>
                 <Heading fontSize="28px">Why Choose  All Engine 4 You?</Heading>
                 <Text fontSize="16px" lineHeight="1.6">
-                  We always focus on attracting customers by offering an exclusive engine comparison 
-                  service at  All Engine 4 You. Our engine enquiry form is simple and highly responsive. 
+                  We always focus on attracting customers by offering an exclusive engine comparison
+                  service at  All Engine 4 You. Our engine enquiry form is simple and highly responsive.
                   We do not waste your time. In fact, we often provide quotes within a minute.
                 </Text>
                 <Text fontSize="16px" lineHeight="1.6">
-                   All Engine 4 You is famous all across the UK because our engine suppliers always offer 
-                  the cheapest rates for all types of engines. You will get a range of options such 
+                  All Engine 4 You is famous all across the UK because our engine suppliers always offer
+                  the cheapest rates for all types of engines. You will get a range of options such
                   as supply, reconditioned, new engine, fitting, recovery and delivery.
                 </Text>
                 <SimpleGrid columns={2} spacing={3} pt={2}>
@@ -296,14 +298,14 @@ export default function AboutPage() {
                 <Icon as={MdSpeed} boxSize={10} color={accentColor} mb={4} />
                 <Heading fontSize="20px" mb={3}>Quick Quotes Within Minutes</Heading>
                 <Text fontSize="15px" mb={4}>
-                  Our engine enquiry form is simple and highly responsive. We often provide quotes 
+                  Our engine enquiry form is simple and highly responsive. We often provide quotes
                   within a minute of your request.
                 </Text>
                 <Divider my={4} />
                 <Icon as={FaShieldAlt} boxSize={10} color={accentColor} mb={4} />
                 <Heading fontSize="20px" mb={3}>100% Trusted Suppliers</Heading>
                 <Text fontSize="15px">
-                  All engine suppliers in our network have been selected after strict scrutiny and 
+                  All engine suppliers in our network have been selected after strict scrutiny and
                   we regularly get customer feedback on our members.
                 </Text>
               </Box>
@@ -347,23 +349,38 @@ export default function AboutPage() {
               <Icon as={FaHandshake} boxSize={12} color={accentColor} />
               <Heading fontSize="28px">Why  All Engine 4 You is the best?</Heading>
               <Text fontSize="16px" maxW="3xl" lineHeight="1.6">
-                 All Engine 4 You is the name of Trust. We are the first engine price comparison site in UK 
-                that helps you find quality reconditioned and used engines from our verified and trusted 
-                engine suppliers. With our devotion to work and years of experience, we have optimized 
-                the formula to give the best engine price comparisons to our customers. Simply by sitting 
-                at home, you can take advantage of our hassle and stress free service. Save time, money 
+                All Engine 4 You is the name of Trust. We are the first engine price comparison site in UK
+                that helps you find quality reconditioned and used engines from our verified and trusted
+                engine suppliers. With our devotion to work and years of experience, we have optimized
+                the formula to give the best engine price comparisons to our customers. Simply by sitting
+                at home, you can take advantage of our hassle and stress free service. Save time, money
                 and get the right engine for your car.
               </Text>
               <Button
-                as="a"
-                href="/search"
+                onClick={() =>
+                  navigate("/call-seller", {
+                    state: {
+                      vrm: "",
+                      category: "",
+                      brand: "",
+                      model: "",
+                      year: "",
+                      type: "",
+                    },
+                  })
+                }
                 bg={accentColor}
                 color="white"
                 size="lg"
                 fontSize="16px"
                 mt={4}
-                _hover={{ bg: "#e55a00", transform: 'translateY(-2px)', boxShadow: 'lg' }}
-                transition="all 0.2s">
+                _hover={{
+                  bg: "#B70303",
+                  transform: "translateY(-2px)",
+                  boxShadow: "lg",
+                }}
+                transition="all 0.2s"
+              >
                 Get Free Quote Now
               </Button>
             </VStack>

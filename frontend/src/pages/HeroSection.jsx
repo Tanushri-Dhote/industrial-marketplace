@@ -581,7 +581,14 @@ export default function HeroSection({ category }) {
 
 							<Text textAlign="center" color="whiteAlpha.600" fontSize="xs">
 								By searching, you agree to our{" "}
-								<Text as="span" textDecor="underline">
+								<Text
+									as="span"
+									textDecor="underline"
+									cursor="pointer"
+									_hover={{ color: "white" }}
+									
+									onClick={() => navigate("/terms-and-conditions")}
+								>
 									Terms of Service
 								</Text>
 								.
