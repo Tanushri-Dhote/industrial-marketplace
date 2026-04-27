@@ -4,10 +4,14 @@ const Product = require("../models/Product");
 exports.getProducts = async (request, reply) => {
 	try {
 		const filter = {};
-		const { make, limit } = request.query || {};
+		const { make, model, limit } = request.query || {};
 
 		if (make) {
 			filter.make = make;
+		}
+
+		if (model) {
+			filter.model = model;
 		}
 
 		if (request.tenantId) {

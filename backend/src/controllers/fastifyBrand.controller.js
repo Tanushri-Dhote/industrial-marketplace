@@ -1,5 +1,6 @@
 const Brand = require("../models/Brand");
 
+// Public endpoints
 exports.getBrands = async (request, reply) => {
 	try {
 		const brands = await Brand.find({ isActive: true }).sort({ name: 1 }).lean();
@@ -21,5 +22,106 @@ exports.getBrandBySlug = async (request, reply) => {
 		return reply.code(200).send({ success: true, data: brand });
 	} catch (error) {
 		return reply.code(500).send({ message: error.message });
+	}
+};
+
+// Admin endpoints
+exports.getAllBrands = async (request, reply) => {
+	try {
+		const brands = await Brand.find().sort({ name: 1 }).lean();
+		return reply.code(200).send({ success: true, data: brands });
+	} catch (error) {
+		return reply.code(500).send({ success: false, message: error.message });
+	}
+};
+
+exports.createBrand = async (request, reply) => {
+	try {
+		const {
+			name,
+			slug,
+			productMake,
+			logoUrl,
+			heroImage,
+			description,
+			spriteClass,
+			spriteSheetUrl,
+			spritePosition,
+			spriteSize,
+		} = request.body;
+
+		if (!name || !slug || !productMake || !logoUrl) {
+			return reply.code(400).send({
+				success: false,
+				message: "Missing required fields: name, slug, productMake, logoUrl",
+			});
+		}
+
+		// Check if slug already exists
+		const existingBrand = await Brand.findOne({ slug });
+		if (existingBrand) {
+			return reply.code(400).send({
+				success: false,
+				message: "Slug already exists",
+			});
+		}
+
+		const brand = new Brand({
+			name,
+			slug: slug.toLowerCase(),
+			productMake,
+			logoUrl,
+			spriteClass: spriteClass || "",
+			spriteSheetUrl: spriteSheetUrl || "",
+			spritePosition: {
+				x: Number(spritePosition?.x || 0),
+				y: Number(spritePosition?.y || 0),
+			},
+			spriteSize: {
+				width: Number(spriteSize?.width || 105),
+				height: Number(spriteSize?.height || 105),
+			},
+			heroImage: heroImage || "",
+			description: description || "",
+			isActive: true,
+		});
+
+		await brand.save();
+		return reply.code(201).send({ success: true, data: brand });
+	} catch (error) {
+		return reply.code(500).send({ success: false, message: error.message });
+	}
+};
+
+exports.updateBrand = async (request, reply) => {
+	try {
+		const { id } = request.params;
+		const updates = request.body;
+
+		const brand = await Brand.findByIdAndUpdate(id, updates, { new: true });
+
+		if (!brand) {
+			return reply.code(404).send({ success: false, message: "Brand not found" });
+		}
+
+		return reply.code(200).send({ success: true, data: brand });
+	} catch (error) {
+		return reply.code(500).send({ success: false, message: error.message });
+	}
+};
+
+exports.deleteBrand = async (request, reply) => {
+	try {
+		const { id } = request.params;
+
+		const brand = await Brand.findByIdAndDelete(id);
+
+		if (!brand) {
+			return reply.code(404).send({ success: false, message: "Brand not found" });
+		}
+
+		return reply.code(200).send({ success: true, message: "Brand deleted successfully" });
+	} catch (error) {
+		return reply.code(500).send({ success: false, message: error.message });
 	}
 };

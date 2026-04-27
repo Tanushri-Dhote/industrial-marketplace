@@ -127,6 +127,7 @@ function EngineProductCard({ engine }) {
 export default function CarMakeSelectorSection() {
 	const [searchParams, setSearchParams] = useSearchParams();
 	const selectedSlug = searchParams.get("brand");
+	const modelSlug = searchParams.get("model");
 
 	// Fetch all brands
 	const { data: brands = [], isLoading: loadingBrands } = useQuery({
@@ -152,14 +153,24 @@ export default function CarMakeSelectorSection() {
 		staleTime: 1000 * 60 * 10,
 	});
 
-	// Fetch products for the brand
+	// Fetch products for the brand and optional model
 	const { data: brandProducts = [], isLoading: loadingProducts } = useQuery({
-		queryKey: ['products', { make: fallbackBrand?.productMake, limit: 8 }],
+		queryKey: ['products', { make: fallbackBrand?.productMake, model: modelSlug, limit: 12 }],
 		queryFn: async () => {
-			const res = await API.get("/products", { params: { make: fallbackBrand.productMake, limit: 8 } });
+			const params = { 
+				make: fallbackBrand.productMake || fallbackBrand.name, 
+				limit: 12 
+			};
+			if (modelSlug) {
+				// We need the model name, but we only have the slug from URL.
+				// For now let's use the slug or try to find it in featuredCars
+				const modelObj = selectedBrandData?.featuredCars?.find(c => c.slug === modelSlug || c.name.toLowerCase().replace(/\s+/g, '-') === modelSlug);
+				params.model = modelObj ? modelObj.name : modelSlug;
+			}
+			const res = await API.get("/products", { params });
 			return res.data?.data || res.data || [];
 		},
-		enabled: !!fallbackBrand?.productMake,
+		enabled: !!fallbackBrand,
 		staleTime: 1000 * 60 * 5,
 	});
 
@@ -170,8 +181,16 @@ export default function CarMakeSelectorSection() {
 		setSearchParams({ brand: brandSlug });
 	};
 
+	const openModel = (mSlug) => {
+		setSearchParams({ brand: selectedSlug, model: mSlug });
+	};
+
 	const closeBrand = () => {
 		setSearchParams({});
+	};
+
+	const clearModel = () => {
+		setSearchParams({ brand: selectedSlug });
 	};
 
 	const showDetailLoader = loadingBrands || loadingBrandDetail || (selectedSlug && !selectedBrand && !error);
@@ -272,9 +291,16 @@ export default function CarMakeSelectorSection() {
 					) : (
 						<VStack spacing={8} align="stretch">
 							<Flex justify="space-between" align="center" wrap="wrap" gap={4}>
-								<Button leftIcon={<FaArrowLeft />} variant="outline" onClick={closeBrand}>
-									Back to all brands
-								</Button>
+								<HStack spacing={3}>
+									<Button leftIcon={<FaArrowLeft />} variant="outline" onClick={closeBrand}>
+										Back to all brands
+									</Button>
+									{modelSlug && (
+										<Button size="sm" variant="ghost" onClick={clearModel} colorScheme="red">
+											Clear Model Filter
+										</Button>
+									)}
+								</HStack>
 
 								<Badge
 									bg="rgba(217, 4, 4, 0.1)"
@@ -289,7 +315,7 @@ export default function CarMakeSelectorSection() {
 									fontWeight="700"
 									letterSpacing="0.2px"
 								>
-									{brandProducts.length} engine listings loaded
+									{brandProducts.length} listings {modelSlug ? `for ${modelSlug}` : ""} loaded
 								</Badge>
 							</Flex>
 
@@ -343,7 +369,7 @@ export default function CarMakeSelectorSection() {
 													fontWeight="900"
 													lineHeight="1.05"
 												>
-													{selectedBrand?.name}
+													{selectedBrand?.name} {modelSlug ? `- ${modelSlug.toUpperCase()}` : ""}
 												</Heading>
 												<Text
 													maxW="760px"
@@ -370,32 +396,36 @@ export default function CarMakeSelectorSection() {
 									<Text as="span" color={accentColor}>
 										{selectedBrand?.name}
 									</Text>{" "}
-									Engines
+									Models
 								</Heading>
 
 								<SimpleGrid columns={{ base: 2, sm: 3, md: 4, lg: 6 }} spacing={5}>
 									{(selectedBrand?.featuredCars || []).map((car) => (
 										<Box
 											key={car.name}
+											onClick={() => openModel(car.slug || car.name.toLowerCase().replace(/\s+/g, '-'))}
+											cursor="pointer"
 											bg="white"
 											border="1px solid"
-											borderColor="gray.200"
+											borderColor={modelSlug === (car.slug || car.name.toLowerCase().replace(/\s+/g, '-')) ? accentColor : "gray.200"}
 											borderRadius="2xl"
 											overflow="hidden"
 											boxShadow="0 10px 24px rgba(15, 23, 42, 0.06)"
+											transition="all 0.2s"
+											_hover={{ transform: "translateY(-4px)", borderColor: accentColor }}
 										>
 											<Image
 												src={car.imageUrl}
 												alt={car.name}
 												w="full"
-												h="220px"
+												h="140px"
 												objectFit="cover"
 											/>
 											<Box p={4}>
-												<Text fontWeight="800" color="gray.900">
+												<Text fontWeight="800" color="gray.900" fontSize="sm">
 													{car.name}
 												</Text>
-												<Text fontSize="sm" color="gray.600" mt={1}>
+												<Text fontSize="xs" color="gray.600" mt={1} noOfLines={1}>
 													{car.trim}
 												</Text>
 											</Box>
@@ -411,7 +441,7 @@ export default function CarMakeSelectorSection() {
 									textAlign="center"
 									mb={8}
 								>
-									Popular {selectedBrand?.name} engines for sale
+									{modelSlug ? `${modelSlug.toUpperCase()} Engines` : `Popular ${selectedBrand?.name} engines`} for sale
 								</Heading>
 
 								<SimpleGrid columns={{ base: 1, sm: 2, md: 3, lg: 4 }} spacing={6}>

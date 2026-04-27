@@ -15,6 +15,16 @@ const brandSchema = new mongoose.Schema(
 		slug: { type: String, required: true, unique: true, lowercase: true },
 		productMake: { type: String, required: true, index: true },
 		logoUrl: { type: String, required: true },
+		spriteClass: { type: String, default: "" },
+		spriteSheetUrl: { type: String, default: "" },
+		spritePosition: {
+			x: { type: Number, default: 0 },
+			y: { type: Number, default: 0 },
+		},
+		spriteSize: {
+			width: { type: Number, default: 105 },
+			height: { type: Number, default: 105 },
+		},
 		heroImage: { type: String, default: "" },
 		description: { type: String, default: "" },
 		featuredCars: [featuredCarSchema],
