@@ -50,6 +50,9 @@ export default function BrandsModule() {
 		slug: "",
 		productMake: "",
 		logoUrl: "",
+		spriteSheetUrl: "",
+		spriteSize: { width: 105, height: 105 },
+		spritePosition: { x: 0, y: 0 },
 		heroImage: "",
 		description: "",
 		isActive: true,
@@ -105,6 +108,9 @@ export default function BrandsModule() {
 			slug: "",
 			productMake: "",
 			logoUrl: "",
+			spriteSheetUrl: "",
+			spriteSize: { width: 105, height: 105 },
+			spritePosition: { x: 0, y: 0 },
 			heroImage: "",
 			description: "",
 			isActive: true,
@@ -114,7 +120,11 @@ export default function BrandsModule() {
 
 	const handleEdit = (brand) => {
 		setEditingBrand(brand);
-		setFormData(brand);
+		setFormData({
+			...brand,
+			spriteSize: brand.spriteSize || { width: 105, height: 105 },
+			spritePosition: brand.spritePosition || { x: 0, y: 0 },
+		});
 		onOpen();
 	};
 
@@ -251,7 +261,19 @@ export default function BrandsModule() {
 										borderColor="gray.100"
 									>
 										<Td>
-											<Image src={brand.logoUrl} alt={brand.name} h="36px" objectFit="contain" />
+											{brand.spriteSheetUrl ? (
+												<Box
+													className="make-sprite"
+													w={`${brand.spriteSize?.width || 105}px`}
+													h={`${brand.spriteSize?.height || 105}px`}
+													backgroundImage={`url(${brand.spriteSheetUrl})`}
+													backgroundPosition={`${brand.spritePosition?.x || 0}px ${brand.spritePosition?.y || 0}px`}
+													transform="scale(0.35)"
+													transformOrigin="left center"
+												/>
+											) : (
+												<Image src={brand.logoUrl} alt={brand.name} h="36px" objectFit="contain" />
+											)}
 										</Td>
 										<Td>
 											<Text fontSize="14px" fontWeight="600" color="gray.900">
@@ -360,9 +382,9 @@ export default function BrandsModule() {
 								/>
 							</FormControl>
 
-							<FormControl isRequired>
+							<FormControl>
 								<FormLabel fontSize="13px" fontWeight="700">
-									Logo URL
+									Logo URL (Fallback)
 								</FormLabel>
 								<Input
 									placeholder="https://example.com/logo.png"
@@ -380,16 +402,64 @@ export default function BrandsModule() {
 								>
 									Upload Logo
 								</Button>
-								{formData.logoUrl && (
-									<Image
-										src={formData.logoUrl}
-										alt="Logo preview"
-										maxH="80px"
-										mt={2}
-										borderRadius="md"
-									/>
-								)}
 							</FormControl>
+
+							<Box w="full" p={4} border="1px dashed" borderColor="gray.200" borderRadius="xl">
+								<Text fontSize="14px" fontWeight="800" mb={4} color={ACCENT}>
+									Sprite Configuration (Preferred)
+								</Text>
+								<VStack spacing={4}>
+									<FormControl>
+										<FormLabel fontSize="12px" fontWeight="700">Sprite Sheet URL</FormLabel>
+										<Input
+											placeholder="https://example.com/sprites.png"
+											value={formData.spriteSheetUrl}
+											onChange={(e) => setFormData({ ...formData, spriteSheetUrl: e.target.value })}
+											borderRadius="lg" fontSize="14px" h="40px"
+										/>
+									</FormControl>
+									<HStack w="full">
+										<FormControl>
+											<FormLabel fontSize="11px">Width</FormLabel>
+											<Input
+												type="number"
+												value={formData.spriteSize?.width || 0}
+												onChange={(e) => setFormData({ ...formData, spriteSize: { ...formData.spriteSize, width: parseInt(e.target.value) || 0 } })}
+												borderRadius="lg" fontSize="14px" h="40px"
+											/>
+										</FormControl>
+										<FormControl>
+											<FormLabel fontSize="11px">Height</FormLabel>
+											<Input
+												type="number"
+												value={formData.spriteSize?.height || 0}
+												onChange={(e) => setFormData({ ...formData, spriteSize: { ...formData.spriteSize, height: parseInt(e.target.value) || 0 } })}
+												borderRadius="lg" fontSize="14px" h="40px"
+											/>
+										</FormControl>
+									</HStack>
+									<HStack w="full">
+										<FormControl>
+											<FormLabel fontSize="11px">Pos X</FormLabel>
+											<Input
+												type="number"
+												value={formData.spritePosition?.x || 0}
+												onChange={(e) => setFormData({ ...formData, spritePosition: { ...formData.spritePosition, x: parseInt(e.target.value) || 0 } })}
+												borderRadius="lg" fontSize="14px" h="40px"
+											/>
+										</FormControl>
+										<FormControl>
+											<FormLabel fontSize="11px">Pos Y</FormLabel>
+											<Input
+												type="number"
+												value={formData.spritePosition?.y || 0}
+												onChange={(e) => setFormData({ ...formData, spritePosition: { ...formData.spritePosition, y: parseInt(e.target.value) || 0 } })}
+												borderRadius="lg" fontSize="14px" h="40px"
+											/>
+										</FormControl>
+									</HStack>
+								</VStack>
+							</Box>
 
 							<FormControl>
 								<FormLabel fontSize="13px" fontWeight="700">
