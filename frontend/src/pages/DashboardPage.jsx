@@ -44,6 +44,8 @@ import {
 	ChevronRight,
 	Home,
 	Settings,
+	Layers,
+	Car,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useUser } from "../context/UserContext";
@@ -60,6 +62,8 @@ import ContactsModule from "../components/dashboard/ContactsModule";
 import QuotesModule from "../components/dashboard/QuotesModule";
 import InquiriesModule from "../components/dashboard/InquiriesModule";
 import PartTypesModule from "../components/dashboard/PartTypesModule";
+import BrandsModule from "../components/dashboard/BrandsModule";
+import ModelsModule from "../components/dashboard/ModelsModule";
 
 // ─── Constants ─────────────────────────────────────────────────────────────
 const ACCENT = "#D90404";
@@ -162,6 +166,20 @@ const ALL_MODULES = [
 		icon: Tags,
 		roles: ["super_admin", "admin", "website_manager", "sales_manager", "viewer"],
 		component: PartTypesModule,
+	},
+	{
+		id: "brands",
+		name: "Brands",
+		icon: Layers,
+		roles: ["super_admin", "admin", "website_manager"],
+		component: BrandsModule,
+	},
+	{
+		id: "models",
+		name: "Models",
+		icon: Car,
+		roles: ["super_admin", "admin", "website_manager"],
+		component: ModelsModule,
 	},
 ];
 

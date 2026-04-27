@@ -25,6 +25,7 @@ import { UserProvider } from "./context/UserContext";
 import CheckoutPage from "./pages/CheckoutPage";
 import ThankYouPage from "./pages/ThankYouPage";
 import CallSellerPage from "./pages/CallSellerPage";
+import ProductsPage from "./pages/ProductsPage";
 import RefreshPopUp from "./components/common/RefreshPopUp";
 import ScrollToTop from "./components/layout/ScrollToTop";
 
@@ -62,7 +63,7 @@ function App() {
 
 						<Route path="/blog" element={<BlogPage />} />
 						<Route path="/blog/:slug" element={<BlogDetailPage />} />
-
+						<Route path="/products" element={<ProductsPage />} />
 						<Route path="/products/:id" element={<ProductDetailPage />} />
 
 						<Route

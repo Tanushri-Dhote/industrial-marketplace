@@ -6,7 +6,7 @@ import ReviewsSection from "./ReviewsSection";
 import TrustBar from "./TrustBar";
 import EasyStepsSection from "./EasyStepsSection";
 import VehicleSelectorSection from "./VehicleSelectorSection";
-import CarMakeSelectorSection from "./CarMakeSelectorSection";
+import BrandModelSelectorSection from "./BrandModelSelectorSection";
 import Areacbar from "./Areabar";
 import TopEnginesSection from "./TopEnginesSection";
 import FAQSection from "./FAQSection";
@@ -29,7 +29,7 @@ export default function HomePage() {
 			<HeroSection category={category} />
 			<TrustBar />
 			<EasyStepsSection />
-			<CarMakeSelectorSection />
+			<BrandModelSelectorSection />
 			{!searchParams.get("brand") && <TopEnginesSection category={category} />}
 			<Areacbar />
 			<ReviewsSection />
