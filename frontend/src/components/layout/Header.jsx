@@ -5,6 +5,7 @@ import {
   Text,
   Button,
   HStack,
+  VStack,
   Input,
   InputGroup,
   InputRightElement,
@@ -19,6 +20,7 @@ import {
   MenuItem,
   MenuDivider,
   Stack,
+
   Link as ChakraLink,
 } from '@chakra-ui/react';
 import { HamburgerIcon, CloseIcon } from '@chakra-ui/icons';
@@ -195,38 +197,69 @@ export default function Header() {
               <Flex flex="1" maxW="480px" mx="auto">
                 <InputGroup size="md">
 
-                  <Input
-
-                    placeholder="Enter Registration Number (e.g. AB12 CDE)"
-                    value={regNumber}
-                    onChange={(e) => setRegNumber(e.target.value.toUpperCase())}
-                    textTransform="uppercase"
-                    bg="gray.50"
-                    borderColor="gray.300"
-                    height="42px"
-                    fontSize="14px"
-                    _placeholder={{ textTransform: "none" }}
-                    _focus={{
-                      borderColor: accentColor,
-                      boxShadow: `0 0 0 3px rgba(255,107,0,0.15)`
-                    }}
-                    onKeyDown={(e) => e.key === "Enter" && handleRegSubmit()}
-                  />
-                  <InputRightElement width="70px" h="42px" pointerEvents="auto">
-                    <Button
-                      onClick={handleRegSubmit}
-                      bg={accentColor}
-                      color="white"
-                      h="34px"
-                      w="60px"
-                      borderLeftRadius="0"
-                      _hover={{ bg: "#B70303" }}
-                      fontWeight="600"
-                      fontSize="13px"
+                  <Box>
+                    <Flex
+                      border="4px solid"
+                      borderColor="#FFD700"
+                      borderRadius="20px"
+                      overflow="hidden"
+                      h="50px"
+                      bg="white"
+                      boxShadow="lg"
                     >
-                      GO
-                    </Button>
-                  </InputRightElement>
+                      {/* Left GB Box */}
+                      <VStack
+                        bg="#003399"
+                        w="80px"
+                        justify="center"
+                        spacing={0}
+                        flexShrink={0}
+                      >
+                        <Text fontSize="14px" color="white" fontWeight="900" lineHeight="1">
+                          GB
+                        </Text>
+                        <Text color="#FFD700" fontSize="14px" lineHeight="1">
+                          ★
+                        </Text>
+                      </VStack>
+
+                      {/* Input */}
+                      <Input
+                        flex="1"
+                        variant="unstyled"
+                        placeholder="ENTER REG"
+                        value={regNumber}
+                        onChange={(e) => setRegNumber(e.target.value.toUpperCase())}
+                        onKeyDown={(e) => e.key === "Enter" && handleRegSubmit()}
+                        textAlign="center"
+                        fontSize="28px"
+                        fontWeight="900"
+                        color="#0F172A"
+                        letterSpacing="2px"
+                        px={4}
+                        textTransform="uppercase"
+                        _placeholder={{
+                          color: "#BFC7D1",
+                          fontWeight: "900",
+                        }}
+                      />
+
+                      {/* Go Button */}
+                      <Button
+                        h="full"
+                        w="80px"
+                        bg="#D90404"
+                        color="white"
+                        borderRadius="0"
+                        fontSize="26px"
+                        fontWeight="900"
+                        _hover={{ bg: "#B70303" }}
+                        onClick={handleRegSubmit}
+                      >
+                      Go
+                      </Button>
+                    </Flex>
+                  </Box>
                 </InputGroup>
               </Flex>
             ) : (
