@@ -3,6 +3,7 @@ import {
   Box,
   Container,
   Stack,
+  Flex,
   SimpleGrid,
   Text,
   Link,
@@ -106,32 +107,65 @@ export default function Footer() {
               {/* REG HERE Input Box */}
               <InputGroup size="lg">
 
-                <Input
-                  placeholder="Enter Registration Number"
-                  value={regNumber}
-                  onChange={(e) => setRegNumber(e.target.value.toUpperCase())}
-                  textTransform="uppercase"
-                  bg="#FFCC00"
-                  color="black"
-                  fontWeight="600"
-                  border="none"
-                  borderRadius="md"
-                  _placeholder={{ color: "blackAlpha.700", textTransform: "none" }}
-                  onKeyDown={(e) => e.key === "Enter" && handleGetQuotes()}
-                />
-                <InputRightElement width="110px">
-                  <Text
-                    fontSize="xs"
-                    fontWeight="700"
-                    color="black"
-                    bg="#FFCC00"
-                    px={3}
-                    py={1}
-                    borderLeft="1px solid #e6b800"
+                <Box w="100%">
+                  <Flex
+                    border="4px solid"
+                    borderColor="#FFD700"
+                    borderRadius="20px"
+                    overflow="hidden"
+                    h="60px"
+                    bg="white"
+                    boxShadow="lg"
                   >
-                    REG HERE
-                  </Text>
-                </InputRightElement>
+                    {/* Left GB Box */}
+                    <VStack
+                      bg="#003399"
+                      w="70px"
+                      justify="center"
+                      spacing={0}
+                      flexShrink={0}
+                    >
+                      <Text
+                        fontSize="14px"
+                        color="white"
+                        fontWeight="900"
+                        lineHeight="1"
+                      >
+                        GB
+                      </Text>
+
+                      <Text
+                        color="#FFD700"
+                        fontSize="14px"
+                        lineHeight="1"
+                      >
+                        ★
+                      </Text>
+                    </VStack>
+
+                    {/* Input */}
+                    <Input
+                      flex="1"
+                      variant="unstyled"
+                      placeholder="ENTER REG"
+                      value={regNumber}
+                      onChange={(e) => setRegNumber(e.target.value.toUpperCase())}
+                      onKeyDown={(e) => e.key === "Enter" && handleGetQuotes()}
+                      textAlign="center"
+                      fontSize={{ base: "20px", md: "26px" }}
+                      fontWeight="900"
+                      color="#0F172A"
+                      letterSpacing="2px"
+                      px={4}
+                      textTransform="uppercase"
+                      _placeholder={{
+                        color: "#BFC7D1",
+                        fontWeight: "900",
+                      }}
+                    />
+                  </Flex>
+                </Box>
+                
               </InputGroup>
 
               {/* Get Free Quotes Button */}
