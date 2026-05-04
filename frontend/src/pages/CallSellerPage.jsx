@@ -40,17 +40,20 @@ export default function CallSellerPage() {
 	const navigate = useNavigate();
 	const toast = useToast();
 
-
-	const { vrm, category, brand, model, year, type, searchType } = location.state || {};
-
+	// Ensure location.state is an object — some callers may pass a primitive
+	let locState = location.state;
+	if (typeof locState !== "object" || locState === null) {
+		locState = { vrm: locState };
+	}
+	const { vrm, category, brand, model, year, type, searchType } = locState || {};
 
 	const safeVrm = (vrm || "").trim();
 	const safeBrand = (brand || "").trim();
 	const safeModel = (model || "").trim();
 	const safeYear = (year || "").trim();
 	const hasVehicle = !!(safeVrm || safeBrand || safeModel || safeYear);
-	const [manualVrm, setManualVrm] = useState(vrm || "");
-	const finalVehicleVrm = manualVrm.trim() || safeVrm || "";
+	const [manualVrm, setManualVrm] = useState(String(vrm || ""));
+	const finalVehicleVrm = (manualVrm || "").trim() || safeVrm || "";
 
 	useEffect(() => {
 		if (!location.state) {
@@ -115,7 +118,6 @@ export default function CallSellerPage() {
 	const API = import.meta.env.VITE_API_URL;
 
 	const handleGetQuote = async () => {
-
 		if (!finalVehicleVrm && !brand) {
 			toast({
 				title: "Enter registration number",
@@ -208,8 +210,6 @@ export default function CallSellerPage() {
 	// 	);
 	// };
 
-
-
 	function VehicleSummary({
 		hasVehicle,
 		safeVrm,
@@ -253,11 +253,7 @@ export default function CallSellerPage() {
 							<Input
 								placeholder="Enter Registration Number"
 								value={manualVrm}
-								onChange={(e) =>
-									setManualVrm(
-										e.target.value.toUpperCase().replace(/\s+/g, "")
-									)
-								}
+								onChange={(e) => setManualVrm(e.target.value.toUpperCase().replace(/\s+/g, ""))}
 								maxW="320px"
 								bg="gray.50"
 								borderColor="gray.300"
