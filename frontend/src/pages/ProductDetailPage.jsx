@@ -128,6 +128,7 @@ const fetchProduct = async (id) => {
 export default function ProductDetailPage() {
 	const { id } = useParams();
 	const [selectedImage, setSelectedImage] = useState(0);
+	const toText = (value) => (value === null || value === undefined ? "" : String(value));
 	const { isOpen, onOpen, onClose } = useDisclosure();
 	const {
 		data: product,
@@ -521,11 +522,11 @@ export default function ProductDetailPage() {
 										onClick={() =>
 											navigate("/call-seller", {
 												state: {
-													brand: product.make || product.brand,
-													model: product.model,
-													year: product.year,
-													type: product.engineType,
-													category: product.category?.name || "",
+													brand: toText(product.make || product.brand),
+													model: toText(product.model),
+													year: toText(product.year),
+													type: toText(product.engineType),
+													category: toText(product.category?.name),
 													searchType: "manual",
 												},
 											})

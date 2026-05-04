@@ -46,13 +46,14 @@ export default function CallSellerPage() {
 		locState = { vrm: locState };
 	}
 	const { vrm, category, brand, model, year, type, searchType } = locState || {};
+	const toText = (value) => (value === null || value === undefined ? "" : String(value));
 
-	const safeVrm = (vrm || "").trim();
-	const safeBrand = (brand || "").trim();
-	const safeModel = (model || "").trim();
-	const safeYear = (year || "").trim();
+	const safeVrm = toText(vrm).trim();
+	const safeBrand = toText(brand).trim();
+	const safeModel = toText(model).trim();
+	const safeYear = toText(year).trim();
 	const hasVehicle = !!(safeVrm || safeBrand || safeModel || safeYear);
-	const [manualVrm, setManualVrm] = useState(String(vrm || ""));
+	const [manualVrm, setManualVrm] = useState(toText(vrm));
 	const finalVehicleVrm = (manualVrm || "").trim() || safeVrm || "";
 
 	useEffect(() => {
