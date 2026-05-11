@@ -1,13 +1,13 @@
 import React from 'react';
-import { 
-  Container, 
-  Heading, 
-  Text, 
-  VStack, 
-  Box, 
-  Badge, 
-  Divider, 
-  UnorderedList, 
+import {
+  Container,
+  Heading,
+  Text,
+  VStack,
+  Box,
+  Badge,
+  Divider,
+  UnorderedList,
   ListItem,
   Accordion,
   AccordionItem,
@@ -72,29 +72,29 @@ export default function PrivacyPage() {
 
       <Container maxW="container.lg" py={4} mb={12}>
         <VStack align="stretch" spacing={6}>
-          
+
           {/* Warning Banner */}
-          <Box 
-            bg="red.50" 
-            p={5} 
-            borderRadius="lg" 
+          <Box
+            bg="red.50"
+            p={5}
+            borderRadius="lg"
             borderLeft="4px solid red"
             mb={4}>
             <HStack spacing={3}>
               <Icon as={MdGavel} boxSize={6} color="red.500" />
               <Text fontSize="14px" color="red.800" fontWeight="500">
-                Before you proceed, please read our privacy policy carefully. If you do not accept this 
-                privacy policy and terms of use, you must exit from our website and do not use our website 
+                Before you proceed, please read our privacy policy carefully. If you do not accept this
+                privacy policy and terms of use, you must exit from our website and do not use our website
                 or any part of the website.
               </Text>
             </HStack>
           </Box>
 
           {/* How  All Engine 4 You  Trust Helps - Highlight Box */}
-          <Box 
-            bg="orange.50" 
-            p={6} 
-            borderRadius="lg" 
+          <Box
+            bg="orange.50"
+            p={6}
+            borderRadius="lg"
             border="1px solid"
             borderColor={accentColor}
             mb={4}>
@@ -104,12 +104,12 @@ export default function PrivacyPage() {
                 <Heading fontSize="20px" color={darkBg}>How can  All Engine 4 You  Trust help me save on my car parts price comparison?</Heading>
               </HStack>
               <Text fontSize="15px" lineHeight="1.6">
-                We are UK's first price comparison website that is focused on comparing used and reconditioned  All Engine 4 You s 
-                as well as ancillaries. Once you enter your reg number, we check our database and give you the cheapest 
-                online quotes in just few clicks. Get multiple quotes from carefully vetted suppliers and get your 
-                 All Engine 4 You s and ancillaries within no time. Choose  All Engine 4 You  Trust as we only have trusted suppliers who 
-                don't compromise on quality. We offer an unmatchable  All Engine 4 You  and ancillaries price comparison service 
-                where you pay the cheapest price. Get free online quotes in few clicks. Compare prices and buy with 
+                We are UK's first price comparison website that is focused on comparing used and reconditioned  All Engine 4 You s
+                as well as ancillaries. Once you enter your reg number, we check our database and give you the cheapest
+                online quotes in just few clicks. Get multiple quotes from carefully vetted suppliers and get your
+                All Engine 4 You s and ancillaries within no time. Choose  All Engine 4 You  Trust as we only have trusted suppliers who
+                don't compromise on quality. We offer an unmatchable  All Engine 4 You  and ancillaries price comparison service
+                where you pay the cheapest price. Get free online quotes in few clicks. Compare prices and buy with
                 confidence with  All Engine 4 You  Trust.
               </Text>
             </VStack>
@@ -120,7 +120,7 @@ export default function PrivacyPage() {
             {sections.map((section, index) => (
               <Accordion key={index} allowToggle mb={4} defaultIndex={index === 0 ? [0] : []}>
                 <AccordionItem border="1px solid" borderColor={borderColor} borderRadius="lg" mb={3}>
-                  <AccordionButton 
+                  <AccordionButton
                     _expanded={{ bg: accentColor, color: 'white' }}
                     _hover={{ bg: 'orange.50' }}
                     borderRadius="lg"
@@ -133,8 +133,8 @@ export default function PrivacyPage() {
                   <AccordionPanel pb={4} pt={4}>
                     {section.id === 1 && (
                       <Text fontSize="15px" lineHeight="1.7">
-                        Before you proceed, please read our privacy policy carefully. If you do not accept this 
-                        privacy policy and terms of use, you must exit from our website and do not use our website 
+                        Before you proceed, please read our privacy policy carefully. If you do not accept this
+                        privacy policy and terms of use, you must exit from our website and do not use our website
                         or any part of the website.
                       </Text>
                     )}
@@ -142,8 +142,8 @@ export default function PrivacyPage() {
                     {section.id === 2 && (
                       <VStack align="stretch" spacing={4}>
                         <Text fontSize="15px" lineHeight="1.7">
-                          As a price comparison business, we are committed to protect all of your information, we collect 
-                          at our website. We want you to be confident when you use our website that your personal 
+                          As a price comparison business, we are committed to protect all of your information, we collect
+                          at our website. We want you to be confident when you use our website that your personal
                           information is safe with us as we do not practice any spamming activities.
                         </Text>
                         <Text fontSize="15px" lineHeight="1.7">
@@ -162,7 +162,7 @@ export default function PrivacyPage() {
                     {section.id === 3 && (
                       <VStack align="stretch" spacing={3}>
                         <Text fontSize="15px" lineHeight="1.7">
-                          Autoonlinemarketing UK is working under the trade name of  All Engine 4 You trust.co.uk (both operating in 
+                          Autoonlinemarketing UK is working under the trade name of  All Engine 4 You trust.co.uk (both operating in
                           the UK) and we all take your privacy very seriously.
                         </Text>
                         <Box bg="gray.50" p={4} borderRadius="md">
@@ -176,17 +176,17 @@ export default function PrivacyPage() {
 
                     {section.id === 4 && (
                       <Text fontSize="15px" lineHeight="1.7">
-                        We may gather your personal information through our website, or other digital media or social 
-                        media channels operated by or on behalf of the company referred to collectively as the "Site" 
-                         All Engine 4 You trust.co.uk.
+                        We may gather your personal information through our website, or other digital media or social
+                        media channels operated by or on behalf of the company referred to collectively as the "Site"
+                        All Engine 4 You trust.co.uk.
                       </Text>
                     )}
 
                     {section.id === 5 && (
                       <VStack align="stretch" spacing={3}>
                         <Text fontSize="15px" lineHeight="1.7">
-                          We collect information about you only when you give this to us at our website for receiving 
-                          price quotes only, for example, we may collect your name, email address, telephone number 
+                          We collect information about you only when you give this to us at our website for receiving
+                          price quotes only, for example, we may collect your name, email address, telephone number
                           and postcode.
                         </Text>
                         <Box bg="orange.50" p={3} borderRadius="md">
@@ -222,22 +222,22 @@ export default function PrivacyPage() {
 
                     {section.id === 8 && (
                       <Text fontSize="15px" lineHeight="1.7">
-                        As a price comparison service, we need to disclose some of your information to our members 
-                        (garages,  All Engine 4 You  reconditioners, workshops, and retailers) to make the best possible price 
+                        As a price comparison service, we need to disclose some of your information to our members
+                        (garages,  All Engine 4 You  reconditioners, workshops, and retailers) to make the best possible price
                         quote for you.
                       </Text>
                     )}
 
                     {section.id === 9 && (
                       <Text fontSize="15px" lineHeight="1.7">
-                        We usually don't use cookies on our websites, but planning to do so very soon. Cookies help us 
+                        We usually don't use cookies on our websites, but planning to do so very soon. Cookies help us
                         understand browsing habits and improve your experience.
                       </Text>
                     )}
 
                     {section.id === 10 && (
                       <Text fontSize="15px" lineHeight="1.7">
-                        The advertisements that you see on our website are delivered on our behalf by third parties 
+                        The advertisements that you see on our website are delivered on our behalf by third parties
                         like Google Adsense. No identifiable information is used to provide these ads.
                       </Text>
                     )}
@@ -259,7 +259,7 @@ export default function PrivacyPage() {
 
                     {section.id === 12 && (
                       <Text fontSize="15px" lineHeight="1.7">
-                        Any electronic communication will include an unsubscribe link. You can unsubscribe your 
+                        Any electronic communication will include an unsubscribe link. You can unsubscribe your
                         information from our system at any time by emailing info@industrialmarket.co.uk.
                       </Text>
                     )}
@@ -292,7 +292,7 @@ export default function PrivacyPage() {
 
                     {section.id === 15 && (
                       <Text fontSize="15px" lineHeight="1.7">
-                        We reserve the right to change and amend our privacy policy at any time. Any changes will be 
+                        We reserve the right to change and amend our privacy policy at any time. Any changes will be
                         published on the sites. If there are significant changes, we may contact you by email or phone.
                       </Text>
                     )}
@@ -303,11 +303,11 @@ export default function PrivacyPage() {
           </Box>
 
           {/* Contact Section */}
-          <Box 
-            bg={darkBg} 
-            color="white" 
-            p={6} 
-            borderRadius="lg" 
+          <Box
+            bg={darkBg}
+            color="white"
+            p={6}
+            borderRadius="lg"
             textAlign="center"
             mt={6}>
             <VStack spacing={3}>
