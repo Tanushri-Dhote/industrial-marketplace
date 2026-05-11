@@ -351,11 +351,11 @@ export default function BrandModelSelectorSection() {
 							)}
 						</Heading>
 						<Text fontSize={{ base: "sm", md: "md" }} color="gray.600" maxW="600px">
-							{selectedModel 
+							{selectedModel
 								? `Browse available engines and price table for ${selectedBrand?.name} ${selectedModel.name}`
 								: showModels && selectedBrand
-								? "Choose a model to find compatible engines"
-								: "Click on your car brand to view all available models"}
+									? "Choose a model to find compatible engines"
+									: "Click on your car brand to view all available models"}
 						</Text>
 					</VStack>
 
@@ -391,11 +391,11 @@ export default function BrandModelSelectorSection() {
 											<Heading fontSize="26px" mb={8} color={darkColor} textAlign="center" fontWeight="800">
 												{selectedBrand?.name} {selectedModel.name} Engine Prices
 											</Heading>
-											<TableContainer 
-												bg="white" 
-												borderRadius="2xl" 
-												border="1px solid" 
-												borderColor="gray.200" 
+											<TableContainer
+												bg="white"
+												borderRadius="2xl"
+												border="1px solid"
+												borderColor="gray.200"
 												boxShadow="0 10px 20px rgba(0,0,0,0.04)"
 												overflow="hidden"
 											>
@@ -423,10 +423,10 @@ export default function BrandModelSelectorSection() {
 																	£{Number(engine.price || 0).toLocaleString("en-GB")}
 																</Td>
 																<Td isNumeric>
-																	<Button 
-																		as={RouterLink} 
-																		to={`/products/${engine._id}`} 
-																		size="sm" 
+																	<Button
+																		as={RouterLink}
+																		to={`/products/${engine._id}`}
+																		size="sm"
 																		bg={darkColor}
 																		color="white"
 																		_hover={{ bg: accentColor }}
@@ -486,76 +486,75 @@ export default function BrandModelSelectorSection() {
 								)}
 							</MotionVStack>
 						) : /* State 1: Model Grid */
-						showModels && selectedBrand ? (
-							<MotionVStack
-								key="models-view"
-								variants={containerVariants}
-								initial="hidden"
-								animate="show"
-								spacing={8}
-								align="stretch"
-							>
-								<Heading fontSize="26px" color={darkColor} textAlign="center" fontWeight="800">
-									Most Popular <Text as="span" color={accentColor}>{selectedBrand.name}</Text> Engines
-								</Heading>
-								<MotionGrid
+							showModels && selectedBrand ? (
+								<MotionVStack
+									key="models-view"
 									variants={containerVariants}
+									initial="hidden"
+									animate="show"
+									spacing={8}
+									align="stretch"
+								>
+									<Heading fontSize="26px" color={darkColor} textAlign="center" fontWeight="800">
+										Most Popular <Text as="span" color={accentColor}>{selectedBrand.name}</Text> Engines
+									</Heading>
+									<MotionGrid
+										variants={containerVariants}
+										templateColumns={{
+											base: "repeat(2, 1fr)",
+											sm: "repeat(3, 1fr)",
+											md: "repeat(4, 1fr)",
+											lg: "repeat(5, 1fr)",
+											xl: "repeat(6, 1fr)",
+										}}
+										gap={{ base: 4, md: 6 }}
+									>
+										{loadingModels ? (
+											<Center py={20} gridColumn="1 / -1">
+												<Spinner color={accentColor} size="lg" thickness="4px" />
+											</Center>
+										) : models.length > 0 ? (
+											models.map((model) => (
+												<ModelCard key={model._id} model={model} onSelect={handleModelSelect} />
+											))
+										) : (
+											<Center py={20} gridColumn="1 / -1">
+												<VStack spacing={3}>
+													<Text fontSize="md" color="gray.500" fontWeight="600">
+														No models found for {selectedBrand?.name}
+													</Text>
+													<Button colorScheme="red" onClick={handleBackToBrands}>
+														Choose Another Brand
+													</Button>
+												</VStack>
+											</Center>
+										)}
+									</MotionGrid>
+								</MotionVStack>
+							) : (
+								/* State 0: Brand Grid */
+								<MotionGrid
+									key="brands-grid"
+									variants={containerVariants}
+									initial="hidden"
+									animate="show"
 									templateColumns={{
 										base: "repeat(2, 1fr)",
-										sm: "repeat(3, 1fr)",
 										md: "repeat(4, 1fr)",
 										lg: "repeat(5, 1fr)",
-										xl: "repeat(6, 1fr)",
 									}}
-									gap={{ base: 4, md: 6 }}
+									gap={{ base: 3, md: 4 }}
 								>
-									{loadingModels ? (
-										<Center py={20} gridColumn="1 / -1">
-											<Spinner color={accentColor} size="lg" thickness="4px" />
-										</Center>
-									) : models.length > 0 ? (
-										models.map((model) => (
-											<ModelCard key={model._id} model={model} onSelect={handleModelSelect} />
-										))
-									) : (
-										<Center py={20} gridColumn="1 / -1">
-											<VStack spacing={3}>
-												<Text fontSize="md" color="gray.500" fontWeight="600">
-													No models found for {selectedBrand?.name}
-												</Text>
-												<Button colorScheme="red" onClick={handleBackToBrands}>
-													Choose Another Brand
-												</Button>
-											</VStack>
-										</Center>
-									)}
+									{brands.map((brand) => (
+										<BrandCard
+											key={brand._id}
+											brand={brand}
+											onSelect={handleBrandSelect}
+											isSelected={selectedBrand?._id === brand._id}
+										/>
+									))}
 								</MotionGrid>
-							</MotionVStack>
-						) : (
-							/* State 0: Brand Grid */
-							<MotionGrid
-								key="brands-grid"
-								variants={containerVariants}
-								initial="hidden"
-								animate="show"
-								templateColumns={{
-									base: "repeat(2, 1fr)",
-									sm: "repeat(3, 1fr)",
-									md: "repeat(4, 1fr)",
-									lg: "repeat(5, 1fr)",
-								}}
-								gap={{ base: 3, md: 4 }}
-							>
-								{brands.map((brand) => (
-									<BrandCard
-										key={brand._id}
-										brand={brand}
-										onSelect={handleBrandSelect}
-										isSelected={selectedBrand?._id === brand._id}
-									/>
-								))}
-							</MotionGrid>
-						)}
+							)}
 					</AnimatePresence>
 
 					{/* Info Cards */}

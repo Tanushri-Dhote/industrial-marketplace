@@ -377,7 +377,7 @@ function Sidebar({ modules, activeModule, onSelect, user, userRole, onLogout }) 
 				>
 					View Website
 				</Button>
-				<Button
+				{/* <Button
 					w="full"
 					justifyContent="flex-start"
 					leftIcon={<LogOut size={18} />}
@@ -390,7 +390,7 @@ function Sidebar({ modules, activeModule, onSelect, user, userRole, onLogout }) 
 					_hover={{ bg: "rgba(255,255,255,0.06)", color: ACCENT }}
 				>
 					Logout
-				</Button>
+				</Button> */}
 			</VStack>
 		</Flex>
 	);
@@ -581,13 +581,14 @@ export default function DashboardPage({ defaultModule }) {
 							</Tooltip>
 							<Box w="1px" h="20px" bg="gray.200" mx={2} />
 							<Button
-								leftIcon={<Settings size={14} />}
+								leftIcon={<LogOut size={14} />}
 								variant="ghost"
 								size="sm"
 								fontSize="13px"
 								display={{ base: "none", md: "flex" }}
+								onClick={handleLogout}
 							>
-								Settings
+								Logout
 							</Button>
 						</HStack>
 					</Flex>

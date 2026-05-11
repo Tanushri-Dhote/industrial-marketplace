@@ -71,72 +71,103 @@ export default function CheckoutPage() {
 		<Box bg="gray.50" minH="100vh" py={10}>
 			<Container maxW="container.xl">
 				{/* Title */}
-				<HStack justify="space-between" mb={4}>
+				<HStack
+					justify="space-between"
+					mb={4}
+					flexWrap="wrap"
+					spacing={3}
+				>
 					<Heading>Checkout</Heading>
 
 					<Button variant="outline">🛒 Cart ({cartItemCount})</Button>
 				</HStack>
 
 				{/* CART TABLE */}
-				<Box bg="white" p={6} borderRadius="lg" boxShadow="sm">
-					<Table>
-						<Thead>
-							<Tr>
-								<Th>Product</Th>
-								<Th>Price</Th>
-								<Th>Qty</Th>
-								<Th>Total</Th>
-								<Th></Th>
-							</Tr>
-						</Thead>
+				<Box bg="white" p={{ base: 3, md: 6 }} borderRadius="lg" boxShadow="sm">
+					<Box overflowX="auto">
+						<Table minW="700px" size={{ base: "sm", md: "md" }}>
+							<Thead>
+								<Tr>
+									<Th whiteSpace="nowrap">Product</Th>
+									<Th whiteSpace="nowrap">Price</Th>
+									<Th whiteSpace="nowrap">Qty</Th>
+									<Th whiteSpace="nowrap">Total</Th>
+									<Th></Th>
+								</Tr>
+							</Thead>
 
-						<Tbody>
-							{cart.map((item) => {
-								const price = Number(item.price || 0);
-								const lineTotal = price * Number(item.qty || 0);
+							<Tbody>
+								{cart.map((item) => {
+									const price = Number(item.price || 0);
+									const lineTotal = price * Number(item.qty || 0);
 
-								return (
-									<Tr key={item._id}>
-										<Td>
-											{item.name} {item.make} {item.model} {item.year}
-										</Td>
-										<Td>£{price.toLocaleString("en-GB")}</Td>
+									return (
+										<Tr key={item._id}>
+											<Td minW="220px">
+												<Text fontSize={{ base: "sm", md: "md" }} fontWeight="500">
+													{item.name} {item.make} {item.model} {item.year}
+												</Text>
+											</Td>
 
-										<Td>
-											<HStack>
-												<Button size="sm" onClick={() => updateQuantity(item._id, -1)}>
-													-
+											<Td whiteSpace="nowrap">
+												£{price.toLocaleString("en-GB")}
+											</Td>
+
+											<Td>
+												<HStack spacing={2}>
+													<Button
+														size="xs"
+														onClick={() => updateQuantity(item._id, -1)}
+													>
+														-
+													</Button>
+
+													<Box minW="20px" textAlign="center">
+														{item.qty}
+													</Box>
+
+													<Button
+														size="xs"
+														onClick={() => updateQuantity(item._id, 1)}
+													>
+														+
+													</Button>
+												</HStack>
+											</Td>
+
+											<Td whiteSpace="nowrap">
+												£{lineTotal.toLocaleString("en-GB")}
+											</Td>
+
+											<Td>
+												<Button
+													colorScheme="red"
+													size="xs"
+													onClick={() => removeFromCart(item._id)}
+												>
+													Remove
 												</Button>
-												<Box>{item.qty}</Box>
-												<Button size="sm" onClick={() => updateQuantity(item._id, 1)}>
-													+
-												</Button>
-											</HStack>
-										</Td>
+											</Td>
+										</Tr>
+									);
+								})}
 
-										<Td>£{lineTotal.toLocaleString("en-GB")}</Td>
-
-										<Td>
-											<Button colorScheme="red" size="sm" onClick={() => removeFromCart(item._id)}>
-												Remove
-											</Button>
-										</Td>
-									</Tr>
-								);
-							})}
-
-							<Tr bg="blue.50">
-								<Td colSpan={3} fontWeight="bold">
-									Total
-								</Td>
-								<Td fontWeight="bold">£{total?.toLocaleString()}</Td>
-							</Tr>
-						</Tbody>
-					</Table>
+								<Tr bg="blue.50">
+									<Td colSpan={3} fontWeight="bold">
+										Total
+									</Td>
+									<Td fontWeight="bold">
+										£{total?.toLocaleString()}
+									</Td>
+								</Tr>
+							</Tbody>
+						</Table>
+					</Box>
 				</Box>
 
 				{/* FORM SECTION */}
-				<Grid templateColumns={{ base: "1fr", md: "1fr 1fr" }} gap={6} mt={8}>
+				<Grid templateColumns={{ base: "1fr", md: "1fr 1fr" }} gap={{ base: 4, md: 6 }} mt={{ base: 6, md: 8 }}>
+
 					{/* LEFT SIDE */}
 					<VStack spacing={6} align="stretch">
 						{/* Service */}
