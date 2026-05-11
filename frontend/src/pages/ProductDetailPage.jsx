@@ -338,10 +338,10 @@ export default function ProductDetailPage() {
 									{product.similarProducts?.map((p, idx) => (
 										<ProductCard key={idx} product={p} />
 									)) || (
-										<Text fontSize="sm" color="gray.400">
-											Loading similar items...
-										</Text>
-									)}
+											<Text fontSize="sm" color="gray.400">
+												Loading similar items...
+											</Text>
+										)}
 								</HStack>
 							</Box>
 
@@ -363,44 +363,128 @@ export default function ProductDetailPage() {
 										Vehicle Compatibility Guide
 									</Heading>
 									<Box
-										overflowX="auto"
+										w="100%"
 										borderRadius="2xl"
 										border="1px solid"
 										borderColor="gray.100"
 										boxShadow="sm"
+										overflow="hidden"
 									>
-										<Table variant="simple" size="md">
+										<Table
+											variant="simple"
+											size={{ base: "xs", md: "md" }}
+											sx={{
+												tableLayout: "fixed",
+												width: "100%",
+											}}
+										>
 											<Thead bg="gray.50">
 												<Tr>
-													<Th color="gray.400" fontSize="xs">
+													<Th
+														color="gray.400"
+														fontSize={{ base: "9px", md: "xs" }}
+														px={{ base: 1, md: 4 }}
+														py={3}
+														wordBreak="break-word"
+													>
 														Make
 													</Th>
-													<Th color="gray.400" fontSize="xs">
+
+													<Th
+														color="gray.400"
+														fontSize={{ base: "9px", md: "xs" }}
+														px={{ base: 1, md: 4 }}
+														py={3}
+														wordBreak="break-word"
+													>
 														Model
 													</Th>
-													<Th color="gray.400" fontSize="xs">
+
+													<Th
+														color="gray.400"
+														fontSize={{ base: "9px", md: "xs" }}
+														px={{ base: 1, md: 4 }}
+														py={3}
+														wordBreak="break-word"
+													>
 														Variant
 													</Th>
-													<Th color="gray.400" fontSize="xs">
+
+													<Th
+														color="gray.400"
+														fontSize={{ base: "9px", md: "xs" }}
+														px={{ base: 1, md: 4 }}
+														py={3}
+														wordBreak="break-word"
+													>
 														Year
 													</Th>
-													<Th color="gray.400" fontSize="xs">
+
+													<Th
+														color="gray.400"
+														fontSize={{ base: "9px", md: "xs" }}
+														px={{ base: 1, md: 4 }}
+														py={3}
+														wordBreak="break-word"
+													>
 														Engine Detail
 													</Th>
 												</Tr>
 											</Thead>
+
 											<Tbody>
 												{product.compatibility?.map((item, idx) => (
 													<Tr key={idx} _hover={{ bg: "blue.50" }} transition="0.2s">
-														<Td fontWeight="900" color="gray.800">
+														<Td
+															fontWeight="900"
+															color="gray.800"
+															fontSize={{ base: "10px", md: "sm" }}
+															px={{ base: 1, md: 4 }}
+															py={3}
+															wordBreak="break-word"
+														>
 															{item.make}
 														</Td>
-														<Td fontWeight="600">{item.model}</Td>
-														<Td color="gray.500" fontSize="sm">
+
+														<Td
+															fontWeight="600"
+															fontSize={{ base: "10px", md: "sm" }}
+															px={{ base: 1, md: 4 }}
+															py={3}
+															wordBreak="break-word"
+														>
+															{item.model}
+														</Td>
+
+														<Td
+															color="gray.500"
+															fontSize={{ base: "9px", md: "sm" }}
+															px={{ base: 1, md: 4 }}
+															py={3}
+															wordBreak="break-word"
+														>
 															{item.variant}
 														</Td>
-														<Td fontWeight="700">{item.year}</Td>
-														<Td color="#D90404" fontWeight="bold" fontSize="xs">
+
+														<Td
+															fontWeight="700"
+															fontSize={{ base: "10px", md: "sm" }}
+															px={{ base: 1, md: 4 }}
+															py={3}
+															wordBreak="break-word"
+														>
+															{item.year}
+														</Td>
+
+														<Td
+															color="#D90404"
+															fontWeight="bold"
+															fontSize={{ base: "8px", md: "xs" }}
+															px={{ base: 1, md: 4 }}
+															py={3}
+															wordBreak="break-word"
+															lineHeight="1.4"
+														>
 															{item.engine}
 														</Td>
 													</Tr>
