@@ -111,7 +111,8 @@ function LineRow({
 				)}
 			</Box>
 
-			<HStack spacing={3}>
+			<HStack spacing={3} flexWrap="wrap"
+				justify={{ base: "center", md: "flex-end" }}>
 				{hasTBC && (
 					<HStack spacing={1} opacity={0.7}>
 						<Checkbox
@@ -381,15 +382,21 @@ export default function CreateQuotePage() {
 			{/* ── Top Bar ── */}
 			<Box
 				bg={DARK}
-				px={8}
-				py={4}
+				px={{ base: 3, md: 8 }}
+				py={{ base: 3, md: 4 }}
 				position="sticky"
 				top={0}
 				zIndex={10}
 				boxShadow="0 4px 20px rgba(0,0,0,0.3)"
 			>
-				<Flex align="center" justify="space-between" maxW="1400px" mx="auto">
-					<HStack spacing={4}>
+				<Flex
+					direction={{ base: "column", md: "row" }}
+					align={{ base: "stretch", md: "center" }}
+					justify="space-between"
+					gap={{ base: 4, md: 0 }}
+					maxW="1400px"
+					mx="auto"
+				>					<HStack spacing={4}>
 						<Button
 							leftIcon={<ArrowBackIcon />}
 							variant="ghost"
@@ -401,7 +408,8 @@ export default function CreateQuotePage() {
 							Back
 						</Button>
 						<Box w="1px" h="20px" bg="whiteAlpha.200" />
-						<HStack spacing={3}>
+						<HStack spacing={3} flexWrap="wrap"
+							justify={{ base: "center", md: "flex-end" }}>
 							<Icon as={FileText} color={RED} size={18} />
 							<Text color="white" fontWeight="800" fontSize="16px">
 								Create Quotation
@@ -420,7 +428,8 @@ export default function CreateQuotePage() {
 						</Badge>
 					</HStack>
 
-					<HStack spacing={3}>
+					<HStack spacing={3} flexWrap="wrap"
+						justify={{ base: "center", md: "flex-end" }}>
 						<Button
 							leftIcon={<DownloadIcon />}
 							variant="outline"
@@ -456,7 +465,12 @@ export default function CreateQuotePage() {
 				</Flex>
 			</Box>
 
-			<Box maxW="1400px" mx="auto" px={8} py={8}>
+			<Box
+				maxW="1400px"
+				mx="auto"
+				px={{ base: 3, sm: 4, md: 8 }}
+				py={{ base: 4, md: 8 }}
+			>
 				<Box ref={pdfRef}>
 					{isSuperAdmin && (
 						<Box
@@ -514,8 +528,18 @@ export default function CreateQuotePage() {
 						boxShadow="0 8px 32px rgba(15,23,42,0.3)"
 						border="1px solid rgba(255,255,255,0.07)"
 					>
-						<Flex align="center" justify="space-between" flexWrap="wrap" gap={4}>
-							<HStack spacing={6} flex={1}>
+						<Flex
+							direction={{ base: "column", lg: "row" }}
+							align={{ base: "stretch", lg: "center" }}
+							justify="space-between"
+							gap={4}
+						>
+							<Flex
+								direction={{ base: "column", md: "row" }}
+								gap={4}
+								flex={1}
+								w="full"
+							>
 								<Box>
 									<Text
 										fontSize="11px"
@@ -571,7 +595,7 @@ export default function CreateQuotePage() {
 										borderRadius="lg"
 									/>
 								</Box>
-								<Box w="130px">
+								<Box w={{ base: "full", md: "130px" }}>
 									<Text
 										fontSize="11px"
 										color="whiteAlpha.500"
@@ -587,6 +611,7 @@ export default function CreateQuotePage() {
 										onChange={(e) =>
 											setMeta((p) => ({ ...p, engineCode: e.target.value.toUpperCase() }))
 										}
+										w={{ base: "full", md: "120px" }}
 										placeholder="D5244T"
 										size="sm"
 										bg="whiteAlpha.100"
@@ -600,13 +625,13 @@ export default function CreateQuotePage() {
 										borderRadius="lg"
 									/>
 								</Box>
-							</HStack>
+							</Flex>
 							<UKPlate vrm={meta.vrm} />
 						</Flex>
 					</Box>
 
 					{/* ── Customer + Quote side by side ── */}
-					<SimpleGrid columns={{ base: 1, lg: 3 }} spacing={6} mb={6}>
+					<SimpleGrid columns={{ base: 1, md: 2, xl: 3 }} spacing={6} mb={6}>
 						{/* Customer card */}
 						<Box
 							bg="white"
@@ -664,7 +689,7 @@ export default function CreateQuotePage() {
 											let val = e.target.value.replace(/[^\d+]/g, "");
 											if (val.startsWith("0")) val = "+44" + val.substring(1);
 											if (val.length > 0 && !val.startsWith("+")) val = "+44" + val;
-											
+
 											let formatted = val;
 											if (val.startsWith("+44")) {
 												let rest = val.substring(3);
@@ -822,8 +847,8 @@ export default function CreateQuotePage() {
 								value={notes}
 								onChange={(e) => setNotes(e.target.value)}
 								placeholder="Additional notes, terms, or special conditions for this quotation..."
-								h="calc(100% - 48px)"
-								minH="160px"
+								h={{ base: "180px", md: "calc(100% - 48px)" }}
+								minH="180px"
 								borderRadius="xl"
 								borderColor="gray.200"
 								fontSize="13px"
@@ -836,6 +861,7 @@ export default function CreateQuotePage() {
 					{/* ── Line Items Card ── */}
 					<Box
 						bg="white"
+						overflowX="auto"
 						borderRadius="2xl"
 						boxShadow="0 4px 20px rgba(0,0,0,0.06)"
 						border="1px solid"
@@ -976,8 +1002,16 @@ export default function CreateQuotePage() {
 					</Box>
 
 					{/* ── Action Row ── */}
-					<Flex justify="flex-end" gap={3}>
+					<Flex
+						direction={{ base: "column", sm: "row" }}
+						justify={{ base: "stretch", md: "flex-end" }}
+						align="center"
+						gap={3}
+						wrap="wrap"
+					>
 						<Button
+							w={{ base: "full", sm: "auto" }}
+							minW={{ md: "130px" }}
 							variant="outline"
 							borderColor="gray.300"
 							color="gray.600"
@@ -990,6 +1024,8 @@ export default function CreateQuotePage() {
 							Cancel
 						</Button>
 						<Button
+							w={{ base: "full", sm: "auto" }}
+							minW={{ md: "170px" }}
 							leftIcon={<DownloadIcon />}
 							variant="outline"
 							borderColor={DARK}
@@ -1006,6 +1042,8 @@ export default function CreateQuotePage() {
 							Download PDF
 						</Button>
 						<Button
+							w={{ base: "full", sm: "auto" }}
+							minW={{ md: "170px" }}
 							leftIcon={<Icon as={Send} size={16} />}
 							bg={RED}
 							color="white"
@@ -1027,6 +1065,7 @@ export default function CreateQuotePage() {
 						>
 							Send Quote
 						</Button>
+
 					</Flex>
 				</Box>
 			</Box>
