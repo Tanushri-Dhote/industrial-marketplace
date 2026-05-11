@@ -106,21 +106,41 @@ export default function BlogPage() {
 						</Text>
 
 						{/* Category Filter Pills */}
-						<HStack spacing={4} pt={6} overflowX="auto" w="full" justify="center">
+						<HStack
+							spacing={3}
+							pt={6}
+							overflowX="auto"
+							w="full"
+							px={2}
+							justify={{ base: "flex-start", md: "center" }}
+							flexWrap="nowrap"
+							css={{
+								scrollbarWidth: "none",
+								msOverflowStyle: "none",
+							}}
+							sx={{
+								"&::-webkit-scrollbar": {
+									display: "none",
+								},
+							}}
+						>
 							<Button
 								size="sm"
 								borderRadius="full"
+								flexShrink={0}
 								variant={!selectedCategory ? "solid" : "outline"}
 								colorScheme={!selectedCategory ? "red" : "whiteAlpha"}
 								onClick={() => setSelectedCategory(null)}
 							>
 								All Articles
 							</Button>
+
 							{categories.map((cat) => (
 								<Button
 									key={cat}
 									size="sm"
 									borderRadius="full"
+									flexShrink={0}
 									variant={selectedCategory === cat ? "solid" : "outline"}
 									colorScheme={selectedCategory === cat ? "red" : "whiteAlpha"}
 									onClick={() => setSelectedCategory(cat)}
