@@ -140,25 +140,31 @@ export default function Header() {
         color="white"
         py={2}
         overflow="hidden"
-        maxH={!scrolled ? "50px" : "0px"}
+        maxH={!scrolled ? { base: "80px", sm: "50px" } : "0px"}
         opacity={!scrolled ? 1 : 0}
         transform={!scrolled ? "translateY(0)" : "translateY(-10px)"}
         transition="all 0.35s ease"
         pointerEvents={!scrolled ? "auto" : "none"}
       >
-        <Container maxW="container.xl" px={{ base: 4, md: 6 }}>
-          <Flex justify="space-between" align="center" fontSize="12px">
-            <HStack spacing={4}>
-              <HStack spacing={2}>
-                <FaPhone size="12px" />
+        <Container maxW="container.xl" px={{ base: 2, md: 6 }}>
+          <Flex 
+            justify={{ base: "center", md: "space-between" }} 
+            align="center" 
+            fontSize={{ base: "10px", sm: "12px" }}
+            direction={{ base: "column", sm: "row" }}
+            gap={{ base: 1, sm: 0 }}
+          >
+            <HStack spacing={{ base: 2, sm: 4 }} wrap="wrap" justify="center">
+              <HStack spacing={1.5}>
+                <FaPhone size="10px" />
                 <Text>+44 20 8133 4040</Text>
               </HStack>
-              <HStack spacing={2}>
-                <FaEnvelope size="12px" />
+              <HStack spacing={1.5}>
+                <FaEnvelope size="10px" />
                 <Text>info@allengine4you.co.uk</Text>
               </HStack>
             </HStack>
-            <HStack spacing={3}>
+            <HStack spacing={3} display={{ base: "none", md: "flex" }}>
               <IconButton
                 icon={<FaFacebookF />}
                 variant="ghost"
