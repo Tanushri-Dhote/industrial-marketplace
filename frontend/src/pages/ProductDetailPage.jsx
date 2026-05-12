@@ -477,7 +477,12 @@ export default function ProductDetailPage() {
 										<CardBody>
 											<VStack align="stretch" spacing={3}>
 												<Flex justify="space-between">
-													<Text fontWeight="600">Engine Price</Text>
+													<Text fontWeight="600">
+														<Text as="span" fontSize="11px" color="gray.500">
+															Starting From
+														</Text>{" "}
+														Engine Price
+													</Text>
 													<Text fontWeight="700">£{itemPrice.toLocaleString()}</Text>
 												</Flex>
 												<Flex justify="space-between">
@@ -485,10 +490,10 @@ export default function ProductDetailPage() {
 													<Text fontWeight="700">£{deliveryPrice.toLocaleString()}</Text>
 												</Flex>
 												<Divider />
-												<Flex justify="space-between">
+												{/* <Flex justify="space-between">
 													<Text fontWeight="600">Subtotal</Text>
 													<Text fontWeight="700">£{(itemPrice + deliveryPrice).toLocaleString()}</Text>
-												</Flex>
+												</Flex> */}
 											</VStack>
 										</CardBody>
 									</Card>
@@ -500,10 +505,10 @@ export default function ProductDetailPage() {
 													<Text fontWeight="700">£{vatAmount.toLocaleString()}</Text>
 												</Flex>
 												<Divider borderColor="#D9040420" />
-												<Flex justify="space-between">
+												{/* <Flex justify="space-between">
 													<Text fontWeight="800" fontSize="lg">Total</Text>
 													<Text fontWeight="800" fontSize="2xl" color="#D90404">£{totalAmount.toLocaleString()}</Text>
-												</Flex>
+												</Flex> */}
 											</VStack>
 										</CardBody>
 									</Card>
@@ -537,7 +542,7 @@ export default function ProductDetailPage() {
 												Get Custom Quote
 											</Button> */}
 
-											<Button
+											{/* <Button
 												onClick={handleBuyItNow}
 												variant="outline"
 												borderColor="#D90404"
@@ -549,7 +554,7 @@ export default function ProductDetailPage() {
 												_hover={{ bg: "#D90404", color: "white", borderColor: "#D90404" }}
 											>
 												Buy It Now
-											</Button>
+											</Button> */}
 
 											{/* <Button
 												variant="ghost"
@@ -568,6 +573,8 @@ export default function ProductDetailPage() {
 												variant="ghost"
 												h="50px"
 												w="full"
+												borderColor="#D90404"
+												color="#D90404"
 												borderRadius="xl"
 												fontWeight="600"
 												leftIcon={<FaPhoneAlt />}
@@ -584,7 +591,7 @@ export default function ProductDetailPage() {
 													})
 												}
 											>
-												Call Seller
+												Buy It Now
 											</Button>
 										</VStack>
 									</CardBody>
