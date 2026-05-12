@@ -199,7 +199,7 @@ export default function Footer() {
                 h="100px"
               >
                 <img
-                  src="logo_engine.png"
+                  src="/logo_engine.png"
                   alt="All Engines Logo"
                   style={{
                     height: "100%",
