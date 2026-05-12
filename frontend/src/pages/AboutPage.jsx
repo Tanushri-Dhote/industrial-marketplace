@@ -78,8 +78,8 @@ export default function AboutPage() {
   return (
     <>
       <Helmet>
-        <title>About  All Engine 4 You - UK's First Engine Price Comparison</title>
-        <meta name="description" content="UK's first price comparison website focused on comparing used and reconditioned engines. Get free quotes from trusted suppliers and save money on car parts." />
+        <title>About  Re-Conditioned Engine - UK's First Engine Price Comparison</title>
+        <meta name="description" content="UK's first price comparison website focused on quote service used and reconditioned engines. Get free quotes from trusted suppliers and save money on car parts." />
       </Helmet>
 
       {/* Hero Section */}
@@ -92,10 +92,10 @@ export default function AboutPage() {
                   UK's First Price Comparison
                 </Badge>
                 <Heading fontSize="36px" lineHeight="1.2">
-                  About  All Engine 4 You
+                  About  Re-Conditioned Engine
                 </Heading>
                 <Text fontSize="16px" opacity={0.9} lineHeight="1.6">
-                  We are UK's first price comparison website that is focused on comparing used
+                  We are UK's first price comparison website that is focused on quote service used
                   and reconditioned engines and ancillaries. Once you enter your reg number,
                   we check our database and give you the cheapest online quotes in just a few clicks.
                 </Text>
@@ -118,7 +118,7 @@ export default function AboutPage() {
                 p={8}
                 textAlign="center">
                 <Icon as={MdCompareArrows} boxSize={16} color="white" mb={3} />
-                <Text fontSize="20px" fontWeight="bold">Compare & Save</Text>
+                <Text fontSize="20px" fontWeight="bold">Quote & Save</Text>
                 <Text fontSize="14px" mt={2}>Get the best deals on car engines</Text>
               </Box>
             </GridItem>
@@ -127,19 +127,19 @@ export default function AboutPage() {
       </Box>
 
       <Container maxW="container.xl" py={8}>
-        {/* How  All Engine 4 You Helps */}
+        {/* How  Re-Conditioned Engine Helps */}
         <Box mb={16}>
           <VStack spacing={3} mb={8} textAlign="center">
             <Badge bg="orange.100" color={accentColor} px={3} py={1} borderRadius="full" fontSize="12px">
               Save Money
             </Badge>
-            <Heading fontSize="28px">How can  All Engine 4 You help me save on my car parts price comparison?</Heading>
+            <Heading fontSize="28px">How can  Re-Conditioned Engine help me save on my car parts price comparison?</Heading>
             <Text fontSize="16px" color="gray.600" maxW="3xl" lineHeight="1.6">
               Get multiple quotes from carefully vetted suppliers and get your engines and ancillaries
-              within no time. Choose  All Engine 4 You as we only have trusted suppliers who don't compromise
+              within no time. Choose  Re-Conditioned Engine as we only have trusted suppliers who don't compromise
               on quality. We offer an unbeatable engine and ancillaries price comparison service where
-              you pay the cheapest price. Get free online quotes in a few clicks. Compare prices and
-              buy with confidence with  All Engine 4 You.
+              you pay the cheapest price. Get free online quotes in a few clicks.
+               {/* Compare prices and buy with confidence with  Re-Conditioned Engine. */}
             </Text>
           </VStack>
         </Box>
@@ -152,7 +152,7 @@ export default function AboutPage() {
             </Badge>
             <Heading fontSize="28px">How we work?</Heading>
             <Text fontSize="16px" color="gray.600" maxW="2xl">
-              Being the UK's first quality engine price comparison website, we always focus on comparing
+              Being the UK's first quality engine price comparison website, we always focus on quote service
               reconditioned, rebuilt and used engine prices for you. In just a matter of minutes or less
               you get the best deal from trusted engine suppliers.
             </Text>
@@ -189,7 +189,7 @@ export default function AboutPage() {
                 mb={4}>
                 <Icon as={MdCompareArrows} boxSize={6} color={accentColor} />
               </Box>
-              <Heading fontSize="18px" mb={2}>Compare Quotes</Heading>
+              <Heading fontSize="18px" mb={2}>Quotes service</Heading>
               <Text fontSize="14px" color="gray.600">Get multiple quotes from trusted suppliers</Text>
             </Box>
 
@@ -267,14 +267,14 @@ export default function AboutPage() {
                 <Badge bg="orange.100" color={accentColor} px={3} py={1} borderRadius="full" fontSize="12px" width="fit-content">
                   Save Time, Save Money
                 </Badge>
-                <Heading fontSize="28px">Why Choose  All Engine 4 You?</Heading>
+                <Heading fontSize="28px">Why Choose  Re-Conditioned Engine?</Heading>
                 <Text fontSize="16px" lineHeight="1.6">
                   We always focus on attracting customers by offering an exclusive engine comparison
-                  service at  All Engine 4 You. Our engine enquiry form is simple and highly responsive.
+                  service at  Re-Conditioned Engine. Our engine enquiry form is simple and highly responsive.
                   We do not waste your time. In fact, we often provide quotes within a minute.
                 </Text>
                 <Text fontSize="16px" lineHeight="1.6">
-                  All Engine 4 You is famous all across the UK because our engine suppliers always offer
+                  Re-Conditioned Engine is famous all across the UK because our engine suppliers always offer
                   the cheapest rates for all types of engines. You will get a range of options such
                   as supply, reconditioned, new engine, fitting, recovery and delivery.
                 </Text>
@@ -337,7 +337,7 @@ export default function AboutPage() {
           </SimpleGrid>
         </Box>
 
-        {/* Why  All Engine 4 You is the best */}
+        {/* Why  Re-Conditioned Engine is the best */}
         <Box mb={16}>
           <Box
             bg="linear-gradient(135deg, #0F172A 0%, #1E2A45 100%)"
@@ -347,9 +347,9 @@ export default function AboutPage() {
             textAlign="center">
             <VStack spacing={4}>
               <Icon as={FaHandshake} boxSize={12} color={accentColor} />
-              <Heading fontSize="28px">Why  All Engine 4 You is the best?</Heading>
+              <Heading fontSize="28px">Why  Re-Conditioned Engine is the best?</Heading>
               <Text fontSize="16px" maxW="3xl" lineHeight="1.6">
-                All Engine 4 You is the name of Trust. We are the first engine price comparison site in UK
+                Re-Conditioned Engine is the name of Trust. We are the first engine price comparison site in UK
                 that helps you find quality reconditioned and used engines from our verified and trusted
                 engine suppliers. With our devotion to work and years of experience, we have optimized
                 the formula to give the best engine price comparisons to our customers. Simply by sitting

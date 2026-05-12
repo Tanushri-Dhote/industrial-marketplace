@@ -158,7 +158,7 @@ export default function LoginPage() {
 						<HStack spacing={3} justify="center">
 							<Box h="50px">
 								<img
-									src="/logo_engine.PNG"
+									src="/logo.png"
 									alt="All Engines Logo"
 									style={{
 										height: "100%",
@@ -292,20 +292,20 @@ export default function LoginPage() {
 					<HStack spacing={3} justify="center">
 						<Box h="50px">
 							<img
-								src="/logo_engine.png"
-								alt="All Engines Logo"
+								src="/logo.png"
+								alt="Logo"
 								style={{
 									height: "100%",
 									objectFit: "contain",
 								}}
 							/>
 						</Box>
-						<Heading as="h1" fontSize="24px" fontWeight="800" letterSpacing="-0.5px" color="white">
+						{/* <Heading as="h1" fontSize="24px" fontWeight="800" letterSpacing="-0.5px" color="white">
 							All Engine
 							<Text as="span" color={accentColor} ml={1}>
 								4 You
 							</Text>
-						</Heading>
+						</Heading> */}
 					</HStack>
 					<Text color="whiteAlpha.800" fontSize="11px" fontWeight="500" letterSpacing="1px" mt={1}>
 						Rebuilt • Repair • Replacement • Reconditioned

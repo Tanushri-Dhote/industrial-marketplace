@@ -45,8 +45,8 @@ export default function TermsPage() {
   return (
     <>
       <Helmet>
-        <title>Terms & Conditions - All Engine 4 You</title>
-        <meta name="description" content="Read our Terms and Conditions to understand the rules and guidelines for using All Engine 4 You engine price comparison platform." />
+        <title>Terms & Conditions - Re-Conditioned Engine</title>
+        <meta name="description" content="Read our Terms and Conditions to understand the rules and guidelines for using Re-Conditioned Engine engine price comparison platform." />
       </Helmet>
 
       {/* Hero Section - Same style as Privacy Page */}
@@ -68,7 +68,7 @@ export default function TermsPage() {
               Terms &amp; Conditions
             </Heading>
             <Text fontSize="16px" maxW="2xl" opacity={0.9}>
-              Please read these terms carefully before using All Engine 4 You
+              Please read these terms carefully before using Re-Conditioned Engine
             </Text>
             <Text fontSize="14px" opacity={0.7}>Last updated: April 17, 2026</Text>
           </VStack>
@@ -121,14 +121,14 @@ export default function TermsPage() {
 
                     {section.id === 1 && (
                       <Text>
-                        By accessing or using All Engine 4 You, you agree to be bound by these Terms and Conditions. 
+                        By accessing or using Re-Conditioned Engine, you agree to be bound by these Terms and Conditions. 
                         If you do not agree, please do not use our website.
                       </Text>
                     )}
 
                     {section.id === 2 && (
                       <VStack align="stretch" spacing={3}>
-                        <Text><strong>“We”, “Us”, “Our”</strong> – refers to All Engine 4 You.</Text>
+                        <Text><strong>“We”, “Us”, “Our”</strong> – refers to Re-Conditioned Engine.</Text>
                         <Text><strong>“You”, “Your”</strong> – refers to the user of this website.</Text>
                         <Text><strong>“Website”</strong> – means www.allengine4you.com and all its pages.</Text>
                         <Text><strong>“Provider”</strong> – means third-party suppliers offering engines and parts.</Text>
@@ -165,7 +165,7 @@ export default function TermsPage() {
 
                     {section.id === 6 && (
                       <Text>
-                        All Engine 4 You is a price comparison service. We help you compare prices from different sellers. 
+                        Re-Conditioned Engine is a price comparison service. We help you compare prices from different sellers. 
                         We do not handle payments, delivery, or any financial transactions. All purchases are made directly with the supplier.
                       </Text>
                     )}
@@ -185,14 +185,14 @@ export default function TermsPage() {
 
                     {section.id === 9 && (
                       <Text>
-                        All content, logos, images, and materials on this website are the intellectual property of All Engine 4 You or its licensors. 
+                        All content, logos, images, and materials on this website are the intellectual property of Re-Conditioned Engine or its licensors. 
                         You may not copy, reproduce, or use them without written permission.
                       </Text>
                     )}
 
                     {section.id === 10 && (
                       <Text>
-                        All Engine 4 You shall not be liable for any loss, damage, fraud, or disputes arising from transactions between you and any third-party supplier.
+                        Re-Conditioned Engine shall not be liable for any loss, damage, fraud, or disputes arising from transactions between you and any third-party supplier.
                       </Text>
                     )}
 
@@ -233,7 +233,7 @@ export default function TermsPage() {
           >
             <VStack spacing={4}>
               <Icon as={FaShieldAlt} boxSize={10} color={accentColor} />
-              <Heading fontSize="22px">By using All Engine 4 You, you agree to these Terms &amp; Conditions</Heading>
+              <Heading fontSize="22px">By using Re-Conditioned Engine, you agree to these Terms &amp; Conditions</Heading>
               <Text fontSize="14px" opacity={0.8}>
                 If you have any questions, please contact us at{' '}
                 <Text as="span" color={accentColor} fontWeight="600">

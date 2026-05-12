@@ -3,7 +3,7 @@ import { Box, HStack, Text, Icon } from '@chakra-ui/react';
 import { FaCheckCircle } from 'react-icons/fa';
 
 const trustItems = [
-  "Compare Free Quotes",
+  // "Compare Free Quotes",
   "24/7 Delivery and Collection",
   "Get engine delivered or fitted locally",
   "Satisfaction Guaranteed",
