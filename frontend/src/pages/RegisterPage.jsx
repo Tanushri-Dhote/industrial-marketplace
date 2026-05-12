@@ -134,7 +134,7 @@ export default function RegisterPage() {
               h="50px"
             >
               <img
-                src="/logo_engine.PNG"
+                src="/logo_engine.png"
                 alt="All Engines Logo"
                 style={{
                   height: "100%",

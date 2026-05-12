@@ -292,7 +292,7 @@ export default function LoginPage() {
 					<HStack spacing={3} justify="center">
 						<Box h="50px">
 							<img
-								src="/logo_engine.PNG"
+								src="/logo_engine.png"
 								alt="All Engines Logo"
 								style={{
 									height: "100%",
