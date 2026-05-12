@@ -108,7 +108,7 @@ export default function FAQSection() {
             </Text>
             
             <Heading 
-              fontSize={{ base: "24px", md: "30px" }} 
+              fontSize={{ base: "22px", md: "30px" }} 
               fontWeight="800" 
               color="gray.800"
               lineHeight="1.3"
@@ -168,7 +168,7 @@ export default function FAQSection() {
                           >
                             {index + 1}
                           </Box>
-                          <Text fontSize="14px" fontWeight="600" color="gray.800" lineHeight="1.4">
+                          <Text fontSize={{ base: "13px", md: "14px" }} fontWeight="600" color="gray.800" lineHeight="1.4">
                             {faq.question}
                           </Text>
                         </Flex>
@@ -187,7 +187,7 @@ export default function FAQSection() {
                     <AccordionPanel pb={3.5} px={4} pt={3}>
                       <Flex gap={2}>
                         <Icon as={FaChevronRight} color={accentColor} mt={0.5} boxSize="10px" />
-                        <Text fontSize="13px" color="gray.600" lineHeight="1.6">
+                        <Text fontSize={{ base: "12px", md: "13px" }} color="gray.600" lineHeight="1.6">
                           {faq.answer}
                         </Text>
                       </Flex>

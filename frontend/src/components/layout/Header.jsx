@@ -200,8 +200,8 @@ export default function Header() {
             <Link to="/">
               <HStack spacing={2}>
                 <Box
-                  h={scrolled ? "55px" : "70px"}
-                  w={scrolled ? "150px" : "180px"}
+                  h={{ base: scrolled ? "45px" : "55px", md: scrolled ? "55px" : "70px" }}
+                  w={{ base: scrolled ? "120px" : "140px", md: scrolled ? "150px" : "180px" }}
                   transition="all 0.3s ease"
                   bg="#001F3F"
                   borderRadius="2xl"
@@ -213,8 +213,8 @@ export default function Header() {
                     src="/logo_engine.png"
                     alt="All Engines Logo"
                     style={{
-                      width: "100%",
-                      height: "100%",
+                      width: "90%",
+                      height: "90%",
                       objectFit: "contain",
                       display: "block",
                     }}
@@ -223,17 +223,13 @@ export default function Header() {
               </HStack>
             </Link>
 
-            {/* Navigation Links - Desktop (Hidden when scrolled) */}
+            {/* Navigation Links - Desktop */}
             <HStack
               spacing={6}
-              display={{ base: 'none', lg: scrolled ? 'none' : 'flex' }}
+              display={{ base: 'none', lg: 'flex' }}
               fontSize="14px"
               fontWeight="500"
-              opacity={!scrolled ? 1 : 0}
-              visibility={!scrolled ? "visible" : "hidden"}
-              transform={!scrolled ? "translateY(0)" : "translateY(-8px)"}
               transition="all 0.25s ease"
-              pointerEvents={!scrolled ? "auto" : "none"}
             >
               {navItems.map((item) => {
                 const isActive = location.pathname === item.path;

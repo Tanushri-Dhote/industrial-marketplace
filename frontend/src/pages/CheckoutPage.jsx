@@ -133,12 +133,18 @@ export default function CheckoutPage() {
 		<Box bg="linear-gradient(135deg, #F8FAFC 0%, #F1F5F9 100%)" minH="100vh" py={8}>
 			<Container maxW="container.xl">
 				{/* Header */}
-				<Flex justify="space-between" align="center" mb={6} wrap="wrap" gap={4}>
+				<Flex 
+					direction={{ base: "column", sm: "row" }}
+					justify="space-between" 
+					align={{ base: "flex-start", sm: "center" }} 
+					mb={6} 
+					gap={4}
+				>
 					<Flex align="center" gap={3}>
 						<Box bg="#D90404" p={2} borderRadius="xl">
 							<Icon as={FaShoppingCart} color="white" boxSize={5} />
 						</Box>
-						<Heading size="lg" fontWeight="800">
+						<Heading size={{ base: "md", md: "lg" }} fontWeight="800">
 							Checkout
 						</Heading>
 					</Flex>
@@ -146,13 +152,14 @@ export default function CheckoutPage() {
 					<Badge 
 						bg="#D90404" 
 						color="white" 
-						fontSize="14px" 
+						fontSize={{ base: "12px", md: "14px" }} 
 						px={4} 
-		py={2} 
+						py={2} 
 						borderRadius="full"
 						display="flex"
 						alignItems="center"
 						gap={2}
+						w="fit-content"
 					>
 						<Icon as={FaShoppingCart} />
 						{cartItemCount} {cartItemCount === 1 ? "Item" : "Items"} in Cart
@@ -170,7 +177,93 @@ export default function CheckoutPage() {
 								</Text>
 							</Box>
 							
-							<Box overflowX="auto">
+							{/* Mobile List View */}
+							<Box display={{ base: "block", md: "none" }} p={4}>
+								<VStack spacing={4} align="stretch">
+									{cart.map((item) => {
+										const price = Number(item.price || 0);
+										const lineTotal = price * Number(item.qty || 0);
+										return (
+											<Box 
+												key={item._id} 
+												p={4} 
+												border="1px solid" 
+												borderColor="gray.100" 
+												borderRadius="xl"
+												bg="gray.50"
+											>
+												<Flex justify="space-between" align="start" mb={3}>
+													<VStack align="start" spacing={1} flex="1">
+														<Text fontSize="sm" fontWeight="700" noOfLines={2}>
+															{item.name}
+														</Text>
+														<Text fontSize="xs" color="gray.500">
+															{item.make} {item.model} {item.year}
+														</Text>
+													</VStack>
+													<IconButton
+														icon={<FaTrash />}
+														size="sm"
+														variant="ghost"
+														color="red.500"
+														onClick={() => removeFromCart(item._id)}
+														aria-label="Remove"
+													/>
+												</Flex>
+												
+												<Divider mb={3} />
+												
+												<Flex justify="space-between" align="center">
+													<VStack align="start" spacing={0}>
+														<Text fontSize="xs" color="gray.500">Price</Text>
+														<Text fontSize="sm" fontWeight="600">£{price.toLocaleString("en-GB")}</Text>
+													</VStack>
+													
+													<HStack spacing={2} bg="white" p={1} borderRadius="lg" border="1px solid" borderColor="gray.200">
+														<IconButton
+															icon={<FaMinus />}
+															size="xs"
+															variant="ghost"
+															onClick={() => updateQuantity(item._id, -1)}
+															aria-label="Decrease"
+														/>
+														<Text minW="20px" textAlign="center" fontSize="sm" fontWeight="700">
+															{item.qty}
+														</Text>
+														<IconButton
+															icon={<FaPlus />}
+															size="xs"
+															variant="ghost"
+															onClick={() => updateQuantity(item._id, 1)}
+															aria-label="Increase"
+														/>
+													</HStack>
+													
+													<VStack align="end" spacing={0}>
+														<Text fontSize="xs" color="gray.500">Total</Text>
+														<Text fontSize="md" fontWeight="800" color="#D90404">£{lineTotal.toLocaleString("en-GB")}</Text>
+													</VStack>
+												</Flex>
+											</Box>
+										);
+									})}
+									
+									<Box p={4} bg="#D9040405" borderRadius="xl" border="1px dashed" borderColor="#D9040430">
+										<Flex justify="space-between" align="center">
+											<VStack align="start" spacing={0}>
+												<Text fontWeight="800" fontSize="md">Total Amount</Text>
+												<Text fontSize="xs" color="gray.500">Excluding VAT</Text>
+											</VStack>
+											<Text fontWeight="900" fontSize="2xl" color="#D90404">
+												£{total?.toLocaleString()}
+											</Text>
+										</Flex>
+									</Box>
+								</VStack>
+							</Box>
+
+							{/* Desktop Table View */}
+							<Box display={{ base: "none", md: "block" }} overflowX="auto">
 								<Table variant="simple" size="md">
 									<Thead bg="gray.50">
 										<Tr>
@@ -263,37 +356,40 @@ export default function CheckoutPage() {
 											<Text fontWeight="700" fontSize="16px">Service Type</Text>
 										</Flex>
 										<Wrap spacing={3}>
-											<WrapItem>
+											<WrapItem flex={{ base: "1", sm: "auto" }}>
 												<Button
 													variant={serviceType === "supply_fitted" ? "solid" : "outline"}
 													bg={serviceType === "supply_fitted" ? "#D90404" : "transparent"}
 													color={serviceType === "supply_fitted" ? "white" : "#D90404"}
 													borderColor="#D90404"
-													size="sm"
+													size={{ base: "sm", md: "md" }}
+													w="full"
 													onClick={() => setServiceType("supply_fitted")}
 												>
 													Supplied & Fitted
 												</Button>
 											</WrapItem>
-											<WrapItem>
+											<WrapItem flex={{ base: "1", sm: "auto" }}>
 												<Button
 													variant={serviceType === "supply_only" ? "solid" : "outline"}
 													bg={serviceType === "supply_only" ? "#D90404" : "transparent"}
 													color={serviceType === "supply_only" ? "white" : "#D90404"}
 													borderColor="#D90404"
-													size="sm"
+													size={{ base: "sm", md: "md" }}
+													w="full"
 													onClick={() => setServiceType("supply_only")}
 												>
 													Supply Only
 												</Button>
 											</WrapItem>
-											<WrapItem>
+											<WrapItem flex={{ base: "1", sm: "auto" }}>
 												<Button
 													variant={serviceType === "both" ? "solid" : "outline"}
 													bg={serviceType === "both" ? "#D90404" : "transparent"}
 													color={serviceType === "both" ? "white" : "#D90404"}
 													borderColor="#D90404"
-													size="sm"
+													size={{ base: "sm", md: "md" }}
+													w="full"
 													onClick={() => setServiceType("both")}
 												>
 													Will consider both
@@ -311,13 +407,14 @@ export default function CheckoutPage() {
 										</Flex>
 										<Wrap spacing={3}>
 											{["reconditioned", "used", "new", "all"].map((cond) => (
-												<WrapItem key={cond}>
+												<WrapItem key={cond} flex={{ base: "1", sm: "auto" }}>
 													<Button
 														variant={condition === cond ? "solid" : "outline"}
 														bg={condition === cond ? "#D90404" : "transparent"}
 														color={condition === cond ? "white" : "#D90404"}
 														borderColor="#D90404"
-														size="sm"
+														size={{ base: "sm", md: "md" }}
+														w="full"
 														onClick={() => setCondition(cond)}
 														textTransform="capitalize"
 													>

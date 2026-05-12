@@ -296,16 +296,16 @@ export default function HeroSection({ category }) {
 						<MotionBox variants={fadeInUp}>
 							<Heading
 								color="white"
-								fontSize={{ base: "36px", md: "52px", lg: "64px" }}
+								fontSize={{ base: "32px", md: "48px", lg: "64px" }}
 								fontWeight="900"
-								lineHeight="1.1"
+								lineHeight={{ base: "1.2", md: "1.1" }}
 							>
 								{isCategoryPage ? `Find ${category} for Sale` : "Engine Replacement Made Easy."}
 							</Heading>
 						</MotionBox>
 
 						<MotionBox variants={fadeInUp}>
-							<Text color="whiteAlpha.800" fontSize={{ base: "lg", md: "xl" }} maxW="600px">
+							<Text color="whiteAlpha.800" fontSize={{ base: "16px", md: "20px" }} maxW="600px">
 								Compare quotes from 200+ verified reconditioners and breakers across the UK. Save up
 								to 50% on used & reconditioned engines.
 							</Text>
@@ -337,8 +337,8 @@ export default function HeroSection({ category }) {
 					<MotionBox
 						bg="rgba(15, 23, 42, 0.85)"
 						backdropFilter="blur(20px)"
-						p={{ base: 6, md: 8 }}
-						borderRadius="3xl"
+						p={{ base: 5, md: 8 }}
+						borderRadius={{ base: "2xl", md: "3xl" }}
 						boxShadow="2xl"
 						w="full"
 						maxW="480px"
@@ -386,7 +386,7 @@ export default function HeroSection({ category }) {
 											bg={GOLD}
 											borderRadius="xl"
 											overflow="hidden"
-											h="64px"
+											h={{ base: "56px", md: "64px" }}
 											align="stretch"
 											border="3px solid"
 											borderColor={GOLD}
@@ -443,10 +443,10 @@ export default function HeroSection({ category }) {
 
 									<Button
 										w="full"
-										h="64px"
+										h={{ base: "56px", md: "64px" }}
 										bg={RED}
 										color="white"
-										fontSize="18px"
+										fontSize={{ base: "16px", md: "18px" }}
 										fontWeight="900"
 										borderRadius="xl"
 										onClick={handleVRMSubmit}

@@ -193,10 +193,10 @@ export default function Footer() {
         <SimpleGrid columns={{ base: 1, sm: 2, md: 3, lg: 4 }} spacing={10}>
 
           {/* Brand Section */}
-          <Stack spacing={5}>
+          <Stack spacing={5} align={{ base: "center", sm: "start" }} textAlign={{ base: "center", sm: "left" }}>
             <HStack spacing={3}>
               <Box
-                h="100px"
+                h={{ base: "80px", md: "100px" }}
               >
                 <img
                   src="/logo_engine.png"
@@ -209,18 +209,18 @@ export default function Footer() {
               </Box>
             </HStack>
 
-            <Text fontSize="sm" color="gray.400" lineHeight="1.7">
+            <Text fontSize={{ base: "13px", md: "sm" }} color="gray.400" lineHeight="1.7">
               Your trusted UK marketplace for quality used and reconditioned car engines.
               Fast delivery with supply & fitting service across England, Scotland, Wales & Northern Ireland.
             </Text>
           </Stack>
 
           {/* Company Links */}
-          <Stack spacing={4}>
+          <Stack spacing={4} align={{ base: "center", sm: "start" }}>
             <Heading size="sm" color="white" textTransform="uppercase" letterSpacing="1px">
               Company
             </Heading>
-            <VStack align="start" spacing={2.5}>
+            <VStack align={{ base: "center", sm: "start" }} spacing={2.5}>
               <FooterLink to="/about">About</FooterLink>
               <FooterLink to="/contact">Contact</FooterLink>
               <FooterLink to="/blog">Blog</FooterLink>
@@ -228,37 +228,37 @@ export default function Footer() {
           </Stack>
 
           {/* Legal Links */}
-          <Stack spacing={4}>
+          <Stack spacing={4} align={{ base: "center", sm: "start" }}>
             <Heading size="sm" color="white" textTransform="uppercase" letterSpacing="1px">
               Legal
             </Heading>
-            <VStack align="start" spacing={2.5}>
+            <VStack align={{ base: "center", sm: "start" }} spacing={2.5}>
               <FooterLink to="/privacy-policy">Privacy Policy</FooterLink>
               <FooterLink to="/terms-and-conditions">Terms & Conditions</FooterLink>
             </VStack>
           </Stack>
 
           {/* Contact Info */}
-          <Stack spacing={4}>
+          <Stack spacing={4} align={{ base: "center", sm: "start" }}>
             <Heading size="sm" color="white" textTransform="uppercase" letterSpacing="1px">
               Get In Touch
             </Heading>
-            <VStack align="start" spacing={4}>
+            <VStack align={{ base: "center", sm: "start" }} spacing={4}>
               <HStack spacing={3}>
                 <Icon as={MdLocationOn} color={accentColor} boxSize={5} />
-                <Text fontSize="sm" color="gray.400">38 Fowler Rd, Ilford IG6 3UT, UK</Text>
+                <Text fontSize={{ base: "13px", md: "sm" }} color="gray.400">38 Fowler Rd, Ilford IG6 3UT, UK</Text>
               </HStack>
               <HStack spacing={3}>
                 <Icon as={MdPhone} color={accentColor} boxSize={5} />
-                <Text fontSize="sm" color="gray.400">+44 20 8133 4040</Text>
+                <Text fontSize={{ base: "13px", md: "sm" }} color="gray.400">+44 20 8133 4040</Text>
               </HStack>
               <HStack spacing={3}>
                 <Icon as={MdEmail} color={accentColor} boxSize={5} />
-                <Text fontSize="sm" color="gray.400">info@allengine4you.co.uk</Text>
+                <Text fontSize={{ base: "13px", md: "sm" }} color="gray.400">info@allengine4you.co.uk</Text>
               </HStack>
               <HStack spacing={3}>
                 <Icon as={MdAccessTime} color={accentColor} boxSize={5} />
-                <Text fontSize="sm" color="gray.400">Mon - Sat: 8:00 AM - 6:00 PM</Text>
+                <Text fontSize={{ base: "13px", md: "sm" }} color="gray.400">Mon - Sat: 8:00 AM - 6:00 PM</Text>
               </HStack>
             </VStack>
           </Stack>

@@ -136,7 +136,7 @@ export default function TopEnginesSection({ category }) {
 				<Divider borderColor="gray.100" />
 
 				<Text
-					fontSize={{ base: "31px", md: "28px" }}
+					fontSize={{ base: "24px", md: "28px" }}
 					fontWeight="900"
 					color="gray.900"
 					letterSpacing="-0.02em"
@@ -144,7 +144,7 @@ export default function TopEnginesSection({ category }) {
 				>
 					<Text
 						as="span"
-						fontSize={{ base: "14px", md: "16px" }}
+						fontSize={{ base: "12px", md: "16px" }}
 						fontWeight="600"
 						color="gray.500"
 						mr={2}
@@ -209,7 +209,7 @@ export default function TopEnginesSection({ category }) {
 						</Text>
 
 						<Heading
-							fontSize={{ base: "30px", md: "42px" }}
+							fontSize={{ base: "26px", md: "42px" }}
 							fontWeight="900"
 							color="gray.900"
 							lineHeight="1.1"

@@ -42,11 +42,11 @@ export default function AdminHeader({ user, onLogout }) {
 						<Link to="/">
 							<HStack spacing={3} _hover={{ opacity: 0.8 }} transition="opacity 0.2s">
 								 <Box
-												 h="70px"
-w="180px"
+												 h={{ base: "45px", md: "70px" }}
+												 w={{ base: "120px", md: "180px" }}
 												  transition="all 0.3s ease"
 												  bg="#001F3F"
-												  borderRadius="2xl"
+												  borderRadius={{ base: "xl", md: "2xl" }}
 												  display="flex"
 												  alignItems="center"
 												  justifyContent="center"
@@ -55,8 +55,8 @@ w="180px"
 													src="/logo_engine.png"
 													alt="All Engines Logo"
 													style={{
-													  width: "100%",
-													  height: "100%",
+													  width: "90%",
+													  height: "90%",
 													  objectFit: "contain",
 													  display: "block",
 													}}
@@ -132,7 +132,7 @@ w="180px"
 							</HStack>
 
 							{/* Nav Links with Icons */}
-							<HStack spacing={1} ml={2}>
+							<HStack spacing={{ base: 1, sm: 2 }} ml={{ base: 0, sm: 2 }}>
 								<NavLink
 									icon={FaTachometerAlt}
 									label="Admin"
@@ -172,16 +172,16 @@ function NavLink({ icon, label, to, isHighlight, accentColor, navHover }) {
 				variant={isHighlight ? "solid" : "ghost"}
 				bg={isHighlight ? accentColor : "transparent"}
 				color={isHighlight ? "white" : "inherit"}
-				size="sm"
-				fontSize="13px"
+				size={{ base: "xs", sm: "sm" }}
+				fontSize={{ base: "11px", sm: "13px" }}
 				fontWeight="700"
 				display="flex"
-				gap={2}
+				gap={{ base: 1, sm: 2 }}
 				alignItems="center"
 				borderRadius="lg"
-				px={3}
+				px={{ base: 2, sm: 3 }}
 				py={2}
-				leftIcon={<Icon as={icon} boxSize={4} />}
+				leftIcon={<Icon as={icon} boxSize={{ base: 3, sm: 4 }} />}
 				_hover={{
 					bg: isHighlight ? "#c90303" : navHover,
 					transform: "translateY(-1px)",

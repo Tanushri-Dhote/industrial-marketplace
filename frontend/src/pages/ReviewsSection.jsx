@@ -57,7 +57,7 @@ export default function ReviewsSection() {
             >
               REAL STORIES FROM REAL BUYERS
             </Text>
-            <Heading fontSize="28px" fontWeight="700">What Our Clients Say</Heading>
+            <Heading fontSize={{ base: "24px", md: "28px" }} fontWeight="700">What Our Clients Say</Heading>
           </Box>
 
           {/* Desktop Grid */}
@@ -103,9 +103,9 @@ export default function ReviewsSection() {
 
           {/* Mobile Slider */}
           <Box display={{ base: "block", md: "none" }} maxW="500px" mx="auto">
-            <Box bg="white" p={8} borderRadius="xl" boxShadow="md">
-              <Icon as={FaQuoteLeft} color="#D90404" opacity={0.15} boxSize={10} mb={4} />
-              <Text fontSize="15px" lineHeight="1.7" mb={6}>"{testimonials[currentIndex].text}"</Text>
+            <Box bg="white" p={{ base: 6, md: 8 }} borderRadius="xl" boxShadow="md">
+              <Icon as={FaQuoteLeft} color="#D90404" opacity={0.15} boxSize={{ base: 8, md: 10 }} mb={4} />
+              <Text fontSize={{ base: "14px", md: "15px" }} lineHeight="1.7" mb={6}>"{testimonials[currentIndex].text}"</Text>
 
               <HStack>
                 <Avatar src={testimonials[currentIndex].image} size="md" />

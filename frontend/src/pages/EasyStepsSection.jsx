@@ -74,7 +74,7 @@ export default function EasyStepsSection() {
 						</Text>
 
 						<Heading
-							fontSize={{ base: "30px", md: "42px" }}
+							fontSize={{ base: "26px", md: "42px" }}
 							fontWeight="700"
 							lineHeight="1.2"
 							color={headingColor}
@@ -85,7 +85,7 @@ export default function EasyStepsSection() {
 							</Text>
 						</Heading>
 
-						<Text fontSize={{ base: "16px", md: "18px" }} color={bodyColor} maxW="680px">
+						<Text fontSize={{ base: "14px", md: "18px" }} color={bodyColor} maxW="680px">
 							From searching to delivery — we’ve made buying the right engine faster, transparent,
 							and hassle-free.
 						</Text>
@@ -175,7 +175,7 @@ export default function EasyStepsSection() {
 										</Heading>
 
 										<Heading
-											fontSize="24px"
+											fontSize={{ base: "20px", md: "24px" }}
 											fontWeight="700"
 											color={headingColor}
 											lineHeight="1.25"
@@ -183,7 +183,7 @@ export default function EasyStepsSection() {
 											{step.title}
 										</Heading>
 
-										<Text fontSize="15px" color={bodyColor} lineHeight="1.7">
+										<Text fontSize={{ base: "14px", md: "15px" }} color={bodyColor} lineHeight="1.7">
 											{step.description}
 										</Text>
 									</VStack>
