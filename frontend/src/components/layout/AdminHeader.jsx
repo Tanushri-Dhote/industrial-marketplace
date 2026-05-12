@@ -42,8 +42,8 @@ export default function AdminHeader({ user, onLogout }) {
 						<Link to="/">
 							<HStack spacing={3} _hover={{ opacity: 0.8 }} transition="opacity 0.2s">
 								 <Box
-												  h={scrolled ? "55px" : "70px"}
-												  w={scrolled ? "150px" : "180px"}
+												 h="70px"
+w="180px"
 												  transition="all 0.3s ease"
 												  bg="#001F3F"
 												  borderRadius="2xl"
