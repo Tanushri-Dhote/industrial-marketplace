@@ -41,16 +41,27 @@ export default function AdminHeader({ user, onLogout }) {
 						{/* Left: Logo & Name */}
 						<Link to="/">
 							<HStack spacing={3} _hover={{ opacity: 0.8 }} transition="opacity 0.2s">
-								<Box h="36px">
-									<img
-										src="/logo_engine.PNG"
-										alt="All Engine 4 You Logo"
-										style={{
-											height: "100%",
-											objectFit: "contain",
-										}}
-									/>
-								</Box>
+								 <Box
+												  h={scrolled ? "55px" : "70px"}
+												  w={scrolled ? "150px" : "180px"}
+												  transition="all 0.3s ease"
+												  bg="#001F3F"
+												  borderRadius="2xl"
+												  display="flex"
+												  alignItems="center"
+												  justifyContent="center"
+												>
+												  <img
+													src="/logo_engine.png"
+													alt="All Engines Logo"
+													style={{
+													  width: "100%",
+													  height: "100%",
+													  objectFit: "contain",
+													  display: "block",
+													}}
+												  />
+												</Box>
 								<VStack align="flex-start" spacing={0}>
 									<Text
 										fontSize="16px"
