@@ -161,7 +161,7 @@ export default function Header() {
               </HStack>
               <HStack spacing={1.5}>
                 <FaEnvelope size="10px" />
-                <Text>info@allengine4you.co.uk</Text>
+                <Text>info@reconditionedengine.co.uk</Text>
               </HStack>
             </HStack>
             <HStack spacing={3} display={{ base: "none", md: "flex" }}>
@@ -209,15 +209,15 @@ export default function Header() {
                   h={{ base: scrolled ? "45px" : "55px", md: scrolled ? "55px" : "70px" }}
                   w={{ base: scrolled ? "120px" : "140px", md: scrolled ? "150px" : "180px" }}
                   transition="all 0.3s ease"
-                  bg="#001F3F"
+                  // bg="#001F3F"
                   borderRadius="2xl"
                   display="flex"
                   alignItems="center"
                   justifyContent="center"
                 >
                   <img
-                    src="/logo_engine.png"
-                    alt="All Engines Logo"
+                    src="/logo.png"
+                    alt="Re-Conditioned Engine Logo"
                     style={{
                       width: "90%",
                       height: "90%",

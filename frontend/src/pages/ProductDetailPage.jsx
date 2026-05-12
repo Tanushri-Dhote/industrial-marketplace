@@ -235,9 +235,9 @@ export default function ProductDetailPage() {
 							<BreadcrumbItem>
 								<BreadcrumbLink as={Link} to="/" color="gray.500">Home</BreadcrumbLink>
 							</BreadcrumbItem>
-							<BreadcrumbItem>
+							{/* <BreadcrumbItem>
 								<BreadcrumbLink as={Link} to="/products" color="gray.500">Products</BreadcrumbLink>
-							</BreadcrumbItem>
+							</BreadcrumbItem> */}
 							<BreadcrumbItem isCurrentPage>
 								<BreadcrumbLink color="#D90404" fontWeight="600">{product.name?.substring(0, 30)}...</BreadcrumbLink>
 							</BreadcrumbItem>
@@ -303,7 +303,7 @@ export default function ProductDetailPage() {
 								</Heading>
 
 								<Flex align="baseline" gap={4} wrap="wrap">
-									<VStack align="start" spacing={0}>
+									{/* <VStack align="start" spacing={0}>
 										<Text
 											fontSize="32px"
 											fontWeight="800"
@@ -331,7 +331,7 @@ export default function ProductDetailPage() {
 										>
 											EXCLUSIVE OF VAT
 										</Text>
-									</VStack>
+									</VStack> */}
 									<Divider orientation="vertical" h="40px" />
 									<VStack align="start" spacing={0}>
 										<Text fontSize="10px" color="gray.400" fontWeight="600" textTransform="uppercase">
@@ -469,17 +469,15 @@ export default function ProductDetailPage() {
 
 							{/* Price Breakdown */}
 							<Box bg="gray.50" p={6} borderRadius="2xl">
-								<Heading fontSize="20px" fontWeight="800" mb={6} textAlign="center">
+								{/* <Heading fontSize="20px" fontWeight="800" mb={6} textAlign="center">
 									Pricing Breakdown
-								</Heading>
+								</Heading> */}
 								<SimpleGrid columns={{ base: 1, md: 2 }} gap={6}>
-									<Card variant="outline" borderColor="gray.200">
+									{/* <Card variant="outline" borderColor="gray.200">
 										<CardBody>
 											<VStack align="stretch" spacing={3}>
 												<Flex justify="space-between">
 													<Text fontWeight="600">
-														
-														
 														Engine Price
 													</Text>
 													<Text fontWeight="700">
@@ -493,13 +491,13 @@ export default function ProductDetailPage() {
 													<Text fontWeight="700">£{deliveryPrice.toLocaleString()}</Text>
 												</Flex>
 												<Divider />
-												{/* <Flex justify="space-between">
+												<Flex justify="space-between">
 													<Text fontWeight="600">Subtotal</Text>
 													<Text fontWeight="700">£{(itemPrice + deliveryPrice).toLocaleString()}</Text>
-												</Flex> */}
+												</Flex>
 											</VStack>
 										</CardBody>
-									</Card>
+									</Card> */}
 									<Card bg="#D9040405" borderColor="#D9040420">
 										<CardBody>
 											<VStack align="stretch" spacing={3}>
@@ -526,8 +524,8 @@ export default function ProductDetailPage() {
 							<VStack spacing={5} align="stretch">
 								{/* Main Action Buttons */}
 								<Card shadow="lg" borderRadius="2xl" border="none">
-									<CardBody p={5}>
-										<VStack spacing={3}>
+									<CardBody p={2}>
+										<VStack spacing={2}>
 											{/* <Button
 												bg="#D90404"
 												color="white"
@@ -647,7 +645,7 @@ export default function ProductDetailPage() {
 										🔥 LIMITED TIME OFFER
 									</Text>
 									<Text fontSize="11px" opacity="0.9">
-										30 days left at this price
+										Exclusive savings available today
 									</Text>
 								</Box>
 
@@ -661,10 +659,10 @@ export default function ProductDetailPage() {
 										<Text fontSize="11px" color="gray.500">Delivery</Text>
 										<Text fontSize="11px" fontWeight="600">{product.shipping?.delivery || "3-5 business days"}</Text>
 									</Flex>
-									<Flex justify="space-between">
+									{/* <Flex justify="space-between">
 										<Text fontSize="11px" color="gray.500">Returns</Text>
 										<Text fontSize="11px" fontWeight="700" color="#D90404">30 Day Returns</Text>
-									</Flex>
+									</Flex> */}
 								</VStack>
 							</VStack>
 						</Box>

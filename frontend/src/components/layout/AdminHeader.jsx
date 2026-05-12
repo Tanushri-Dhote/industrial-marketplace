@@ -45,15 +45,15 @@ export default function AdminHeader({ user, onLogout }) {
 												 h={{ base: "45px", md: "70px" }}
 												 w={{ base: "120px", md: "180px" }}
 												  transition="all 0.3s ease"
-												  bg="#001F3F"
+												//   bg="#001F3F"
 												  borderRadius={{ base: "xl", md: "2xl" }}
 												  display="flex"
 												  alignItems="center"
 												  justifyContent="center"
 												>
 												  <img
-													src="/logo_engine.png"
-													alt="All Engines Logo"
+													src="/logo.png"
+													alt="Re-Conditioned Engine Logo"
 													style={{
 													  width: "90%",
 													  height: "90%",

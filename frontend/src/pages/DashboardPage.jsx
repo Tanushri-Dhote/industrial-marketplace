@@ -314,12 +314,23 @@ function Sidebar({ modules, activeModule, onSelect, user, userRole, onLogout }) 
 					<Package color="white" size={20} />
 				</Box>
 				<VStack align="flex-start" spacing={0}>
-					<Text fontSize="15px" fontWeight="900" color="white" lineHeight="1">
+					{/* <Text fontSize="15px" fontWeight="900" color="white" lineHeight="1">
 						All Engine
 					</Text>
 					<Text fontSize="11px" color={ACCENT} fontWeight="700" letterSpacing="2px">
 						4 YOU
-					</Text>
+					</Text> */}
+
+					<Box h="50px">
+							<img
+								src="/logo.png"
+								alt="Logo"
+								style={{
+									height: "100%",
+									objectFit: "contain",
+								}}
+							/>
+						</Box>
 				</VStack>
 			</HStack>
 

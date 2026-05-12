@@ -106,8 +106,8 @@ export default function ContactPage() {
 		{
 			icon: FaEnvelope,
 			title: "Email",
-			details: "info@industrialmarket.co.uk",
-			subtext: "support@industrialmarket.co.uk",
+			details: "info@reconditionedengine.co.uk",
+			subtext: "support@reconditionedengine.co.uk",
 		},
 		{
 			icon: FaMapMarkerAlt,
@@ -126,10 +126,10 @@ export default function ContactPage() {
 	return (
 		<>
 			<Helmet>
-				<title>Contact Us - All Engine 4 You | UK's Leading Engine Price Comparison</title>
+				<title>Contact Us - Re-Conditioned Engine | UK's Leading Engine </title>
 				<meta
 					name="description"
-					content="Get in touch with  All Engine 4 You for engine price comparison, quotes, and customer support across the UK."
+					content="Get in touch with  Re-Conditioned Engine for engine price, quotes, and customer support across the UK."
 				/>
 			</Helmet>
 
@@ -202,7 +202,7 @@ export default function ContactPage() {
 									</Heading>
 								</Flex>
 								<Text color="gray.600" fontSize="15px" lineHeight="1.6">
-									Get free quotes, compare prices, and find the best deals on reconditioned and used
+									Get free quotes, and find the best deals on reconditioned and used
 									engines from trusted UK suppliers.
 								</Text>
 							</Box>
@@ -215,7 +215,7 @@ export default function ContactPage() {
 									</Heading>
 								</Flex>
 								<Text fontSize="14px" mb={3} lineHeight="1.6">
-									Dedicated support for engine price comparison, order tracking, and technical
+									Dedicated support for engine price, order tracking, and technical
 									assistance. Get help finding the right engine for your vehicle.
 								</Text>
 								<Button
@@ -244,7 +244,7 @@ export default function ContactPage() {
 								<HStack spacing={2}>
 									<Icon as={FaEnvelope} color={accentColor} boxSize={4} />
 									<Text fontSize="13px" fontWeight="500">
-										partners@industrialmarket.co.uk
+										partners@reconditionedengine.co.uk
 									</Text>
 								</HStack>
 							</Box>

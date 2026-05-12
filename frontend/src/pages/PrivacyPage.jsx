@@ -48,8 +48,8 @@ export default function PrivacyPage() {
   return (
     <>
       <Helmet>
-        <title>Privacy Policy -  All Engine 4 You  Trust | UK's Leading  All Engine 4 You  Price Comparison</title>
-        <meta name="description" content="Read our privacy policy to understand how we collect, use, and protect your personal information when using  All Engine 4 You  Trust price comparison services." />
+        <title>Privacy Policy -  Re-Conditioned Engine  Trust | UK's Leading  Re-Conditioned Engine  Price Comparison</title>
+        <meta name="description" content="Read our privacy policy to understand how we collect, use, and protect your personal information when using  Re-Conditioned Engine  Trust price comparison services." />
       </Helmet>
 
       {/* Hero Section */}
@@ -90,7 +90,7 @@ export default function PrivacyPage() {
             </HStack>
           </Box>
 
-          {/* How  All Engine 4 You  Trust Helps - Highlight Box */}
+          {/* How  Re-Conditioned Engine  Trust Helps - Highlight Box */}
           <Box
             bg="orange.50"
             p={6}
@@ -101,16 +101,16 @@ export default function PrivacyPage() {
             <VStack align="start" spacing={3}>
               <HStack>
                 <Icon as={FaShieldAlt} boxSize={6} color={accentColor} />
-                <Heading fontSize="20px" color={darkBg}>How can  All Engine 4 You  Trust help me save on my car parts price comparison?</Heading>
+                <Heading fontSize="20px" color={darkBg}>How can  Re-Conditioned Engine  Trust help me save on my car parts price comparison?</Heading>
               </HStack>
               <Text fontSize="15px" lineHeight="1.6">
-                We are UK's first price comparison website that is focused on comparing used and reconditioned  All Engine 4 You s
+                We are UK's first price comparison website that is focused on comparing used and reconditioned  Re-Conditioned Engine s
                 as well as ancillaries. Once you enter your reg number, we check our database and give you the cheapest
                 online quotes in just few clicks. Get multiple quotes from carefully vetted suppliers and get your
-                All Engine 4 You s and ancillaries within no time. Choose  All Engine 4 You  Trust as we only have trusted suppliers who
-                don't compromise on quality. We offer an unmatchable  All Engine 4 You  and ancillaries price comparison service
+                Re-Conditioned Engine s and ancillaries within no time. Choose  Re-Conditioned Engine  Trust as we only have trusted suppliers who
+                don't compromise on quality. We offer an unmatchable  Re-Conditioned Engine  and ancillaries price comparison service
                 where you pay the cheapest price. Get free online quotes in few clicks. Compare prices and buy with
-                confidence with  All Engine 4 You  Trust.
+                confidence with  Re-Conditioned Engine  Trust.
               </Text>
             </VStack>
           </Box>
@@ -162,7 +162,7 @@ export default function PrivacyPage() {
                     {section.id === 3 && (
                       <VStack align="stretch" spacing={3}>
                         <Text fontSize="15px" lineHeight="1.7">
-                          Autoonlinemarketing UK is working under the trade name of  All Engine 4 You trust.co.uk (both operating in
+                          Autoonlinemarketing UK is working under the trade name of  Re-Conditioned Engine trust.co.uk (both operating in
                           the UK) and we all take your privacy very seriously.
                         </Text>
                         <Box bg="gray.50" p={4} borderRadius="md">
@@ -178,7 +178,7 @@ export default function PrivacyPage() {
                       <Text fontSize="15px" lineHeight="1.7">
                         We may gather your personal information through our website, or other digital media or social
                         media channels operated by or on behalf of the company referred to collectively as the "Site"
-                        All Engine 4 You trust.co.uk.
+                        Re-Conditioned Engine trust.co.uk.
                       </Text>
                     )}
 
@@ -223,7 +223,7 @@ export default function PrivacyPage() {
                     {section.id === 8 && (
                       <Text fontSize="15px" lineHeight="1.7">
                         As a price comparison service, we need to disclose some of your information to our members
-                        (garages,  All Engine 4 You  reconditioners, workshops, and retailers) to make the best possible price
+                        (garages,  Re-Conditioned Engine  reconditioners, workshops, and retailers) to make the best possible price
                         quote for you.
                       </Text>
                     )}

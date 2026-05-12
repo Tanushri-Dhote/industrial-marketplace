@@ -209,7 +209,7 @@ function WebsiteModal({ isOpen, onClose, onSave, website }) {
               <Input
                 value={formData.name}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                placeholder="All Engine 4 You"
+                placeholder="Re-Conditioned Engine"
                 h="44px" borderRadius="xl" fontSize="14px"
                 _focus={{ borderColor: '#D90404', boxShadow: '0 0 0 3px rgba(217,4,4,0.1)' }}
               />

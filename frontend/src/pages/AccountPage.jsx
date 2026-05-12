@@ -230,7 +230,7 @@ export default function AccountPage() {
                 My Account Details
               </Heading>
               <Text color="gray.300" fontSize="16px">
-                Manage your personal and business credentials for the All Engine 4 You.
+                Manage your personal and business credentials for the Re-Conditioned Engine.
               </Text>
             </VStack>
           </Box>

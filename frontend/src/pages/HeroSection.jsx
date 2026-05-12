@@ -319,7 +319,7 @@ export default function HeroSection({ category }) {
 								</HStack>
 								<HStack color="whiteAlpha.900">
 									<Icon as={FaCheckCircle} color="green.400" />
-									<Text fontWeight="600">Up to 5 Year Warranty</Text>
+									<Text fontWeight="600">Up to 1 Year Warranty</Text>
 								</HStack>
 								<HStack color="whiteAlpha.900">
 									<Icon as={FaCheckCircle} color="green.400" />

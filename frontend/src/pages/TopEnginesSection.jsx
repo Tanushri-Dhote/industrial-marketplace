@@ -135,7 +135,7 @@ export default function TopEnginesSection({ category }) {
 
 				<Divider borderColor="gray.100" />
 
-				<Text
+				{/* <Text
 					fontSize={{ base: "24px", md: "28px" }}
 					fontWeight="900"
 					color="gray.900"
@@ -154,7 +154,7 @@ export default function TopEnginesSection({ category }) {
 					</Text>
 
 					£{Number(engine.price || 0).toLocaleString("en-GB")}
-				</Text>
+				</Text> */}
 
 				<Flex
 					w="full"

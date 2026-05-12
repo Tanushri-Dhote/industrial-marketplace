@@ -199,7 +199,7 @@ export default function Footer() {
                 h={{ base: "80px", md: "100px" }}
               >
                 <img
-                  src="/logo_engine.png"
+                  src="/logo.png"
                   alt="All Engines Logo"
                   style={{
                     height: "100%",
@@ -254,7 +254,7 @@ export default function Footer() {
               </HStack>
               <HStack spacing={3}>
                 <Icon as={MdEmail} color={accentColor} boxSize={5} />
-                <Text fontSize={{ base: "13px", md: "sm" }} color="gray.400">info@allengine4you.co.uk</Text>
+                <Text fontSize={{ base: "13px", md: "sm" }} color="gray.400">info@reconditionedengine.co.uk</Text>
               </HStack>
               <HStack spacing={3}>
                 <Icon as={MdAccessTime} color={accentColor} boxSize={5} />
@@ -274,7 +274,7 @@ export default function Footer() {
           spacing={4}
         >
           <Text fontSize="sm" color="gray.500">
-            © 2026 info@allengine4you.co.uk • All Rights Reserved
+            © 2026 info@reconditionedengine.co.uk • All Rights Reserved
           </Text>
 
           <HStack spacing={2}>

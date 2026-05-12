@@ -43,7 +43,7 @@ export default function MembershipExpiredCard() {
 
         <VStack spacing={3}>
           <Text fontSize="16px" color={subTextColor} fontWeight="500">
-            Your All Engine 4 You membership was expired on
+            Your Re-Conditioned Engine membership was expired on
           </Text>
           <Box bg="black" color="white" px={4} py={1} borderRadius="sm" fontWeight="800" fontSize="18px">
             16 Apr 2026.

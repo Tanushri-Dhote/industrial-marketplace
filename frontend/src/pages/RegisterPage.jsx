@@ -134,15 +134,15 @@ export default function RegisterPage() {
               h="50px"
             >
               <img
-                src="/logo_engine.png"
-                alt="All Engines Logo"
+                src="/logo.png"
+                alt="Logo"
                 style={{
                   height: "100%",
                   objectFit: "contain"
                 }}
               />
             </Box>
-            <Heading
+            {/* <Heading
               as="h1"
               fontSize="24px"
               fontWeight="800"
@@ -151,7 +151,7 @@ export default function RegisterPage() {
             >
               All Engine
               <Text as="span" color={accentColor} ml={1}>4 You</Text>
-            </Heading>
+            </Heading> */}
           </HStack>
           <Text color="whiteAlpha.800" fontSize="11px" fontWeight="500" letterSpacing="1px" mt={1}>
             Rebuilt • Repair • Replacement • Reconditioned
