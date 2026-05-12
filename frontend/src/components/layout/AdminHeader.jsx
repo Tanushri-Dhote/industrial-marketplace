@@ -62,7 +62,7 @@ export default function AdminHeader({ user, onLogout }) {
 													}}
 												  />
 												</Box>
-								<VStack align="flex-start" spacing={0}>
+								{/* <VStack align="flex-start" spacing={0}>
 									<Text
 										fontSize="16px"
 										fontWeight="900"
@@ -81,7 +81,7 @@ export default function AdminHeader({ user, onLogout }) {
 									>
 										Dashboard
 									</Text>
-								</VStack>
+								</VStack> */}
 							</HStack>
 						</Link>
 
