@@ -339,14 +339,14 @@ export default function ProductDetailPage() {
 										</Text>
 										<Text fontWeight="700" fontSize="14px">{product.condition}</Text>
 									</VStack>
-									<VStack align="start" spacing={0}>
+									{/* <VStack align="start" spacing={0}>
 										<Text fontSize="10px" color="gray.400" fontWeight="600" textTransform="uppercase">
 											Compatibility
 										</Text>
 										<ChakraLink color="#D90404" fontWeight="700" fontSize="14px">
 											Check Vehicles →
 										</ChakraLink>
-									</VStack>
+									</VStack> */}
 								</Flex>
 							</VStack>
 
@@ -520,7 +520,7 @@ export default function ProductDetailPage() {
 								<Card shadow="lg" borderRadius="2xl" border="none">
 									<CardBody p={5}>
 										<VStack spacing={3}>
-											<Button
+											{/* <Button
 												bg="#D90404"
 												color="white"
 												h="60px"
@@ -535,7 +535,7 @@ export default function ProductDetailPage() {
 												onClick={onOpen}
 											>
 												Get Custom Quote
-											</Button>
+											</Button> */}
 
 											<Button
 												onClick={handleBuyItNow}

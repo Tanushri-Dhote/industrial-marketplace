@@ -80,9 +80,9 @@ export default function CheckoutPage() {
 					</Box>
 					<Heading size="lg">No Product Selected</Heading>
 					<Text color="gray.600">Please select a product to checkout.</Text>
-					<Button 
-						onClick={() => navigate("/")} 
-						bg="#D90404" 
+					<Button
+						onClick={() => navigate("/")}
+						bg="#D90404"
 						color="white"
 						_hover={{ bg: "#B70303" }}
 						size="lg"
@@ -133,11 +133,11 @@ export default function CheckoutPage() {
 		<Box bg="linear-gradient(135deg, #F8FAFC 0%, #F1F5F9 100%)" minH="100vh" py={8}>
 			<Container maxW="container.xl">
 				{/* Header */}
-				<Flex 
+				<Flex
 					direction={{ base: "column", sm: "row" }}
-					justify="space-between" 
-					align={{ base: "flex-start", sm: "center" }} 
-					mb={6} 
+					justify="space-between"
+					align={{ base: "flex-start", sm: "center" }}
+					mb={6}
 					gap={4}
 				>
 					<Flex align="center" gap={3}>
@@ -148,13 +148,13 @@ export default function CheckoutPage() {
 							Checkout
 						</Heading>
 					</Flex>
-					
-					<Badge 
-						bg="#D90404" 
-						color="white" 
-						fontSize={{ base: "12px", md: "14px" }} 
-						px={4} 
-						py={2} 
+
+					<Badge
+						bg="#D90404"
+						color="white"
+						fontSize={{ base: "12px", md: "14px" }}
+						px={4}
+						py={2}
 						borderRadius="full"
 						display="flex"
 						alignItems="center"
@@ -176,7 +176,7 @@ export default function CheckoutPage() {
 									Order Summary
 								</Text>
 							</Box>
-							
+
 							{/* Mobile List View */}
 							<Box display={{ base: "block", md: "none" }} p={4}>
 								<VStack spacing={4} align="stretch">
@@ -184,11 +184,11 @@ export default function CheckoutPage() {
 										const price = Number(item.price || 0);
 										const lineTotal = price * Number(item.qty || 0);
 										return (
-											<Box 
-												key={item._id} 
-												p={4} 
-												border="1px solid" 
-												borderColor="gray.100" 
+											<Box
+												key={item._id}
+												p={4}
+												border="1px solid"
+												borderColor="gray.100"
 												borderRadius="xl"
 												bg="gray.50"
 											>
@@ -210,15 +210,15 @@ export default function CheckoutPage() {
 														aria-label="Remove"
 													/>
 												</Flex>
-												
+
 												<Divider mb={3} />
-												
+
 												<Flex justify="space-between" align="center">
 													<VStack align="start" spacing={0}>
 														<Text fontSize="xs" color="gray.500">Price</Text>
 														<Text fontSize="sm" fontWeight="600">£{price.toLocaleString("en-GB")}</Text>
 													</VStack>
-													
+
 													<HStack spacing={2} bg="white" p={1} borderRadius="lg" border="1px solid" borderColor="gray.200">
 														<IconButton
 															icon={<FaMinus />}
@@ -238,7 +238,7 @@ export default function CheckoutPage() {
 															aria-label="Increase"
 														/>
 													</HStack>
-													
+
 													<VStack align="end" spacing={0}>
 														<Text fontSize="xs" color="gray.500">Total</Text>
 														<Text fontSize="md" fontWeight="800" color="#D90404">£{lineTotal.toLocaleString("en-GB")}</Text>
@@ -247,7 +247,7 @@ export default function CheckoutPage() {
 											</Box>
 										);
 									})}
-									
+
 									<Box p={4} bg="#D9040405" borderRadius="xl" border="1px dashed" borderColor="#D9040430">
 										<Flex justify="space-between" align="center">
 											<VStack align="start" spacing={0}>
@@ -328,7 +328,7 @@ export default function CheckoutPage() {
 												</Tr>
 											);
 										})}
-										
+
 										{/* Total Row */}
 										<Tr bg="#D9040405" borderTop="2px solid" borderColor="#D9040410">
 											<Td colSpan={3}>
@@ -600,6 +600,8 @@ export default function CheckoutPage() {
 										</InputLeftElement>
 										<Input
 											placeholder="+44 1234 567890"
+											type="tel"
+											maxLength={10}
 											value={phone}
 											onChange={(e) => setPhone(e.target.value)}
 											borderRadius="xl"
@@ -638,7 +640,7 @@ export default function CheckoutPage() {
 								</Button>
 
 								<Text fontSize="11px" color="gray.500" textAlign="center">
-									By clicking proceed you agree to our 
+									By clicking proceed you agree to our
 									<Button variant="link" color="#D90404" size="xs" ml={1}>
 										Terms & Conditions
 									</Button>
