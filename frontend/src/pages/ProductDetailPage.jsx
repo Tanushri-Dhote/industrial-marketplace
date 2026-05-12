@@ -503,7 +503,7 @@ export default function ProductDetailPage() {
 											<VStack align="stretch" spacing={3}>
 												<Flex justify="space-between">
 													<Text fontWeight="600">VAT ({Math.round(vatRate * 100)}%)</Text>
-													<Text fontWeight="700">£{vatAmount.toLocaleString()}</Text>
+													{/* <Text fontWeight="700">£{vatAmount.toLocaleString()}</Text> */}
 												</Flex>
 												<Divider borderColor="#D9040420" />
 												{/* <Flex justify="space-between">
@@ -634,7 +634,7 @@ export default function ProductDetailPage() {
 								</Card>
 
 								{/* Limited Offer */}
-								<Box
+								{/* <Box
 									bg="linear-gradient(135deg, #D90404 0%, #B70303 100%)"
 									color="white"
 									p={4}
@@ -647,7 +647,7 @@ export default function ProductDetailPage() {
 									<Text fontSize="11px" opacity="0.9">
 										Exclusive savings available today
 									</Text>
-								</Box>
+								</Box> */}
 
 								{/* Meta Info */}
 								<VStack align="stretch" spacing={2} px={2}>
@@ -655,10 +655,10 @@ export default function ProductDetailPage() {
 										<Text fontSize="11px" color="gray.500">Location</Text>
 										<Text fontSize="11px" fontWeight="600">{product.shipping?.location || "United Kingdom"}</Text>
 									</Flex>
-									<Flex justify="space-between">
+									{/* <Flex justify="space-between">
 										<Text fontSize="11px" color="gray.500">Delivery</Text>
 										<Text fontSize="11px" fontWeight="600">{product.shipping?.delivery || "3-5 business days"}</Text>
-									</Flex>
+									</Flex> */}
 									{/* <Flex justify="space-between">
 										<Text fontSize="11px" color="gray.500">Returns</Text>
 										<Text fontSize="11px" fontWeight="700" color="#D90404">30 Day Returns</Text>
