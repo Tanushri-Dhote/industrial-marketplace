@@ -10,7 +10,11 @@ import {
   AccordionButton,
   AccordionPanel,
   AccordionIcon,
+  SimpleGrid,
+  Icon,
+  Flex,
 } from '@chakra-ui/react';
+import { FaQuestionCircle, FaChevronRight } from 'react-icons/fa';
 
 const faqs = [
   {
@@ -47,67 +51,175 @@ export default function FAQSection() {
   const accentColor = "#D90404";
 
   return (
-    <Box bg="#F8FAFC" py={12}>
-      <Container maxW="container.xl">
-        <VStack spacing={8} align="center">
+    <Box bg="linear-gradient(135deg, #F8FAFC 0%, #F1F5F9 100%)" py={10} position="relative" overflow="hidden">
+      {/* Background Decorative Elements */}
+      <Box
+        position="absolute"
+        top="-50%"
+        right="-20%"
+        w="300px"
+        h="300px"
+        bg={`${accentColor}05`}
+        borderRadius="full"
+        filter="blur(60px)"
+        pointerEvents="none"
+      />
+      <Box
+        position="absolute"
+        bottom="-30%"
+        left="-10%"
+        w="250px"
+        h="250px"
+        bg={`${accentColor}08`}
+        borderRadius="full"
+        filter="blur(50px)"
+        pointerEvents="none"
+      />
 
-          {/* Header */}
-          <VStack spacing={3} textAlign="center" maxW="680px">
+      <Container maxW="container.xl" position="relative" zIndex={1}>
+        <VStack spacing={6} align="center">
+
+          {/* Header Section with Icon */}
+          <VStack spacing={2} textAlign="center" maxW="700px">
+            <Flex
+              w="48px"
+              h="48px"
+              bg={`${accentColor}10`}
+              borderRadius="full"
+              align="center"
+              justify="center"
+            >
+              <Icon as={FaQuestionCircle} w={5} h={5} color={accentColor} />
+            </Flex>
+            
             <Text 
-              fontSize="14px" 
+              fontSize="12px" 
               fontWeight="700" 
               color={accentColor} 
               letterSpacing="1.5px"
               textTransform="uppercase"
+              bg={`${accentColor}10`}
+              px={2.5}
+              py={0.5}
+              borderRadius="full"
+              display="inline-block"
             >
-              HAVE QUESTIONS?
+              FAQ
             </Text>
             
             <Heading 
-              fontSize="28px" 
-              fontWeight="700" 
+              fontSize={{ base: "24px", md: "30px" }} 
+              fontWeight="800" 
               color="gray.800"
-              lineHeight="1.2"
+              lineHeight="1.3"
+              letterSpacing="-0.5px"
             >
-              Frequently Asked Questions
+              Got Questions? We've Got Answers
             </Heading>
 
-            <Text fontSize="16px" color="gray.600">
-              Find answers to the most common questions
+            <Text fontSize="14px" color="gray.600">
+              Everything you need to know about finding and buying quality engines
             </Text>
           </VStack>
 
-          {/* FAQ Accordion - Full width with 10px left/right padding + All Open by Default */}
-          <Box w="full" maxW="1200px" px={2.5}>   {/* 10px padding from left & right */}
+          {/* FAQ Accordion - Modern Card Style */}
+          <Box w="full" maxW="1000px">
             <Accordion allowMultiple defaultIndex={faqs.map((_, index) => index)}>
-              {faqs.map((faq, index) => (
-                <AccordionItem 
-                  key={index}
-                  border="1px solid"
-                  borderColor="gray.200"
-                  borderRadius="xl"
-                  mb={3}
-                  bg="white"
-                  overflow="hidden"
-                >
-                  <AccordionButton 
-                    p={5}
-                    _hover={{ bg: "gray.50" }}
-                    _expanded={{ bg: "orange.50" }}
+              <SimpleGrid columns={{ base: 1, lg: 2 }} spacing={3}>
+                {faqs.map((faq, index) => (
+                  <AccordionItem 
+                    key={index}
+                    border="none"
+                    borderRadius="xl"
+                    bg="white"
+                    overflow="hidden"
+                    transition="all 0.2s ease"
+                    _hover={{
+                      transform: "translateY(-1px)",
+                      boxShadow: "md"
+                    }}
+                    sx={{
+                      boxShadow: "0 1px 4px rgba(0,0,0,0.04)",
+                    }}
                   >
-                    <Box flex="1" textAlign="left" fontSize="16px" fontWeight="600" color="gray.800">
-                      {faq.question}
-                    </Box>
-                    <AccordionIcon color={accentColor} fontSize="18px" />
-                  </AccordionButton>
+                    <AccordionButton 
+                      py={3.5}
+                      px={4}
+                      _hover={{ bg: "gray.50" }}
+                      _expanded={{ 
+                        bg: `linear-gradient(135deg, ${accentColor}05 0%, white 100%)`,
+                        borderBottom: "1px solid",
+                        borderColor: `${accentColor}15`
+                      }}
+                    >
+                      <Box flex="1" textAlign="left">
+                        <Flex align="center" gap={2.5}>
+                          <Box
+                            w="28px"
+                            h="28px"
+                            bg={`${accentColor}10`}
+                            borderRadius="md"
+                            display="flex"
+                            alignItems="center"
+                            justifyContent="center"
+                            fontSize="12px"
+                            fontWeight="700"
+                            color={accentColor}
+                          >
+                            {index + 1}
+                          </Box>
+                          <Text fontSize="14px" fontWeight="600" color="gray.800" lineHeight="1.4">
+                            {faq.question}
+                          </Text>
+                        </Flex>
+                      </Box>
+                      <AccordionIcon 
+                        color={accentColor} 
+                        fontSize="16px"
+                        bg={`${accentColor}10`}
+                        borderRadius="full"
+                        p={1}
+                        w={5}
+                        h={5}
+                      />
+                    </AccordionButton>
 
-                  <AccordionPanel pb={5} px={5} fontSize="15px" color="gray.600" lineHeight="1.75">
-                    {faq.answer}
-                  </AccordionPanel>
-                </AccordionItem>
-              ))}
+                    <AccordionPanel pb={3.5} px={4} pt={3}>
+                      <Flex gap={2}>
+                        <Icon as={FaChevronRight} color={accentColor} mt={0.5} boxSize="10px" />
+                        <Text fontSize="13px" color="gray.600" lineHeight="1.6">
+                          {faq.answer}
+                        </Text>
+                      </Flex>
+                    </AccordionPanel>
+                  </AccordionItem>
+                ))}
+              </SimpleGrid>
             </Accordion>
           </Box>
+
+          {/* Help Section Footer */}
+          <Flex
+            direction={{ base: "column", sm: "row" }}
+            align="center"
+            justify="center"
+            gap={3}
+            pt={4}
+          >
+            <Text fontSize="13px" color="gray.600">
+              Still have questions?
+            </Text>
+            <Text 
+              fontSize="13px" 
+              fontWeight="600" 
+              color={accentColor}
+              cursor="pointer"
+              _hover={{ textDecoration: "underline" }}
+                   onClick={() => window.location.href = "/contact"}
+            >
+              Contact our support team →
+            </Text>
+          </Flex>
 
         </VStack>
       </Container>

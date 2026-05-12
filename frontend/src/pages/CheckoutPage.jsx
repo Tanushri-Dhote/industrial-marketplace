@@ -20,23 +20,76 @@ import {
 	RadioGroup,
 	Textarea,
 	Center,
+	Divider,
+	Icon,
+	Badge,
+	Card,
+	CardBody,
+	Flex,
+	Avatar,
+	Tag,
+	Wrap,
+	WrapItem,
+	InputGroup,
+	InputLeftElement,
+	InputRightElement,
+	FormLabel,
+	IconButton,
 } from "@chakra-ui/react";
-import { useNavigate } from "react-router-dom";
-import { useLocation } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
+import {
+	FaShoppingCart,
+	FaTrash,
+	FaPlus,
+	FaMinus,
+	FaCar,
+	FaTools,
+	FaMapMarkerAlt,
+	FaInfoCircle,
+	FaCreditCard,
+	FaPaypal,
+	FaEnvelope,
+	FaUser,
+	FaPhone,
+	FaShieldAlt,
+	FaTruck,
+} from "react-icons/fa";
+import { MdLocalShipping } from "react-icons/md";
 
 export default function CheckoutPage() {
 	const navigate = useNavigate();
 	const location = useLocation();
 	const product = location.state?.product;
 	const [cart, setCart] = useState(() => (product ? [{ ...product, qty: 1 }] : []));
+	const [postcode, setPostcode] = useState("");
+	const [email, setEmail] = useState("");
+	const [name, setName] = useState("");
+	const [phone, setPhone] = useState("");
+	const [additionalNotes, setAdditionalNotes] = useState("");
+	const [serviceType, setServiceType] = useState("supply_only");
+	const [condition, setCondition] = useState("reconditioned");
+	const [drives, setDrives] = useState("no");
+	const [paymentMethod, setPaymentMethod] = useState("card");
 
 	if (!product && cart.length === 0) {
 		return (
-			<Center minH="100vh">
-				<VStack spacing={4}>
+			<Center minH="100vh" bg="gray.50">
+				<VStack spacing={6} p={8} bg="white" borderRadius="2xl" shadow="xl">
+					<Box bg="red.50" p={4} borderRadius="full">
+						<Icon as={FaShoppingCart} boxSize={8} color="red.500" />
+					</Box>
 					<Heading size="lg">No Product Selected</Heading>
-					<Text>Please select a product to checkout.</Text>
-					<Button onClick={() => navigate("/")}>Return Home</Button>
+					<Text color="gray.600">Please select a product to checkout.</Text>
+					<Button 
+						onClick={() => navigate("/")} 
+						bg="#D90404" 
+						color="white"
+						_hover={{ bg: "#B70303" }}
+						size="lg"
+						px={8}
+					>
+						Return Home
+					</Button>
 				</VStack>
 			</Center>
 		);
@@ -55,8 +108,8 @@ export default function CheckoutPage() {
 					if (item._id !== productId) {
 						return item;
 					}
-
 					const nextQty = Number(item.qty || 1) + delta;
+					if (nextQty < 1) return item;
 					return { ...item, qty: nextQty };
 				})
 				.filter((item) => item.qty > 0),
@@ -67,193 +120,439 @@ export default function CheckoutPage() {
 		setCart((prev) => prev.filter((item) => item._id !== productId));
 	};
 
+	const handleProceed = () => {
+		// Validation
+		if (!email || !name || !phone) {
+			// You can add toast notification here
+			return;
+		}
+		navigate("/thank-you");
+	};
+
 	return (
-		<Box bg="gray.50" minH="100vh" py={10}>
+		<Box bg="linear-gradient(135deg, #F8FAFC 0%, #F1F5F9 100%)" minH="100vh" py={8}>
 			<Container maxW="container.xl">
-				{/* Title */}
-				<HStack
-					justify="space-between"
-					mb={4}
-					flexWrap="wrap"
-					spacing={3}
-				>
-					<Heading>Checkout</Heading>
+				{/* Header */}
+				<Flex justify="space-between" align="center" mb={6} wrap="wrap" gap={4}>
+					<Flex align="center" gap={3}>
+						<Box bg="#D90404" p={2} borderRadius="xl">
+							<Icon as={FaShoppingCart} color="white" boxSize={5} />
+						</Box>
+						<Heading size="lg" fontWeight="800">
+							Checkout
+						</Heading>
+					</Flex>
+					
+					<Badge 
+						bg="#D90404" 
+						color="white" 
+						fontSize="14px" 
+						px={4} 
+		py={2} 
+						borderRadius="full"
+						display="flex"
+						alignItems="center"
+						gap={2}
+					>
+						<Icon as={FaShoppingCart} />
+						{cartItemCount} {cartItemCount === 1 ? "Item" : "Items"} in Cart
+					</Badge>
+				</Flex>
 
-					<Button variant="outline">🛒 Cart ({cartItemCount})</Button>
-				</HStack>
-
-				{/* CART TABLE */}
-				<Box bg="white" p={{ base: 3, md: 6 }} borderRadius="lg" boxShadow="sm">
-					<Box overflowX="auto">
-						<Table minW="700px" size={{ base: "sm", md: "md" }}>
-							<Thead>
-								<Tr>
-									<Th whiteSpace="nowrap">Product</Th>
-									<Th whiteSpace="nowrap">Price</Th>
-									<Th whiteSpace="nowrap">Qty</Th>
-									<Th whiteSpace="nowrap">Total</Th>
-									<Th></Th>
-								</Tr>
-							</Thead>
-
-							<Tbody>
-								{cart.map((item) => {
-									const price = Number(item.price || 0);
-									const lineTotal = price * Number(item.qty || 0);
-
-									return (
-										<Tr key={item._id}>
-											<Td minW="220px">
-												<Text fontSize={{ base: "sm", md: "md" }} fontWeight="500">
-													{item.name} {item.make} {item.model} {item.year}
+				<Grid templateColumns={{ base: "1fr", lg: "1.5fr 1fr" }} gap={8}>
+					{/* LEFT COLUMN - Cart & Forms */}
+					<VStack spacing={6} align="stretch">
+						{/* Cart Summary Card */}
+						<Card shadow="lg" borderRadius="2xl" overflow="hidden">
+							<Box bg="#D90404" px={5} py={3}>
+								<Text color="white" fontWeight="700" fontSize="18px">
+									Order Summary
+								</Text>
+							</Box>
+							
+							<Box overflowX="auto">
+								<Table variant="simple" size="md">
+									<Thead bg="gray.50">
+										<Tr>
+											<Th fontSize="12px">Product</Th>
+											<Th fontSize="12px">Price</Th>
+											<Th fontSize="12px">Qty</Th>
+											<Th fontSize="12px">Total</Th>
+											<Th></Th>
+										</Tr>
+									</Thead>
+									<Tbody>
+										{cart.map((item) => {
+											const price = Number(item.price || 0);
+											const lineTotal = price * Number(item.qty || 0);
+											return (
+												<Tr key={item._id}>
+													<Td>
+														<Text fontSize="sm" fontWeight="600" noOfLines={2}>
+															{item.name}
+														</Text>
+														<Text fontSize="xs" color="gray.500" mt={1}>
+															{item.make} {item.model} {item.year}
+														</Text>
+													</Td>
+													<Td fontSize="sm" fontWeight="600">
+														£{price.toLocaleString("en-GB")}
+													</Td>
+													<Td>
+														<HStack spacing={1}>
+															<IconButton
+																icon={<FaMinus />}
+																size="xs"
+																variant="outline"
+																onClick={() => updateQuantity(item._id, -1)}
+																aria-label="Decrease"
+															/>
+															<Text minW="25px" textAlign="center" fontSize="sm" fontWeight="600">
+																{item.qty}
+															</Text>
+															<IconButton
+																icon={<FaPlus />}
+																size="xs"
+																variant="outline"
+																onClick={() => updateQuantity(item._id, 1)}
+																aria-label="Increase"
+															/>
+														</HStack>
+													</Td>
+													<Td fontSize="sm" fontWeight="700" color="#D90404">
+														£{lineTotal.toLocaleString("en-GB")}
+													</Td>
+													<Td>
+														<IconButton
+															icon={<FaTrash />}
+															size="xs"
+															variant="ghost"
+															color="red.500"
+															onClick={() => removeFromCart(item._id)}
+															aria-label="Remove"
+														/>
+													</Td>
+												</Tr>
+											);
+										})}
+										
+										{/* Total Row */}
+										<Tr bg="#D9040405" borderTop="2px solid" borderColor="#D9040410">
+											<Td colSpan={3}>
+												<Text fontWeight="800" fontSize="lg">Total Amount</Text>
+												<Text fontSize="xs" color="gray.500">Excluding VAT</Text>
+											</Td>
+											<Td colSpan={2}>
+												<Text fontWeight="800" fontSize="2xl" color="#D90404">
+													£{total?.toLocaleString()}
 												</Text>
 											</Td>
+										</Tr>
+									</Tbody>
+								</Table>
+							</Box>
+						</Card>
 
-											<Td whiteSpace="nowrap">
-												£{price.toLocaleString("en-GB")}
-											</Td>
+						{/* Service & Options Card */}
+						<Card shadow="md" borderRadius="2xl">
+							<CardBody p={6}>
+								<VStack align="stretch" spacing={6}>
+									<Box>
+										<Flex align="center" gap={2} mb={3}>
+											<Icon as={FaTools} color="#D90404" />
+											<Text fontWeight="700" fontSize="16px">Service Type</Text>
+										</Flex>
+										<Wrap spacing={3}>
+											<WrapItem>
+												<Button
+													variant={serviceType === "supply_fitted" ? "solid" : "outline"}
+													bg={serviceType === "supply_fitted" ? "#D90404" : "transparent"}
+													color={serviceType === "supply_fitted" ? "white" : "#D90404"}
+													borderColor="#D90404"
+													size="sm"
+													onClick={() => setServiceType("supply_fitted")}
+												>
+													Supplied & Fitted
+												</Button>
+											</WrapItem>
+											<WrapItem>
+												<Button
+													variant={serviceType === "supply_only" ? "solid" : "outline"}
+													bg={serviceType === "supply_only" ? "#D90404" : "transparent"}
+													color={serviceType === "supply_only" ? "white" : "#D90404"}
+													borderColor="#D90404"
+													size="sm"
+													onClick={() => setServiceType("supply_only")}
+												>
+													Supply Only
+												</Button>
+											</WrapItem>
+											<WrapItem>
+												<Button
+													variant={serviceType === "both" ? "solid" : "outline"}
+													bg={serviceType === "both" ? "#D90404" : "transparent"}
+													color={serviceType === "both" ? "white" : "#D90404"}
+													borderColor="#D90404"
+													size="sm"
+													onClick={() => setServiceType("both")}
+												>
+													Will consider both
+												</Button>
+											</WrapItem>
+										</Wrap>
+									</Box>
 
-											<Td>
-												<HStack spacing={2}>
+									<Divider />
+
+									<Box>
+										<Flex align="center" gap={2} mb={3}>
+											<Icon as={FaCar} color="#D90404" />
+											<Text fontWeight="700" fontSize="16px">Engine Condition</Text>
+										</Flex>
+										<Wrap spacing={3}>
+											{["reconditioned", "used", "new", "all"].map((cond) => (
+												<WrapItem key={cond}>
 													<Button
-														size="xs"
-														onClick={() => updateQuantity(item._id, -1)}
+														variant={condition === cond ? "solid" : "outline"}
+														bg={condition === cond ? "#D90404" : "transparent"}
+														color={condition === cond ? "white" : "#D90404"}
+														borderColor="#D90404"
+														size="sm"
+														onClick={() => setCondition(cond)}
+														textTransform="capitalize"
 													>
-														-
+														{cond}
 													</Button>
+												</WrapItem>
+											))}
+										</Wrap>
+									</Box>
 
-													<Box minW="20px" textAlign="center">
-														{item.qty}
-													</Box>
+									<Divider />
 
+									<Box>
+										<Flex align="center" gap={2} mb={3}>
+											<Icon as={FaMapMarkerAlt} color="#D90404" />
+											<Text fontWeight="700" fontSize="16px">Your Postcode</Text>
+										</Flex>
+										<InputGroup>
+											<Input
+												placeholder="e.g. OX11 2TX"
+												value={postcode}
+												onChange={(e) => setPostcode(e.target.value)}
+												size="lg"
+												borderRadius="xl"
+											/>
+											<InputRightElement width="auto" mr={2} mt={1}>
+												<Icon as={MdLocalShipping} color="#D90404" />
+											</InputRightElement>
+										</InputGroup>
+									</Box>
+
+									<Divider />
+
+									<Box>
+										<Flex align="center" gap={2} mb={3}>
+											<Icon as={FaInfoCircle} color="#D90404" />
+											<Text fontWeight="700" fontSize="16px">Additional Information</Text>
+										</Flex>
+										<VStack align="stretch" spacing={3}>
+											<Flex align="center" gap={4} wrap="wrap">
+												<Text fontSize="14px" fontWeight="500">Does vehicle drive?</Text>
+												<HStack spacing={3}>
 													<Button
-														size="xs"
-														onClick={() => updateQuantity(item._id, 1)}
+														size="sm"
+														variant={drives === "yes" ? "solid" : "outline"}
+														bg={drives === "yes" ? "green.500" : "transparent"}
+														color={drives === "yes" ? "white" : "gray.600"}
+														onClick={() => setDrives("yes")}
 													>
-														+
+														Yes
+													</Button>
+													<Button
+														size="sm"
+														variant={drives === "no" ? "solid" : "outline"}
+														bg={drives === "no" ? "red.500" : "transparent"}
+														color={drives === "no" ? "white" : "gray.600"}
+														onClick={() => setDrives("no")}
+													>
+														No
 													</Button>
 												</HStack>
-											</Td>
+											</Flex>
+											<Textarea
+												placeholder="Additional notes or special requirements..."
+												value={additionalNotes}
+												onChange={(e) => setAdditionalNotes(e.target.value)}
+												rows={3}
+												borderRadius="xl"
+											/>
+										</VStack>
+									</Box>
 
-											<Td whiteSpace="nowrap">
-												£{lineTotal.toLocaleString("en-GB")}
-											</Td>
+									<Divider />
 
-											<Td>
+									<Box>
+										<Flex align="center" gap={2} mb={3}>
+											<Icon as={FaCreditCard} color="#D90404" />
+											<Text fontWeight="700" fontSize="16px">Payment Method</Text>
+										</Flex>
+										<Wrap spacing={3}>
+											<WrapItem>
 												<Button
-													colorScheme="red"
-													size="xs"
-													onClick={() => removeFromCart(item._id)}
+													variant={paymentMethod === "card" ? "solid" : "outline"}
+													bg={paymentMethod === "card" ? "#D90404" : "transparent"}
+													color={paymentMethod === "card" ? "white" : "#D90404"}
+													borderColor="#D90404"
+													size="md"
+													leftIcon={<FaCreditCard />}
+													onClick={() => setPaymentMethod("card")}
 												>
-													Remove
+													Credit Card
 												</Button>
-											</Td>
-										</Tr>
-									);
-								})}
-
-								<Tr bg="blue.50">
-									<Td colSpan={3} fontWeight="bold">
-										Total
-									</Td>
-									<Td fontWeight="bold">
-										£{total?.toLocaleString()}
-									</Td>
-								</Tr>
-							</Tbody>
-						</Table>
-					</Box>
-				</Box>
-
-				{/* FORM SECTION */}
-				<Grid templateColumns={{ base: "1fr", md: "1fr 1fr" }} gap={{ base: 4, md: 6 }} mt={{ base: 6, md: 8 }}>
-
-					{/* LEFT SIDE */}
-					<VStack spacing={6} align="stretch">
-						{/* Service */}
-						<Box bg="white" p={5} borderRadius="lg">
-							<Text fontWeight="bold">1. Please select a service.</Text>
-							<HStack mt={2}>
-								<Checkbox>Supplied & Fitted</Checkbox>
-								<Checkbox defaultChecked>Supply Only</Checkbox>
-								<Checkbox>Will consider both</Checkbox>
-							</HStack>
-						</Box>
-
-						{/* Condition */}
-						<Box bg="white" p={5} borderRadius="lg">
-							<Text fontWeight="bold">2. Select a condition</Text>
-							<HStack mt={2}>
-								<Checkbox defaultChecked>Reconditioned</Checkbox>
-								<Checkbox>Used</Checkbox>
-								<Checkbox>New</Checkbox>
-								<Checkbox>All</Checkbox>
-							</HStack>
-						</Box>
-
-						{/* Postcode */}
-						<Box bg="white" p={5} borderRadius="lg">
-							<Text fontWeight="bold">3. Your postcode</Text>
-							<Input placeholder="e.g. OX11 2TX" mt={2} />
-						</Box>
-
-						{/* Extra */}
-						<Box bg="white" p={5} borderRadius="lg">
-							<Text fontWeight="bold">4. Additional information</Text>
-
-							<HStack mt={3}>
-								<Text>Does vehicle drive?</Text>
-								<RadioGroup defaultValue="no">
-									<HStack>
-										<Radio value="yes">Yes</Radio>
-										<Radio value="no">No</Radio>
-									</HStack>
-								</RadioGroup>
-							</HStack>
-
-							<Textarea mt={3} placeholder="Extra notes" />
-						</Box>
-
-						{/* Payment */}
-						<Box bg="white" p={5} borderRadius="lg">
-							<Text fontWeight="bold">5. Payment Method</Text>
-							<RadioGroup defaultValue="card">
-								<HStack mt={2}>
-									<Radio value="card">Credit card</Radio>
-									<Radio value="debit">Debit card</Radio>
-									<Radio value="paypal">PayPal</Radio>
-								</HStack>
-							</RadioGroup>
-						</Box>
+											</WrapItem>
+											<WrapItem>
+												<Button
+													variant={paymentMethod === "debit" ? "solid" : "outline"}
+													bg={paymentMethod === "debit" ? "#D90404" : "transparent"}
+													color={paymentMethod === "debit" ? "white" : "#D90404"}
+													borderColor="#D90404"
+													size="md"
+													leftIcon={<FaCreditCard />}
+													onClick={() => setPaymentMethod("debit")}
+												>
+													Debit Card
+												</Button>
+											</WrapItem>
+											<WrapItem>
+												<Button
+													variant={paymentMethod === "paypal" ? "solid" : "outline"}
+													bg={paymentMethod === "paypal" ? "#0070BA" : "transparent"}
+													color={paymentMethod === "paypal" ? "white" : "#0070BA"}
+													borderColor="#0070BA"
+													size="md"
+													leftIcon={<FaPaypal />}
+													onClick={() => setPaymentMethod("paypal")}
+												>
+													PayPal
+												</Button>
+											</WrapItem>
+										</Wrap>
+									</Box>
+								</VStack>
+							</CardBody>
+						</Card>
 					</VStack>
 
-					{/* RIGHT SIDE */}
-					<Box bg="white" p={6} borderRadius="lg">
-						<Heading size="md" mb={4}>
-							Confirm Your Details
-						</Heading>
-
-						<VStack spacing={4}>
-							<Input placeholder="Email address*" />
-							<Input placeholder="Name*" />
-							<Input placeholder="Phone Number*" />
-
-							<Button
-								bg="green.600"
-								color="white"
-								w="full"
-								h="50px"
-								_hover={{ bg: "green.700" }}
-								onClick={() => navigate("/thank-you")}
-							>
-								Proceed
-							</Button>
-
-							<Text fontSize="xs" color="gray.500">
-								By clicking proceed you agree to terms & privacy policy.
+					{/* RIGHT COLUMN - Customer Details */}
+					<Card shadow="lg" borderRadius="2xl" position="sticky" top="100px" h="fit-content">
+						<Box bg="linear-gradient(135deg, #D90404 0%, #B70303 100%)" px={6} py={4} borderTopRadius="2xl">
+							<Text color="white" fontWeight="800" fontSize="20px">
+								Confirm Your Details
 							</Text>
-						</VStack>
-					</Box>
+							<Text color="white" opacity="0.8" fontSize="13px">
+								Please fill in your information
+							</Text>
+						</Box>
+
+						<CardBody p={6}>
+							<VStack spacing={5}>
+								<Box w="full">
+									<FormLabel fontSize="13px" fontWeight="600" mb={2}>
+										Email Address *
+									</FormLabel>
+									<InputGroup>
+										<InputLeftElement>
+											<Icon as={FaEnvelope} color="gray.400" />
+										</InputLeftElement>
+										<Input
+											placeholder="you@example.com"
+											value={email}
+											onChange={(e) => setEmail(e.target.value)}
+											borderRadius="xl"
+											size="lg"
+										/>
+									</InputGroup>
+								</Box>
+
+								<Box w="full">
+									<FormLabel fontSize="13px" fontWeight="600" mb={2}>
+										Full Name *
+									</FormLabel>
+									<InputGroup>
+										<InputLeftElement>
+											<Icon as={FaUser} color="gray.400" />
+										</InputLeftElement>
+										<Input
+											placeholder="John Doe"
+											value={name}
+											onChange={(e) => setName(e.target.value)}
+											borderRadius="xl"
+											size="lg"
+										/>
+									</InputGroup>
+								</Box>
+
+								<Box w="full">
+									<FormLabel fontSize="13px" fontWeight="600" mb={2}>
+										Phone Number *
+									</FormLabel>
+									<InputGroup>
+										<InputLeftElement>
+											<Icon as={FaPhone} color="gray.400" />
+										</InputLeftElement>
+										<Input
+											placeholder="+44 1234 567890"
+											value={phone}
+											onChange={(e) => setPhone(e.target.value)}
+											borderRadius="xl"
+											size="lg"
+										/>
+									</InputGroup>
+								</Box>
+
+								<Divider />
+
+								<Box w="full" bg="gray.50" p={4} borderRadius="xl">
+									<HStack spacing={3} mb={3}>
+										<Icon as={FaShieldAlt} color="#D90404" />
+										<Text fontSize="13px" fontWeight="600">Order Protection</Text>
+									</HStack>
+									<Text fontSize="12px" color="gray.600">
+										Your order is protected by our buyer guarantee. Full refund if not delivered.
+									</Text>
+								</Box>
+
+								<Button
+									bg="#D90404"
+									color="white"
+									w="full"
+									h="56px"
+									size="lg"
+									_hover={{ bg: "#B70303", transform: "translateY(-2px)" }}
+									_active={{ transform: "translateY(0)" }}
+									onClick={handleProceed}
+									boxShadow="0 4px 15px rgba(217, 4, 4, 0.3)"
+									transition="all 0.2s"
+									fontWeight="700"
+									fontSize="16px"
+								>
+									Proceed to Payment →
+								</Button>
+
+								<Text fontSize="11px" color="gray.500" textAlign="center">
+									By clicking proceed you agree to our 
+									<Button variant="link" color="#D90404" size="xs" ml={1}>
+										Terms & Conditions
+									</Button>
+									{" "}and{" "}
+									<Button variant="link" color="#D90404" size="xs">
+										Privacy Policy
+									</Button>
+								</Text>
+							</VStack>
+						</CardBody>
+					</Card>
 				</Grid>
 			</Container>
 		</Box>

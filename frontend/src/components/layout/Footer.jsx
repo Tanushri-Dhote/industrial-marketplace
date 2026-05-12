@@ -92,7 +92,7 @@ export default function Footer() {
     <Box as="footer" bg="#0F172A" color="white" mt="auto">
 
       {/* ==================== GET ENGINE PRICE QUOTES BAR ==================== */}
-      <Box bg="#0A1F3D" py={5}>
+      {/* <Box bg="#0A1F3D" py={5}>
         <Container maxW="container.xl">
           <HStack justify="space-between" align="center" flexWrap="wrap" gap={4}>
             <Text
@@ -104,7 +104,7 @@ export default function Footer() {
             </Text>
 
             <HStack spacing={3} flex="1" maxW={{ base: "100%", md: "520px" }}>
-              {/* REG HERE Input Box */}
+            
               <InputGroup size="lg">
 
                 <Box w="100%">
@@ -117,7 +117,7 @@ export default function Footer() {
                     bg="white"
                     boxShadow="lg"
                   >
-                    {/* Left GB Box */}
+                
                     <VStack
                       bg="#003399"
                       w="70px"
@@ -143,7 +143,7 @@ export default function Footer() {
                       </Text>
                     </VStack>
 
-                    {/* Input */}
+               
                     <Input
                       flex="1"
                       variant="unstyled"
@@ -168,7 +168,7 @@ export default function Footer() {
                 
               </InputGroup>
 
-              {/* Get Free Quotes Button */}
+         
               <Button
                 bg="#E63939"
                 color="white"
@@ -186,7 +186,7 @@ export default function Footer() {
             </HStack>
           </HStack>
         </Container>
-      </Box>
+      </Box> */}
 
       {/* ==================== MAIN FOOTER ==================== */}
       <Container maxW="container.xl" py={12}>
@@ -199,7 +199,7 @@ export default function Footer() {
                 h="100px"
               >
                 <img
-                  src="/logo_engine.PNG"
+                  src="logo_engine.png"
                   alt="All Engines Logo"
                   style={{
                     height: "100%",

@@ -29,9 +29,9 @@ export default function HomePage() {
 			<HeroSection category={category} />
 			<TrustBar />
 			<EasyStepsSection />
-			<BrandModelSelectorSection />
+			{/* <BrandModelSelectorSection /> */}
 			{!searchParams.get("brand") && <TopEnginesSection category={category} />}
-			<Areacbar />
+			{/* <Areacbar /> */}
 			<ReviewsSection />
 			<FAQSection />
 		</>
