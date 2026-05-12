@@ -32,7 +32,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 const DARK = "#0F172A";
 const RED = "#D90404";
 
-export default function CallSellerPage() {
+export default function CallSellerPage({ isModal = false, onCloseModal }) {
 	const [step, setStep] = useState(1);
 	const [engineOptions, setEngineOptions] = useState([]);
 	const [fittingOptions, setFittingOptions] = useState([]);
@@ -57,7 +57,7 @@ export default function CallSellerPage() {
 	const finalVehicleVrm = (manualVrm || "").trim() || safeVrm || "";
 
 	useEffect(() => {
-		if (!location.state) {
+		if (!location.state && !isModal) {
 			toast({
 				title: "Start from the quote form",
 				description: "Please begin on the homepage so we can capture your vehicle details.",
@@ -67,7 +67,7 @@ export default function CallSellerPage() {
 			});
 			navigate("/", { replace: true });
 		}
-	}, [location.state, navigate, toast]);
+	}, [location.state, navigate, toast, isModal]);
 
 	const [form, setForm] = useState({
 		postcode: "",
@@ -286,7 +286,7 @@ export default function CallSellerPage() {
 	);
 
 	return (
-		<Box bg="#F8FAFC" minH="100vh" py={{ base: 6, md: 12 }}>
+		<Box bg="#F8FAFC" minH={isModal ? "auto" : "100vh"} py={{ base: 6, md: 12 }}>
 			<Container maxW="container.md">
 				<Progress />
 				{/* <VehicleSummary /> */}
@@ -626,10 +626,16 @@ export default function CallSellerPage() {
 						<Button
 							variant="link"
 							color={DARK}
-							onClick={() => navigate("/")}
+							onClick={() => {
+								if (isModal && onCloseModal) {
+									onCloseModal();
+								} else {
+									navigate("/");
+								}
+							}}
 							textDecoration="underline"
 						>
-							Return to Homepage
+							{isModal ? "Close" : "Return to Homepage"}
 						</Button>
 					</VStack>
 				)}

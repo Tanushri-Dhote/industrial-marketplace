@@ -136,12 +136,23 @@ export default function TopEnginesSection({ category }) {
 				<Divider borderColor="gray.100" />
 
 				<Text
-					fontSize={{ base: "31px", md: "32px" }}
+					fontSize={{ base: "31px", md: "28px" }}
 					fontWeight="900"
 					color="gray.900"
 					letterSpacing="-0.02em"
 					lineHeight="1"
 				>
+					<Text
+						as="span"
+						fontSize={{ base: "14px", md: "16px" }}
+						fontWeight="600"
+						color="gray.500"
+						mr={2}
+						verticalAlign="middle"
+					>
+						Starting From
+					</Text>
+
 					£{Number(engine.price || 0).toLocaleString("en-GB")}
 				</Text>
 
