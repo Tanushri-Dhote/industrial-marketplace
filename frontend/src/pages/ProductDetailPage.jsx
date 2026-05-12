@@ -478,12 +478,15 @@ export default function ProductDetailPage() {
 											<VStack align="stretch" spacing={3}>
 												<Flex justify="space-between">
 													<Text fontWeight="600">
+														
+														
+														Engine Price
+													</Text>
+													<Text fontWeight="700">
 														<Text as="span" fontSize="11px" color="gray.500">
 															Starting From
 														</Text>{" "}
-														Engine Price
-													</Text>
-													<Text fontWeight="700">£{itemPrice.toLocaleString()}</Text>
+														£{itemPrice.toLocaleString()}</Text>
 												</Flex>
 												<Flex justify="space-between">
 													<Text fontWeight="600">Delivery</Text>
@@ -591,7 +594,7 @@ export default function ProductDetailPage() {
 													})
 												}
 											>
-												Buy It Now
+												Request Quote
 											</Button>
 										</VStack>
 									</CardBody>
