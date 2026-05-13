@@ -18,27 +18,27 @@ const steps = [
 	{
 		number: "01",
 		icon: FaSearch,
-		title: "Enter Your Engine Details",
+		title: "Enter Your Vehicle Details",
 		description:
-			"Simply enter your engine registration or model number to instantly find compatible engines from verified sellers.",
+			"Provide your registration number or engine details so we can identify the right engine for your vehicle.",
 		image:
 			"https://images.unsplash.com/photo-1517524206127-48bbd363f3d7?auto=format&fit=crop&w=1200&q=80",
 	},
 	{
 		number: "02",
 		icon: FaHandshake,
-		title: "Receive Competitive Quotes",
+		title: "We Review Your Request",
 		description:
-			"Submit your requirement once and get multiple price quotes from trusted suppliers across India.",
+			"Our team carefully reviews your enquiry and helps match you with the most suitable engine solution.",
 		image:
 			"https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?auto=format&fit=crop&w=1200&q=80",
 	},
 	{
 		number: "03",
 		icon: FaTruck,
-		title: "Choose the Best Deal & Get Delivered",
+		title: "Confirm & Get Delivery",
 		description:
-			"Compare offers, select the best one, and enjoy fast delivery or local fitting with warranty support.",
+			"Once everything is confirmed, your engine is prepared for fast delivery or local fitting support.",
 		image:
 			"https://images.unsplash.com/photo-1616432043562-3671ea2e5242?auto=format&fit=crop&w=1200&q=80",
 	},

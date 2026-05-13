@@ -306,7 +306,7 @@ export default function HeroSection({ category }) {
 
 						<MotionBox variants={fadeInUp}>
 							<Text color="whiteAlpha.800" fontSize={{ base: "16px", md: "20px" }} maxW="600px">
-								Compare quotes from 200+ verified reconditioners and breakers across the UK. Save up
+								Get access to 200+ verified reconditioners and breakers across the UK. Save up
 								to 50% on used & reconditioned engines.
 							</Text>
 						</MotionBox>
@@ -586,7 +586,7 @@ export default function HeroSection({ category }) {
 									textDecor="underline"
 									cursor="pointer"
 									_hover={{ color: "white" }}
-									
+
 									onClick={() => navigate("/terms-and-conditions")}
 								>
 									Terms of Service

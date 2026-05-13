@@ -19,7 +19,7 @@ import { FaQuestionCircle, FaChevronRight } from 'react-icons/fa';
 const faqs = [
   {
     question: "How does the engine search work?",
-    answer: "Simply enter your vehicle registration number or engine model to instantly find matching engines from verified sellers across India."
+    answer: "Simply enter your vehicle registration number or engine model to instantly find matching engines from verified sellers nationwide"
   },
   {
     question: "Are the engines original or refurbished?",
@@ -27,11 +27,11 @@ const faqs = [
   },
   {
     question: "Do you provide warranty on engines?",
-    answer: "Yes, all engines come with a minimum 6 months to 2 years warranty depending on the seller and condition of the engine."
+    answer: "Yes, all engines come with a minimum 6 months to 1 years warranty depending on the seller and condition of the engine."
   },
   {
     question: "How long does delivery take?",
-    answer: "Delivery usually takes 3-7 working days across India. Local pickup or fitting options are also available in major cities."
+    answer: "Delivery usually takes 3-7 working days nationwide Local pickup or fitting options are also available in major cities."
   },
   {
     question: "Can I get the engine fitted locally?",
@@ -39,11 +39,11 @@ const faqs = [
   },
   {
     question: "What if I receive a wrong or defective engine?",
-    answer: "We have a clear return and replacement policy. Contact our support within 48 hours of delivery for quick resolution."
+    answer: "If you receive an incorrect or faulty engine, please contact the supplier directly along with our support team within 48 hours of delivery so the issue can be reviewed and resolved."
   },
   {
-    question: "How do I compare prices from different sellers?",
-    answer: "After submitting your requirement, you will receive multiple competitive quotes from verified sellers. You can compare them easily on our platform."
+    question: "How do I find the right engine for my vehicle?",
+    answer: "Simply submit your vehicle or engine details and our team will help connect you with suitable engine options from verified sellers."
   },
 ];
 
@@ -91,11 +91,11 @@ export default function FAQSection() {
             >
               <Icon as={FaQuestionCircle} w={5} h={5} color={accentColor} />
             </Flex>
-            
-            <Text 
-              fontSize="12px" 
-              fontWeight="700" 
-              color={accentColor} 
+
+            <Text
+              fontSize="12px"
+              fontWeight="700"
+              color={accentColor}
               letterSpacing="1.5px"
               textTransform="uppercase"
               bg={`${accentColor}10`}
@@ -106,10 +106,10 @@ export default function FAQSection() {
             >
               FAQ
             </Text>
-            
-            <Heading 
-              fontSize={{ base: "22px", md: "30px" }} 
-              fontWeight="800" 
+
+            <Heading
+              fontSize={{ base: "22px", md: "30px" }}
+              fontWeight="800"
               color="gray.800"
               lineHeight="1.3"
               letterSpacing="-0.5px"
@@ -127,7 +127,7 @@ export default function FAQSection() {
             <Accordion allowMultiple defaultIndex={faqs.map((_, index) => index)}>
               <SimpleGrid columns={{ base: 1, lg: 2 }} spacing={3}>
                 {faqs.map((faq, index) => (
-                  <AccordionItem 
+                  <AccordionItem
                     key={index}
                     border="none"
                     borderRadius="xl"
@@ -142,11 +142,11 @@ export default function FAQSection() {
                       boxShadow: "0 1px 4px rgba(0,0,0,0.04)",
                     }}
                   >
-                    <AccordionButton 
+                    <AccordionButton
                       py={3.5}
                       px={4}
                       _hover={{ bg: "gray.50" }}
-                      _expanded={{ 
+                      _expanded={{
                         bg: `linear-gradient(135deg, ${accentColor}05 0%, white 100%)`,
                         borderBottom: "1px solid",
                         borderColor: `${accentColor}15`
@@ -173,8 +173,8 @@ export default function FAQSection() {
                           </Text>
                         </Flex>
                       </Box>
-                      <AccordionIcon 
-                        color={accentColor} 
+                      <AccordionIcon
+                        color={accentColor}
                         fontSize="16px"
                         bg={`${accentColor}10`}
                         borderRadius="full"
@@ -209,13 +209,13 @@ export default function FAQSection() {
             <Text fontSize="13px" color="gray.600">
               Still have questions?
             </Text>
-            <Text 
-              fontSize="13px" 
-              fontWeight="600" 
+            <Text
+              fontSize="13px"
+              fontWeight="600"
               color={accentColor}
               cursor="pointer"
               _hover={{ textDecoration: "underline" }}
-                   onClick={() => window.location.href = "/contact"}
+              onClick={() => window.location.href = "/contact"}
             >
               Contact our support team →
             </Text>

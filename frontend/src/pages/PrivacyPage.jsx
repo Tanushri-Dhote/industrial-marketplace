@@ -260,7 +260,7 @@ export default function PrivacyPage() {
                     {section.id === 12 && (
                       <Text fontSize="15px" lineHeight="1.7">
                         Any electronic communication will include an unsubscribe link. You can unsubscribe your
-                        information from our system at any time by emailing info@industrialmarket.co.uk.
+                        information from our system at any time by emailing info@reconditionedengine.co.uk.
                       </Text>
                     )}
 
@@ -275,7 +275,7 @@ export default function PrivacyPage() {
                           <ListItem>Right to data portability</ListItem>
                           <ListItem>Right to object to our use of your information</ListItem>
                         </UnorderedList>
-                        <Text fontSize="14px" mt={2}>Contact: info@industrialmarket.co.uk</Text>
+                        <Text fontSize="14px" mt={2}>Contact: info@reconditionedengine.co.uk</Text>
                       </VStack>
                     )}
 
@@ -317,7 +317,7 @@ export default function PrivacyPage() {
                 Contact our Data Protection Officer at:
               </Text>
               <Text fontSize="16px" fontWeight="bold" color={accentColor}>
-                info@allengine4you.co.uk
+                info@reconditionedengine.co.uk
               </Text>
               <Text fontSize="12px" opacity={0.7}>
                 Response time: 48-72 hours on working days
