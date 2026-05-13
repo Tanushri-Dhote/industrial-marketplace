@@ -38,6 +38,7 @@ import { AddIcon, EditIcon, DeleteIcon, ViewIcon } from "@chakra-ui/icons";
 import { FileText } from "lucide-react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import ModuleFrame from "./ModuleFrame";
+import { canModify } from "../../utils/permissions";
 import API from "../../services/api";
 
 export default function QuotesModule() {
@@ -245,24 +246,28 @@ export default function QuotesModule() {
 													}}
 													aria-label="View Quote"
 												/>
-												<IconButton
-													icon={<EditIcon />}
-													size="sm"
-													variant="ghost"
-													onClick={() => {
-														setEditingQuote(quote);
-														onOpen();
-													}}
-													aria-label="Edit Quote"
-												/>
-												<IconButton
-													icon={<DeleteIcon />}
-													size="sm"
-													variant="ghost"
-													colorScheme="red"
-													onClick={() => handleDelete(quote._id)}
-													aria-label="Delete Quote"
-												/>
+												{canModify() && (
+													<>
+														<IconButton
+															icon={<EditIcon />}
+															size="sm"
+															variant="ghost"
+															onClick={() => {
+																setEditingQuote(quote);
+																onOpen();
+															}}
+															aria-label="Edit Quote"
+														/>
+														<IconButton
+															icon={<DeleteIcon />}
+															size="sm"
+															variant="ghost"
+															colorScheme="red"
+															onClick={() => handleDelete(quote._id)}
+															aria-label="Delete Quote"
+														/>
+													</>
+												)}
 											</HStack>
 										</Td>
 									</Tr>

@@ -38,6 +38,7 @@ import { toast } from "sonner";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import ModuleFrame from "./ModuleFrame";
 import API from "../../services/api";
+import { canModify } from "../../utils/permissions";
 
 const ACCENT = "#D90404";
 
@@ -305,23 +306,27 @@ export default function ModelsModule() {
 										</Td>
 										<Td>
 											<HStack justify="center" spacing={1}>
-												<IconButton
-													icon={<EditIcon />}
-													size="sm"
-													variant="ghost"
-													colorScheme="blue"
-													onClick={() => handleEdit(model)}
-													aria-label="Edit"
-												/>
-												<IconButton
-													icon={<DeleteIcon />}
-													size="sm"
-													variant="ghost"
-													colorScheme="red"
-													onClick={() => handleDelete(model._id)}
-													isLoading={deleteMutation.isPending}
-													aria-label="Delete"
-												/>
+												{canModify() && (
+													<>
+														<IconButton
+															icon={<EditIcon />}
+															size="sm"
+															variant="ghost"
+															colorScheme="blue"
+															onClick={() => handleEdit(model)}
+															aria-label="Edit"
+														/>
+														<IconButton
+															icon={<DeleteIcon />}
+															size="sm"
+															variant="ghost"
+															colorScheme="red"
+															onClick={() => handleDelete(model._id)}
+															isLoading={deleteMutation.isPending}
+															aria-label="Delete"
+														/>
+													</>
+												)}
 											</HStack>
 										</Td>
 									</Tr>

@@ -38,6 +38,7 @@ import { toast } from "sonner";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import ModuleFrame from "./ModuleFrame";
 import API from "../../services/api";
+import { canModify } from "../../utils/permissions";
 
 const ACCENT = "#D90404";
 
@@ -303,23 +304,27 @@ export default function BrandsModule() {
 										</Td>
 										<Td>
 											<HStack justify="center" spacing={1}>
-												<IconButton
-													icon={<EditIcon />}
-													size="sm"
-													variant="ghost"
-													colorScheme="blue"
-													onClick={() => handleEdit(brand)}
-													aria-label="Edit"
-												/>
-												<IconButton
-													icon={<DeleteIcon />}
-													size="sm"
-													variant="ghost"
-													colorScheme="red"
-													onClick={() => handleDelete(brand._id)}
-													isLoading={deleteMutation.isPending}
-													aria-label="Delete"
-												/>
+												{canModify() && (
+													<>
+														<IconButton
+															icon={<EditIcon />}
+															size="sm"
+															variant="ghost"
+															colorScheme="blue"
+															onClick={() => handleEdit(brand)}
+															aria-label="Edit"
+														/>
+														<IconButton
+															icon={<DeleteIcon />}
+															size="sm"
+															variant="ghost"
+															colorScheme="red"
+															onClick={() => handleDelete(brand._id)}
+															isLoading={deleteMutation.isPending}
+															aria-label="Delete"
+														/>
+													</>
+												)}
 											</HStack>
 										</Td>
 									</Tr>
@@ -410,12 +415,16 @@ export default function BrandsModule() {
 								</Text>
 								<VStack spacing={4}>
 									<FormControl>
-										<FormLabel fontSize="12px" fontWeight="700">Sprite Sheet URL</FormLabel>
+										<FormLabel fontSize="12px" fontWeight="700">
+											Sprite Sheet URL
+										</FormLabel>
 										<Input
 											placeholder="https://example.com/sprites.png"
 											value={formData.spriteSheetUrl}
 											onChange={(e) => setFormData({ ...formData, spriteSheetUrl: e.target.value })}
-											borderRadius="lg" fontSize="14px" h="40px"
+											borderRadius="lg"
+											fontSize="14px"
+											h="40px"
 										/>
 									</FormControl>
 									<HStack w="full">
@@ -424,8 +433,18 @@ export default function BrandsModule() {
 											<Input
 												type="number"
 												value={formData.spriteSize?.width || 0}
-												onChange={(e) => setFormData({ ...formData, spriteSize: { ...formData.spriteSize, width: parseInt(e.target.value) || 0 } })}
-												borderRadius="lg" fontSize="14px" h="40px"
+												onChange={(e) =>
+													setFormData({
+														...formData,
+														spriteSize: {
+															...formData.spriteSize,
+															width: parseInt(e.target.value) || 0,
+														},
+													})
+												}
+												borderRadius="lg"
+												fontSize="14px"
+												h="40px"
 											/>
 										</FormControl>
 										<FormControl>
@@ -433,8 +452,18 @@ export default function BrandsModule() {
 											<Input
 												type="number"
 												value={formData.spriteSize?.height || 0}
-												onChange={(e) => setFormData({ ...formData, spriteSize: { ...formData.spriteSize, height: parseInt(e.target.value) || 0 } })}
-												borderRadius="lg" fontSize="14px" h="40px"
+												onChange={(e) =>
+													setFormData({
+														...formData,
+														spriteSize: {
+															...formData.spriteSize,
+															height: parseInt(e.target.value) || 0,
+														},
+													})
+												}
+												borderRadius="lg"
+												fontSize="14px"
+												h="40px"
 											/>
 										</FormControl>
 									</HStack>
@@ -444,8 +473,18 @@ export default function BrandsModule() {
 											<Input
 												type="number"
 												value={formData.spritePosition?.x || 0}
-												onChange={(e) => setFormData({ ...formData, spritePosition: { ...formData.spritePosition, x: parseInt(e.target.value) || 0 } })}
-												borderRadius="lg" fontSize="14px" h="40px"
+												onChange={(e) =>
+													setFormData({
+														...formData,
+														spritePosition: {
+															...formData.spritePosition,
+															x: parseInt(e.target.value) || 0,
+														},
+													})
+												}
+												borderRadius="lg"
+												fontSize="14px"
+												h="40px"
 											/>
 										</FormControl>
 										<FormControl>
@@ -453,8 +492,18 @@ export default function BrandsModule() {
 											<Input
 												type="number"
 												value={formData.spritePosition?.y || 0}
-												onChange={(e) => setFormData({ ...formData, spritePosition: { ...formData.spritePosition, y: parseInt(e.target.value) || 0 } })}
-												borderRadius="lg" fontSize="14px" h="40px"
+												onChange={(e) =>
+													setFormData({
+														...formData,
+														spritePosition: {
+															...formData.spritePosition,
+															y: parseInt(e.target.value) || 0,
+														},
+													})
+												}
+												borderRadius="lg"
+												fontSize="14px"
+												h="40px"
 											/>
 										</FormControl>
 									</HStack>

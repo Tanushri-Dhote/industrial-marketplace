@@ -39,6 +39,7 @@ import { AddIcon, EditIcon, DeleteIcon, ViewIcon, SearchIcon } from "@chakra-ui/
 import { TrendingUp, UserCheck } from "lucide-react";
 import ModuleFrame from "./ModuleFrame";
 import API from "../../services/api";
+import { canModify } from "../../utils/permissions";
 
 const STATUS_OPTIONS = ["New", "Contacted", "Quoted", "Won", "Lost", "Dead"];
 
@@ -69,6 +70,7 @@ export default function LeadsModule() {
 	const currentUser = JSON.parse(localStorage.getItem("user") || "{}");
 	const currentRole = currentUser.role || "viewer";
 	const isViewer = currentRole === "viewer" || currentRole === "Viewer";
+	const canModify = currentRole !== "admin";
 	const isSuperAdmin = currentRole === "super_admin" || currentRole === "Super Admin";
 
 	const [leads, setLeads] = useState([]);
@@ -241,7 +243,7 @@ export default function LeadsModule() {
 						))}
 					</Select>
 
-					{!isViewer && (
+					{canModify && (
 						<Button
 							leftIcon={<AddIcon />}
 							bg="#D90404"
@@ -262,116 +264,110 @@ export default function LeadsModule() {
 				</HStack>
 			</HStack>
 
-			{isLoading ? (
-				<Center py={16}>
-					<Spinner size="xl" color="#D90404" thickness="4px" />
-				</Center>
-			) : (
-				<Box overflowX="auto">
-					<Table variant="simple" size="sm">
-						<Thead>
-							<Tr>
-								<Th fontSize="12px" fontWeight="800" textTransform="uppercase" letterSpacing="1px">
-									Name
-								</Th>
-								<Th fontSize="12px" fontWeight="800" textTransform="uppercase" letterSpacing="1px">
-									Email
-								</Th>
-								<Th fontSize="12px" fontWeight="800" textTransform="uppercase" letterSpacing="1px">
-									Product
-								</Th>
-								<Th fontSize="12px" fontWeight="800" textTransform="uppercase" letterSpacing="1px">
-									Website
-								</Th>
-								<Th fontSize="12px" fontWeight="800" textTransform="uppercase" letterSpacing="1px">
-									Status
-								</Th>
-								<Th fontSize="12px" fontWeight="800" textTransform="uppercase" letterSpacing="1px">
-									Date
-								</Th>
-								<Th fontSize="12px" fontWeight="800" textTransform="uppercase" letterSpacing="1px">
-									Actions
-								</Th>
-							</Tr>
-						</Thead>
-						<Tbody>
-							{filteredLeads.map((lead) => (
-								<Tr key={lead.id}>
-									<Td fontSize="13px" fontWeight="600">
-										{lead.name}
-									</Td>
-									<Td fontSize="13px">{lead.email}</Td>
-									<Td fontSize="13px">{lead.product}</Td>
-									<Td fontSize="13px">{lead.websiteName}</Td>
-									<Td>
-										<Select
-											value={lead.status}
+			<Box overflowX="auto" borderRadius="xl" border="1px solid" borderColor="gray.100">
+				<Table variant="simple">
+					<Thead bg="gray.50">
+						<Tr>
+							<Th fontSize="12px" fontWeight="800" textTransform="uppercase" letterSpacing="1px">
+								Lead
+							</Th>
+							<Th fontSize="12px" fontWeight="800" textTransform="uppercase" letterSpacing="1px">
+								Email
+							</Th>
+							<Th fontSize="12px" fontWeight="800" textTransform="uppercase" letterSpacing="1px">
+								Product
+							</Th>
+							<Th fontSize="12px" fontWeight="800" textTransform="uppercase" letterSpacing="1px">
+								Website
+							</Th>
+							<Th fontSize="12px" fontWeight="800" textTransform="uppercase" letterSpacing="1px">
+								Status
+							</Th>
+							<Th fontSize="12px" fontWeight="800" textTransform="uppercase" letterSpacing="1px">
+								Date
+							</Th>
+							<Th fontSize="12px" fontWeight="800" textTransform="uppercase" letterSpacing="1px">
+								Actions
+							</Th>
+						</Tr>
+					</Thead>
+					<Tbody>
+						{filteredLeads.map((lead) => (
+							<Tr key={lead.id}>
+								<Td fontSize="13px" fontWeight="600">
+									{lead.name}
+								</Td>
+								<Td fontSize="13px">{lead.email}</Td>
+								<Td fontSize="13px">{lead.product}</Td>
+								<Td fontSize="13px">{lead.websiteName}</Td>
+								<Td>
+									<Select
+										value={lead.status}
+										size="sm"
+										width="130px"
+										fontSize="12px"
+										borderRadius="md"
+										onChange={(e) => handleStatusChange(lead.id, e.target.value)}
+										isDisabled={isViewer}
+									>
+										{STATUS_OPTIONS.map((status) => (
+											<option key={status} value={status}>
+												{status}
+											</option>
+										))}
+									</Select>
+								</Td>
+								<Td fontSize="13px">{lead.date}</Td>
+								<Td>
+									<HStack spacing={1}>
+										<IconButton
+											icon={<ViewIcon />}
 											size="sm"
-											width="130px"
-											fontSize="12px"
-											borderRadius="md"
-											onChange={(e) => handleStatusChange(lead.id, e.target.value)}
-											isDisabled={isViewer}
-										>
-											{STATUS_OPTIONS.map((status) => (
-												<option key={status} value={status}>
-													{status}
-												</option>
-											))}
-										</Select>
-									</Td>
-									<Td fontSize="13px">{lead.date}</Td>
-									<Td>
-										<HStack spacing={1}>
-											<IconButton
-												icon={<ViewIcon />}
-												size="sm"
-												variant="ghost"
-												onClick={() => {
-													setViewingLead(lead);
-													onViewOpen();
-												}}
-												aria-label="View Lead"
-											/>
-											{!isViewer && (
-												<>
-													<IconButton
-														icon={<EditIcon />}
-														size="sm"
-														variant="ghost"
-														onClick={() => {
-															setEditingLead(lead);
-															onOpen();
-														}}
-														aria-label="Edit Lead"
-													/>
-													<IconButton
-														icon={<DeleteIcon />}
-														size="sm"
-														variant="ghost"
-														colorScheme="red"
-														onClick={() => handleDelete(lead.id)}
-														aria-label="Delete Lead"
-													/>
-												</>
-											)}
-										</HStack>
-									</Td>
-								</Tr>
-							))}
-						</Tbody>
-					</Table>
+											variant="ghost"
+											onClick={() => {
+												setViewingLead(lead);
+												onViewOpen();
+											}}
+											aria-label="View Lead"
+										/>
+										{canModify && (
+											<>
+												<IconButton
+													icon={<EditIcon />}
+													size="sm"
+													variant="ghost"
+													onClick={() => {
+														setEditingLead(lead);
+														onOpen();
+													}}
+													aria-label="Edit Lead"
+												/>
+												<IconButton
+													icon={<DeleteIcon />}
+													size="sm"
+													variant="ghost"
+													colorScheme="red"
+													onClick={() => handleDelete(lead.id)}
+													aria-label="Delete Lead"
+												/>
+											</>
+										)}
+									</HStack>
+								</Td>
+							</Tr>
+						))}
+					</Tbody>
+				</Table>
 
-					{filteredLeads.length === 0 && (
-						<Flex justify="center" py={16}>
-							<VStack spacing={3} color="gray.500">
-								<Icon as={UserCheck} boxSize={10} />
-								<Text fontWeight="600">No leads found</Text>
-							</VStack>
-						</Flex>
-					)}
-				</Box>
-			)}
+				{filteredLeads.length === 0 && (
+					<Flex justify="center" py={16}>
+						<VStack spacing={3} color="gray.500">
+							<Icon as={UserCheck} boxSize={10} />
+							<Text fontWeight="600">No leads found</Text>
+						</VStack>
+					</Flex>
+				)}
+			</Box>
 
 			<LeadModal
 				isOpen={isOpen}

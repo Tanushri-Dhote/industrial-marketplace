@@ -33,15 +33,15 @@ const tenantHook = async (request, reply) => {
 
 const rolePermissions = {
 	admin: {
-		products: ["create", "read", "update", "delete"],
-		employees: ["create", "read", "update", "delete"],
-		leads: ["create", "read", "update", "delete"],
-		quotes: ["create", "read", "update", "delete"],
-		contacts: ["create", "read", "update", "delete"],
-		categories: ["create", "read", "update", "delete"],
+		products: ["create", "read"],
+		employees: ["create", "read"],
+		leads: ["create", "read"],
+		quotes: ["create", "read"],
+		contacts: ["create", "read"],
+		categories: ["create", "read"],
 		websites: ["read"],
-		blogs: ["create", "read", "update", "delete"],
-		inquiries: ["create", "read", "update", "delete"],
+		blogs: ["create", "read"],
+		inquiries: ["create", "read"],
 	},
 	website_manager: {
 		products: ["create", "read", "update", "delete"],

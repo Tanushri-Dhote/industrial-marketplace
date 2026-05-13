@@ -42,6 +42,7 @@ import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import API from "../../services/api";
 import ModuleFrame from "./ModuleFrame";
+import { canModify } from "../../utils/permissions";
 
 // ─── Role mapping ─────────────────────────────────────────────────────────────
 const mapRoleToUI = (role) =>
@@ -381,7 +382,7 @@ export default function UsersModule({ moduleId }) {
 												};
 												const userId = getStrId(user.website_id);
 												if (!userId) return "—";
-												const site = websites.find(w => getStrId(w._id) === userId);
+												const site = websites.find((w) => getStrId(w._id) === userId);
 												return site?.name || "—";
 											})()}
 										</Badge>
@@ -443,15 +444,17 @@ export default function UsersModule({ moduleId }) {
 											/>
 											<Portal>
 												<MenuList fontSize="13px">
-													<MenuItem
-														icon={<EditIcon />}
-														onClick={() => {
-															setEditingUser(user);
-															onOpen();
-														}}
-													>
-														Edit user
-													</MenuItem>
+													{canModify() && (
+														<MenuItem
+															icon={<EditIcon />}
+															onClick={() => {
+																setEditingUser(user);
+																onOpen();
+															}}
+														>
+															Edit user
+														</MenuItem>
+													)}
 													{isSuperAdmin && (
 														<MenuItem
 															icon={<LockIcon />}
@@ -476,13 +479,15 @@ export default function UsersModule({ moduleId }) {
 															Resend invite
 														</MenuItem>
 													)}
-													<MenuItem
-														icon={<DeleteIcon />}
-														color="red.600"
-														onClick={() => handleDelete(user.id)}
-													>
-														Delete user
-													</MenuItem>
+													{canModify() && (
+														<MenuItem
+															icon={<DeleteIcon />}
+															color="red.600"
+															onClick={() => handleDelete(user.id)}
+														>
+															Delete user
+														</MenuItem>
+													)}
 												</MenuList>
 											</Portal>
 										</Menu>

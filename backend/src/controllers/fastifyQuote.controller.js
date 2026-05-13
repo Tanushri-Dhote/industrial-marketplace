@@ -83,14 +83,21 @@ exports.updateQuote = async (request, reply) => {
 			filter.website_id = request.tenantId;
 		}
 
+		// Load the quote first so we can enforce status-based restrictions
+		const existing = await Quote.findOne(filter);
+		if (!existing) {
+			return reply.status(404).send({ success: false, message: "Quote not found" });
+		}
+
+		// Prevent editing of quotes that have been sent
+		if (existing.status && existing.status.toLowerCase() === "sent") {
+			return reply.status(403).send({ success: false, message: "Sent quotes cannot be edited" });
+		}
+
 		const quote = await Quote.findOneAndUpdate(filter, request.body, {
 			new: true,
 			runValidators: true,
 		});
-
-		if (!quote) {
-			return reply.status(404).send({ success: false, message: "Quote not found" });
-		}
 
 		return reply.send({ success: true, message: "Quote updated", data: quote });
 	} catch (error) {
