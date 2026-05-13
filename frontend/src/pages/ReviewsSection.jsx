@@ -21,7 +21,7 @@ export default function ReviewsSection() {
       name: "Rajesh Sharma",
       role: "Plant Manager",
       company: "SteelTech Industries, Pune",
-      text: "We purchased a 500kVA reconditioned generator from IndustrialMarket. Excellent quality and outstanding technical support.",
+      text: "We purchased a 500kVA reconditioned generator from Reconditioned Engine. Excellent quality and outstanding technical support.",
       rating: 5,
       image: "https://randomuser.me/api/portraits/men/32.jpg",
     },

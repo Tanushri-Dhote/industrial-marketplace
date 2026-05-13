@@ -23,11 +23,8 @@ import {
 	Td,
 	Th,
 	Thead,
-	Stack,
 	Flex,
 	Avatar,
-	Link as ChakraLink,
-	useColorModeValue,
 	Spinner,
 	Center,
 	useDisclosure,
@@ -37,6 +34,16 @@ import {
 	Tag,
 	Wrap,
 	WrapItem,
+	Accordion,
+	AccordionItem,
+	AccordionButton,
+	AccordionPanel,
+	AccordionIcon,
+	Stat,
+	StatLabel,
+	StatNumber,
+	StatHelpText,
+	StatArrow,
 } from "@chakra-ui/react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
@@ -48,94 +55,65 @@ import {
 	FaCheckCircle,
 	FaShippingFast,
 	FaShieldAlt,
-	FaTools,
-	FaArrowLeft,
-	FaArrowRight,
 	FaStar,
-	FaUndo,
-	FaMapMarkerAlt,
-	FaInfoCircle,
 	FaPhoneAlt,
-	FaWhatsapp,
 	FaClock,
+	FaTachometerAlt,
+	FaCalendarAlt,
+	FaCog,
+	FaStore,
+	FaGasPump,
+	FaCertificate,
+	FaThumbsUp,
 	FaTruck,
+	FaHeadset,
+	FaMapMarkerAlt,
+	FaEnvelope,
+	FaCheck,
 } from "react-icons/fa";
-import { FiHeart, FiShare2 } from "react-icons/fi";
+import { FiShare2, FiDownload, FiPrinter } from "react-icons/fi";
 import API from "../services/api";
-
 import ConfirmProdutModel from "../components/common/ConfirmProdutModel";
 
-// --- Animated Wrapper ---
 const MotionBox = motion(Box);
 
 const ProductCard = ({ product }) => (
 	<MotionBox
 		as={Link}
 		to={`/products/${product.slug || product._id}`}
-		whileHover={{ y: -5, scale: 1.02 }}
+		whileHover={{ y: -3 }}
 		transition={{ duration: 0.2 }}
 		bg="white"
-		borderRadius="2xl"
+		borderRadius="xl"
 		overflow="hidden"
-		boxShadow="0 2px 8px rgba(0,0,0,0.04)"
-		border="1px solid"
-		borderColor="gray.100"
+		boxShadow="sm"
 		p={3}
 		minW="200px"
 		cursor="pointer"
 		_hover={{
 			textDecoration: "none",
-			boxShadow: "0 8px 25px rgba(0,0,0,0.1)",
-			borderColor: "gray.200"
+			boxShadow: "lg",
 		}}
 	>
 		<Image
 			src={product.images?.[0]}
 			borderRadius="lg"
-			mb={3}
-			h="120px"
+			mb={2}
+			h="100px"
 			w="full"
 			objectFit="cover"
 		/>
-		<VStack align="start" spacing={1}>
-			<Text fontSize="xs" fontWeight="700" noOfLines={1} color="#D90404" textTransform="uppercase">
-				{product.name}
-			</Text>
-			<Badge bg="#D9040410" color="#D90404" fontSize="10px" px={2} borderRadius="full">
-				{product.condition}
-			</Badge>
-			<Text fontSize="lg" fontWeight="800" color="gray.900">
-				£{product.price?.toLocaleString()}
-			</Text>
-			<HStack spacing={1}>
-				<Icon as={FaCheckCircle} color="green.500" boxSize="10px" />
-				<Text fontSize="10px" color="green.600" fontWeight="600">
-					Supplied & Fitted
-				</Text>
-			</HStack>
-		</VStack>
+		<Text fontSize="xs" fontWeight="600" noOfLines={1}>
+			{product.name}
+		</Text>
+		<Text fontSize="xx-small" color="gray.500" noOfLines={1}>
+			{product.condition} • {product.year}
+		</Text>
+		<Badge bg="#D9040410" color="#D90404" fontSize="9px" mt={1}>
+			Compatible
+		</Badge>
 	</MotionBox>
 );
-
-const PriceRow = ({ label, value, isTotal, color = "gray.600" }) => {
-	const amount = Number(value || 0);
-	const formattedAmount = Number.isFinite(amount) ? amount.toLocaleString("en-GB") : "0";
-
-	return (
-		<Flex justify="space-between" align="center" py={isTotal ? 3 : 2}>
-			<Text fontWeight={isTotal ? "700" : "500"} fontSize={isTotal ? "md" : "sm"} color={color}>
-				{label}
-			</Text>
-			<Text
-				fontWeight={isTotal ? "800" : "600"}
-				fontSize={isTotal ? "2xl" : "md"}
-				color={isTotal ? "#D90404" : "gray.800"}
-			>
-				£{formattedAmount}
-			</Text>
-		</Flex>
-	);
-};
 
 const fetchProduct = async (id) => {
 	const res = await API.get(`/products/${id}`);
@@ -161,20 +139,12 @@ export default function ProductDetailPage() {
 
 	const navigate = useNavigate();
 
-	const handleBuyItNow = () => {
-		navigate("/checkout", { state: { product } });
-	};
-
-	const bgColor = "white";
-
 	if (isLoading) {
 		return (
-			<Center minH="100vh">
-				<VStack spacing={4}>
-					<Spinner size="xl" color="#D90404" thickness="4px" />
-					<Text fontWeight="600" color="gray.500">
-						Loading premium part details...
-					</Text>
+			<Center minH="100vh" bg="gray.50">
+				<VStack spacing={3}>
+					<Spinner size="xl" color="#D90404" thickness="3px" />
+					<Text color="gray.500" fontSize="sm">Loading product details...</Text>
 				</VStack>
 			</Center>
 		);
@@ -182,13 +152,10 @@ export default function ProductDetailPage() {
 
 	if (error || !product) {
 		return (
-			<Center minH="100vh">
-				<VStack spacing={4}>
-					<Heading size="lg" color="red.500">
-						Oops! Product Not Found
-					</Heading>
-					<Text color="gray.500">We couldn't find the engine you're looking for.</Text>
-					<Button as={Link} to="/" bg="#D90404" color="white" _hover={{ bg: "#B70303" }}>
+			<Center minH="100vh" bg="gray.50">
+				<VStack spacing={3}>
+					<Heading size="md" color="red.500">Product Not Found</Heading>
+					<Button as={Link} to="/" bg="#D90404" color="white" size="sm">
 						Return Home
 					</Button>
 				</VStack>
@@ -196,477 +163,438 @@ export default function ProductDetailPage() {
 		);
 	}
 
-	const itemPrice = Number.isFinite(Number(product.pricingBreakdown?.item ?? product.price ?? 0))
-		? Number(product.pricingBreakdown?.item ?? product.price ?? 0)
-		: 0;
-	const deliveryPrice = Number.isFinite(Number(product.pricingBreakdown?.delivery ?? 0))
-		? Number(product.pricingBreakdown?.delivery ?? 0)
-		: 0;
-	const vatRate = Number.isFinite(Number(product.pricingBreakdown?.vatRate ?? 0.2))
-		? Number(product.pricingBreakdown?.vatRate ?? 0.2)
-		: 0.2;
-	const vatAmount = (itemPrice + deliveryPrice) * vatRate;
-	const totalAmount = itemPrice + deliveryPrice + vatAmount;
-
 	return (
-		<Box bg={bgColor} minH="100vh">
-			{/* Modern Top Bar */}
-			<Box borderBottom="1px solid" borderColor="gray.100" py={3} bg="white">
-				<Container maxW="container.xl">
-					<Flex justify="space-between" align="center" wrap="wrap" gap={3}>
+		<Box bg="gray.50" minH="100vh">
+			{/* Top Bar */}
+			<Box bg="white" borderBottom="1px solid" borderColor="gray.100" py={2}>
+				<Container maxW="container.xl" px={4}>
+					<Flex justify="space-between" align="center">
 						<HStack spacing={3}>
-							<Avatar size="sm" name={product.seller?.name} bg="#D90404" color="white" />
-							<Box>
-								<Text fontSize="sm" fontWeight="700" color="gray.800">
-									{product.seller?.name}
-								</Text>
-								<HStack spacing={1}>
-									<Icon as={FaStar} color="gold" boxSize="10px" />
-									<Text fontSize="xs" color="gray.500">{product.seller?.rating}</Text>
+							<Avatar size="xs" name={product.seller?.name} bg="#D90404" />
+							<Text fontSize="xs" fontWeight="500">{product.seller?.name}</Text>
+							{product.seller?.rating && (
+								<HStack spacing={0.5}>
+									<Icon as={FaStar} color="gold" boxSize="8px" />
+									<Text fontSize="9px">{product.seller?.rating}</Text>
 								</HStack>
-							</Box>
+							)}
 						</HStack>
-						<Breadcrumb
-							spacing="8px"
-							separator={<Icon as={FaChevronRight} color="gray.300" fontSize="10px" />}
-							fontSize="xs"
-							display={{ base: "none", md: "flex" }}
-						>
-							<BreadcrumbItem>
-								<BreadcrumbLink as={Link} to="/" color="gray.500">Home</BreadcrumbLink>
-							</BreadcrumbItem>
-							{/* <BreadcrumbItem>
-								<BreadcrumbLink as={Link} to="/products" color="gray.500">Products</BreadcrumbLink>
-							</BreadcrumbItem> */}
-							<BreadcrumbItem isCurrentPage>
-								<BreadcrumbLink color="#D90404" fontWeight="600">{product.name?.substring(0, 30)}...</BreadcrumbLink>
-							</BreadcrumbItem>
-						</Breadcrumb>
 						<HStack spacing={2}>
-							{/* <IconButton
-								icon={<FiHeart />}
-								variant="ghost"
-								size="sm"
-								aria-label="Wishlist"
-							/> */}
-							<IconButton
-								icon={<FiShare2 />}
-								variant="ghost"
-								size="sm"
-								aria-label="Share"
-								onClick={() => {
-									if (navigator.share) {
-										navigator.share({
-											title: document.title,
-											text: "Check this out",
-											url: window.location.href,
-										});
-									} else {
-										navigator.clipboard.writeText(window.location.href);
-										alert("Link copied to clipboard");
-									}
-								}}
-							/>
+							<IconButton icon={<FiShare2 />} variant="ghost" size="xs" aria-label="Share"
+								onClick={() => navigator.clipboard.writeText(window.location.href)} />
+
 						</HStack>
 					</Flex>
 				</Container>
 			</Box>
 
-			<Container maxW="container.xl" py={8}>
-				<Grid templateColumns={{ base: "1fr", lg: "repeat(12, 1fr)" }} gap={8}>
-					{/* LEFT CONTENT */}
-					<GridItem colSpan={{ base: 1, lg: 8 }}>
-						<VStack spacing={8} align="stretch">
-							{/* Product Header */}
-							<VStack align="start" spacing={4}>
-								<Wrap spacing={2}>
-									<WrapItem>
-										<Tag bg="#D9040410" color="#D90404" borderRadius="full" fontSize="11px" fontWeight="600">
-											{product.category?.name || "Engine Part"}
-										</Tag>
-									</WrapItem>
-									<WrapItem>
-										<Tag bg="green.50" color="green.600" borderRadius="full" fontSize="11px" fontWeight="600">
-											In Stock
-										</Tag>
-									</WrapItem>
-								</Wrap>
+			<Container maxW="container.xl" py={6} px={4}>
+				<Grid templateColumns={{ base: "1fr", lg: "1fr 0.9fr" }} gap={8}>
 
-								<Heading
-									fontSize={{ base: "28px", md: "36px" }}
-									fontWeight="800"
-									lineHeight="1.2"
-									color="gray.800"
-									letterSpacing="-0.5px"
-								>
-									{product.name}
-								</Heading>
+					{/* LEFT COLUMN */}
+					<VStack spacing={6} align="stretch">
 
-								<Flex align="baseline" gap={4} wrap="wrap">
-									{/* <VStack align="start" spacing={0}>
-										<Text
-											fontSize="32px"
-											fontWeight="800"
-											color="#D90404"
-											lineHeight="1"
+						{/* Gallery */}
+						<Box bg="white" borderRadius="lg" overflow="hidden" p={4}>
+							<AnimatePresence mode="wait">
+								<MotionBox key={selectedImage} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+									<Image
+										src={product.images?.[selectedImage]}
+										h={{ base: "250px", md: "350px" }}
+										w="full"
+										objectFit="contain"
+									/>
+								</MotionBox>
+							</AnimatePresence>
+							{product.images?.length > 1 && (
+								<HStack spacing={2} mt={3} justify="center">
+									{product.images?.map((img, idx) => (
+										<Box
+											key={idx}
+											cursor="pointer"
+											border={selectedImage === idx ? "2px solid #D90404" : "1px solid #E2E8F0"}
+											borderRadius="md"
+											onClick={() => setSelectedImage(idx)}
 										>
-											<Text
-												as="span"
-												fontSize="14px"
-												fontWeight="600"
-												color="gray.500"
-												mr={2}
-												verticalAlign="middle"
-											>
-												Starting From
-											</Text>
+											<Image src={img} boxSize="50px" objectFit="cover" />
+										</Box>
+									))}
+								</HStack>
+							)}
+						</Box>
 
-											£{product.price?.toLocaleString()}
-										</Text>
-
-										<Text
-											fontSize="11px"
-											color="gray.400"
-											fontWeight="500"
-										>
-											EXCLUSIVE OF VAT
-										</Text>
-									</VStack> */}
-									<Divider orientation="vertical" h="40px" />
-									<VStack align="start" spacing={0}>
-										<Text fontSize="10px" color="gray.400" fontWeight="600" textTransform="uppercase">
-											Condition
-										</Text>
-										<Text fontWeight="700" fontSize="14px">{product.condition}</Text>
-									</VStack>
-									{/* <VStack align="start" spacing={0}>
-										<Text fontSize="10px" color="gray.400" fontWeight="600" textTransform="uppercase">
-											Compatibility
-										</Text>
-										<ChakraLink color="#D90404" fontWeight="700" fontSize="14px">
-											Check Vehicles →
-										</ChakraLink>
-									</VStack> */}
-								</Flex>
-							</VStack>
-
-							{/* Gallery Section */}
-							<Box position="relative">
-								<AnimatePresence mode="wait">
-									<MotionBox
-										key={selectedImage}
-										initial={{ opacity: 0 }}
-										animate={{ opacity: 1 }}
-										exit={{ opacity: 0 }}
-										transition={{ duration: 0.2 }}
-										borderRadius="2xl"
-										overflow="hidden"
-										bg="gray.50"
-									>
-										<Image
-											src={product.images?.[selectedImage]}
-											w="full"
-											h={{ base: "300px", md: "450px" }}
-											objectFit="contain"
-											fallbackSrc="https://via.placeholder.com/600x400?text=No+Image"
-										/>
-									</MotionBox>
-								</AnimatePresence>
-								{product.images?.length > 1 && (
-									<HStack spacing={3} mt={4} justify="center" wrap="wrap">
-										{product.images?.map((img, idx) => (
-											<Box
-												key={idx}
-												cursor="pointer"
-												border="2px solid"
-												borderColor={selectedImage === idx ? "#D90404" : "transparent"}
-												borderRadius="lg"
-												overflow="hidden"
-												onClick={() => setSelectedImage(idx)}
-												transition="all 0.2s"
-												_hover={{ transform: "scale(1.05)", borderColor: "#D90404" }}
-											>
-												<Image src={img} boxSize="70px" objectFit="cover" />
-											</Box>
-										))}
-									</HStack>
+						{/* Product Header */}
+						<Box>
+							<Wrap spacing={2} mb={2}>
+								<Tag size="sm" bg="#D9040410" color="#D90404" fontSize="10px">
+									{product.category?.name}
+								</Tag>
+								<Tag size="sm" bg="green.50" color="green.600" fontSize="10px">
+									{!product.isSold ? "In Stock" : "Sold"}
+								</Tag>
+								{product.isFeatured && (
+									<Tag size="sm" bg="blue.50" color="blue.600" fontSize="10px">
+										⭐ Featured
+									</Tag>
 								)}
-							</Box>
+							</Wrap>
+							<Heading fontSize="24px" fontWeight="700" mb={3} lineHeight="1.3">
+								{product.name}
+							</Heading>
 
-							{/* People Also Search */}
-							{product.similarProducts?.length > 0 && (
-								<Box>
-									<Flex justify="space-between" align="center" mb={4}>
-										<Heading fontSize="xl" fontWeight="800">
-											People also search
-										</Heading>
+							{/* Quick Specs */}
+							<SimpleGrid columns={{ base: 2, md: 4 }} spacing={3} mb={4}>
+								{product.make && product.model && (
+									<Box bg="white" p={2} borderRadius="md" border="1px solid" borderColor="gray.100">
+										<Icon as={FaTachometerAlt} color="#D90404" mb={1} />
+										<Text fontSize="9px" color="gray.500">Make & Model</Text>
+										<Text fontSize="13px" fontWeight="600">{product.make} {product.model}</Text>
+									</Box>
+								)}
+								{product.year && (
+									<Box bg="white" p={2} borderRadius="md" border="1px solid" borderColor="gray.100">
+										<Icon as={FaCalendarAlt} color="#D90404" mb={1} />
+										<Text fontSize="9px" color="gray.500">Year</Text>
+										<Text fontSize="13px" fontWeight="600">{product.year}</Text>
+									</Box>
+								)}
+								{product.engineType && (
+									<Box bg="white" p={2} borderRadius="md" border="1px solid" borderColor="gray.100">
+										<Icon as={FaGasPump} color="#D90404" mb={1} />
+										<Text fontSize="9px" color="gray.500">Engine Type</Text>
+										<Text fontSize="13px" fontWeight="600">{product.engineType}</Text>
+									</Box>
+								)}
+								{product.condition && (
+									<Box bg="white" p={2} borderRadius="md" border="1px solid" borderColor="gray.100">
+										<Icon as={FaCog} color="#D90404" mb={1} />
+										<Text fontSize="9px" color="gray.500">Condition</Text>
+										<Text fontSize="13px" fontWeight="600">{product.condition}</Text>
+									</Box>
+								)}
+							</SimpleGrid>
+						</Box>
+
+						{/* Product Description */}
+						<Box bg="white" p={5} borderRadius="lg">
+							<Heading fontSize="18px" fontWeight="700" mb={3}>Product Overview</Heading>
+							<Text fontSize="14px" color="gray.600" lineHeight="1.6">
+								{product.description}
+							</Text>
+						</Box>
+
+						{/* Technical Specifications */}
+						<Box bg="white" p={5} borderRadius="lg">
+							<Heading fontSize="18px" fontWeight="700" mb={3}>Technical Specifications</Heading>
+							<SimpleGrid columns={{ base: 1, md: 2 }} spacing={3}>
+								{product.make && (
+									<Flex justify="space-between" py={1} borderBottom="1px solid" borderColor="gray.100">
+										<Text fontSize="13px" color="gray.600">Make</Text>
+										<Text fontSize="13px" fontWeight="500">{product.make}</Text>
 									</Flex>
-									<HStack
-										spacing={4}
-										overflowX="auto"
-										pb={4}
-										css={{ "&::-webkit-scrollbar": { display: "none" } }}
-									>
-										{product.similarProducts?.map((p, idx) => (
-											<ProductCard key={idx} product={p} />
-										))}
-									</HStack>
+								)}
+								{product.model && (
+									<Flex justify="space-between" py={1} borderBottom="1px solid" borderColor="gray.100">
+										<Text fontSize="13px" color="gray.600">Model</Text>
+										<Text fontSize="13px" fontWeight="500">{product.model}</Text>
+									</Flex>
+								)}
+								{product.year && (
+									<Flex justify="space-between" py={1} borderBottom="1px solid" borderColor="gray.100">
+										<Text fontSize="13px" color="gray.600">Year</Text>
+										<Text fontSize="13px" fontWeight="500">{product.year}</Text>
+									</Flex>
+								)}
+								{product.engineType && (
+									<Flex justify="space-between" py={1} borderBottom="1px solid" borderColor="gray.100">
+										<Text fontSize="13px" color="gray.600">Engine Type</Text>
+										<Text fontSize="13px" fontWeight="500">{product.engineType}</Text>
+									</Flex>
+								)}
+								{product.condition && (
+									<Flex justify="space-between" py={1} borderBottom="1px solid" borderColor="gray.100">
+										<Text fontSize="13px" color="gray.600">Condition</Text>
+										<Text fontSize="13px" fontWeight="500">{product.condition}</Text>
+									</Flex>
+								)}
+								{product.currency && (
+									<Flex justify="space-between" py={1} borderBottom="1px solid" borderColor="gray.100">
+										<Text fontSize="13px" color="gray.600">Currency</Text>
+										<Text fontSize="13px" fontWeight="500">{product.currency}</Text>
+									</Flex>
+								)}
+							</SimpleGrid>
+						</Box>
+
+						{/* Compatibility Table - Only if data exists */}
+						{product.compatibility && product.compatibility.length > 0 && (
+							<Box bg="white" p={5} borderRadius="lg">
+								<Heading fontSize="18px" fontWeight="700" mb={3}>Vehicle Compatibility</Heading>
+								<Text fontSize="13px" color="gray.500" mb={3}>This engine fits the following vehicles:</Text>
+								<Box overflowX="auto">
+									<Table variant="simple" size="sm">
+										<Thead bg="gray.50">
+											<Tr>
+												<Th fontSize="11px">Make</Th>
+												<Th fontSize="11px">Model</Th>
+												<Th fontSize="11px">Variant</Th>
+												<Th fontSize="11px">Year</Th>
+												<Th fontSize="11px">Engine</Th>
+											</Tr>
+										</Thead>
+										<Tbody>
+											{product.compatibility?.slice(0, 6).map((item, idx) => (
+												<Tr key={idx} _hover={{ bg: "gray.50" }}>
+													<Td fontSize="12px" fontWeight="500">{item.make}</Td>
+													<Td fontSize="12px">{item.model}</Td>
+													<Td fontSize="12px">{item.variant || "-"}</Td>
+													<Td fontSize="12px">{item.year || "-"}</Td>
+													<Td fontSize="12px" color="#D90404" fontWeight="500">{item.engine || "-"}</Td>
+												</Tr>
+											))}
+										</Tbody>
+									</Table>
 								</Box>
+							</Box>
+						)}
+
+					
+
+						{/* Similar Products - Only if data exists */}
+						{product.similarProducts && product.similarProducts.length > 0 && (
+							<Box>
+								<Heading fontSize="18px" fontWeight="700" mb={3}>You May Also Like</Heading>
+								<HStack spacing={3} overflowX="auto" pb={2}>
+									{product.similarProducts?.slice(0, 5).map((p, idx) => (
+										<ProductCard key={idx} product={p} />
+									))}
+								</HStack>
+							</Box>
+						)}
+					</VStack>
+
+					{/* RIGHT COLUMN - Sticky Sidebar */}
+					<Box position="sticky" top="80px">
+						<VStack spacing={4} align="stretch">
+
+							{/* Request Quote Card */}
+							<Card shadow="lg" borderRadius="xl" overflow="hidden">
+								<Box bg="linear-gradient(135deg, #D90404 0%, #B70303 100%)" p={4} textAlign="center">
+									<Text color="white" fontWeight="700" fontSize="16px">Interested in this {product.category?.name || "product"}?</Text>
+									<Text color="white" opacity="0.9" fontSize="12px">Get a quote today</Text>
+								</Box>
+								<CardBody p={4}>
+									<Button
+										bg="#D90404"
+										color="white"
+										w="full"
+										h="50px"
+										_hover={{ bg: "#B70303" }}
+										borderRadius="md"
+										fontWeight="600"
+										leftIcon={<FaPhoneAlt />}
+										mb={3}
+										onClick={() =>
+											navigate("/call-seller", {
+												state: {
+													brand: toText(product.make),
+													model: toText(product.model),
+													year: toText(product.year),
+													type: toText(product.engineType),
+													category: toText(product.category?.name),
+													searchType: "manual",
+												},
+											})
+										}
+									>
+										Request Quote
+									</Button>
+
+									<Text fontSize="11px" color="gray.500" textAlign="center">
+										No commitment. Free consultation.
+									</Text>
+								</CardBody>
+							</Card>
+
+							{/* Seller Details */}
+							{product.seller && (
+								<Card borderRadius="xl">
+									<CardBody p={4}>
+										<HStack spacing={2} mb={3}>
+											<Icon as={FaStore} color="#D90404" />
+											<Text fontSize="14px" fontWeight="700">About the Seller</Text>
+										</HStack>
+										<Text fontSize="13px" fontWeight="600">{product.seller?.name}</Text>
+										<HStack spacing={2} mb={2}>
+											<Icon as={FaMapMarkerAlt} color="gray.400" boxSize="10px" />
+											<Text fontSize="11px" color="gray.500">{product.shipping?.location || "United Kingdom"}</Text>
+										</HStack>
+
+										<Divider my={3} />
+
+										{product.seller?.rating && (
+											<Stat size="sm">
+												<StatLabel fontSize="11px">Seller Rating</StatLabel>
+
+												<StatNumber fontSize="14px">
+													{product.seller?.rating} / 5.0
+												</StatNumber>
+
+												<StatHelpText fontSize="10px">
+													<HStack spacing={0.5}>
+														{[1, 2, 3, 4, 5].map((star) => (
+															<Icon
+																key={star}
+																as={FaStar}
+																color={
+																	star <= Math.round(product.seller?.rating)
+																		? "yellow.400"
+																		: "gray.300"
+																}
+																boxSize="10px"
+															/>
+														))}
+													</HStack>
+												</StatHelpText>
+											</Stat>
+										)}
+									</CardBody>
+								</Card>
 							)}
 
-							{/* Description */}
-							<Box>
-								<Heading fontSize="22px" fontWeight="800" mb={4} color="gray.800">
-									Product Description
-								</Heading>
-								<Text fontSize="15px" color="gray.600" lineHeight="1.7">
-									{product.description}
+							{/* Key Benefits */}
+							<Card borderRadius="xl" bg="#D9040405">
+								<CardBody p={4}>
+									<VStack spacing={3} align="start">
+										<HStack spacing={2}>
+											<Box
+												w="25px"
+												h="25px"
+												borderRadius="full"
+												bg="#D90404"
+												display="flex"
+												alignItems="center"
+												justifyContent="center"
+											>
+												<Icon as={FaCertificate} color="white" boxSize="10px" />
+											</Box>
+
+											<Text fontSize="12px" fontWeight="600">
+												Certified Quality
+											</Text>
+										</HStack>
+										<HStack spacing={2}>
+											<Box
+												w="25px"
+												h="25px"
+												borderRadius="full"
+												bg="#D90404"
+												display="flex"
+												alignItems="center"
+												justifyContent="center"
+											>
+												<Icon as={FaTruck} color="white" boxSize="10px" />
+											</Box>
+											<Text fontSize="12px" fontWeight="600">UK Delivery Available</Text>
+										</HStack>
+										<HStack spacing={2}>
+											<Box
+												w="25px"
+												h="25px"
+												borderRadius="full"
+												bg="#D90404"
+												display="flex"
+												alignItems="center"
+												justifyContent="center"
+											>
+												<Icon as={FaShieldAlt} color="white" boxSize="10px" />
+											</Box>
+											<Text fontSize="12px" fontWeight="600">Warranty Included</Text>
+										</HStack>
+										<HStack spacing={2}>
+											<Box
+												w="25px"
+												h="25px"
+												borderRadius="full"
+												bg="#D90404"
+												display="flex"
+												alignItems="center"
+												justifyContent="center"
+											>
+												<Icon as={FaThumbsUp} color="white" boxSize="10px" />
+											</Box>
+											<Text fontSize="12px" fontWeight="600">Satisfaction Guaranteed</Text>
+										</HStack>
+									</VStack>
+								</CardBody>
+							</Card>
+
+
+
+								{/* Warranty & Support Accordion */}
+						<Accordion allowToggle defaultIndex={[0]}>
+							<AccordionItem bg="white" borderRadius="lg" border="none" mb={3}>
+								<AccordionButton _expanded={{ bg: "#D90404", color: "white" }} borderRadius="lg">
+									<Box flex="1" textAlign="left" fontWeight="600">
+										<Icon as={FaShieldAlt} mr={2} /> Warranty Information
+									</Box>
+									<AccordionIcon />
+								</AccordionButton>
+								<AccordionPanel pb={4} pt={4}>
+									<VStack align="start" spacing={2}>
+										<Text fontSize="13px">✓ 12 months comprehensive warranty included</Text>
+										<Text fontSize="13px">✓ Parts and labour covered at approved garages</Text>
+										<Text fontSize="13px">✓ Nationwide coverage </Text>
+									</VStack>
+								</AccordionPanel>
+							</AccordionItem>
+
+							<AccordionItem bg="white" borderRadius="lg" border="none" mb={3}>
+								<AccordionButton _expanded={{ bg: "#D90404", color: "white" }} borderRadius="lg">
+									<Box flex="1" textAlign="left" fontWeight="600">
+										<Icon as={FaShippingFast} mr={2} /> Delivery Information
+									</Box>
+									<AccordionIcon />
+								</AccordionButton>
+								<AccordionPanel pb={4} pt={4}>
+									<VStack align="start" spacing={2}>
+										<Text fontSize="13px">✓ {product.shipping?.delivery || "Standard delivery available"}</Text>
+										<Text fontSize="13px">✓ Professional installation service available</Text>
+										{/* <Text fontSize="13px">✓ {product.shipping?.returns}</Text> */}
+									</VStack>
+								</AccordionPanel>
+							</AccordionItem>
+
+							<AccordionItem bg="white" borderRadius="lg" border="none" mb={3}>
+								<AccordionButton _expanded={{ bg: "#D90404", color: "white" }} borderRadius="lg">
+									<Box flex="1" textAlign="left" fontWeight="600">
+										<Icon as={FaHeadset} mr={2} /> Customer Support
+									</Box>
+									<AccordionIcon />
+								</AccordionButton>
+								<AccordionPanel pb={4} pt={4}>
+									<VStack align="start" spacing={2}>
+										<Text fontSize="13px">✓ Dedicated support team available</Text>
+										<Text fontSize="13px">✓ Email support with quick response</Text>
+										<Text fontSize="13px">✓ Technical advice from certified mechanics</Text>
+									</VStack>
+								</AccordionPanel>
+							</AccordionItem>
+						</Accordion>
+
+							{/* Trust Badges */}
+							<Box textAlign="center" p={3}>
+								<HStack justify="center" spacing={3} mb={2}>
+									<Icon as={FaCertificate} color="gray.400" />
+									<Icon as={FaShieldAlt} color="gray.400" />
+									<Icon as={FaCheckCircle} color="gray.400" />
+								</HStack>
+								<Text fontSize="10px" color="gray.500">
+									Premium Quality Assured
 								</Text>
 							</Box>
-
-							{/* Compatibility Table */}
-							{product.compatibility?.length > 0 && (
-								<Box>
-									<Heading fontSize="22px" fontWeight="800" mb={4} color="gray.800">
-										Vehicle Compatibility
-									</Heading>
-									<Box
-										borderRadius="xl"
-										border="1px solid"
-										borderColor="gray.200"
-										overflowX="auto"
-									>
-										<Table variant="simple" size="sm">
-											<Thead bg="gray.50">
-												<Tr>
-													<Th fontSize="11px" fontWeight="700">Make</Th>
-													<Th fontSize="11px" fontWeight="700">Model</Th>
-													<Th fontSize="11px" fontWeight="700">Variant</Th>
-													<Th fontSize="11px" fontWeight="700">Year</Th>
-													<Th fontSize="11px" fontWeight="700">Engine</Th>
-												</Tr>
-											</Thead>
-											<Tbody>
-												{product.compatibility?.slice(0, 5).map((item, idx) => (
-													<Tr key={idx} _hover={{ bg: "gray.50" }}>
-														<Td fontWeight="600" fontSize="13px">{item.make}</Td>
-														<Td fontSize="13px">{item.model}</Td>
-														<Td fontSize="12px" color="gray.600">{item.variant}</Td>
-														<Td fontSize="13px">{item.year}</Td>
-														<Td fontSize="12px" color="#D90404" fontWeight="600">{item.engine}</Td>
-													</Tr>
-												))}
-											</Tbody>
-										</Table>
-									</Box>
-									{product.compatibility?.length > 5 && (
-										<Button variant="link" color="#D90404" mt={3} size="sm">
-											View all {product.compatibility.length} vehicles →
-										</Button>
-									)}
-								</Box>
-							)}
-
-							{/* Price Breakdown */}
-							<Box bg="gray.50" p={6} borderRadius="2xl">
-								{/* <Heading fontSize="20px" fontWeight="800" mb={6} textAlign="center">
-									Pricing Breakdown
-								</Heading> */}
-								<SimpleGrid columns={{ base: 1, md: 2 }} gap={6}>
-									{/* <Card variant="outline" borderColor="gray.200">
-										<CardBody>
-											<VStack align="stretch" spacing={3}>
-												<Flex justify="space-between">
-													<Text fontWeight="600">
-														Engine Price
-													</Text>
-													<Text fontWeight="700">
-														<Text as="span" fontSize="11px" color="gray.500">
-															Starting From
-														</Text>{" "}
-														£{itemPrice.toLocaleString()}</Text>
-												</Flex>
-												<Flex justify="space-between">
-													<Text fontWeight="600">Delivery</Text>
-													<Text fontWeight="700">£{deliveryPrice.toLocaleString()}</Text>
-												</Flex>
-												<Divider />
-												<Flex justify="space-between">
-													<Text fontWeight="600">Subtotal</Text>
-													<Text fontWeight="700">£{(itemPrice + deliveryPrice).toLocaleString()}</Text>
-												</Flex>
-											</VStack>
-										</CardBody>
-									</Card> */}
-									<Card bg="#D9040405" borderColor="#D9040420">
-										<CardBody>
-											<VStack align="stretch" spacing={3}>
-												<Flex justify="space-between">
-													<Text fontWeight="600">VAT ({Math.round(vatRate * 100)}%)</Text>
-													{/* <Text fontWeight="700">£{vatAmount.toLocaleString()}</Text> */}
-												</Flex>
-												<Divider borderColor="#D9040420" />
-												{/* <Flex justify="space-between">
-													<Text fontWeight="800" fontSize="lg">Total</Text>
-													<Text fontWeight="800" fontSize="2xl" color="#D90404">£{totalAmount.toLocaleString()}</Text>
-												</Flex> */}
-											</VStack>
-										</CardBody>
-									</Card>
-								</SimpleGrid>
-							</Box>
 						</VStack>
-					</GridItem>
-
-					{/* RIGHT SIDEBAR */}
-					<GridItem colSpan={{ base: 1, lg: 4 }}>
-						<Box position="sticky" top="100px">
-							<VStack spacing={5} align="stretch">
-								{/* Main Action Buttons */}
-								<Card shadow="lg" borderRadius="2xl" border="none">
-									<CardBody p={2}>
-										<VStack spacing={2}>
-											{/* <Button
-												bg="#D90404"
-												color="white"
-												h="60px"
-												w="full"
-												_hover={{ bg: "#B70303", transform: "translateY(-2px)" }}
-												_active={{ transform: "translateY(0)" }}
-												borderRadius="xl"
-												fontSize="16px"
-												fontWeight="700"
-												boxShadow="0 4px 12px rgba(217, 4, 4, 0.3)"
-												transition="all 0.2s"
-												onClick={onOpen}
-											>
-												Get Custom Quote
-											</Button> */}
-
-											{/* <Button
-												onClick={handleBuyItNow}
-												variant="outline"
-												borderColor="#D90404"
-												color="#D90404"
-												h="50px"
-												w="full"
-												borderRadius="xl"
-												fontWeight="600"
-												_hover={{ bg: "#D90404", color: "white", borderColor: "#D90404" }}
-											>
-												Buy It Now
-											</Button> */}
-
-											{/* <Button
-												variant="ghost"
-												h="50px"
-												w="full"
-												borderRadius="xl"
-												fontWeight="600"
-												leftIcon={<FaWhatsapp />}
-												color="green.600"
-												_hover={{ bg: "green.50" }}
-											>
-												Chat on WhatsApp
-											</Button> */}
-
-											<Button
-												variant="ghost"
-												h="50px"
-												w="full"
-												borderColor="#D90404"
-												color="#D90404"
-												borderRadius="xl"
-												fontWeight="600"
-												leftIcon={<FaPhoneAlt />}
-												onClick={() =>
-													navigate("/call-seller", {
-														state: {
-															brand: toText(product.make || product.brand),
-															model: toText(product.model),
-															year: toText(product.year),
-															type: toText(product.engineType),
-															category: toText(product.category?.name),
-															searchType: "manual",
-														},
-													})
-												}
-											>
-												Request Quote
-											</Button>
-										</VStack>
-									</CardBody>
-								</Card>
-
-								{/* Features Card */}
-								<Card borderRadius="2xl" border="1px solid" borderColor="gray.100">
-									<CardBody p={5}>
-										<VStack align="start" spacing={4}>
-											<HStack spacing={3}>
-												<Box bg="blue.50" p={2} borderRadius="lg">
-													<Icon as={FaShippingFast} color="#D90404" boxSize={5} />
-												</Box>
-												<VStack align="start" spacing={0}>
-													<Text fontSize="14px" fontWeight="700">Nationwide Delivery</Text>
-													<Text fontSize="11px" color="gray.500">Fast shipping across UK</Text>
-												</VStack>
-											</HStack>
-											<HStack spacing={3}>
-												<Box bg="orange.50" p={2} borderRadius="lg">
-													<Icon as={FaShieldAlt} color="#D90404" boxSize={5} />
-												</Box>
-												<VStack align="start" spacing={0}>
-													<Text fontSize="14px" fontWeight="700">Warranty Included</Text>
-													<Text fontSize="11px" color="gray.500">12 months guarantee</Text>
-												</VStack>
-											</HStack>
-											<HStack spacing={3}>
-												<Box bg="green.50" p={2} borderRadius="lg">
-													<Icon as={FaClock} color="#D90404" boxSize={5} />
-												</Box>
-												<VStack align="start" spacing={0}>
-													<Text fontSize="14px" fontWeight="700">Quick Installation</Text>
-													<Text fontSize="11px" color="gray.500">24-48 hour fitting available</Text>
-												</VStack>
-											</HStack>
-										</VStack>
-									</CardBody>
-								</Card>
-
-								{/* Limited Offer */}
-								{/* <Box
-									bg="linear-gradient(135deg, #D90404 0%, #B70303 100%)"
-									color="white"
-									p={4}
-									borderRadius="xl"
-									textAlign="center"
-								>
-									<Text fontWeight="800" fontSize="13px">
-										🔥 LIMITED TIME OFFER
-									</Text>
-									<Text fontSize="11px" opacity="0.9">
-										Exclusive savings available today
-									</Text>
-								</Box> */}
-
-								{/* Meta Info */}
-								<VStack align="stretch" spacing={2} px={2}>
-									<Flex justify="space-between">
-										<Text fontSize="11px" color="gray.500">Location</Text>
-										<Text fontSize="11px" fontWeight="600">{product.shipping?.location || "United Kingdom"}</Text>
-									</Flex>
-									{/* <Flex justify="space-between">
-										<Text fontSize="11px" color="gray.500">Delivery</Text>
-										<Text fontSize="11px" fontWeight="600">{product.shipping?.delivery || "3-5 business days"}</Text>
-									</Flex> */}
-									{/* <Flex justify="space-between">
-										<Text fontSize="11px" color="gray.500">Returns</Text>
-										<Text fontSize="11px" fontWeight="700" color="#D90404">30 Day Returns</Text>
-									</Flex> */}
-								</VStack>
-							</VStack>
-						</Box>
-					</GridItem>
+					</Box>
 				</Grid>
 			</Container>
 

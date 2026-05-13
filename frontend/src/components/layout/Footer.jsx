@@ -209,9 +209,9 @@ export default function Footer() {
               </Box>
             </HStack>
 
-            <Text fontSize={{ base: "13px", md: "sm" }} color="gray.400" lineHeight="1.7">
+            <Text fontSize={{ base: "14px", md: "16px" }} color="gray.400">
               Your trusted UK marketplace for quality used and reconditioned car engines.
-              Fast delivery with supply & fitting service across England, Scotland, Wales & Northern Ireland.
+              Fast delivery with professional supply & fitting service available nationwide.
             </Text>
           </Stack>
 

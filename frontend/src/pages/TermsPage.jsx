@@ -17,6 +17,8 @@ import {
   AccordionIcon,
   useColorModeValue,
   Icon,
+  Link,
+  UnorderedList,
 } from '@chakra-ui/react';
 import { Helmet } from 'react-helmet-async';
 import { FaCheckCircle, FaGavel, FaShieldAlt } from 'react-icons/fa';
@@ -53,13 +55,13 @@ export default function TermsPage() {
       <Box bg={darkBg} color="white" py={12} mb={8}>
         <Container maxW="container.xl">
           <VStack spacing={3} textAlign="center">
-            <Box 
-              bg={accentColor} 
-              color="white" 
-              px={4} 
-              py={1} 
-              borderRadius="full" 
-              fontSize="12px" 
+            <Box
+              bg={accentColor}
+              color="white"
+              px={4}
+              py={1}
+              borderRadius="full"
+              fontSize="12px"
               fontWeight="600"
             >
               LEGAL
@@ -79,16 +81,16 @@ export default function TermsPage() {
         <VStack align="stretch" spacing={8}>
 
           {/* Warning Banner */}
-          <Box 
-            bg="red.50" 
-            p={6} 
-            borderRadius="lg" 
+          <Box
+            bg="red.50"
+            p={6}
+            borderRadius="lg"
             borderLeft="5px solid #D90404"
           >
             <HStack spacing={4} align="start">
               <Icon as={MdGavel} boxSize={7} color="#D90404" mt={1} />
               <Text fontSize="15px" color="red.800" lineHeight="1.7" fontWeight="500">
-                Before you proceed, please read these Terms and Conditions carefully. 
+                Before you proceed, please read these Terms and Conditions carefully.
                 If you do not agree with these terms, you must immediately exit and not use this website.
               </Text>
             </HStack>
@@ -98,13 +100,13 @@ export default function TermsPage() {
           <Box>
             {sections.map((section) => (
               <Accordion key={section.id} allowToggle mb={4}>
-                <AccordionItem 
-                  border="1px solid" 
-                  borderColor="gray.200" 
-                  borderRadius="lg" 
+                <AccordionItem
+                  border="1px solid"
+                  borderColor="gray.200"
+                  borderRadius="lg"
                   overflow="hidden"
                 >
-                  <AccordionButton 
+                  <AccordionButton
                     _expanded={{ bg: accentColor, color: 'white' }}
                     _hover={{ bg: 'orange.50' }}
                     py={5}
@@ -121,7 +123,7 @@ export default function TermsPage() {
 
                     {section.id === 1 && (
                       <Text>
-                        By accessing or using Re-Conditioned Engine, you agree to be bound by these Terms and Conditions. 
+                        By accessing or using Re-Conditioned Engine, you agree to be bound by these Terms and Conditions.
                         If you do not agree, please do not use our website.
                       </Text>
                     )}
@@ -130,15 +132,26 @@ export default function TermsPage() {
                       <VStack align="stretch" spacing={3}>
                         <Text><strong>“We”, “Us”, “Our”</strong> – refers to Re-Conditioned Engine.</Text>
                         <Text><strong>“You”, “Your”</strong> – refers to the user of this website.</Text>
-                        <Text><strong>“Website”</strong> – means www.allengine4you.com and all its pages.</Text>
-                        <Text><strong>“Provider”</strong> – means third-party suppliers offering engines and parts.</Text>
-                        <Text><strong>“Quote”</strong> – means a price offer received from a supplier via our platform.</Text>
+                        <Text>
+                          <strong>“Website”</strong> – means{" "}
+                          <Link
+                            href="https://reconditionedengine.co.uk/"
+                            color="#D90404"
+                            isExternal
+                            fontWeight="600"
+                          >
+                            https://reconditionedengine.co.uk/
+                          </Link>{" "}
+                          and all its pages.
+                        </Text>
+                        {/* <Text><strong>“Provider”</strong> – means third-party suppliers offering engines and parts.</Text>
+                        <Text><strong>“Quote”</strong> – means a price offer received from a supplier via our platform.</Text> */}
                       </VStack>
                     )}
 
                     {section.id === 3 && (
                       <VStack align="stretch" spacing={3}>
-                        <Text>1.1 We operate as a price comparison platform only. We do not supply engines or parts directly.</Text>
+                        <Text>1.1 We operate as an online marketplace platform only. We do not supply engines or parts directly.</Text>
                         <Text>1.2 We have no control over the quality, safety, or legality of products supplied by third-party providers.</Text>
                         <Text>1.3 We do not verify or endorse any quotes provided by suppliers.</Text>
                         <Text>1.4 All transactions and agreements are made directly between you and the supplier.</Text>
@@ -158,34 +171,35 @@ export default function TermsPage() {
 
                     {section.id === 5 && (
                       <Text>
-                        You are responsible for ensuring that all information you provide is accurate and complete. 
+                        You are responsible for ensuring that all information you provide is accurate and complete.
                         Incorrect information may result in inaccurate quotes and may affect any warranty from the supplier.
                       </Text>
                     )}
 
                     {section.id === 6 && (
                       <Text>
-                        Re-Conditioned Engine is a price comparison service. We help you compare prices from different sellers. 
-                        We do not handle payments, delivery, or any financial transactions. All purchases are made directly with the supplier.
+                        Re-Conditioned Engine connects customers with verified engine suppliers.
+                        We do not handle payments, delivery, or any financial transactions. All purchases are made
+                        directly with the supplier.
                       </Text>
                     )}
 
                     {section.id === 7 && (
                       <Text>
-                        Price quotes are provided by third-party suppliers. We do not guarantee the availability or final price. 
+                       Quotes are provided by third-party suppliers. We do not guarantee the availability or final price.
                         All final terms are set by the supplier. You must contact the supplier directly to confirm the quote.
                       </Text>
                     )}
 
                     {section.id === 8 && (
                       <Text>
-                        Price quotes are delivered via email or on the website. We rely on third-party services and cannot guarantee delivery in all cases due to technical issues.
+                        Quotes are delivered via email or on the website. We rely on third-party services and cannot guarantee delivery in all cases due to technical issues.
                       </Text>
                     )}
 
                     {section.id === 9 && (
                       <Text>
-                        All content, logos, images, and materials on this website are the intellectual property of Re-Conditioned Engine or its licensors. 
+                        All content, logos, images, and materials on this website are the intellectual property of Re-Conditioned Engine or its licensors.
                         You may not copy, reproduce, or use them without written permission.
                       </Text>
                     )}
@@ -204,7 +218,7 @@ export default function TermsPage() {
 
                     {section.id === 12 && (
                       <VStack align="stretch" spacing={3}>
-                        <Text>If you have a complaint about our service, please contact us at support@allengine4you.com.</Text>
+                        <Text>If you have a complaint about our service, please contact us at support @reconditionedengine.co.uk</Text>
                         <Text fontSize="14px" color="gray.600">
                           Note: For complaints regarding engines or services from suppliers, you must contact the supplier directly.
                         </Text>
@@ -224,11 +238,11 @@ export default function TermsPage() {
           </Box>
 
           {/* Final Note */}
-          <Box 
-            bg={darkBg} 
-            color="white" 
-            p={8} 
-            borderRadius="xl" 
+          <Box
+            bg={darkBg}
+            color="white"
+            p={8}
+            borderRadius="xl"
             textAlign="center"
           >
             <VStack spacing={4}>
@@ -237,7 +251,7 @@ export default function TermsPage() {
               <Text fontSize="14px" opacity={0.8}>
                 If you have any questions, please contact us at{' '}
                 <Text as="span" color={accentColor} fontWeight="600">
-                  support@allengine4you.com
+                  support@reconditionedengine.co.uk
                 </Text>
               </Text>
             </VStack>
