@@ -12,7 +12,33 @@ import {
 	HStack,
 	useColorModeValue,
 } from "@chakra-ui/react";
+import { motion } from "framer-motion";
 import { FaSearch, FaHandshake, FaTruck } from "react-icons/fa";
+
+const MotionBox = motion(Box);
+const MotionSimpleGrid = motion(SimpleGrid);
+
+const containerVariants = {
+	hidden: { opacity: 0 },
+	visible: {
+		opacity: 1,
+		transition: {
+			staggerChildren: 0.2,
+		},
+	},
+};
+
+const itemVariants = {
+	hidden: { opacity: 0, y: 30 },
+	visible: {
+		opacity: 1,
+		y: 0,
+		transition: {
+			duration: 0.6,
+			ease: [0.25, 0.1, 0.25, 1.0],
+		},
+	},
+};
 
 const steps = [
 	{
@@ -58,49 +84,64 @@ export default function EasyStepsSection() {
 	const stepNumberMuted = useColorModeValue("gray.100", "whiteAlpha.300");
 
 	return (
-		<Box bgGradient={sectionBg} py={{ base: 14, md: 20 }}>
+		<Box bgGradient={sectionBg} py={{ base: 14, md: 20 }} overflow="hidden">
 			<Container maxW="container.xl">
 				<VStack spacing={{ base: 10, md: 14 }}>
 					{/* Header */}
-					<VStack spacing={4} textAlign="center" maxW="800px" mx="auto">
-						<Text
-							fontSize="14px"
-							fontWeight="700"
-							color={accentColor}
-							letterSpacing="2px"
-							textTransform="uppercase"
-						>
-							SUPER SIMPLE PROCESS
-						</Text>
-
-						<Heading
-							fontSize={{ base: "26px", md: "42px" }}
-							fontWeight="700"
-							lineHeight="1.2"
-							color={headingColor}
-						>
-							Get Your Perfect Engine in Just{" "}
-							<Text as="span" color={accentColor}>
-								3 Easy Steps
+					<MotionBox
+						initial={{ opacity: 0, y: 20 }}
+						whileInView={{ opacity: 1, y: 0 }}
+						viewport={{ once: true, margin: "-100px" }}
+						transition={{ duration: 0.6 }}
+						textAlign="center"
+						maxW="800px"
+						mx="auto"
+					>
+						<VStack spacing={4}>
+							<Text
+								fontSize="14px"
+								fontWeight="700"
+								color={accentColor}
+								letterSpacing="2px"
+								textTransform="uppercase"
+							>
+								SUPER SIMPLE PROCESS
 							</Text>
-						</Heading>
 
-						<Text fontSize={{ base: "14px", md: "18px" }} color={bodyColor} maxW="680px">
-							From searching to delivery — we’ve made buying the right engine faster, transparent,
-							and hassle-free.
-						</Text>
-					</VStack>
+							<Heading
+								fontSize={{ base: "26px", md: "42px" }}
+								fontWeight="700"
+								lineHeight="1.2"
+								color={headingColor}
+							>
+								Get Your Perfect Engine in Just{" "}
+								<Text as="span" color={accentColor}>
+									3 Easy Steps
+								</Text>
+							</Heading>
+
+							<Text fontSize={{ base: "14px", md: "18px" }} color={bodyColor} maxW="680px">
+								From searching to delivery — we’ve made buying the right engine faster,
+								transparent, and hassle-free.
+							</Text>
+						</VStack>
+					</MotionBox>
 
 					{/* Steps Grid */}
 					<Box w="full" maxW="1100px" mx="auto" position="relative">
-						<SimpleGrid
+						<MotionSimpleGrid
 							columns={{ base: 1, md: 3 }}
 							spacing={{ base: 12, md: 10 }}
 							position="relative"
+							variants={containerVariants}
+							initial="hidden"
+							whileInView="visible"
+							viewport={{ once: true, margin: "-100px" }}
 						>
 							{steps.map((step, index) => (
-								<Box
+								<MotionBox
 									key={index}
+									variants={itemVariants}
 									role="group"
 									position="relative"
 									zIndex={2}
@@ -175,7 +216,7 @@ export default function EasyStepsSection() {
 										</Heading>
 
 										<Heading
-											fontSize={{ base: "20px", md: "24px" }}
+											fontSize={{ base: "20px", md: "20px" }}
 											fontWeight="700"
 											color={headingColor}
 											lineHeight="1.25"
@@ -189,11 +230,11 @@ export default function EasyStepsSection() {
 									</VStack>
 
 									<Box h="5px" bgGradient="linear(to-r, #D90404, #ff7b00)" />
-								</Box>
+								</MotionBox>
 							))}
 
 							{/* Connecting Line */}
-							<Box
+							<MotionBox
 								display={{ base: "none", md: "block" }}
 								position="absolute"
 								top="23px"
@@ -204,8 +245,12 @@ export default function EasyStepsSection() {
 								zIndex={1}
 								borderRadius="full"
 								opacity={0.8}
+								initial={{ scaleX: 0 }}
+								whileInView={{ scaleX: 1 }}
+								viewport={{ once: true }}
+								transition={{ duration: 1, delay: 0.5 }}
 							/>
-						</SimpleGrid>
+						</MotionSimpleGrid>
 					</Box>
 				</VStack>
 			</Container>

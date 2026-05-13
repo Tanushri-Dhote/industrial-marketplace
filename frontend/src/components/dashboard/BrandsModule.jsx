@@ -217,26 +217,26 @@ export default function BrandsModule() {
 					<Spinner color={ACCENT} size="lg" thickness="4px" />
 				</Center>
 			) : (
-				<Box overflowX="auto" bg="white" borderRadius="xl" boxShadow="sm">
-					<Table variant="simple" size="sm">
+				<Box overflowX="auto" bg="white" borderRadius="xl" boxShadow="sm" border="1px solid" borderColor="gray.100">
+					<Table variant="simple" size="sm" layout="fixed" minW="900px">
 						<Thead bg="gray.50" borderBottom="2px solid" borderColor="gray.100">
 							<Tr>
-								<Th fontSize="12px" fontWeight="700" color="gray.600">
+								<Th w="120px" fontSize="12px" fontWeight="700" color="gray.600" py={4}>
 									Logo
 								</Th>
-								<Th fontSize="12px" fontWeight="700" color="gray.600">
+								<Th w="200px" fontSize="12px" fontWeight="700" color="gray.600">
 									Name
 								</Th>
-								<Th fontSize="12px" fontWeight="700" color="gray.600">
+								<Th w="180px" fontSize="12px" fontWeight="700" color="gray.600">
 									Slug
 								</Th>
-								<Th fontSize="12px" fontWeight="700" color="gray.600">
+								<Th w="150px" fontSize="12px" fontWeight="700" color="gray.600">
 									Make
 								</Th>
-								<Th fontSize="12px" fontWeight="700" color="gray.600">
+								<Th w="120px" fontSize="12px" fontWeight="700" color="gray.600">
 									Status
 								</Th>
-								<Th fontSize="12px" fontWeight="700" color="gray.600" textAlign="center">
+								<Th w="130px" fontSize="12px" fontWeight="700" color="gray.600" textAlign="center">
 									Actions
 								</Th>
 							</Tr>
@@ -276,17 +276,17 @@ export default function BrandsModule() {
 											)}
 										</Td>
 										<Td>
-											<Text fontSize="14px" fontWeight="600" color="gray.900">
+											<Text fontSize="14px" fontWeight="600" color="gray.900" isTruncated>
 												{brand.name}
 											</Text>
 										</Td>
 										<Td>
-											<Text fontSize="13px" color="gray.600" fontFamily="mono">
+											<Text fontSize="13px" color="gray.600" fontFamily="mono" isTruncated>
 												{brand.slug}
 											</Text>
 										</Td>
 										<Td>
-											<Text fontSize="13px" color="gray.600">
+											<Text fontSize="13px" color="gray.600" isTruncated>
 												{brand.productMake}
 											</Text>
 										</Td>
@@ -297,12 +297,13 @@ export default function BrandsModule() {
 												px={2}
 												py={1}
 												borderRadius="md"
+												whiteSpace="nowrap"
 											>
 												{brand.isActive ? "Active" : "Inactive"}
 											</Badge>
 										</Td>
 										<Td>
-											<HStack justify="center" spacing={1}>
+											<HStack justify="center" spacing={1} whiteSpace="nowrap">
 												<IconButton
 													icon={<EditIcon />}
 													size="sm"

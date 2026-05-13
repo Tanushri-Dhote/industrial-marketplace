@@ -153,13 +153,13 @@ export default function PartTypesModule() {
         <Center py={20}><Spinner color={RED} size="xl" /></Center>
       ) : (
         <Box overflowX="auto" borderRadius="2xl" border="1px solid" borderColor="gray.100" bg="white">
-          <Table variant="simple">
+          <Table variant="simple" layout="fixed" minW="800px">
             <Thead bg={DARK}>
               <Tr>
-                <Th color="whiteAlpha.700">Name</Th>
-                <Th color="whiteAlpha.700">Slug</Th>
-                <Th color="whiteAlpha.700">Description</Th>
-                <Th color="whiteAlpha.700" textAlign="right">Actions</Th>
+                <Th w="200px" color="whiteAlpha.700" py={4}>Name</Th>
+                <Th w="150px" color="whiteAlpha.700">Slug</Th>
+                <Th w="300px" color="whiteAlpha.700">Description</Th>
+                <Th w="120px" color="whiteAlpha.700" textAlign="right">Actions</Th>
               </Tr>
             </Thead>
             <Tbody>
@@ -168,11 +168,11 @@ export default function PartTypesModule() {
               ) : (
                 filteredParts.map((part) => (
                   <Tr key={part._id} _hover={{ bg: "gray.50" }}>
-                    <Td fontWeight="700" color={DARK}>{part.name}</Td>
-                    <Td><Badge colorScheme="blue" variant="subtle">{part.slug}</Badge></Td>
-                    <Td color="gray.500" fontSize="13px" maxW="300px" isTruncated>{part.description || "—"}</Td>
+                    <Td fontWeight="700" color={DARK} isTruncated>{part.name}</Td>
+                    <Td><Badge colorScheme="blue" variant="subtle" whiteSpace="nowrap">{part.slug}</Badge></Td>
+                    <Td color="gray.500" fontSize="13px" isTruncated>{part.description || "—"}</Td>
                     <Td textAlign="right">
-                      <HStack spacing={2} justify="flex-end">
+                      <HStack spacing={2} justify="flex-end" whiteSpace="nowrap">
                         <IconButton
                           icon={<EditIcon />}
                           size="sm"

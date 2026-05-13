@@ -99,23 +99,23 @@ export default function WebsitesModule() {
           </VStack>
         </Center>
       ) : (
-        <Box overflowX="auto">
-          <Table variant="simple" size="sm">
-            <Thead>
+        <Box overflowX="auto" borderRadius="xl" border="1px solid" borderColor="gray.100">
+          <Table variant="simple" size="sm" layout="fixed" minW="1000px">
+            <Thead bg="gray.50">
               <Tr>
-                <Th fontSize="11px" fontWeight="800" textTransform="uppercase" letterSpacing="1px">Name</Th>
-                <Th fontSize="11px" fontWeight="800" textTransform="uppercase" letterSpacing="1px">Domain</Th>
-                <Th fontSize="11px" fontWeight="800" textTransform="uppercase" letterSpacing="1px">Status</Th>
-                <Th fontSize="11px" fontWeight="800" textTransform="uppercase" letterSpacing="1px">Users</Th>
-                <Th fontSize="11px" fontWeight="800" textTransform="uppercase" letterSpacing="1px">Owner</Th>
-                <Th fontSize="11px" fontWeight="800" textTransform="uppercase" letterSpacing="1px">Actions</Th>
+                <Th w="200px" fontSize="11px" fontWeight="800" textTransform="uppercase" letterSpacing="1px" py={4}>Name</Th>
+                <Th w="220px" fontSize="11px" fontWeight="800" textTransform="uppercase" letterSpacing="1px">Domain</Th>
+                <Th w="120px" fontSize="11px" fontWeight="800" textTransform="uppercase" letterSpacing="1px">Status</Th>
+                <Th w="100px" fontSize="11px" fontWeight="800" textTransform="uppercase" letterSpacing="1px">Users</Th>
+                <Th w="200px" fontSize="11px" fontWeight="800" textTransform="uppercase" letterSpacing="1px">Owner</Th>
+                <Th w="120px" fontSize="11px" fontWeight="800" textTransform="uppercase" letterSpacing="1px">Actions</Th>
               </Tr>
             </Thead>
             <Tbody>
               {websites.map((site) => (
                 <Tr key={site._id} _hover={{ bg: 'gray.50' }}>
-                  <Td fontSize="13px" fontWeight="700">{site.name}</Td>
-                  <Td fontSize="12px" color="gray.500">{site.domain || '—'}</Td>
+                  <Td fontSize="13px" fontWeight="700" isTruncated>{site.name}</Td>
+                  <Td fontSize="12px" color="gray.500" isTruncated>{site.domain || '—'}</Td>
                   <Td>
                     <Badge
                       colorScheme={STATUS_COLORS[site.status] || 'gray'}
@@ -123,19 +123,20 @@ export default function WebsitesModule() {
                       borderRadius="full"
                       px={3}
                       textTransform="capitalize"
+                      whiteSpace="nowrap"
                     >
                       {site.status}
                     </Badge>
                   </Td>
                   <Td>
-                    <HStack spacing={1}>
+                    <HStack spacing={1} whiteSpace="nowrap">
                       <Icon as={Users} color="gray.400" boxSize={3} />
                       <Text fontSize="13px" fontWeight="600">{site.userCount ?? '—'}</Text>
                     </HStack>
                   </Td>
-                  <Td fontSize="12px" color="gray.500">{site.owner?.name || '—'}</Td>
+                  <Td fontSize="12px" color="gray.500" isTruncated>{site.owner?.name || '—'}</Td>
                   <Td>
-                    <HStack spacing={1}>
+                    <HStack spacing={1} whiteSpace="nowrap">
                       <IconButton
                         icon={<EditIcon />}
                         size="sm"

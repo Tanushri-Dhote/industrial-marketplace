@@ -1,49 +1,35 @@
-import React from 'react';
-import {
-  Container,
-  Heading,
-  Text,
-  VStack,
-  SimpleGrid,
-  Box,
-  Image,
-  List,
-  ListItem,
-  ListIcon,
-  Flex,
-  Badge,
-  Divider,
-  useColorModeValue,
-  Grid,
-  GridItem,
-  Icon,
-  HStack,
-  Button,
-} from '@chakra-ui/react';
+import { Box, Container, Flex, Heading, Icon, Text, SimpleGrid, VStack, Grid, GridItem, Badge, useColorModeValue, HStack, Divider, Button, Accordion, AccordionItem, AccordionButton, AccordionPanel, AccordionIcon } from '@chakra-ui/react';
+import { motion } from 'framer-motion';
 import { Helmet } from 'react-helmet-async';
-import {
-  CheckCircleIcon,
-  StarIcon,
-  ViewIcon,
-  TimeIcon,
-  SearchIcon,
-  RepeatIcon,
-} from '@chakra-ui/icons';
-import {
-  FaIndustry,
-  FaGlobe,
-  FaUsers,
-  FaTruck,
-  FaShieldAlt,
-  FaHandshake,
-  FaChartLine,
-  FaPoundSign,
-  FaClock,
-  FaThumbsUp,
-  FaUserCheck,
-} from 'react-icons/fa';
-import { MdCompareArrows, MdMoneyOff, MdSpeed } from 'react-icons/md';
+import { FaIndustry, FaHandshake, FaUsers, FaClock, FaShieldAlt, FaChartLine, FaUserCheck, FaThumbsUp, FaPoundSign, FaTruck } from 'react-icons/fa';
+import { StarIcon } from '@chakra-ui/icons';
+import { MdMoneyOff, MdCompareArrows } from 'react-icons/md';
+import { SearchIcon } from '@chakra-ui/icons';
 import { useNavigate } from 'react-router-dom';
+
+const MotionBox = motion(Box);
+const MotionVStack = motion(VStack);
+const MotionSimpleGrid = motion(SimpleGrid);
+const MotionFlex = motion(Flex);
+const MotionHeading = motion(Heading);
+const MotionText = motion(Text);
+
+const fadeInUp = {
+  initial: { opacity: 0, y: 30 },
+  whileInView: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } },
+  viewport: { once: true }
+};
+
+const staggerContainer = {
+  initial: { opacity: 0 },
+  whileInView: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.1
+    }
+  },
+  viewport: { once: true }
+};
 
 export default function AboutPage() {
   const bgColor = useColorModeValue('white', 'gray.800');
@@ -78,314 +64,205 @@ export default function AboutPage() {
   return (
     <>
       <Helmet>
-        <title>About  Re-Conditioned Engine - UK's First Engine Price Comparison</title>
-        <meta name="description" content="UK's first price comparison website focused on quote service used and reconditioned engines. Get free quotes from trusted suppliers and save money on car parts." />
+        <title>About  Re-Conditioned Engine - UK's First Engine </title>
+        <meta name="description" content="UK's first  website focused on quote service used and reconditioned engines. Get free quotes from trusted suppliers and save money on car parts." />
       </Helmet>
 
       {/* Hero Section */}
-      <Box bg="#0F172A" color="white" py={16} mb={12}>
+      <Box bg="#0F172A" color="white" py={16} mb={10} position="relative" overflow="hidden">
+        <Box position="absolute" top="-10%" right="-5%" w="400px" h="400px" bg={accentColor} filter="blur(150px)" opacity={0.1} />
         <Container maxW="container.xl">
-          <Grid templateColumns={{ base: '1fr', lg: '1fr 1fr' }} gap={8} alignItems="center">
+          <Grid templateColumns={{ base: '1fr', lg: '1fr 1fr' }} gap={10} alignItems="center">
             <GridItem>
-              <VStack align="start" spacing={4}>
-                <Badge bg={accentColor} color="white" px={3} py={1} borderRadius="full" fontSize="12px">
-                  UK's First Price Comparison
+              <MotionVStack align="start" spacing={5} initial={{ opacity: 0, x: -50 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.8 }}>
+                <Badge bg={accentColor} color="white" px={3} py={1} borderRadius="full" fontSize="10px" fontWeight="800" letterSpacing="1px">
+                  UK'S FIRST WEBSITE focused on premium reconditioned
                 </Badge>
-                <Heading fontSize="36px" lineHeight="1.2">
-                  About  Re-Conditioned Engine
+                <Heading fontSize={{ base: "36px", md: "48px" }} lineHeight="1.1" fontWeight="900">
+                  Precision Engine, <br />
+                  <Text as="span" color={accentColor}>Trusted</Text> Delivery.
                 </Heading>
-                <Text fontSize="16px" opacity={0.9} lineHeight="1.6">
-                  We are UK's first price comparison website that is focused on quote service used
-                  and reconditioned engines and ancillaries. Once you enter your reg number,
-                  we check our database and give you the cheapest online quotes in just a few clicks.
+                <Text fontSize="16px" opacity={0.8} lineHeight="1.6" maxW="lg">
+                  We are UK's first website focused on premium reconditioned engines.
+                  Get the cheapest online quotes in just a few clicks.
                 </Text>
-                <HStack spacing={4} pt={2}>
+                <HStack spacing={6} pt={2}>
                   <HStack>
-                    <Icon as={StarIcon} boxSize={4} />
-                    <Text fontSize="14px">4.9 Rating</Text>
+                    <Icon as={StarIcon} boxSize={4} color="yellow.400" />
+                    <VStack align="start" spacing={0}>
+                      <Text fontWeight="800" fontSize="14px">4.9/5</Text>
+                      <Text fontSize="11px" opacity={0.6}>User Rating</Text>
+                    </VStack>
                   </HStack>
+                  <Divider orientation="vertical" h="30px" borderColor="whiteAlpha.300" />
                   <HStack>
-                    <Icon as={FaThumbsUp} boxSize={4} />
-                    <Text fontSize="14px">Trusted by Thousands</Text>
+                    <Icon as={FaThumbsUp} boxSize={4} color={accentColor} />
+                    <VStack align="start" spacing={0}>
+                      <Text fontWeight="800" fontSize="14px">Trusted</Text>
+                      <Text fontSize="11px" opacity={0.6}>By Thousands</Text>
+                    </VStack>
                   </HStack>
                 </HStack>
-              </VStack>
+              </MotionVStack>
             </GridItem>
             <GridItem display={{ base: 'none', lg: 'block' }}>
-              <Box
-                bg={accentColor}
-                borderRadius="lg"
-                p={8}
+              <MotionBox
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.8 }}
+                bg="whiteAlpha.100"
+                backdropFilter="blur(10px)"
+                borderRadius="3xl"
+                p={12}
+                border="1px solid"
+                borderColor="whiteAlpha.200"
                 textAlign="center">
-                <Icon as={MdCompareArrows} boxSize={16} color="white" mb={3} />
-                <Text fontSize="20px" fontWeight="bold">Quote & Save</Text>
-                <Text fontSize="14px" mt={2}>Get the best deals on car engines</Text>
-              </Box>
+                <Icon as={MdCompareArrows} boxSize={20} color={accentColor} mb={6} />
+                <Heading fontSize="28px" mb={3}>Quote & Save</Heading>
+                <Text fontSize="16px" opacity={0.7}>Get the best deals on car engines instantly</Text>
+              </MotionBox>
             </GridItem>
           </Grid>
         </Container>
       </Box>
 
       <Container maxW="container.xl" py={8}>
-        {/* How  Re-Conditioned Engine Helps */}
-        <Box mb={16}>
-          <VStack spacing={3} mb={8} textAlign="center">
-            <Badge bg="orange.100" color={accentColor} px={3} py={1} borderRadius="full" fontSize="12px">
-              Save Money
-            </Badge>
-            <Heading fontSize="28px">How can  Re-Conditioned Engine help me save on my car parts price comparison?</Heading>
-            <Text fontSize="16px" color="gray.600" maxW="3xl" lineHeight="1.6">
-              Get multiple quotes from carefully vetted suppliers and get your engines and ancillaries
-              within no time. Choose  Re-Conditioned Engine as we only have trusted suppliers who don't compromise
-              on quality. We offer an unbeatable engine and ancillaries price comparison service where
-              you pay the cheapest price. Get free online quotes in a few clicks.
-               {/* Compare prices and buy with confidence with  Re-Conditioned Engine. */}
-            </Text>
-          </VStack>
-        </Box>
-
         {/* How we work? */}
-        <Box mb={16}>
-          <VStack spacing={3} mb={8} textAlign="center">
-            <Badge bg="orange.100" color={accentColor} px={3} py={1} borderRadius="full" fontSize="12px">
-              Simple Process
+        <Box mb={20}>
+          <VStack spacing={3} mb={12} textAlign="center">
+            <Badge bg="orange.100" color={accentColor} px={3} py={1} borderRadius="full" fontSize="10px" fontWeight="800">
+              SIMPLE PROCESS
             </Badge>
-            <Heading fontSize="28px">How we work?</Heading>
+            <Heading fontSize={{ base: "28px", md: "36px" }} fontWeight="900">How we work?</Heading>
             <Text fontSize="16px" color="gray.600" maxW="2xl">
-              Being the UK's first quality engine price comparison website, we always focus on quote service
-              reconditioned, rebuilt and used engine prices for you. In just a matter of minutes or less
-              you get the best deal from trusted engine suppliers.
+              Get the best deal from trusted engine suppliers in minutes.
             </Text>
           </VStack>
 
-          <SimpleGrid columns={{ base: 1, md: 2, lg: 4 }} spacing={6}>
-            <Box textAlign="center" p={6}>
-              <Box
-                w="60px"
-                h="60px"
-                bg="orange.100"
-                borderRadius="full"
-                display="flex"
-                alignItems="center"
-                justifyContent="center"
-                mx="auto"
-                mb={4}>
-                <Icon as={SearchIcon} boxSize={6} color={accentColor} />
-              </Box>
-              <Heading fontSize="18px" mb={2}>Enter Reg Number</Heading>
-              <Text fontSize="14px" color="gray.600">Enter your vehicle registration number</Text>
-            </Box>
-
-            <Box textAlign="center" p={6}>
-              <Box
-                w="60px"
-                h="60px"
-                bg="orange.100"
-                borderRadius="full"
-                display="flex"
-                alignItems="center"
-                justifyContent="center"
-                mx="auto"
-                mb={4}>
-                <Icon as={MdCompareArrows} boxSize={6} color={accentColor} />
-              </Box>
-              <Heading fontSize="18px" mb={2}>Quotes service</Heading>
-              <Text fontSize="14px" color="gray.600">Get multiple quotes from trusted suppliers</Text>
-            </Box>
-
-            <Box textAlign="center" p={6}>
-              <Box
-                w="60px"
-                h="60px"
-                bg="orange.100"
-                borderRadius="full"
-                display="flex"
-                alignItems="center"
-                justifyContent="center"
-                mx="auto"
-                mb={4}>
-                <Icon as={FaPoundSign} boxSize={6} color={accentColor} />
-              </Box>
-              <Heading fontSize="18px" mb={2}>Best Price</Heading>
-              <Text fontSize="14px" color="gray.600">Choose the best deal that suits you</Text>
-            </Box>
-
-            <Box textAlign="center" p={6}>
-              <Box
-                w="60px"
-                h="60px"
-                bg="orange.100"
-                borderRadius="full"
-                display="flex"
-                alignItems="center"
-                justifyContent="center"
-                mx="auto"
-                mb={4}>
-                <Icon as={FaTruck} boxSize={6} color={accentColor} />
-              </Box>
-              <Heading fontSize="18px" mb={2}>Get Delivery</Heading>
-              <Text fontSize="14px" color="gray.600">Fast delivery across the UK</Text>
-            </Box>
-          </SimpleGrid>
+          <MotionSimpleGrid columns={{ base: 1, md: 2, lg: 4 }} spacing={10} variants={staggerContainer} initial="initial" whileInView="whileInView">
+            {[
+              { icon: SearchIcon, title: 'Enter Reg', desc: 'Enter your vehicle registration' },
+              { icon: MdCompareArrows, title: 'Quotes', desc: 'Get multiple quotes instantly' },
+              { icon: FaPoundSign, title: 'Best Price', desc: 'Choose the deal that suits you' },
+              { icon: FaTruck, title: 'Delivery', desc: 'Fast delivery across the UK' },
+            ].map((step, idx) => (
+              <MotionVStack key={idx} spacing={4} variants={fadeInUp} whileHover={{ y: -10 }}>
+                <Box
+                  w="64px"
+                  h="64px"
+                  bg="white"
+                  borderRadius="xl"
+                  display="flex"
+                  alignItems="center"
+                  justifyContent="center"
+                  boxShadow="lg"
+                  mb={2}>
+                  <Icon as={step.icon} boxSize={6} color={accentColor} />
+                </Box>
+                <Heading fontSize="18px" fontWeight="800">{step.title}</Heading>
+                <Text fontSize="14px" color="gray.500" textAlign="center">{step.desc}</Text>
+              </MotionVStack>
+            ))}
+          </MotionSimpleGrid>
         </Box>
 
         {/* Features Section */}
-        <Box mb={16}>
-          <SimpleGrid columns={{ base: 1, md: 2 }} spacing={6}>
+        <Box mb={20}>
+          <MotionSimpleGrid columns={{ base: 1, md: 2 }} spacing={6} variants={staggerContainer} initial="initial" whileInView="whileInView">
             {features.map((feature, index) => (
-              <Flex
+              <MotionFlex
                 key={index}
                 bg={bgColor}
                 p={6}
-                borderRadius="lg"
+                borderRadius="xl"
                 border="1px solid"
                 borderColor={borderColor}
-                _hover={{ transform: 'translateY(-5px)', boxShadow: 'lg', borderColor: accentColor }}
+                variants={fadeInUp}
+                whileHover={{ y: -6, borderColor: accentColor, boxShadow: 'xl' }}
                 transition="all 0.3s">
                 <Box
-                  bg="orange.100"
-                  p={3}
-                  borderRadius="full"
-                  mr={4}
+                  bg="orange.50"
+                  p={3.5}
+                  borderRadius="lg"
+                  mr={5}
                   h="fit-content">
                   <Icon as={feature.icon} boxSize={6} color={accentColor} />
                 </Box>
                 <Box>
-                  <Heading fontSize="18px" mb={2}>{feature.title}</Heading>
-                  <Text fontSize="14px" color="gray.600">{feature.description}</Text>
+                  <Heading fontSize="18px" mb={2} fontWeight="800">{feature.title}</Heading>
+                  <Text fontSize="14px" color="gray.600" lineHeight="1.6">{feature.description}</Text>
                 </Box>
-              </Flex>
+              </MotionFlex>
             ))}
-          </SimpleGrid>
-        </Box>
-
-        {/* Save Time, Save Money Section */}
-        <Box mb={16}>
-          <Grid templateColumns={{ base: '1fr', lg: '1fr 1fr' }} gap={12}>
-            <GridItem>
-              <VStack align="stretch" spacing={4}>
-                <Badge bg="orange.100" color={accentColor} px={3} py={1} borderRadius="full" fontSize="12px" width="fit-content">
-                  Save Time, Save Money
-                </Badge>
-                <Heading fontSize="28px">Why Choose  Re-Conditioned Engine?</Heading>
-                <Text fontSize="16px" lineHeight="1.6">
-                  We always focus on attracting customers by offering an exclusive engine comparison
-                  service at  Re-Conditioned Engine. Our engine enquiry form is simple and highly responsive.
-                  We do not waste your time. In fact, we often provide quotes within a minute.
-                </Text>
-                <Text fontSize="16px" lineHeight="1.6">
-                  Re-Conditioned Engine is famous all across the UK because our engine suppliers always offer
-                  the cheapest rates for all types of engines. You will get a range of options such
-                  as supply, reconditioned, new engine, fitting, recovery and delivery.
-                </Text>
-                <SimpleGrid columns={2} spacing={3} pt={2}>
-                  {benefits.map((benefit, index) => (
-                    <HStack key={index}>
-                      <CheckCircleIcon color={accentColor} boxSize={4} />
-                      <Text fontSize="14px">{benefit}</Text>
-                    </HStack>
-                  ))}
-                </SimpleGrid>
-              </VStack>
-            </GridItem>
-            <GridItem>
-              <Box
-                bg={cardBg}
-                p={6}
-                borderRadius="lg"
-                border="1px solid"
-                borderColor={borderColor}>
-                <Icon as={MdSpeed} boxSize={10} color={accentColor} mb={4} />
-                <Heading fontSize="20px" mb={3}>Quick Quotes Within Minutes</Heading>
-                <Text fontSize="15px" mb={4}>
-                  Our engine enquiry form is simple and highly responsive. We often provide quotes
-                  within a minute of your request.
-                </Text>
-                <Divider my={4} />
-                <Icon as={FaShieldAlt} boxSize={10} color={accentColor} mb={4} />
-                <Heading fontSize="20px" mb={3}>100% Trusted Suppliers</Heading>
-                <Text fontSize="15px">
-                  All engine suppliers in our network have been selected after strict scrutiny and
-                  we regularly get customer feedback on our members.
-                </Text>
-              </Box>
-            </GridItem>
-          </Grid>
+          </MotionSimpleGrid>
         </Box>
 
         {/* Statistics Section */}
-        <Box mb={16}>
-          <SimpleGrid columns={{ base: 2, md: 4 }} spacing={6}>
+        <Box mb={20}>
+          <MotionSimpleGrid columns={{ base: 2, md: 4 }} spacing={6} variants={staggerContainer} initial="initial" whileInView="whileInView">
             {stats.map((stat, index) => (
-              <Box
+              <MotionBox
                 key={index}
-                bg={bgColor}
-                p={6}
-                borderRadius="lg"
+                bg="white"
+                p={8}
+                borderRadius="2xl"
                 border="1px solid"
-                borderColor={borderColor}
+                borderColor="gray.100"
                 textAlign="center"
-                _hover={{ transform: 'translateY(-5px)', boxShadow: 'lg' }}
-                transition="all 0.3s">
-                <Icon as={stat.icon} boxSize={8} color={accentColor} mb={3} />
-                <Heading fontSize="32px" color={accentColor} mb={2}>
+                variants={fadeInUp}
+                whileHover={{ scale: 1.05, boxShadow: 'xl' }}>
+                <Icon as={stat.icon} boxSize={8} color={accentColor} mb={4} />
+                <Heading fontSize="36px" fontWeight="900" color={accentColor} mb={1}>
                   {stat.number}
                 </Heading>
-                <Text fontSize="14px" fontWeight="500">{stat.label}</Text>
-              </Box>
+                <Text fontSize="14px" fontWeight="700" color="gray.500" letterSpacing="1px">{stat.label}</Text>
+              </MotionBox>
             ))}
-          </SimpleGrid>
+          </MotionSimpleGrid>
         </Box>
 
-        {/* Why  Re-Conditioned Engine is the best */}
-        <Box mb={16}>
-          <Box
-            bg="linear-gradient(135deg, #0F172A 0%, #1E2A45 100%)"
-            color="white"
-            p={8}
-            borderRadius="lg"
-            textAlign="center">
-            <VStack spacing={4}>
-              <Icon as={FaHandshake} boxSize={12} color={accentColor} />
-              <Heading fontSize="28px">Why  Re-Conditioned Engine is the best?</Heading>
-              <Text fontSize="16px" maxW="3xl" lineHeight="1.6">
-                Re-Conditioned Engine is the name of Trust. We are the first engine price comparison site in UK
-                that helps you find quality reconditioned and used engines from our verified and trusted
-                engine suppliers. With our devotion to work and years of experience, we have optimized
-                the formula to give the best engine price comparisons to our customers. Simply by sitting
-                at home, you can take advantage of our hassle and stress free service. Save time, money
-                and get the right engine for your car.
-              </Text>
-              <Button
-                onClick={() =>
-                  navigate("/call-seller", {
-                    state: {
-                      vrm: "",
-                      category: "",
-                      brand: "",
-                      model: "",
-                      year: "",
-                      type: "",
-                    },
-                  })
-                }
-                bg={accentColor}
-                color="white"
-                size="lg"
-                fontSize="16px"
-                mt={4}
-                _hover={{
-                  bg: "#B70303",
-                  transform: "translateY(-2px)",
-                  boxShadow: "lg",
-                }}
-                transition="all 0.2s"
-              >
-                Get Free Quote Now
-              </Button>
-            </VStack>
-          </Box>
-        </Box>
+        {/* CTA Section */}
+        <MotionBox
+          mb={12}
+          initial={{ opacity: 0, y: 50 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8 }}
+          bg="linear-gradient(135deg, #0F172A 0%, #1E2A45 100%)"
+          color="white"
+          p={{ base: 8, md: 12 }}
+          borderRadius="2xl"
+          textAlign="center"
+          position="relative"
+          overflow="hidden">
+          <Box position="absolute" bottom="-20%" left="-10%" w="300px" h="300px" bg={accentColor} filter="blur(100px)" opacity={0.1} />
+          <VStack spacing={6}>
+            <Icon as={FaHandshake} boxSize={12} color={accentColor} />
+            <Heading fontSize={{ base: "28px", md: "40px" }} fontWeight="900">Why  Re-Conditioned Engine is the best?</Heading>
+            <Text fontSize="16px" maxW="3xl" lineHeight="1.8" opacity={0.8}>
+              Re-Conditioned Engine is the name of Trust. We find quality reconditioned and used engines
+              from verified suppliers. Save time, money and get the right engine for your car today.
+            </Text>
+            <Button
+              onClick={() => navigate("/call-seller", { state: { vrm: "" } })}
+              bg={accentColor}
+              color="white"
+              size="lg"
+              px={10}
+              h="56px"
+              fontSize="16px"
+              fontWeight="800"
+              borderRadius="lg"
+              _hover={{
+                bg: "#B70303",
+                transform: "translateY(-4px)",
+                boxShadow: "0 20px 40px rgba(217, 4, 4, 0.3)",
+              }}
+              transition="all 0.3s"
+            >
+              Get Free Quote Now
+            </Button>
+          </VStack>
+        </MotionBox>
       </Container>
     </>
   );

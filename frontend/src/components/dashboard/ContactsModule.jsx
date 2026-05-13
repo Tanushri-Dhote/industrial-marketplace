@@ -174,29 +174,29 @@ export default function ContactsModule() {
 				</Select>
 			</HStack>
 
-			<Box overflowX="auto">
-				<Table variant="simple" size="sm">
-					<Thead>
+			<Box overflowX="auto" borderRadius="xl" border="1px solid" borderColor="gray.100">
+				<Table variant="simple" size="sm" layout="fixed" minW="1100px">
+					<Thead bg="gray.50">
 						<Tr>
-							<Th fontSize="11px" fontWeight="800" textTransform="uppercase" letterSpacing="1px">
+							<Th w="150px" fontSize="11px" fontWeight="800" textTransform="uppercase" letterSpacing="1px" py={4}>
 								Name
 							</Th>
-							<Th fontSize="11px" fontWeight="800" textTransform="uppercase" letterSpacing="1px">
+							<Th w="180px" fontSize="11px" fontWeight="800" textTransform="uppercase" letterSpacing="1px">
 								Email
 							</Th>
-							<Th fontSize="11px" fontWeight="800" textTransform="uppercase" letterSpacing="1px">
+							<Th w="200px" fontSize="11px" fontWeight="800" textTransform="uppercase" letterSpacing="1px">
 								Subject
 							</Th>
-							<Th fontSize="11px" fontWeight="800" textTransform="uppercase" letterSpacing="1px">
+							<Th w="300px" fontSize="11px" fontWeight="800" textTransform="uppercase" letterSpacing="1px">
 								Message
 							</Th>
-							<Th fontSize="11px" fontWeight="800" textTransform="uppercase" letterSpacing="1px">
+							<Th w="150px" fontSize="11px" fontWeight="800" textTransform="uppercase" letterSpacing="1px">
 								Received
 							</Th>
-							<Th fontSize="11px" fontWeight="800" textTransform="uppercase" letterSpacing="1px">
+							<Th w="120px" fontSize="11px" fontWeight="800" textTransform="uppercase" letterSpacing="1px">
 								Status
 							</Th>
-							<Th fontSize="11px" fontWeight="800" textTransform="uppercase" letterSpacing="1px">
+							<Th w="200px" fontSize="11px" fontWeight="800" textTransform="uppercase" letterSpacing="1px">
 								Actions
 							</Th>
 						</Tr>
@@ -230,21 +230,21 @@ export default function ContactsModule() {
 						) : (
 							filteredContacts.map((contact) => (
 								<Tr key={contact.id} _hover={{ bg: "gray.50" }}>
-									<Td fontSize="13px" fontWeight="700">
+									<Td fontSize="13px" fontWeight="700" isTruncated>
 										{contact.name}
 									</Td>
-									<Td fontSize="12px" color="gray.600">
+									<Td fontSize="12px" color="gray.600" isTruncated>
 										{contact.email}
 									</Td>
-									<Td fontSize="12px" fontWeight="600" color="gray.700">
+									<Td fontSize="12px" fontWeight="600" color="gray.700" isTruncated>
 										{contact.subject}
 									</Td>
 									<Td fontSize="12px" color="gray.500">
-										<Text noOfLines={2} maxW="360px">
+										<Text noOfLines={2} isTruncated>
 											{contact.message}
 										</Text>
 									</Td>
-									<Td fontSize="12px" color="gray.500">
+									<Td fontSize="12px" color="gray.500" whiteSpace="nowrap">
 										{contact.date}
 									</Td>
 									<Td>
@@ -253,12 +253,13 @@ export default function ContactsModule() {
 											variant="subtle"
 											borderRadius="full"
 											px={3}
+											whiteSpace="nowrap"
 										>
 											{contact.status}
 										</Badge>
 									</Td>
 									<Td>
-										<HStack spacing={1}>
+										<HStack spacing={1} whiteSpace="nowrap">
 											<IconButton
 												icon={<ViewIcon />}
 												size="sm"
@@ -271,7 +272,8 @@ export default function ContactsModule() {
 											/>
 											<Select
 												size="sm"
-												maxW="140px"
+												maxW="110px"
+												fontSize="12px"
 												value={contact.status}
 												onChange={(e) => handleStatusChange(contact.id, e.target.value)}
 											>

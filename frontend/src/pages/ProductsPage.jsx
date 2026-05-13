@@ -21,10 +21,29 @@ import {
 	Tr,
 	VStack,
 } from "@chakra-ui/react";
+import { motion, AnimatePresence } from "framer-motion";
 import { FaArrowLeft, FaArrowRight, FaCarSide, FaTools } from "react-icons/fa";
 import { Link as RouterLink, useSearchParams, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import API from "../services/api";
+
+const MotionBox = motion(Box);
+const MotionVStack = motion(VStack);
+const MotionSimpleGrid = motion(SimpleGrid);
+const MotionFlex = motion(Flex);
+
+const fadeInUp = {
+	initial: { opacity: 0, y: 20 },
+	animate: { opacity: 1, y: 0, transition: { duration: 0.5 } },
+};
+
+const staggerContainer = {
+	animate: {
+		transition: {
+			staggerChildren: 0.1,
+		},
+	},
+};
 
 const accentColor = "#D90404";
 const surfaceColor = "#F3F5F8";
@@ -32,7 +51,7 @@ const darkColor = "#0F172A";
 
 function EngineProductCard({ engine }) {
 	return (
-		<Box
+		<MotionBox
 			as={RouterLink}
 			to={`/products/${engine._id}`}
 			bg="white"
@@ -40,9 +59,10 @@ function EngineProductCard({ engine }) {
 			overflow="hidden"
 			boxShadow="0 6px 16px rgba(10, 19, 36, 0.05)"
 			transition="all 0.25s ease"
-			_hover={{ transform: "translateY(-6px)", boxShadow: "0 12px 24px rgba(10, 19, 36, 0.08)" }}
+			whileHover={{ transform: "translateY(-8px)", boxShadow: "0 12px 24px rgba(10, 19, 36, 0.12)" }}
 			display="flex"
 			flexDirection="column"
+			variants={fadeInUp}
 		>
 			<Box position="relative" h={{ base: "134px", md: "148px" }} bg="gray.50">
 				<Image
@@ -121,7 +141,7 @@ function EngineProductCard({ engine }) {
 					</HStack>
 				</Flex>
 			</VStack>
-		</Box>
+		</MotionBox>
 	);
 }
 
@@ -132,7 +152,7 @@ export default function ProductsPage() {
 	const brandSlug = searchParams.get("brand");
 	const modelSlug = searchParams.get("model");
 
-	// Fetch all brands (for fallback or selection)
+	// Fetch all brands
 	const { data: brands = [], isLoading: loadingBrands } = useQuery({
 		queryKey: ['brands'],
 		queryFn: async () => {
@@ -142,7 +162,6 @@ export default function ProductsPage() {
 		staleTime: 1000 * 60 * 30,
 	});
 
-	// Find basic brand info from the list
 	const currentBrand = brands.find((b) => b.slug === brandSlug);
 
 	// Fetch models for the brand
@@ -157,10 +176,9 @@ export default function ProductsPage() {
 		staleTime: 1000 * 60 * 10,
 	});
 
-	// Find selected model
 	const currentModel = models.find(m => m.slug === modelSlug);
 
-	// Fetch products filtered by brand (make) and model
+	// Fetch products
 	const { data: products = [], isLoading: loadingProducts } = useQuery({
 		queryKey: ['products', { brandSlug, modelSlug }],
 		queryFn: async () => {
@@ -204,11 +222,11 @@ export default function ProductsPage() {
 		return (
 			<Box py={20} bg={surfaceColor}>
 				<Container maxW="container.xl">
-					<VStack spacing={8} textAlign="center">
+					<MotionVStack spacing={8} textAlign="center" initial="initial" animate="animate" variants={fadeInUp}>
 						<Heading>Browse Engines by Brand</Heading>
 						<Text>Please select a brand to view available engines.</Text>
 						<Button as={RouterLink} to="/" colorScheme="red">Go to Home</Button>
-					</VStack>
+					</MotionVStack>
 				</Container>
 			</Box>
 		);
@@ -221,9 +239,9 @@ export default function ProductsPage() {
 			minH="100vh"
 		>
 			<Container maxW="container.xl">
-				<VStack spacing={10} align="stretch">
-					{/* Breadcrumbs / Back button */}
-					<Flex justify="space-between" align="center">
+				<MotionVStack spacing={10} align="stretch" initial="initial" animate="animate" variants={staggerContainer}>
+					{/* Breadcrumbs */}
+					<MotionFlex justify="space-between" align="center" variants={fadeInUp}>
 						<Button 
 							leftIcon={<FaArrowLeft />} 
 							variant="ghost" 
@@ -232,26 +250,35 @@ export default function ProductsPage() {
 							Back to Brands
 						</Button>
 						
-						{modelSlug && (
-							<Button 
-								rightIcon={<FaTools />} 
-								variant="outline" 
-								size="sm"
-								onClick={clearModel}
-							>
-								Clear Model Filter: {currentModel?.name || modelSlug}
-							</Button>
-						)}
-					</Flex>
+						<AnimatePresence>
+							{modelSlug && (
+								<MotionBox 
+									initial={{ opacity: 0, x: 20 }}
+									animate={{ opacity: 1, x: 0 }}
+									exit={{ opacity: 0, x: 20 }}
+								>
+									<Button 
+										rightIcon={<FaTools />} 
+										variant="outline" 
+										size="sm"
+										onClick={clearModel}
+									>
+										Clear Model Filter: {currentModel?.name || modelSlug}
+									</Button>
+								</MotionBox>
+							)}
+						</AnimatePresence>
+					</MotionFlex>
 
 					{/* Brand Header */}
-					<Box
+					<MotionBox
 						bg="white"
 						borderRadius="3xl"
 						p={{ base: 6, md: 8 }}
 						boxShadow="0 10px 30px rgba(15, 23, 42, 0.08)"
 						border="1px solid"
 						borderColor="gray.100"
+						variants={fadeInUp}
 					>
 						<HStack spacing={6} align="center">
 							<Box 
@@ -279,17 +306,17 @@ export default function ProductsPage() {
 								</Text>
 							</VStack>
 						</HStack>
-					</Box>
+					</MotionBox>
 
-					{/* Models Selection (Horizontal Scroll or Grid) */}
+					{/* Models Selection */}
 					{!modelSlug && models.length > 0 && (
-						<Box>
+						<MotionBox variants={fadeInUp}>
 							<Heading fontSize="20px" mb={5} color={darkColor}>
 								Popular {currentBrand?.name} Models
 							</Heading>
 							<SimpleGrid columns={{ base: 2, sm: 3, md: 4, lg: 6 }} spacing={4}>
 								{models.map((model) => (
-									<Box
+									<MotionBox
 										key={model._id}
 										onClick={() => handleModelSelect(model.slug)}
 										cursor="pointer"
@@ -300,17 +327,17 @@ export default function ProductsPage() {
 										borderColor="gray.200"
 										textAlign="center"
 										transition="all 0.2s"
-										_hover={{ 
-											transform: "translateY(-4px)", 
+										whileHover={{ 
+											y: -4, 
 											borderColor: accentColor,
-											boxShadow: "md"
+											boxShadow: "0 4px 12px rgba(217, 4, 4, 0.1)"
 										}}
 									>
 										<Text fontWeight="700">{model.name}</Text>
-									</Box>
+									</MotionBox>
 								))}
 							</SimpleGrid>
-						</Box>
+						</MotionBox>
 					)}
 
 					{/* Product Listings */}
@@ -321,19 +348,25 @@ export default function ProductsPage() {
 					) : products.length > 0 ? (
 						<VStack spacing={12} align="stretch">
 							<Box>
-								<Heading fontSize="22px" mb={6} color={darkColor} display="flex" alignItems="center">
+								<MotionFlex align="center" mb={6} variants={fadeInUp}>
 									<Box as={FaCarSide} mr={3} color={accentColor} />
-									Available {currentModel?.name || ""} Engine Inventory
-								</Heading>
-								<SimpleGrid columns={{ base: 1, sm: 2, md: 3, lg: 4 }} spacing={6}>
+									<Heading fontSize="22px" color={darkColor}>
+										Available {currentModel?.name || ""} Engine Inventory
+									</Heading>
+								</MotionFlex>
+								<MotionSimpleGrid 
+									columns={{ base: 1, sm: 2, md: 3, lg: 4 }} 
+									spacing={6}
+									variants={staggerContainer}
+								>
 									{products.map((engine) => (
 										<EngineProductCard key={engine._id} engine={engine} />
 									))}
-								</SimpleGrid>
+								</MotionSimpleGrid>
 							</Box>
 
 							{/* Price Table */}
-							<Box>
+							<MotionBox variants={fadeInUp}>
 								<VStack align="start" spacing={1} mb={6}>
 									<Text fontSize="12px" fontWeight="700" color="gray.500" textTransform="uppercase" letterSpacing="wider">
 										Market Overview
@@ -390,11 +423,11 @@ export default function ProductsPage() {
 										</Tbody>
 									</Table>
 								</TableContainer>
-							</Box>
+							</MotionBox>
 						</VStack>
 					) : (
-						<Center py={20} bg="white" borderRadius="2xl" border="1px dashed" borderColor="gray.300">
-							<VStack spacing={4}>
+						<MotionBox py={20} bg="white" borderRadius="2xl" border="1px dashed" borderColor="gray.300" variants={fadeInUp}>
+							<VStack spacing={4} textAlign="center">
 								<Text fontSize="lg" color="gray.500" fontWeight="600">
 									No engines found for this selection.
 								</Text>
@@ -402,9 +435,9 @@ export default function ProductsPage() {
 									Browse All Brands
 								</Button>
 							</VStack>
-						</Center>
+						</MotionBox>
 					)}
-				</VStack>
+				</MotionVStack>
 			</Container>
 		</Box>
 	);
