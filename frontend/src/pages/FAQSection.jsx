@@ -14,6 +14,7 @@ import {
   Icon,
   Flex,
 } from '@chakra-ui/react';
+import { motion } from 'framer-motion';
 import { FaQuestionCircle, FaChevronRight } from 'react-icons/fa';
 
 const faqs = [
@@ -46,6 +47,31 @@ const faqs = [
     answer: "Simply submit your vehicle or engine details and our team will help connect you with suitable engine options from verified sellers."
   },
 ];
+
+const MotionBox = motion(Box);
+const MotionSimpleGrid = motion(SimpleGrid);
+
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.1,
+    },
+  },
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 15 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      duration: 0.4,
+      ease: "easeOut",
+    },
+  },
+};
 
 export default function FAQSection() {
   const accentColor = "#D90404";
@@ -80,54 +106,72 @@ export default function FAQSection() {
         <VStack spacing={6} align="center">
 
           {/* Header Section with Icon */}
-          <VStack spacing={2} textAlign="center" maxW="700px">
-            <Flex
-              w="48px"
-              h="48px"
-              bg={`${accentColor}10`}
-              borderRadius="full"
-              align="center"
-              justify="center"
-            >
-              <Icon as={FaQuestionCircle} w={5} h={5} color={accentColor} />
-            </Flex>
+          <MotionBox 
+            textAlign="center" 
+            maxW="700px"
+            initial={{ opacity: 0, scale: 0.95 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5 }}
+          >
+            <VStack spacing={2}>
+              <Flex
+                w="48px"
+                h="48px"
+                bg={`${accentColor}10`}
+                borderRadius="full"
+                align="center"
+                justify="center"
+              >
+                <Icon as={FaQuestionCircle} w={5} h={5} color={accentColor} />
+              </Flex>
 
-            <Text
-              fontSize="12px"
-              fontWeight="700"
-              color={accentColor}
-              letterSpacing="1.5px"
-              textTransform="uppercase"
-              bg={`${accentColor}10`}
-              px={2.5}
-              py={0.5}
-              borderRadius="full"
-              display="inline-block"
-            >
-              FAQ
-            </Text>
+              <Text
+                fontSize="12px"
+                fontWeight="700"
+                color={accentColor}
+                letterSpacing="1.5px"
+                textTransform="uppercase"
+                bg={`${accentColor}10`}
+                px={2.5}
+                py={0.5}
+                borderRadius="full"
+                display="inline-block"
+              >
+                FAQ
+              </Text>
 
-            <Heading
-              fontSize={{ base: "22px", md: "30px" }}
-              fontWeight="800"
-              color="gray.800"
-              lineHeight="1.3"
-              letterSpacing="-0.5px"
-            >
-              Got Questions? We've Got Answers
-            </Heading>
+              <Heading
+                fontSize={{ base: "22px", md: "30px" }}
+                fontWeight="800"
+                color="gray.800"
+                lineHeight="1.3"
+                letterSpacing="-0.5px"
+              >
+                Got Questions? We've Got Answers
+              </Heading>
 
-            <Text fontSize="14px" color="gray.600">
-              Everything you need to know about finding and buying quality engines
-            </Text>
-          </VStack>
+              <Text fontSize="14px" color="gray.600">
+                Everything you need to know about finding and buying quality engines
+              </Text>
+            </VStack>
+          </MotionBox>
 
           {/* FAQ Accordion - Modern Card Style */}
           <Box w="full" maxW="1000px">
-            <Accordion allowMultiple defaultIndex={faqs.map((_, index) => index)}>
-              <SimpleGrid columns={{ base: 1, lg: 2 }} spacing={3}>
+            <Accordion allowMultiple defaultIndex={faqs.map((_, i) => i)}>
+              <MotionSimpleGrid 
+                columns={{ base: 1, lg: 2 }} 
+                spacing={3}
+                variants={containerVariants}
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true, margin: "-50px" }}
+              >
                 {faqs.map((faq, index) => (
                   <AccordionItem
+                    as={motion.div}
+                    variants={itemVariants}
                     key={index}
                     border="none"
                     borderRadius="xl"
@@ -194,7 +238,7 @@ export default function FAQSection() {
                     </AccordionPanel>
                   </AccordionItem>
                 ))}
-              </SimpleGrid>
+              </MotionSimpleGrid>
             </Accordion>
           </Box>
 

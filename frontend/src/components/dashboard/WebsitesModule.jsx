@@ -222,6 +222,93 @@ export default function WebsitesModule() {
 					</Table>
 				</Box>
 			)}
+							{isLoading ? (
+								<Center py={16}>
+									<VStack spacing={3}>
+										<Spinner color="#D90404" size="lg" thickness="4px" />
+										<Text color="gray.500" fontSize="14px">
+											Loading sites...
+										</Text>
+									</VStack>
+								</Center>
+							) : websites.length === 0 ? (
+								<Center py={16}>
+									<VStack spacing={3}>
+										<Icon as={Globe} boxSize={10} color="gray.300" />
+										<Text color="gray.500" fontWeight="600">
+											No sites found
+										</Text>
+										<Text color="gray.400" fontSize="13px">
+											Create your first tenant site to get started
+										</Text>
+									</VStack>
+								</Center>
+							) : (
+								<Box overflowX="auto" borderRadius="xl" border="1px solid" borderColor="gray.100">
+									<Table variant="simple" size="sm" layout="fixed" minW="1000px">
+										<Thead bg="gray.50">
+											<Tr>
+												<Th w="200px" fontSize="11px" fontWeight="800" textTransform="uppercase" letterSpacing="1px" py={4}>Name</Th>
+												<Th w="220px" fontSize="11px" fontWeight="800" textTransform="uppercase" letterSpacing="1px">Domain</Th>
+												<Th w="120px" fontSize="11px" fontWeight="800" textTransform="uppercase" letterSpacing="1px">Status</Th>
+												<Th w="100px" fontSize="11px" fontWeight="800" textTransform="uppercase" letterSpacing="1px">Users</Th>
+												<Th w="200px" fontSize="11px" fontWeight="800" textTransform="uppercase" letterSpacing="1px">Owner</Th>
+												<Th w="120px" fontSize="11px" fontWeight="800" textTransform="uppercase" letterSpacing="1px">Actions</Th>
+											</Tr>
+										</Thead>
+										<Tbody>
+											{websites.map((site) => (
+												<Tr key={site._id} _hover={{ bg: 'gray.50' }}>
+													<Td fontSize="13px" fontWeight="700" isTruncated>{site.name}</Td>
+													<Td fontSize="12px" color="gray.500" isTruncated>{site.domain || '—'}</Td>
+													<Td>
+														<Badge
+															colorScheme={STATUS_COLORS[site.status] || 'gray'}
+															fontSize="11px"
+															borderRadius="full"
+															px={3}
+															textTransform="capitalize"
+															whiteSpace="nowrap"
+														>
+															{site.status}
+														</Badge>
+													</Td>
+													<Td>
+														<HStack spacing={1} whiteSpace="nowrap">
+															<Icon as={Users} color="gray.400" boxSize={3} />
+															<Text fontSize="13px" fontWeight="600">{site.userCount ?? '—'}</Text>
+														</HStack>
+													</Td>
+													<Td fontSize="12px" color="gray.500" isTruncated>{site.owner?.name || '—'}</Td>
+													<Td>
+														<HStack spacing={1} whiteSpace="nowrap">
+															{canModify() && (
+																<>
+																	<IconButton
+																		icon={<EditIcon />}
+																		size="sm"
+																		variant="ghost"
+																		onClick={() => { setEditingSite(site); onOpen(); }}
+																		aria-label="Edit Site"
+																	/>
+																	<IconButton
+																		icon={<DeleteIcon />}
+																		size="sm"
+																		variant="ghost"
+																		colorScheme="red"
+																		onClick={() => handleDelete(site._id)}
+																		aria-label="Delete Site"
+																	/>
+																</>
+															)}
+														</HStack>
+													</Td>
+												</Tr>
+											))}
+										</Tbody>
+									</Table>
+								</Box>
+							)}
 
 			<WebsiteModal isOpen={isOpen} onClose={onClose} onSave={handleSave} website={editingSite} />
 		</ModuleFrame>

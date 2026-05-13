@@ -40,6 +40,30 @@ import {
 } from "react-icons/fa";
 import { MdEmail, MdMessage } from "react-icons/md";
 import API from "../services/api";
+import { motion } from "framer-motion";
+
+const MotionBox = motion(Box);
+const MotionVStack = motion(VStack);
+const MotionSimpleGrid = motion(SimpleGrid);
+const MotionFlex = motion(Flex);
+const MotionHeading = motion(Heading);
+
+const fadeInUp = {
+	initial: { opacity: 0, y: 30 },
+	whileInView: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } },
+	viewport: { once: true },
+};
+
+const staggerContainer = {
+	initial: { opacity: 0 },
+	whileInView: {
+		opacity: 1,
+		transition: {
+			staggerChildren: 0.1,
+		},
+	},
+	viewport: { once: true },
+};
 
 export default function ContactPage() {
 	const [formData, setFormData] = useState({
@@ -134,318 +158,314 @@ export default function ContactPage() {
 			</Helmet>
 
 			{/* Hero Section - Matching Header Theme */}
-			<Box bg={darkBg} color="white" py={12} mb={8}>
+			<Box bg={darkBg} color="white" py={20} mb={8} position="relative" overflow="hidden">
+				<Box position="absolute" top="-10%" right="-5%" w="400px" h="400px" bg={accentColor} filter="blur(150px)" opacity={0.1} />
 				<Container maxW="container.xl">
-					<VStack spacing={3} textAlign="center">
-						<Badge bg={accentColor} color="white" px={3} py={1} borderRadius="full" fontSize="12px">
-							Get in Touch
+					<MotionVStack spacing={4} textAlign="center" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }}>
+						<Badge bg={accentColor} color="white" px={4} py={1.5} borderRadius="full" fontSize="12px" fontWeight="800" letterSpacing="1px">
+							GET IN TOUCH
 						</Badge>
-						<Heading fontSize="36px" fontWeight="800">
-							Contact Us
+						<Heading fontSize={{ base: "42px", md: "56px" }} fontWeight="900" lineHeight="1.1">
+							We're Here to <Text as="span" color={accentColor}>Help.</Text>
 						</Heading>
-						<Text fontSize="16px" maxW="2xl" opacity={0.9}>
-							Have questions about engine prices or need assistance? We're here to help.
+						<Text fontSize="18px" maxW="2xl" opacity={0.8} lineHeight="1.6">
+							Have questions about engine prices or need assistance? Our specialists are ready to support you.
 						</Text>
-					</VStack>
+					</MotionVStack>
 				</Container>
 			</Box>
 
 			<Container maxW="container.xl" py={4}>
 				{/* Contact Info Cards */}
-				<SimpleGrid columns={{ base: 1, md: 2, lg: 4 }} spacing={5} mb={12}>
+				<MotionSimpleGrid columns={{ base: 1, md: 2, lg: 4 }} spacing={6} mb={20} variants={staggerContainer} initial="initial" whileInView="whileInView">
 					{contactInfo.map((info, index) => (
-						<Card
+						<MotionBox
 							key={index}
 							bg={bgColor}
+							p={8}
+							borderRadius="2xl"
 							border="1px solid"
 							borderColor={borderColor}
-							borderRadius="lg"
-							boxShadow="sm"
-							_hover={{ transform: "translateY(-5px)", boxShadow: "lg", borderColor: accentColor }}
+							boxShadow="xl"
+							variants={fadeInUp}
+							whileHover={{ y: -10, borderColor: accentColor, boxShadow: "2xl" }}
 							transition="all 0.3s"
 						>
-							<CardBody py={5}>
-								<VStack spacing={2} textAlign="center">
-									<Box bg="orange.50" p={3} borderRadius="full" color={accentColor}>
-										<Icon as={info.icon} boxSize={5} />
-									</Box>
-									<Text
-										fontSize="13px"
-										fontWeight="700"
-										color="gray.500"
-										textTransform="uppercase"
-										letterSpacing="1px"
-									>
-										{info.title}
-									</Text>
-									<Text fontWeight="bold" fontSize="15px" color={darkBg}>
-										{info.details}
-									</Text>
-									<Text color="gray.500" fontSize="12px">
-										{info.subtext}
-									</Text>
-								</VStack>
-							</CardBody>
-						</Card>
+							<VStack spacing={4} textAlign="center">
+								<Box bg="orange.50" p={4} borderRadius="2xl" color={accentColor}>
+									<Icon as={info.icon} boxSize={6} />
+								</Box>
+								<Text
+									fontSize="12px"
+									fontWeight="800"
+									color="gray.400"
+									textTransform="uppercase"
+									letterSpacing="2px"
+								>
+									{info.title}
+								</Text>
+								<Text fontWeight="800" fontSize="16px" color={darkBg}>
+									{info.details}
+								</Text>
+								<Text color="gray.500" fontSize="13px">
+									{info.subtext}
+								</Text>
+							</VStack>
+						</MotionBox>
 					))}
-				</SimpleGrid>
+				</MotionSimpleGrid>
 
-				<Grid templateColumns={{ base: "1fr", lg: "1fr 1.5fr" }} gap={10}>
-					{/* Left Column - Additional Info */}
+				<Grid templateColumns={{ base: "1fr", lg: "1fr 1.5fr" }} gap={16}>
+					{/* Left Column */}
 					<GridItem>
-						<VStack align="stretch" spacing={6}>
-							<Box>
-								<Flex align="center" mb={3}>
-									<Icon as={FaIndustry} boxSize={6} color={accentColor} mr={2} />
-									<Heading fontSize="24px" color={darkBg}>
+						<MotionVStack align="stretch" spacing={8} initial="initial" whileInView="whileInView" variants={staggerContainer}>
+							<MotionBox variants={fadeInUp}>
+								<Flex align="center" mb={4}>
+									<Icon as={FaIndustry} boxSize={8} color={accentColor} mr={4} />
+									<MotionHeading fontSize="32px" color={darkBg} fontWeight="900">
 										Let's Talk
-									</Heading>
+									</MotionHeading>
 								</Flex>
-								<Text color="gray.600" fontSize="15px" lineHeight="1.6">
+								<Text color="gray.600" fontSize="17px" lineHeight="1.8">
 									Get free quotes, and find the best deals on reconditioned and used
 									engines from trusted UK suppliers.
 								</Text>
-							</Box>
+							</MotionBox>
 
-							<Box bg={cardBg} p={5} borderRadius="lg" borderLeft={`4px solid ${accentColor}`}>
-								<Flex align="center" mb={3}>
-									<Icon as={FaHeadset} boxSize={5} color={accentColor} mr={2} />
-									<Heading size="sm" fontSize="18px">
+							<MotionBox bg={cardBg} p={8} borderRadius="2xl" borderLeft={`6px solid ${accentColor}`} variants={fadeInUp} whileHover={{ x: 10 }}>
+								<Flex align="center" mb={4}>
+									<Icon as={FaHeadset} boxSize={6} color={accentColor} mr={3} />
+									<Heading fontSize="22px" fontWeight="800">
 										Customer Support
 									</Heading>
 								</Flex>
-								<Text fontSize="14px" mb={3} lineHeight="1.6">
+								<Text fontSize="15px" color="gray.600" mb={4} lineHeight="1.7">
 									Dedicated support for engine price, order tracking, and technical
-									assistance. Get help finding the right engine for your vehicle.
+									assistance. Get help finding the right engine.
 								</Text>
 								<Button
 									variant="link"
 									color={accentColor}
-									fontSize="13px"
-									fontWeight="600"
+									fontSize="14px"
+									fontWeight="800"
 									rightIcon={<FaPaperPlane />}
-									_hover={{ textDecoration: "none", color: "#e55a00" }}
+									_hover={{ textDecoration: "none", transform: "translateX(5px)" }}
+									transition="all 0.2s"
 								>
-									Learn more about our service
+									SERVICE GUIDE
 								</Button>
-							</Box>
+							</MotionBox>
 
-							<Box bg={cardBg} p={5} borderRadius="lg" borderLeft={`4px solid ${accentColor}`}>
-								<Flex align="center" mb={3}>
-									<Icon as={FaRegBuilding} boxSize={5} color={accentColor} mr={2} />
-									<Heading size="sm" fontSize="18px">
+							<MotionBox bg={cardBg} p={8} borderRadius="2xl" borderLeft={`6px solid ${darkBg}`} variants={fadeInUp} whileHover={{ x: 10 }}>
+								<Flex align="center" mb={4}>
+									<Icon as={FaRegBuilding} boxSize={6} color={accentColor} mr={3} />
+									<Heading fontSize="22px" fontWeight="800">
 										Supplier Inquiries
 									</Heading>
 								</Flex>
-								<Text fontSize="14px" mb={2}>
+								<Text fontSize="15px" color="gray.600" mb={4} lineHeight="1.7">
 									Interested in becoming a trusted supplier? Join our network of verified engine
 									suppliers.
 								</Text>
-								<HStack spacing={2}>
-									<Icon as={FaEnvelope} color={accentColor} boxSize={4} />
-									<Text fontSize="13px" fontWeight="500">
+								<HStack spacing={3}>
+									<Icon as={FaEnvelope} color={accentColor} boxSize={5} />
+									<Text fontSize="15px" fontWeight="700">
 										partners@reconditionedengine.co.uk
 									</Text>
 								</HStack>
-							</Box>
+							</MotionBox>
 
-							{/* Trust Badges */}
-							<Box bg={darkBg} p={5} borderRadius="lg" textAlign="center">
-								<SimpleGrid columns={2} spacing={3}>
-									<VStack spacing={1}>
-										<Text fontSize="24px" fontWeight="bold" color={accentColor}>
-											500+
-										</Text>
-										<Text fontSize="11px" color="white">
-											Engines Available
-										</Text>
-									</VStack>
-									<VStack spacing={1}>
-										<Text fontSize="24px" fontWeight="bold" color={accentColor}>
-											100+
-										</Text>
-										<Text fontSize="11px" color="white">
-											Trusted Suppliers
-										</Text>
-									</VStack>
-									<VStack spacing={1}>
-										<Text fontSize="24px" fontWeight="bold" color={accentColor}>
-											50K+
-										</Text>
-										<Text fontSize="11px" color="white">
-											Happy Customers
-										</Text>
-									</VStack>
-									<VStack spacing={1}>
-										<Text fontSize="24px" fontWeight="bold" color={accentColor}>
-											24/7
-										</Text>
-										<Text fontSize="11px" color="white">
-											Support Available
-										</Text>
-									</VStack>
+							{/* Stats */}
+							<MotionBox bg={darkBg} p={10} borderRadius="3xl" textAlign="center" variants={fadeInUp}>
+								<SimpleGrid columns={2} spacing={8}>
+									{[
+										{ val: "500+", label: "Engines" },
+										{ val: "100+", label: "Suppliers" },
+										{ val: "50K+", label: "Customers" },
+										{ val: "24/7", label: "Support" },
+									].map((s, idx) => (
+										<VStack key={idx} spacing={1}>
+											<Text fontSize="28px" fontWeight="900" color={accentColor}>
+												{s.val}
+											</Text>
+											<Text fontSize="12px" color="whiteAlpha.700" fontWeight="700" letterSpacing="1px">
+												{s.label.toUpperCase()}
+											</Text>
+										</VStack>
+									))}
 								</SimpleGrid>
-							</Box>
-						</VStack>
+							</MotionBox>
+						</MotionVStack>
 					</GridItem>
 
-					{/* Right Column - Contact Form */}
+					{/* Right Column - Form */}
 					<GridItem>
-						<Box
+						<MotionBox
+							initial={{ opacity: 0, x: 50 }}
+							whileInView={{ opacity: 1, x: 0 }}
+							transition={{ duration: 0.8 }}
+							viewport={{ once: true }}
 							bg={bgColor}
-							p={6}
-							borderRadius="lg"
+							p={{ base: 6, md: 12 }}
+							borderRadius="3xl"
 							border="1px solid"
 							borderColor={borderColor}
-							boxShadow="lg"
-							_hover={{ boxShadow: "xl" }}
-							transition="all 0.3s"
+							boxShadow="2xl"
 						>
-							<VStack spacing={5} align="stretch">
+							<VStack spacing={8} align="stretch">
 								<Box>
-									<Heading fontSize="24px" mb={2} color={darkBg}>
-										Send us a Message
+									<Heading fontSize="32px" mb={3} color={darkBg} fontWeight="900">
+										Send a Message
 									</Heading>
-									<Text color="gray.500" fontSize="14px">
-										Get free engine price quotes. Fill out the form and we'll get back to you within
-										24 hours.
+									<Text color="gray.500" fontSize="16px">
+										Get free engine price quotes. We'll respond within 24 hours.
 									</Text>
 								</Box>
 
 								<form onSubmit={handleSubmit}>
-									<VStack spacing={4}>
+									<VStack spacing={6}>
 										<FormControl isRequired>
-											<FormLabel fontWeight="600" fontSize="13px" color={darkBg}>
-												Full Name
+											<FormLabel fontWeight="800" fontSize="13px" color={darkBg} letterSpacing="1px">
+												FULL NAME
 											</FormLabel>
 											<Flex
-												border="1px solid"
+												border="2px solid"
 												borderColor={borderColor}
-												borderRadius="md"
-												px={3}
+												borderRadius="xl"
+												px={4}
 												align="center"
-												bg="white"
+												bg="gray.50"
 												_focus-within={{
 													borderColor: accentColor,
-													boxShadow: `0 0 0 1px ${accentColor}`,
+													bg: "white",
+													boxShadow: "0 0 0 1px " + accentColor,
 												}}
+												transition="all 0.2s"
 											>
-												<Icon as={FaUser} color={accentColor} boxSize={4} mr={3} flexShrink={0} />
+												<Icon as={FaUser} color={accentColor} boxSize={5} mr={4} />
 												<Input
 													name="name"
 													value={formData.name}
 													onChange={handleChange}
 													placeholder="John Doe"
-													fontSize="14px"
+													fontSize="15px"
+													fontWeight="600"
 													border="none"
 													p={0}
 													_focus={{ outline: "none", boxShadow: "none" }}
-													height="44px"
+													height="56px"
 												/>
 											</Flex>
 										</FormControl>
 
 										<FormControl isRequired>
-											<FormLabel fontWeight="600" fontSize="13px" color={darkBg}>
-												Email Address
+											<FormLabel fontWeight="800" fontSize="13px" color={darkBg} letterSpacing="1px">
+												EMAIL ADDRESS
 											</FormLabel>
 											<Flex
-												border="1px solid"
+												border="2px solid"
 												borderColor={borderColor}
-												borderRadius="md"
-												px={3}
+												borderRadius="xl"
+												px={4}
 												align="center"
-												bg="white"
+												bg="gray.50"
 												_focus-within={{
 													borderColor: accentColor,
-													boxShadow: `0 0 0 1px ${accentColor}`,
+													bg: "white",
+													boxShadow: "0 0 0 1px " + accentColor,
 												}}
+												transition="all 0.2s"
 											>
-												<Icon as={MdEmail} color={accentColor} boxSize={4} mr={3} flexShrink={0} />
+												<Icon as={MdEmail} color={accentColor} boxSize={5} mr={4} />
 												<Input
 													name="email"
 													type="email"
 													value={formData.email}
 													onChange={handleChange}
 													placeholder="john@example.com"
-													fontSize="14px"
+													fontSize="15px"
+													fontWeight="600"
 													border="none"
 													p={0}
 													_focus={{ outline: "none", boxShadow: "none" }}
-													height="44px"
+													height="56px"
 												/>
 											</Flex>
 										</FormControl>
 
 										<FormControl isRequired>
-											<FormLabel fontWeight="600" fontSize="13px" color={darkBg}>
-												Subject
+											<FormLabel fontWeight="800" fontSize="13px" color={darkBg} letterSpacing="1px">
+												SUBJECT
 											</FormLabel>
 											<Flex
-												border="1px solid"
+												border="2px solid"
 												borderColor={borderColor}
-												borderRadius="md"
-												px={3}
+												borderRadius="xl"
+												px={4}
 												align="center"
-												bg="white"
+												bg="gray.50"
 												_focus-within={{
 													borderColor: accentColor,
-													boxShadow: `0 0 0 1px ${accentColor}`,
+													bg: "white",
+													boxShadow: "0 0 0 1px " + accentColor,
 												}}
+												transition="all 0.2s"
 											>
 												<Icon
 													as={FaCommentDots}
 													color={accentColor}
-													boxSize={4}
-													mr={3}
-													flexShrink={0}
+													boxSize={5}
+													mr={4}
 												/>
 												<Input
 													name="subject"
 													value={formData.subject}
 													onChange={handleChange}
-													placeholder="Engine price quote request"
-													fontSize="14px"
+													placeholder="Engine quote request"
+													fontSize="15px"
+													fontWeight="600"
 													border="none"
 													p={0}
 													_focus={{ outline: "none", boxShadow: "none" }}
-													height="44px"
+													height="56px"
 												/>
 											</Flex>
 										</FormControl>
 
 										<FormControl isRequired>
-											<FormLabel fontWeight="600" fontSize="13px" color={darkBg}>
-												Message
+											<FormLabel fontWeight="800" fontSize="13px" color={darkBg} letterSpacing="1px">
+												MESSAGE
 											</FormLabel>
 											<Flex
-												border="1px solid"
+												border="2px solid"
 												borderColor={borderColor}
-												borderRadius="md"
-												px={3}
-												py={3}
-												bg="white"
+												borderRadius="xl"
+												px={4}
+												py={4}
+												bg="gray.50"
 												align="flex-start"
 												_focus-within={{
 													borderColor: accentColor,
-													boxShadow: `0 0 0 1px ${accentColor}`,
+													bg: "white",
+													boxShadow: "0 0 0 1px " + accentColor,
 												}}
+												transition="all 0.2s"
 											>
 												<Icon
 													as={MdMessage}
 													color={accentColor}
-													boxSize={4}
-													mr={3}
+													boxSize={5}
+													mr={4}
 													mt={1}
-													flexShrink={0}
 												/>
 												<Textarea
 													name="message"
 													value={formData.message}
 													onChange={handleChange}
-													placeholder="Please provide your vehicle registration number and engine requirements..."
+													placeholder="How can we help?"
 													rows={5}
-													fontSize="14px"
+													fontSize="15px"
+													fontWeight="600"
 													border="none"
 													p={0}
 													m={0}
@@ -460,33 +480,31 @@ export default function ContactPage() {
 											bg={accentColor}
 											color="white"
 											size="lg"
-											fontSize="15px"
-											fontWeight="600"
+											h="64px"
 											width="100%"
-											borderRadius="md"
+											borderRadius="xl"
 											isLoading={isSubmitting}
-											loadingText="Sending..."
 											leftIcon={<FaPaperPlane />}
+											fontSize="18px"
+											fontWeight="800"
 											_hover={{
-												bg: "#e55a00",
-												transform: "translateY(-2px)",
-												boxShadow: "lg",
+												bg: "#B70303",
+												transform: "translateY(-4px)",
+												boxShadow: "0 20px 40px rgba(217, 4, 4, 0.3)",
 											}}
-											transition="all 0.2s"
+											transition="all 0.3s"
 										>
-											Get Free Quotes
+											Send Message
 										</Button>
 									</VStack>
 								</form>
 
-								<Divider />
-
-								<Text fontSize="11px" color="gray.500" textAlign="center">
+								<Text fontSize="12px" color="gray.500" textAlign="center">
 									By submitting, you agree to our privacy policy. We'll never share your
 									information.
 								</Text>
 							</VStack>
-						</Box>
+						</MotionBox>
 					</GridItem>
 				</Grid>
 

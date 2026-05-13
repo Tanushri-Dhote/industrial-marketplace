@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+﻿import React, { useCallback, useEffect, useMemo, useState } from "react";
 import {
 	Table,
 	Thead,
@@ -72,21 +72,21 @@ function saveStatuses(s) {
 
 const mapInquiryFromApi = (inquiry) => ({
 	id: inquiry._id,
-	registrationNumber: inquiry.registrationNumber || "—",
+	registrationNumber: inquiry.registrationNumber || "ÔÇö",
 	brand: inquiry.brand || "",
 	model: inquiry.model || "",
 	year: inquiry.year || "",
 	engineType: inquiry.engineType || "",
-	category: inquiry.category || "—",
+	category: inquiry.category || "ÔÇö",
 	engineOptions: inquiry.engineOptions || [],
 	fittingOptions: inquiry.fittingOptions || [],
-	postcode: inquiry.postcode || "—",
+	postcode: inquiry.postcode || "ÔÇö",
 	notes: inquiry.notes || "",
-	name: inquiry.name || "—",
-	email: inquiry.email || "—",
-	phone: inquiry.phone || "—",
-	date: inquiry.createdAt ? new Date(inquiry.createdAt).toLocaleString() : "—",
-	refNumber: inquiry._id?.slice(-6).toUpperCase() || "——",
+	name: inquiry.name || "ÔÇö",
+	email: inquiry.email || "ÔÇö",
+	phone: inquiry.phone || "ÔÇö",
+	date: inquiry.createdAt ? new Date(inquiry.createdAt).toLocaleString() : "ÔÇö",
+	refNumber: inquiry._id?.slice(-6).toUpperCase() || "ÔÇöÔÇö",
 });
 
 function UKPlate({ vrm }) {
@@ -107,7 +107,7 @@ function UKPlate({ vrm }) {
 					GB
 				</Text>
 				<Text color={PLATE_YELLOW} fontSize="7px">
-					★
+					Ôÿà
 				</Text>
 			</Flex>
 			<Text
@@ -118,7 +118,7 @@ function UKPlate({ vrm }) {
 				color={DARK}
 				fontFamily="'Arial Black', sans-serif"
 			>
-				{vrm || "—"}
+				{vrm || "ÔÇö"}
 			</Text>
 		</Flex>
 	);
@@ -291,7 +291,7 @@ export default function InquiriesModule({ moduleId }) {
 			title="Vehicle Inquiries"
 			description="Manage, quote, and track vehicle inquiries from customers."
 		>
-			{/* ── Tab bar ── */}
+			{/* ÔöÇÔöÇ Tab bar ÔöÇÔöÇ */}
 			<Flex mb={6} gap={2} p={1.5} bg="gray.100" borderRadius="2xl" align="center" flexWrap="wrap">
 				{TABS.map((tab) => {
 					const isActive = activeTab === tab.key;
@@ -349,7 +349,7 @@ export default function InquiriesModule({ moduleId }) {
 				</InputGroup>
 			</Flex>
 
-			{/* ── Tab hint ── */}
+			{/* ÔöÇÔöÇ Tab hint ÔöÇÔöÇ */}
 			{activeTab === "hidden" && (
 				<Box
 					bg="gray.50"
@@ -384,7 +384,7 @@ export default function InquiriesModule({ moduleId }) {
 				</Box>
 			)}
 
-			{/* ── Table ── */}
+			{/* ÔöÇÔöÇ Table ÔöÇÔöÇ */}
 			{isLoading ? (
 				<Center py={16}>
 					<Spinner size="xl" color={RED} thickness="4px" />
@@ -691,7 +691,7 @@ export default function InquiriesModule({ moduleId }) {
 	);
 }
 
-/* ─── Detail Modal ──────────────────────────────────────────────── */
+/* ÔöÇÔöÇÔöÇ Detail Modal ÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇÔöÇ */
 function InquiryViewModal({
 	isOpen,
 	onClose,
@@ -724,7 +724,7 @@ function InquiryViewModal({
 									Inquiry Details
 								</Text>
 								<Text opacity={0.7} fontSize="13px">
-									{inquiry.registrationNumber !== "—"
+									{inquiry.registrationNumber !== "ÔÇö"
 										? `Reference: ${inquiry.refNumber}`
 										: `${inquiry.brand} ${inquiry.model} ${inquiry.year}`.trim() ||
 											"Manual Selection"}
@@ -732,7 +732,7 @@ function InquiryViewModal({
 							</VStack>
 						</HStack>
 
-						{inquiry.registrationNumber !== "—" && (
+						{inquiry.registrationNumber !== "ÔÇö" && (
 							<Flex
 								bg={PLATE_YELLOW}
 								border="2.5px solid #1a1a1a"
@@ -754,7 +754,7 @@ function InquiryViewModal({
 										GB
 									</Text>
 									<Text color={PLATE_YELLOW} fontSize="9px">
-										★
+										Ôÿà
 									</Text>
 								</Flex>
 								<Text

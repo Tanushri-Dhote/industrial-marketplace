@@ -17,23 +17,14 @@ import {
 } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import API from "../services/api";
 import { FaArrowRight, FaCar, FaCheckCircle, FaTools } from "react-icons/fa";
 
 const MotionBox = motion(Box);
 const MotionVStack = motion(VStack);
-
-const fadeInUp = {
-	initial: { opacity: 0, y: 20 },
-	animate: { opacity: 1, y: 0 },
-	transition: { duration: 0.6 },
-};
-
-const staggerContainer = {
-	animate: { transition: { staggerChildren: 0.1 } },
-};
+const MotionFlex = motion(Flex);
 
 const DARK = "#0F172A";
 const RED = "#D90404";
@@ -47,6 +38,16 @@ const POPULAR_BRANDS = [
 	{ name: "Mercedes-Benz", slug: "mercedes-benz" },
 	{ name: "Vauxhall", slug: "vauxhall" },
 ];
+
+const fadeInUp = {
+	initial: { opacity: 0, y: 20 },
+	animate: { opacity: 1, y: 0 },
+	transition: { duration: 0.6, ease: "easeOut" },
+};
+
+const staggerContainer = {
+	animate: { transition: { staggerChildren: 0.12 } },
+};
 
 export default function HeroSection({ category }) {
 	const navigate = useNavigate();
@@ -89,19 +90,6 @@ export default function HeroSection({ category }) {
 		staleTime: 1000 * 60 * 30,
 	});
 
-	// Prefetching logic
-	const prefetchModels = (brandId) => {
-		if (!brandId) return;
-		queryClient.prefetchQuery({
-			queryKey: ["models", brandId],
-			queryFn: async () => {
-				const res = await API.get(`/models/${brandId}`);
-				return res.data?.data || [];
-			},
-			staleTime: 1000 * 60 * 5,
-		});
-	};
-
 	// Handlers
 	const handleBrandChange = async (brandId) => {
 		setSelectedBrand(brandId);
@@ -114,8 +102,6 @@ export default function HeroSection({ category }) {
 
 		if (brandId) {
 			try {
-				// We could also use useQuery here, but for simplicity of the dependent flow
-				// in this specific complex UI, we'll fetch and set local state
 				const data = await queryClient.fetchQuery({
 					queryKey: ["models", brandId],
 					queryFn: async () => {
@@ -141,7 +127,6 @@ export default function HeroSection({ category }) {
 			try {
 				const res = await API.get(`/years/${modelId}`);
 				setYears(res.data?.data || []);
-				// Prefetch types for first year maybe? Or just fetch years
 			} catch (error) {
 				console.error(error);
 			}
@@ -218,14 +203,12 @@ export default function HeroSection({ category }) {
 							variant="outline"
 							color="white"
 							borderColor="whiteAlpha.300"
-							_hover={{ bg: "whiteAlpha.200", borderColor: "white" }}
+							_hover={{ bg: "whiteAlpha.200", borderColor: "white", transform: "translateY(-2px)" }}
+							transition="all 0.2s"
 							fontSize="11px"
 							onClick={() => {
 								setActiveTab("manual");
 								if (brandObj) handleBrandChange(brandObj._id);
-							}}
-							onMouseEnter={() => {
-								if (brandObj) prefetchModels(brandObj._id);
 							}}
 						>
 							{b.name}
@@ -246,15 +229,22 @@ export default function HeroSection({ category }) {
 		>
 			{/* Background */}
 			<Box position="absolute" inset={0} bg={DARK}>
-				<Image
-					src="/car-engine-banner.jpg"
-					alt="Banner"
-					objectFit="cover"
+				<MotionBox
+					initial={{ scale: 1.1, opacity: 0 }}
+					animate={{ scale: 1, opacity: 0.4 }}
+					transition={{ duration: 1.5, ease: "easeOut" }}
 					w="full"
 					h="full"
-					opacity={0.4}
-					filter="grayscale(20%)"
-				/>
+				>
+					<Image
+						src="/car-engine-banner.jpg"
+						alt="Banner"
+						objectFit="cover"
+						w="full"
+						h="full"
+						filter="grayscale(20%)"
+					/>
+				</MotionBox>
 				<Box
 					position="absolute"
 					inset={0}
@@ -313,22 +303,17 @@ export default function HeroSection({ category }) {
 
 						<MotionBox variants={fadeInUp}>
 							<SimpleGrid columns={{ base: 1, md: 2 }} gap={4} w="full" maxW="500px">
-								<HStack color="whiteAlpha.900">
-									<Icon as={FaCheckCircle} color="green.400" />
-									<Text fontWeight="600">Verified Suppliers Only</Text>
-								</HStack>
-								<HStack color="whiteAlpha.900">
-									<Icon as={FaCheckCircle} color="green.400" />
-									<Text fontWeight="600">Up to 1 Year Warranty</Text>
-								</HStack>
-								<HStack color="whiteAlpha.900">
-									<Icon as={FaCheckCircle} color="green.400" />
-									<Text fontWeight="600">Free Nationwide Delivery</Text>
-								</HStack>
-								<HStack color="whiteAlpha.900">
-									<Icon as={FaCheckCircle} color="green.400" />
-									<Text fontWeight="600">No Upfront Payment</Text>
-								</HStack>
+								{[
+									"Verified Suppliers Only",
+									"Up to 1 Year Warranty",
+									"Free Nationwide Delivery",
+									"No Upfront Payment"
+								].map((feature, i) => (
+									<HStack key={i} color="whiteAlpha.900">
+										<Icon as={FaCheckCircle} color="green.400" />
+										<Text fontWeight="600">{feature}</Text>
+									</HStack>
+								))}
 							</SimpleGrid>
 						</MotionBox>
 					</MotionVStack>
@@ -344,9 +329,9 @@ export default function HeroSection({ category }) {
 						maxW="480px"
 						border="1px solid"
 						borderColor="whiteAlpha.200"
-						initial={{ opacity: 0, x: 20 }}
+						initial={{ opacity: 0, x: 30 }}
 						animate={{ opacity: 1, x: 0 }}
-						transition={{ duration: 0.6, delay: 0.2 }}
+						transition={{ duration: 0.8, delay: 0.3, ease: "easeOut" }}
 					>
 						{/* Tabs */}
 						<HStack bg="whiteAlpha.100" p={1} borderRadius="xl" mb={8}>
@@ -360,6 +345,7 @@ export default function HeroSection({ category }) {
 								onClick={() => setActiveTab("vrm")}
 								leftIcon={<FaCar />}
 								fontWeight="800"
+								transition="all 0.3s"
 							>
 								Registration
 							</Button>
@@ -373,227 +359,181 @@ export default function HeroSection({ category }) {
 								onClick={() => setActiveTab("manual")}
 								leftIcon={<FaTools />}
 								fontWeight="800"
+								transition="all 0.3s"
 							>
 								Manual
 							</Button>
 						</HStack>
 
-						<VStack spacing={6} align="stretch">
-							{activeTab === "vrm" ? (
-								<VStack spacing={4} align="stretch">
-									<Box>
-										<Flex
-											bg={GOLD}
-											borderRadius="xl"
-											overflow="hidden"
-											h={{ base: "56px", md: "64px" }}
-											align="stretch"
-											border="3px solid"
-											borderColor={GOLD}
-											boxShadow="lg"
-										>
-											<VStack bg="#003399" w="50px" justify="center" spacing={0}>
-												<Text fontSize="10px" color="white" fontWeight="900">
-													GB
-												</Text>
-												<Text color={GOLD} fontSize="12px">
-													★
-												</Text>
-											</VStack>
-											<Input
-												placeholder="ENTER REG"
-												value={vrm}
-												onChange={(e) => setVrm(e.target.value.toUpperCase())}
-												variant="unstyled"
-												bg="white"
-												color={DARK}
-												_placeholder={{ color: "gray.300" }}
-												h="full"
-												fontSize="28px"
+						<AnimatePresence mode="wait">
+							<MotionBox
+								key={activeTab}
+								initial={{ opacity: 0, y: 10 }}
+								animate={{ opacity: 1, y: 0 }}
+								exit={{ opacity: 0, y: -10 }}
+								transition={{ duration: 0.3 }}
+							>
+								<VStack spacing={6} align="stretch">
+									{activeTab === "vrm" ? (
+										<VStack spacing={4} align="stretch">
+											<Box>
+												<MotionFlex
+													bg={GOLD}
+													borderRadius="xl"
+													overflow="hidden"
+													h={{ base: "56px", md: "64px" }}
+													align="stretch"
+													border="3px solid"
+													borderColor={GOLD}
+													boxShadow="lg"
+													whileFocusWithin={{ scale: 1.02 }}
+													transition={{ duration: 0.2 }}
+												>
+													<VStack bg="#003399" w="50px" justify="center" spacing={0}>
+														<Text fontSize="10px" color="white" fontWeight="900">GB</Text>
+														<Text color={GOLD} fontSize="12px">★</Text>
+													</VStack>
+													<Input
+														placeholder="ENTER REG"
+														value={vrm}
+														onChange={(e) => setVrm(e.target.value.toUpperCase())}
+														variant="unstyled"
+														bg="white"
+														color={DARK}
+														_placeholder={{ color: "gray.300" }}
+														h="full"
+														fontSize="28px"
+														fontWeight="900"
+														textAlign="center"
+														letterSpacing="2px"
+													/>
+												</MotionFlex>
+											</Box>
+
+											<select
+												value={selectedCategory}
+												onChange={(e) => setSelectedCategory(e.target.value)}
+												style={{
+													padding: "16px",
+													borderRadius: "12px",
+													fontSize: "16px",
+													fontWeight: "700",
+													width: "100%",
+													backgroundColor: "rgba(255,255,255,0.1)",
+													color: "white",
+													border: "1px solid rgba(255,255,255,0.2)",
+												}}
+											>
+												<option value="" style={{ color: DARK }}>Select Part Type</option>
+												{partTypes.map((pt) => (
+													<option key={pt._id} value={pt.slug} style={{ color: DARK }}>{pt.name}</option>
+												))}
+											</select>
+
+											<Button
+												w="full"
+												h={{ base: "56px", md: "64px" }}
+												bg={RED}
+												color="white"
+												fontSize={{ base: "16px", md: "18px" }}
 												fontWeight="900"
-												textAlign="center"
-												letterSpacing="2px"
-											/>
-										</Flex>
-									</Box>
+												borderRadius="xl"
+												onClick={handleVRMSubmit}
+												_hover={{ bg: "#B70303", transform: "translateY(-2px)", boxShadow: "xl" }}
+												rightIcon={<FaArrowRight />}
+											>
+												Get Free Quotes
+											</Button>
 
-									<select
-										value={selectedCategory}
-										onChange={(e) => setSelectedCategory(e.target.value)}
-										style={{
-											padding: "16px",
-											borderRadius: "12px",
-											fontSize: "16px",
-											fontWeight: "700",
-											width: "100%",
-											backgroundColor: "rgba(255,255,255,0.1)",
-											color: "white",
-											border: "1px solid rgba(255,255,255,0.2)",
-										}}
-									>
-										<option value="" style={{ color: DARK }}>
-											Select Part Type
-										</option>
-										{partTypes.map((pt) => (
-											<option key={pt._id} value={pt.slug} style={{ color: DARK }}>
-												{pt.name}
-											</option>
-										))}
-									</select>
+											<BrandQuickSelect />
+										</VStack>
+									) : (
+										<VStack spacing={4} align="stretch">
+											<SimpleGrid columns={2} spacing={3}>
+												<select
+													value={selectedBrand}
+													onChange={(e) => handleBrandChange(e.target.value)}
+													style={{ padding: "12px", borderRadius: "10px", fontSize: "14px", fontWeight: "600", background: "white" }}
+												>
+													<option value="">Make</option>
+													{brands.map((b) => <option key={b._id} value={b._id}>{b.name}</option>)}
+												</select>
+												<select
+													value={selectedModel}
+													onChange={(e) => handleModelChange(e.target.value)}
+													style={{ padding: "12px", borderRadius: "10px", fontSize: "14px", fontWeight: "600", background: "white" }}
+												>
+													<option value="">Model</option>
+													{models.map((m) => <option key={m._id} value={m._id}>{m.name}</option>)}
+												</select>
+											</SimpleGrid>
 
-									<Button
-										w="full"
-										h={{ base: "56px", md: "64px" }}
-										bg={RED}
-										color="white"
-										fontSize={{ base: "16px", md: "18px" }}
-										fontWeight="900"
-										borderRadius="xl"
-										onClick={handleVRMSubmit}
-										_hover={{ bg: "#B70303", transform: "translateY(-2px)" }}
-										rightIcon={<FaArrowRight />}
-									>
-										Get Free Quotes
-									</Button>
+											<SimpleGrid columns={2} spacing={3}>
+												<select
+													value={selectedYear}
+													onChange={(e) => handleYearChange(e.target.value)}
+													style={{ padding: "12px", borderRadius: "10px", fontSize: "14px", fontWeight: "600", background: "white" }}
+												>
+													<option value="">Year</option>
+													{years.map((y, i) => <option key={i} value={y.name}>{y.name}</option>)}
+												</select>
+												<select
+													value={selectedType}
+													onChange={(e) => setSelectedType(e.target.value)}
+													style={{ padding: "12px", borderRadius: "10px", fontSize: "14px", fontWeight: "600", background: "white" }}
+												>
+													<option value="">Type</option>
+													{types.map((t, i) => <option key={i} value={t.name}>{t.name}</option>)}
+												</select>
+											</SimpleGrid>
 
-									<BrandQuickSelect />
+											<select
+												value={selectedCategory}
+												onChange={(e) => setSelectedCategory(e.target.value)}
+												style={{
+													padding: "16px",
+													borderRadius: "12px",
+													fontSize: "16px",
+													fontWeight: "700",
+													width: "100%",
+													backgroundColor: "rgba(255,255,255,0.1)",
+													color: "white",
+													border: "1px solid rgba(255,255,255,0.2)",
+												}}
+											>
+												<option value="" style={{ color: DARK }}>Select Part Type</option>
+												{partTypes.map((pt) => (
+													<option key={pt._id} value={pt.slug} style={{ color: DARK }}>{pt.name}</option>
+												))}
+											</select>
+
+											<Button
+												w="full"
+												h="64px"
+												bg={RED}
+												color="white"
+												fontSize="18px"
+												fontWeight="900"
+												borderRadius="xl"
+												onClick={handleManualSubmit}
+												_hover={{ bg: "#B70303", transform: "translateY(-2px)", boxShadow: "xl" }}
+												rightIcon={<FaArrowRight />}
+											>
+												Get Free Quotes
+											</Button>
+										</VStack>
+									)}
+
+									<Text textAlign="center" color="whiteAlpha.600" fontSize="xs">
+										By searching, you agree to our{" "}
+										<Text as="span" textDecor="underline" cursor="pointer" _hover={{ color: "white" }} onClick={() => navigate("/terms-and-conditions")}>
+											Terms of Service
+										</Text>
+										.
+									</Text>
 								</VStack>
-							) : (
-								<VStack spacing={4} align="stretch">
-									<SimpleGrid columns={2} spacing={3}>
-										<select
-											value={selectedBrand}
-											onChange={(e) => handleBrandChange(e.target.value)}
-											style={{
-												padding: "12px",
-												borderRadius: "10px",
-												fontSize: "14px",
-												fontWeight: "600",
-												background: "white",
-											}}
-										>
-											<option value="">Make</option>
-											{brands.map((b) => (
-												<option key={b._id} value={b._id}>
-													{b.name}
-												</option>
-											))}
-										</select>
-										<select
-											value={selectedModel}
-											onChange={(e) => handleModelChange(e.target.value)}
-											style={{
-												padding: "12px",
-												borderRadius: "10px",
-												fontSize: "14px",
-												fontWeight: "600",
-												background: "white",
-											}}
-										>
-											<option value="">Model</option>
-											{models.map((m) => (
-												<option key={m._id} value={m._id}>
-													{m.name}
-												</option>
-											))}
-										</select>
-									</SimpleGrid>
-
-									<SimpleGrid columns={2} spacing={3}>
-										<select
-											value={selectedYear}
-											onChange={(e) => handleYearChange(e.target.value)}
-											style={{
-												padding: "12px",
-												borderRadius: "10px",
-												fontSize: "14px",
-												fontWeight: "600",
-												background: "white",
-											}}
-										>
-											<option value="">Year</option>
-											{years.map((y, i) => (
-												<option key={i} value={y.name}>
-													{y.name}
-												</option>
-											))}
-										</select>
-										<select
-											value={selectedType}
-											onChange={(e) => setSelectedType(e.target.value)}
-											style={{
-												padding: "12px",
-												borderRadius: "10px",
-												fontSize: "14px",
-												fontWeight: "600",
-												background: "white",
-											}}
-										>
-											<option value="">Type</option>
-											{types.map((t, i) => (
-												<option key={i} value={t.name}>
-													{t.name}
-												</option>
-											))}
-										</select>
-									</SimpleGrid>
-
-									<select
-										value={selectedCategory}
-										onChange={(e) => setSelectedCategory(e.target.value)}
-										style={{
-											padding: "16px",
-											borderRadius: "12px",
-											fontSize: "16px",
-											fontWeight: "700",
-											width: "100%",
-											backgroundColor: "rgba(255,255,255,0.1)",
-											color: "white",
-											border: "1px solid rgba(255,255,255,0.2)",
-										}}
-									>
-										<option value="" style={{ color: DARK }}>
-											Select Part Type
-										</option>
-										{partTypes.map((pt) => (
-											<option key={pt._id} value={pt.slug} style={{ color: DARK }}>
-												{pt.name}
-											</option>
-										))}
-									</select>
-
-									<Button
-										w="full"
-										h="64px"
-										bg={RED}
-										color="white"
-										fontSize="18px"
-										fontWeight="900"
-										borderRadius="xl"
-										onClick={handleManualSubmit}
-										_hover={{ bg: "#B70303", transform: "translateY(-2px)" }}
-										rightIcon={<FaArrowRight />}
-									>
-										Get Free Quotes
-									</Button>
-								</VStack>
-							)}
-
-							<Text textAlign="center" color="whiteAlpha.600" fontSize="xs">
-								By searching, you agree to our{" "}
-								<Text
-									as="span"
-									textDecor="underline"
-									cursor="pointer"
-									_hover={{ color: "white" }}
-
-									onClick={() => navigate("/terms-and-conditions")}
-								>
-									Terms of Service
-								</Text>
-								.
-							</Text>
-						</VStack>
+							</MotionBox>
+						</AnimatePresence>
 					</MotionBox>
 				</Flex>
 			</Container>

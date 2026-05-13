@@ -168,10 +168,11 @@ export default function BlogsModule() {
 				</Center>
 			) : (
 				<Box overflowX="auto" borderRadius="xl" border="1px solid" borderColor="gray.100">
-					<Table variant="simple" size="md">
+					<Table variant="simple" size="md" layout="fixed" minW="900px">
 						<Thead bg="gray.50">
 							<Tr>
 								<Th
+									w="350px"
 									fontSize="11px"
 									fontWeight="800"
 									textTransform="uppercase"
@@ -181,6 +182,7 @@ export default function BlogsModule() {
 									Title & Slug
 								</Th>
 								<Th
+									w="150px"
 									fontSize="11px"
 									fontWeight="800"
 									textTransform="uppercase"
@@ -190,6 +192,7 @@ export default function BlogsModule() {
 									Author
 								</Th>
 								<Th
+									w="120px"
 									fontSize="11px"
 									fontWeight="800"
 									textTransform="uppercase"
@@ -199,6 +202,7 @@ export default function BlogsModule() {
 									Status
 								</Th>
 								<Th
+									w="150px"
 									fontSize="11px"
 									fontWeight="800"
 									textTransform="uppercase"
@@ -209,6 +213,7 @@ export default function BlogsModule() {
 								</Th>
 								{!isViewer && (
 									<Th
+										w="100px"
 										fontSize="11px"
 										fontWeight="800"
 										textTransform="uppercase"
@@ -224,11 +229,11 @@ export default function BlogsModule() {
 							{filteredBlogs.map((b) => (
 								<Tr key={b._id} _hover={{ bg: "gray.50/50" }}>
 									<Td>
-										<VStack align="flex-start" spacing={0}>
-											<Text fontWeight="800" color="gray.800" fontSize="14px" noOfLines={1}>
+										<VStack align="flex-start" spacing={0} maxW="330px">
+											<Text fontWeight="800" color="gray.800" fontSize="14px" isTruncated w="full">
 												{b.title}
 											</Text>
-											<Text fontSize="11px" color="gray.400">
+											<Text fontSize="11px" color="gray.400" isTruncated w="full">
 												/{b.slug}
 											</Text>
 										</VStack>
@@ -240,6 +245,9 @@ export default function BlogsModule() {
 											fontSize="11px"
 											px={2}
 											borderRadius="md"
+											whiteSpace="nowrap"
+											maxW="130px"
+											isTruncated
 										>
 											{b.author || "Admin"}
 										</Badge>
@@ -253,16 +261,17 @@ export default function BlogsModule() {
 											py={1}
 											textTransform="uppercase"
 											variant="solid"
+											whiteSpace="nowrap"
 										>
 											{b.isPublished ? "Published" : "Draft"}
 										</Badge>
 									</Td>
-									<Td fontSize="13px" color="gray.600">
+									<Td fontSize="13px" color="gray.600" whiteSpace="nowrap">
 										{b.date || new Date(b.createdAt).toLocaleDateString()}
 									</Td>
 									{!isViewer && (
 										<Td>
-											<HStack spacing={1}>
+											<HStack spacing={1} whiteSpace="nowrap">
 												<IconButton
 													icon={<EditIcon />}
 													size="sm"

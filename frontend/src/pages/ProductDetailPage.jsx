@@ -76,12 +76,28 @@ import API from "../services/api";
 import ConfirmProdutModel from "../components/common/ConfirmProdutModel";
 
 const MotionBox = motion(Box);
+const MotionVStack = motion(VStack);
+const MotionFlex = motion(Flex);
+const MotionGrid = motion(Grid);
+
+const fadeInUp = {
+	initial: { opacity: 0, y: 20 },
+	animate: { opacity: 1, y: 0, transition: { duration: 0.5 } },
+};
+
+const staggerContainer = {
+	animate: {
+		transition: {
+			staggerChildren: 0.1,
+		},
+	},
+};
 
 const ProductCard = ({ product }) => (
 	<MotionBox
 		as={Link}
 		to={`/products/${product.slug || product._id}`}
-		whileHover={{ y: -3 }}
+		whileHover={{ y: -5, boxShadow: "0 10px 20px rgba(0,0,0,0.1)" }}
 		transition={{ duration: 0.2 }}
 		bg="white"
 		borderRadius="xl"
@@ -92,7 +108,6 @@ const ProductCard = ({ product }) => (
 		cursor="pointer"
 		_hover={{
 			textDecoration: "none",
-			boxShadow: "lg",
 		}}
 	>
 		<Image
@@ -166,7 +181,14 @@ export default function ProductDetailPage() {
 	return (
 		<Box bg="gray.50" minH="100vh">
 			{/* Top Bar */}
-			<Box bg="white" borderBottom="1px solid" borderColor="gray.100" py={2}>
+			<MotionBox 
+				bg="white" 
+				borderBottom="1px solid" 
+				borderColor="gray.100" 
+				py={2}
+				initial={{ opacity: 0, y: -20 }}
+				animate={{ opacity: 1, y: 0 }}
+			>
 				<Container maxW="container.xl" px={4}>
 					<Flex justify="space-between" align="center">
 						<HStack spacing={3}>
@@ -186,18 +208,30 @@ export default function ProductDetailPage() {
 						</HStack>
 					</Flex>
 				</Container>
-			</Box>
+			</MotionBox>
 
 			<Container maxW="container.xl" py={6} px={4}>
-				<Grid templateColumns={{ base: "1fr", lg: "1fr 0.9fr" }} gap={8}>
+				<MotionGrid 
+					templateColumns={{ base: "1fr", lg: "1fr 0.9fr" }} 
+					gap={8}
+					variants={staggerContainer}
+					initial="initial"
+					animate="animate"
+				>
 
 					{/* LEFT COLUMN */}
-					<VStack spacing={6} align="stretch">
+					<MotionVStack spacing={6} align="stretch" variants={fadeInUp}>
 
 						{/* Gallery */}
-						<Box bg="white" borderRadius="lg" overflow="hidden" p={4}>
+						<Box bg="white" borderRadius="lg" overflow="hidden" p={4} boxShadow="sm">
 							<AnimatePresence mode="wait">
-								<MotionBox key={selectedImage} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+								<MotionBox 
+									key={selectedImage} 
+									initial={{ opacity: 0, scale: 0.95 }} 
+									animate={{ opacity: 1, scale: 1 }} 
+									exit={{ opacity: 0, scale: 1.05 }}
+									transition={{ duration: 0.3 }}
+								>
 									<Image
 										src={product.images?.[selectedImage]}
 										h={{ base: "250px", md: "350px" }}
@@ -209,22 +243,24 @@ export default function ProductDetailPage() {
 							{product.images?.length > 1 && (
 								<HStack spacing={2} mt={3} justify="center">
 									{product.images?.map((img, idx) => (
-										<Box
+										<MotionBox
 											key={idx}
 											cursor="pointer"
 											border={selectedImage === idx ? "2px solid #D90404" : "1px solid #E2E8F0"}
 											borderRadius="md"
 											onClick={() => setSelectedImage(idx)}
+											whileHover={{ scale: 1.1 }}
+											whileTap={{ scale: 0.9 }}
 										>
 											<Image src={img} boxSize="50px" objectFit="cover" />
-										</Box>
+										</MotionBox>
 									))}
 								</HStack>
 							)}
 						</Box>
 
 						{/* Product Header */}
-						<Box>
+						<MotionBox variants={fadeInUp}>
 							<Wrap spacing={2} mb={2}>
 								<Tag size="sm" bg="#D9040410" color="#D90404" fontSize="10px">
 									{product.category?.name}
@@ -244,91 +280,60 @@ export default function ProductDetailPage() {
 
 							{/* Quick Specs */}
 							<SimpleGrid columns={{ base: 2, md: 4 }} spacing={3} mb={4}>
-								{product.make && product.model && (
-									<Box bg="white" p={2} borderRadius="md" border="1px solid" borderColor="gray.100">
-										<Icon as={FaTachometerAlt} color="#D90404" mb={1} />
-										<Text fontSize="9px" color="gray.500">Make & Model</Text>
-										<Text fontSize="13px" fontWeight="600">{product.make} {product.model}</Text>
-									</Box>
-								)}
-								{product.year && (
-									<Box bg="white" p={2} borderRadius="md" border="1px solid" borderColor="gray.100">
-										<Icon as={FaCalendarAlt} color="#D90404" mb={1} />
-										<Text fontSize="9px" color="gray.500">Year</Text>
-										<Text fontSize="13px" fontWeight="600">{product.year}</Text>
-									</Box>
-								)}
-								{product.engineType && (
-									<Box bg="white" p={2} borderRadius="md" border="1px solid" borderColor="gray.100">
-										<Icon as={FaGasPump} color="#D90404" mb={1} />
-										<Text fontSize="9px" color="gray.500">Engine Type</Text>
-										<Text fontSize="13px" fontWeight="600">{product.engineType}</Text>
-									</Box>
-								)}
-								{product.condition && (
-									<Box bg="white" p={2} borderRadius="md" border="1px solid" borderColor="gray.100">
-										<Icon as={FaCog} color="#D90404" mb={1} />
-										<Text fontSize="9px" color="gray.500">Condition</Text>
-										<Text fontSize="13px" fontWeight="600">{product.condition}</Text>
-									</Box>
-								)}
+								{[
+									{ icon: FaTachometerAlt, label: "Make & Model", value: `${product.make} ${product.model}`, show: product.make && product.model },
+									{ icon: FaCalendarAlt, label: "Year", value: product.year, show: product.year },
+									{ icon: FaGasPump, label: "Engine Type", value: product.engineType, show: product.engineType },
+									{ icon: FaCog, label: "Condition", value: product.condition, show: product.condition },
+								].map((spec, i) => spec.show && (
+									<MotionBox 
+										key={i} 
+										bg="white" 
+										p={2} 
+										borderRadius="md" 
+										border="1px solid" 
+										borderColor="gray.100"
+										whileHover={{ y: -2, borderColor: "#D90404" }}
+									>
+										<Icon as={spec.icon} color="#D90404" mb={1} />
+										<Text fontSize="9px" color="gray.500">{spec.label}</Text>
+										<Text fontSize="13px" fontWeight="600">{spec.value}</Text>
+									</MotionBox>
+								))}
 							</SimpleGrid>
-						</Box>
+						</MotionBox>
 
 						{/* Product Description */}
-						<Box bg="white" p={5} borderRadius="lg">
+						<MotionBox bg="white" p={5} borderRadius="lg" variants={fadeInUp} boxShadow="sm">
 							<Heading fontSize="18px" fontWeight="700" mb={3}>Product Overview</Heading>
 							<Text fontSize="14px" color="gray.600" lineHeight="1.6">
 								{product.description}
 							</Text>
-						</Box>
+						</MotionBox>
 
 						{/* Technical Specifications */}
-						<Box bg="white" p={5} borderRadius="lg">
+						<MotionBox bg="white" p={5} borderRadius="lg" variants={fadeInUp} boxShadow="sm">
 							<Heading fontSize="18px" fontWeight="700" mb={3}>Technical Specifications</Heading>
 							<SimpleGrid columns={{ base: 1, md: 2 }} spacing={3}>
-								{product.make && (
-									<Flex justify="space-between" py={1} borderBottom="1px solid" borderColor="gray.100">
-										<Text fontSize="13px" color="gray.600">Make</Text>
-										<Text fontSize="13px" fontWeight="500">{product.make}</Text>
+								{[
+									{ label: "Make", value: product.make },
+									{ label: "Model", value: product.model },
+									{ label: "Year", value: product.year },
+									{ label: "Engine Type", value: product.engineType },
+									{ label: "Condition", value: product.condition },
+									{ label: "Currency", value: product.currency },
+								].map((item, i) => item.value && (
+									<Flex key={i} justify="space-between" py={1} borderBottom="1px solid" borderColor="gray.100">
+										<Text fontSize="13px" color="gray.600">{item.label}</Text>
+										<Text fontSize="13px" fontWeight="500">{item.value}</Text>
 									</Flex>
-								)}
-								{product.model && (
-									<Flex justify="space-between" py={1} borderBottom="1px solid" borderColor="gray.100">
-										<Text fontSize="13px" color="gray.600">Model</Text>
-										<Text fontSize="13px" fontWeight="500">{product.model}</Text>
-									</Flex>
-								)}
-								{product.year && (
-									<Flex justify="space-between" py={1} borderBottom="1px solid" borderColor="gray.100">
-										<Text fontSize="13px" color="gray.600">Year</Text>
-										<Text fontSize="13px" fontWeight="500">{product.year}</Text>
-									</Flex>
-								)}
-								{product.engineType && (
-									<Flex justify="space-between" py={1} borderBottom="1px solid" borderColor="gray.100">
-										<Text fontSize="13px" color="gray.600">Engine Type</Text>
-										<Text fontSize="13px" fontWeight="500">{product.engineType}</Text>
-									</Flex>
-								)}
-								{product.condition && (
-									<Flex justify="space-between" py={1} borderBottom="1px solid" borderColor="gray.100">
-										<Text fontSize="13px" color="gray.600">Condition</Text>
-										<Text fontSize="13px" fontWeight="500">{product.condition}</Text>
-									</Flex>
-								)}
-								{product.currency && (
-									<Flex justify="space-between" py={1} borderBottom="1px solid" borderColor="gray.100">
-										<Text fontSize="13px" color="gray.600">Currency</Text>
-										<Text fontSize="13px" fontWeight="500">{product.currency}</Text>
-									</Flex>
-								)}
+								))}
 							</SimpleGrid>
-						</Box>
+						</MotionBox>
 
-						{/* Compatibility Table - Only if data exists */}
+						{/* Compatibility Table */}
 						{product.compatibility && product.compatibility.length > 0 && (
-							<Box bg="white" p={5} borderRadius="lg">
+							<MotionBox bg="white" p={5} borderRadius="lg" variants={fadeInUp} boxShadow="sm">
 								<Heading fontSize="18px" fontWeight="700" mb={3}>Vehicle Compatibility</Heading>
 								<Text fontSize="13px" color="gray.500" mb={3}>This engine fits the following vehicles:</Text>
 								<Box overflowX="auto">
@@ -355,30 +360,28 @@ export default function ProductDetailPage() {
 										</Tbody>
 									</Table>
 								</Box>
-							</Box>
+							</MotionBox>
 						)}
 
-					
-
-						{/* Similar Products - Only if data exists */}
+						{/* Similar Products */}
 						{product.similarProducts && product.similarProducts.length > 0 && (
-							<Box>
+							<MotionBox variants={fadeInUp}>
 								<Heading fontSize="18px" fontWeight="700" mb={3}>You May Also Like</Heading>
-								<HStack spacing={3} overflowX="auto" pb={2}>
+								<HStack spacing={3} overflowX="auto" pb={4} pt={1} px={1}>
 									{product.similarProducts?.slice(0, 5).map((p, idx) => (
 										<ProductCard key={idx} product={p} />
 									))}
 								</HStack>
-							</Box>
+							</MotionBox>
 						)}
-					</VStack>
+					</MotionVStack>
 
 					{/* RIGHT COLUMN - Sticky Sidebar */}
-					<Box position="sticky" top="80px">
+					<MotionBox position="sticky" top="80px" variants={fadeInUp}>
 						<VStack spacing={4} align="stretch">
 
 							{/* Request Quote Card */}
-							<Card shadow="lg" borderRadius="xl" overflow="hidden">
+							<Card shadow="lg" borderRadius="xl" overflow="hidden" border="1px solid" borderColor="gray.100">
 								<Box bg="linear-gradient(135deg, #D90404 0%, #B70303 100%)" p={4} textAlign="center">
 									<Text color="white" fontWeight="700" fontSize="16px">Interested in this {product.category?.name || "product"}?</Text>
 									<Text color="white" opacity="0.9" fontSize="12px">Get a quote today</Text>
@@ -389,11 +392,13 @@ export default function ProductDetailPage() {
 										color="white"
 										w="full"
 										h="50px"
-										_hover={{ bg: "#B70303" }}
+										_hover={{ bg: "#B70303", transform: "scale(1.02)" }}
+										_active={{ transform: "scale(0.98)" }}
 										borderRadius="md"
 										fontWeight="600"
 										leftIcon={<FaPhoneAlt />}
 										mb={3}
+										transition="all 0.2s"
 										onClick={() =>
 											navigate("/call-seller", {
 												state: {
@@ -418,7 +423,7 @@ export default function ProductDetailPage() {
 
 							{/* Seller Details */}
 							{product.seller && (
-								<Card borderRadius="xl">
+								<Card borderRadius="xl" boxShadow="sm" border="1px solid" borderColor="gray.100">
 									<CardBody p={4}>
 										<HStack spacing={2} mb={3}>
 											<Icon as={FaStore} color="#D90404" />
@@ -463,124 +468,83 @@ export default function ProductDetailPage() {
 							)}
 
 							{/* Key Benefits */}
-							<Card borderRadius="xl" bg="#D9040405">
+							<Card borderRadius="xl" bg="#D9040405" border="1px dashed" borderColor="#D9040430">
 								<CardBody p={4}>
 									<VStack spacing={3} align="start">
-										<HStack spacing={2}>
-											<Box
-												w="25px"
-												h="25px"
-												borderRadius="full"
-												bg="#D90404"
-												display="flex"
-												alignItems="center"
-												justifyContent="center"
-											>
-												<Icon as={FaCertificate} color="white" boxSize="10px" />
-											</Box>
-
-											<Text fontSize="12px" fontWeight="600">
-												Certified Quality
-											</Text>
-										</HStack>
-										<HStack spacing={2}>
-											<Box
-												w="25px"
-												h="25px"
-												borderRadius="full"
-												bg="#D90404"
-												display="flex"
-												alignItems="center"
-												justifyContent="center"
-											>
-												<Icon as={FaTruck} color="white" boxSize="10px" />
-											</Box>
-											<Text fontSize="12px" fontWeight="600">UK Delivery Available</Text>
-										</HStack>
-										<HStack spacing={2}>
-											<Box
-												w="25px"
-												h="25px"
-												borderRadius="full"
-												bg="#D90404"
-												display="flex"
-												alignItems="center"
-												justifyContent="center"
-											>
-												<Icon as={FaShieldAlt} color="white" boxSize="10px" />
-											</Box>
-											<Text fontSize="12px" fontWeight="600">Warranty Included</Text>
-										</HStack>
-										<HStack spacing={2}>
-											<Box
-												w="25px"
-												h="25px"
-												borderRadius="full"
-												bg="#D90404"
-												display="flex"
-												alignItems="center"
-												justifyContent="center"
-											>
-												<Icon as={FaThumbsUp} color="white" boxSize="10px" />
-											</Box>
-											<Text fontSize="12px" fontWeight="600">Satisfaction Guaranteed</Text>
-										</HStack>
+										{[
+											{ icon: FaCertificate, text: "Certified Quality" },
+											{ icon: FaTruck, text: "UK Delivery Available" },
+											{ icon: FaShieldAlt, text: "Warranty Included" },
+											{ icon: FaThumbsUp, text: "Satisfaction Guaranteed" },
+										].map((benefit, i) => (
+											<HStack key={i} spacing={2}>
+												<Box
+													w="25px"
+													h="25px"
+													borderRadius="full"
+													bg="#D90404"
+													display="flex"
+													alignItems="center"
+													justifyContent="center"
+												>
+													<Icon as={benefit.icon} color="white" boxSize="10px" />
+												</Box>
+												<Text fontSize="12px" fontWeight="600">
+													{benefit.text}
+												</Text>
+											</HStack>
+										))}
 									</VStack>
 								</CardBody>
 							</Card>
 
-
-
-								{/* Warranty & Support Accordion */}
-						<Accordion allowToggle defaultIndex={[0]}>
-							<AccordionItem bg="white" borderRadius="lg" border="none" mb={3}>
-								<AccordionButton _expanded={{ bg: "#D90404", color: "white" }} borderRadius="lg">
-									<Box flex="1" textAlign="left" fontWeight="600">
-										<Icon as={FaShieldAlt} mr={2} /> Warranty Information
-									</Box>
-									<AccordionIcon />
-								</AccordionButton>
-								<AccordionPanel pb={4} pt={4}>
-									<VStack align="start" spacing={2}>
-										<Text fontSize="13px">✓ 12 months comprehensive warranty included</Text>
-										<Text fontSize="13px">✓ Parts and labour covered at approved garages</Text>
-										<Text fontSize="13px">✓ Nationwide coverage </Text>
-									</VStack>
-								</AccordionPanel>
-							</AccordionItem>
-
-							<AccordionItem bg="white" borderRadius="lg" border="none" mb={3}>
-								<AccordionButton _expanded={{ bg: "#D90404", color: "white" }} borderRadius="lg">
-									<Box flex="1" textAlign="left" fontWeight="600">
-										<Icon as={FaShippingFast} mr={2} /> Delivery Information
-									</Box>
-									<AccordionIcon />
-								</AccordionButton>
-								<AccordionPanel pb={4} pt={4}>
-									<VStack align="start" spacing={2}>
-										<Text fontSize="13px">✓ {product.shipping?.delivery || "Standard delivery available"}</Text>
-										<Text fontSize="13px">✓ Professional installation service available</Text>
-										{/* <Text fontSize="13px">✓ {product.shipping?.returns}</Text> */}
-									</VStack>
-								</AccordionPanel>
-							</AccordionItem>
-
-							<AccordionItem bg="white" borderRadius="lg" border="none" mb={3}>
-								<AccordionButton _expanded={{ bg: "#D90404", color: "white" }} borderRadius="lg">
-									<Box flex="1" textAlign="left" fontWeight="600">
-										<Icon as={FaHeadset} mr={2} /> Customer Support
-									</Box>
-									<AccordionIcon />
-								</AccordionButton>
-								<AccordionPanel pb={4} pt={4}>
-									<VStack align="start" spacing={2}>
-										<Text fontSize="13px">✓ Dedicated support team available</Text>
-										<Text fontSize="13px">✓ Email support with quick response</Text>
-										<Text fontSize="13px">✓ Technical advice from certified mechanics</Text>
-									</VStack>
-								</AccordionPanel>
-							</AccordionItem>
-						</Accordion>
+							{/* Warranty & Support Accordion */}
+							<Accordion allowToggle defaultIndex={[0]}>
+								{[
+									{ 
+										icon: FaShieldAlt, 
+										title: "Warranty Information", 
+										content: [
+											"✓ 12 months comprehensive warranty included",
+											"✓ Parts and labour covered at approved garages",
+											"✓ Nationwide coverage"
+										] 
+									},
+									{ 
+										icon: FaShippingFast, 
+										title: "Delivery Information", 
+										content: [
+											`✓ ${product.shipping?.delivery || "Standard delivery available"}`,
+											"✓ Professional installation service available"
+										] 
+									},
+									{ 
+										icon: FaHeadset, 
+										title: "Customer Support", 
+										content: [
+											"✓ Dedicated support team available",
+											"✓ Email support with quick response",
+											"✓ Technical advice from certified mechanics"
+										] 
+									},
+								].map((item, i) => (
+									<AccordionItem key={i} bg="white" borderRadius="lg" border="none" mb={3} boxShadow="sm">
+										<AccordionButton _expanded={{ bg: "#D90404", color: "white" }} borderRadius="lg">
+											<Box flex="1" textAlign="left" fontWeight="600">
+												<Icon as={item.icon} mr={2} /> {item.title}
+											</Box>
+											<AccordionIcon />
+										</AccordionButton>
+										<AccordionPanel pb={4} pt={4}>
+											<VStack align="start" spacing={2}>
+												{item.content.map((line, j) => (
+													<Text key={j} fontSize="13px">{line}</Text>
+												))}
+											</VStack>
+										</AccordionPanel>
+									</AccordionItem>
+								))}
+							</Accordion>
 
 							{/* Trust Badges */}
 							<Box textAlign="center" p={3}>
@@ -594,8 +558,8 @@ export default function ProductDetailPage() {
 								</Text>
 							</Box>
 						</VStack>
-					</Box>
-				</Grid>
+					</MotionBox>
+				</MotionGrid>
 			</Container>
 
 			<ConfirmProdutModel isOpen={isOpen} onClose={onClose} />

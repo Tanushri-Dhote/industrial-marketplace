@@ -14,11 +14,37 @@ import {
 	Text,
 	VStack,
 } from "@chakra-ui/react";
-import { useEffect, useState } from "react";
+import { motion } from "framer-motion";
 import { FaArrowRight } from "react-icons/fa";
-import { Link as RouterLink } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
+import { Link as RouterLink } from "react-router-dom";
 import API from "../services/api";
+
+const MotionBox = motion(Box);
+const MotionSimpleGrid = motion(SimpleGrid);
+
+const containerVariants = {
+	hidden: { opacity: 0 },
+	visible: {
+		opacity: 1,
+		transition: {
+			staggerChildren: 0.1,
+		},
+	},
+};
+
+const cardVariants = {
+	hidden: { opacity: 0, scale: 0.95, y: 20 },
+	visible: {
+		opacity: 1,
+		scale: 1,
+		y: 0,
+		transition: {
+			duration: 0.5,
+			ease: [0.215, 0.61, 0.355, 1],
+		},
+	},
+};
 
 export default function TopEnginesSection({ category }) {
 	const accentColor = "#B50303";
@@ -46,10 +72,13 @@ export default function TopEnginesSection({ category }) {
 	});
 
 	const EngineCard = ({ engine }) => (
-		<VStack
+		<MotionBox
 			as={RouterLink}
 			to={`/products/${engine._id}`}
+			variants={cardVariants}
 			align="stretch"
+			display="flex"
+			flexDirection="column"
 			spacing={0}
 			bg="white"
 			borderRadius="xl"
@@ -57,12 +86,12 @@ export default function TopEnginesSection({ category }) {
 			border="1px solid"
 			borderColor="gray.200"
 			_hover={{
-				transform: "translateY(-3px)",
-				boxShadow: "0 14px 24px rgba(8, 15, 31, 0.11)",
+				transform: "translateY(-5px) scale(1.02)",
+				boxShadow: "0 20px 30px rgba(8, 15, 31, 0.12)",
 				borderColor: "gray.300",
 				textDecoration: "none",
 			}}
-			transition="all 0.24s ease"
+			transition="all 0.3s cubic-bezier(.25,.8,.25,1)"
 			cursor="pointer"
 			role="group"
 			w="full"
@@ -84,8 +113,8 @@ export default function TopEnginesSection({ category }) {
 					w="full"
 					h="full"
 					objectFit="cover"
-					transition="transform 0.28s ease"
-					_groupHover={{ transform: "scale(1.03)" }}
+					transition="transform 0.4s ease"
+					_groupHover={{ transform: "scale(1.08)" }}
 				/>
 
 				<Badge
@@ -135,27 +164,6 @@ export default function TopEnginesSection({ category }) {
 
 				<Divider borderColor="gray.100" />
 
-				{/* <Text
-					fontSize={{ base: "24px", md: "28px" }}
-					fontWeight="900"
-					color="gray.900"
-					letterSpacing="-0.02em"
-					lineHeight="1"
-				>
-					<Text
-						as="span"
-						fontSize={{ base: "12px", md: "16px" }}
-						fontWeight="600"
-						color="gray.500"
-						mr={2}
-						verticalAlign="middle"
-					>
-						Starting From
-					</Text>
-
-					£{Number(engine.price || 0).toLocaleString("en-GB")}
-				</Text> */}
-
 				<Flex
 					w="full"
 					justify="space-between"
@@ -168,11 +176,16 @@ export default function TopEnginesSection({ category }) {
 					<Text>Shipping available</Text>
 					<HStack spacing={1} color={accentColor} fontWeight="700">
 						<Text>View</Text>
-						<Icon as={FaArrowRight} boxSize={2.5} />
+						<Icon 
+							as={FaArrowRight} 
+							boxSize={2.5} 
+							transition="transform 0.2s"
+							_groupHover={{ transform: "translateX(3px)" }}
+						/>
 					</HStack>
 				</Flex>
 			</VStack>
-		</VStack>
+		</MotionBox>
 	);
 
 	if (loading) {
@@ -185,7 +198,7 @@ export default function TopEnginesSection({ category }) {
 
 	return (
 		<Box bg={surfaceColor} py={{ base: 14, md: 16 }} position="relative" overflow="hidden">
-			<Box
+			<MotionBox
 				position="absolute"
 				top="-120px"
 				right="-80px"
@@ -193,42 +206,58 @@ export default function TopEnginesSection({ category }) {
 				h="320px"
 				borderRadius="full"
 				bg="linear-gradient(180deg, rgba(217,4,4,0.14), rgba(217,4,4,0))"
+				animate={{ 
+					scale: [1, 1.1, 1],
+					opacity: [0.6, 0.8, 0.6]
+				}}
+				transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
 			/>
 
 			<Container maxW="container.xl" position="relative" zIndex={1}>
 				<VStack spacing={8} align="start">
-					<VStack align="start" spacing={2}>
-						<Text
-							textTransform="uppercase"
-							letterSpacing="0.1em"
-							fontSize="12px"
-							fontWeight="700"
-							color="gray.600"
-						>
-							Curated Listings
-						</Text>
+					<MotionBox
+						initial={{ opacity: 0, x: -20 }}
+						whileInView={{ opacity: 1, x: 0 }}
+						viewport={{ once: true }}
+						transition={{ duration: 0.6 }}
+					>
+						<VStack align="start" spacing={2}>
+							<Text
+								textTransform="uppercase"
+								letterSpacing="0.1em"
+								fontSize="12px"
+								fontWeight="700"
+								color="gray.600"
+							>
+								Curated Listings
+							</Text>
 
-						<Heading
-							fontSize={{ base: "26px", md: "42px" }}
-							fontWeight="900"
-							color="gray.900"
-							lineHeight="1.1"
-							letterSpacing="-0.02em"
-						>
-							Top {category.toLowerCase()} for Sale in the UK
-						</Heading>
-					</VStack>
+							<Heading
+								fontSize={{ base: "26px", md: "42px" }}
+								fontWeight="900"
+								color="gray.900"
+								lineHeight="1.1"
+								letterSpacing="-0.02em"
+							>
+								Top {category.toLowerCase()} for Sale in the UK
+							</Heading>
+						</VStack>
+					</MotionBox>
 
 					{engines.length > 0 ? (
-						<SimpleGrid
+						<MotionSimpleGrid
 							columns={{ base: 1, sm: 2, md: 3, lg: 4, xl: 5, "2xl": 6 }}
 							spacing={{ base: 3, lg: 3.5 }}
 							w="full"
+							variants={containerVariants}
+							initial="hidden"
+							whileInView="visible"
+							viewport={{ once: true, margin: "-50px" }}
 						>
 							{engines.map((engine) => (
 								<EngineCard key={engine._id} engine={engine} />
 							))}
-						</SimpleGrid>
+						</MotionSimpleGrid>
 					) : (
 						<Text color="gray.500">No {category.toLowerCase()} found in the database.</Text>
 					)}

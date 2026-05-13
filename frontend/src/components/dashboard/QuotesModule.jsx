@@ -161,31 +161,31 @@ export default function QuotesModule() {
 				</Center>
 			) : (
 				<Box overflowX="auto" borderRadius="xl" border="1px solid" borderColor="gray.100">
-					<Table variant="simple">
+					<Table variant="simple" layout="fixed" minW="1000px">
 						<Thead bg="gray.50">
 							<Tr>
-								<Th fontSize="12px" fontWeight="800" textTransform="uppercase" letterSpacing="1px">
+								<Th w="160px" fontSize="12px" fontWeight="800" textTransform="uppercase" letterSpacing="1px">
 									Customer
 								</Th>
-								<Th fontSize="12px" fontWeight="800" textTransform="uppercase" letterSpacing="1px">
+								<Th w="180px" fontSize="12px" fontWeight="800" textTransform="uppercase" letterSpacing="1px">
 									Product
 								</Th>
-								<Th fontSize="12px" fontWeight="800" textTransform="uppercase" letterSpacing="1px">
+								<Th w="120px" fontSize="12px" fontWeight="800" textTransform="uppercase" letterSpacing="1px">
 									Amount
 								</Th>
-								<Th fontSize="12px" fontWeight="800" textTransform="uppercase" letterSpacing="1px">
+								<Th w="140px" fontSize="12px" fontWeight="800" textTransform="uppercase" letterSpacing="1px">
 									Status
 								</Th>
-								<Th fontSize="12px" fontWeight="800" textTransform="uppercase" letterSpacing="1px">
+								<Th w="120px" fontSize="12px" fontWeight="800" textTransform="uppercase" letterSpacing="1px">
 									Date
 								</Th>
-								<Th fontSize="12px" fontWeight="800" textTransform="uppercase" letterSpacing="1px">
+								<Th w="180px" fontSize="12px" fontWeight="800" textTransform="uppercase" letterSpacing="1px">
 									Site
 								</Th>
-								<Th fontSize="12px" fontWeight="800" textTransform="uppercase" letterSpacing="1px">
+								<Th w="120px" fontSize="12px" fontWeight="800" textTransform="uppercase" letterSpacing="1px">
 									Admin
 								</Th>
-								<Th fontSize="12px" fontWeight="800" textTransform="uppercase" letterSpacing="1px">
+								<Th w="120px" fontSize="12px" fontWeight="800" textTransform="uppercase" letterSpacing="1px">
 									Actions
 								</Th>
 							</Tr>
@@ -200,18 +200,18 @@ export default function QuotesModule() {
 								const amount = quote.pricing?.total || 0;
 								return (
 									<Tr key={quote._id}>
-										<Td fontSize="13px" fontWeight="600">
+										<Td fontSize="13px" fontWeight="600" isTruncated>
 											{quote.customer?.name || "-"}
 										</Td>
-										<Td fontSize="13px">{productLabel}</Td>
-										<Td fontSize="13px" fontWeight="700">
+										<Td fontSize="13px" isTruncated>{productLabel}</Td>
+										<Td fontSize="13px" fontWeight="700" whiteSpace="nowrap">
 											£{amount.toLocaleString()}
 										</Td>
 										<Td>
 											<Select
 												value={quote.status || "Pending"}
 												size="sm"
-												width="120px"
+												width="110px"
 												fontSize="12px"
 												borderRadius="md"
 												onChange={(e) => handleStatusChange(quote._id, e.target.value)}
@@ -223,19 +223,19 @@ export default function QuotesModule() {
 												<option value="Rejected">Rejected</option>
 											</Select>
 										</Td>
-										<Td fontSize="13px" color={textMuted}>
+										<Td fontSize="13px" color={textMuted} whiteSpace="nowrap">
 											{new Date(quote.createdAt).toISOString().slice(0, 10)}
 										</Td>
 										<Td fontSize="12px">
-											<Badge variant="subtle" colorScheme="blue">
+											<Badge variant="subtle" colorScheme="blue" whiteSpace="nowrap" px={2}>
 												{quote.website_id?.name || "Main Site"}
 											</Badge>
 										</Td>
-										<Td fontSize="13px" fontWeight="500">
+										<Td fontSize="13px" fontWeight="500" whiteSpace="nowrap">
 											{quote.createdBy?.name || "System"}
 										</Td>
 										<Td>
-											<HStack spacing={1}>
+											<HStack spacing={1} whiteSpace="nowrap">
 												<IconButton
 													icon={<ViewIcon />}
 													size="sm"
