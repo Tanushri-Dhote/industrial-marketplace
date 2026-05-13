@@ -21,6 +21,23 @@ import {
 import { Helmet } from 'react-helmet-async';
 import { FaShieldAlt, FaLock, FaCookie, FaEye, FaUserSecret } from 'react-icons/fa';
 import { MdGavel, MdPrivacyTip } from 'react-icons/md';
+import { motion } from 'framer-motion';
+
+const MotionBox = motion(Box);
+const MotionVStack = motion(VStack);
+
+const fadeInUp = {
+  initial: { opacity: 0, y: 20 },
+  animate: { opacity: 1, y: 0, transition: { duration: 0.6 } },
+};
+
+const staggerContainer = {
+  animate: {
+    transition: {
+      staggerChildren: 0.1,
+    },
+  },
+};
 
 export default function PrivacyPage() {
   const accentColor = "#D90404";
@@ -55,31 +72,41 @@ export default function PrivacyPage() {
       {/* Hero Section */}
       <Box bg={darkBg} color="white" py={12} mb={8}>
         <Container maxW="container.xl">
-          <VStack spacing={3} textAlign="center">
-            <Badge bg={accentColor} color="white" px={3} py={1} borderRadius="full" fontSize="12px">
-              Legal & Privacy
-            </Badge>
-            <Heading fontSize="36px" fontWeight="800">
-              Privacy Policy
-            </Heading>
-            <Text fontSize="16px" maxW="2xl" opacity={0.9}>
-              Your privacy is important to us. Read how we protect your data.
-            </Text>
-            <Text fontSize="14px" opacity={0.7}>Last updated: April, 2026</Text>
-          </VStack>
+          <MotionVStack spacing={3} textAlign="center" initial="initial" animate="animate" variants={staggerContainer}>
+            <MotionBox variants={fadeInUp}>
+              <Badge bg={accentColor} color="white" px={3} py={1} borderRadius="full" fontSize="12px">
+                Legal & Privacy
+              </Badge>
+            </MotionBox>
+            <MotionBox variants={fadeInUp}>
+              <Heading fontSize="36px" fontWeight="800">
+                Privacy Policy
+              </Heading>
+            </MotionBox>
+            <MotionBox variants={fadeInUp}>
+              <Text fontSize="16px" maxW="2xl" opacity={0.9}>
+                Your privacy is important to us. Read how we protect your data.
+              </Text>
+            </MotionBox>
+            <MotionBox variants={fadeInUp}>
+              <Text fontSize="14px" opacity={0.7}>Last updated: April, 2026</Text>
+            </MotionBox>
+          </MotionVStack>
         </Container>
       </Box>
 
       <Container maxW="container.lg" py={4} mb={12}>
-        <VStack align="stretch" spacing={6}>
+        <MotionVStack align="stretch" spacing={6} initial="initial" whileInView="animate" viewport={{ once: true }} variants={staggerContainer}>
 
           {/* Warning Banner */}
-          <Box
+          <MotionBox
             bg="red.50"
             p={5}
             borderRadius="lg"
             borderLeft="4px solid red"
-            mb={4}>
+            mb={4}
+            variants={fadeInUp}
+          >
             <HStack spacing={3}>
               <Icon as={MdGavel} boxSize={6} color="red.500" />
               <Text fontSize="14px" color="red.800" fontWeight="500">
@@ -88,16 +115,18 @@ export default function PrivacyPage() {
                 or any part of the website.
               </Text>
             </HStack>
-          </Box>
+          </MotionBox>
 
           {/* How  Re-Conditioned Engine  Trust Helps - Highlight Box */}
-          <Box
+          <MotionBox
             bg="orange.50"
             p={6}
             borderRadius="lg"
             border="1px solid"
             borderColor={accentColor}
-            mb={4}>
+            mb={4}
+            variants={fadeInUp}
+          >
             <VStack align="start" spacing={3}>
               <HStack>
                 <Icon as={FaShieldAlt} boxSize={6} color={accentColor} />
@@ -113,10 +142,10 @@ export default function PrivacyPage() {
                 confidence with  Re-Conditioned Engine  Trust.
               </Text>
             </VStack>
-          </Box>
+          </MotionBox>
 
           {/* Main Content with Accordion */}
-          <Box>
+          <MotionBox variants={fadeInUp}>
             {sections.map((section, index) => (
               <Accordion key={index} allowToggle mb={4} defaultIndex={index === 0 ? [0] : []}>
                 <AccordionItem border="1px solid" borderColor={borderColor} borderRadius="lg" mb={3}>
@@ -300,16 +329,18 @@ export default function PrivacyPage() {
                 </AccordionItem>
               </Accordion>
             ))}
-          </Box>
+          </MotionBox>
 
           {/* Contact Section */}
-          <Box
+          <MotionBox
             bg={darkBg}
             color="white"
             p={6}
             borderRadius="lg"
             textAlign="center"
-            mt={6}>
+            mt={6}
+            variants={fadeInUp}
+          >
             <VStack spacing={3}>
               <Icon as={MdPrivacyTip} boxSize={10} color={accentColor} />
               <Heading fontSize="22px">Questions About Your Privacy?</Heading>
@@ -323,13 +354,13 @@ export default function PrivacyPage() {
                 Response time: 48-72 hours on working days
               </Text>
             </VStack>
-          </Box>
+          </MotionBox>
 
           {/* Footer Note */}
           <Text fontSize="12px" color="gray.500" textAlign="center" mt={4}>
             This privacy policy is constructed and governed in all aspects in accordance with UK and Wales laws.
           </Text>
-        </VStack>
+        </MotionVStack>
       </Container>
     </>
   );

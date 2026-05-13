@@ -284,32 +284,32 @@ export default function UsersModule({ moduleId }) {
 				)}
 			</HStack>
 
-			<Box overflowX="auto">
-				<Table variant="simple" size="sm">
-					<Thead>
+			<Box overflowX="auto" borderRadius="xl" border="1px solid" borderColor="gray.100">
+				<Table variant="simple" size="sm" layout="fixed" minW="1100px">
+					<Thead bg="gray.50">
 						<Tr>
-							<Th fontSize="11px" fontWeight="800" textTransform="uppercase" letterSpacing="1px">
+							<Th w="220px" fontSize="11px" fontWeight="800" textTransform="uppercase" letterSpacing="1px" py={4}>
 								User
 							</Th>
-							<Th fontSize="11px" fontWeight="800" textTransform="uppercase" letterSpacing="1px">
+							<Th w="150px" fontSize="11px" fontWeight="800" textTransform="uppercase" letterSpacing="1px">
 								Role
 							</Th>
-							<Th fontSize="11px" fontWeight="800" textTransform="uppercase" letterSpacing="1px">
+							<Th w="150px" fontSize="11px" fontWeight="800" textTransform="uppercase" letterSpacing="1px">
 								Tenant/Site
 							</Th>
-							<Th fontSize="11px" fontWeight="800" textTransform="uppercase" letterSpacing="1px">
+							<Th w="120px" fontSize="11px" fontWeight="800" textTransform="uppercase" letterSpacing="1px">
 								Joined
 							</Th>
-							<Th fontSize="11px" fontWeight="800" textTransform="uppercase" letterSpacing="1px">
+							<Th w="200px" fontSize="11px" fontWeight="800" textTransform="uppercase" letterSpacing="1px">
 								Last Login & IP
 							</Th>
-							<Th fontSize="11px" fontWeight="800" textTransform="uppercase" letterSpacing="1px">
+							<Th w="120px" fontSize="11px" fontWeight="800" textTransform="uppercase" letterSpacing="1px">
 								Verified
 							</Th>
-							<Th fontSize="11px" fontWeight="800" textTransform="uppercase" letterSpacing="1px">
+							<Th w="100px" fontSize="11px" fontWeight="800" textTransform="uppercase" letterSpacing="1px">
 								Status
 							</Th>
-							<Th fontSize="11px" fontWeight="800" textTransform="uppercase" letterSpacing="1px">
+							<Th w="80px" fontSize="11px" fontWeight="800" textTransform="uppercase" letterSpacing="1px">
 								Actions
 							</Th>
 						</Tr>
@@ -345,16 +345,16 @@ export default function UsersModule({ moduleId }) {
 							filteredUsers.map((user) => (
 								<Tr key={user.id} _hover={{ bg: "gray.50" }}>
 									<Td>
-										<VStack align="start" spacing={0.5}>
-											<HStack spacing={2}>
-												<Text fontSize="13px" fontWeight="700">
+										<VStack align="start" spacing={0.5} maxW="200px">
+											<HStack spacing={2} w="full">
+												<Text fontSize="13px" fontWeight="700" isTruncated>
 													{user.name}
 												</Text>
 												{user.role === "Super Admin" && (
-													<Icon as={ShieldCheck} color="red.500" boxSize={3} />
+													<Icon as={ShieldCheck} color="red.500" boxSize={3} flexShrink={0} />
 												)}
 											</HStack>
-											<Text fontSize="12px" color="gray.600">
+											<Text fontSize="12px" color="gray.600" isTruncated w="full">
 												{user.email}
 											</Text>
 										</VStack>
@@ -366,12 +366,13 @@ export default function UsersModule({ moduleId }) {
 											fontSize="11px"
 											borderRadius="full"
 											px={3}
+											whiteSpace="nowrap"
 										>
 											{user.role}
 										</Badge>
 									</Td>
-									<Td fontSize="12px" fontWeight="600" color="gray.700">
-										<Badge variant="outline" fontSize="10px" borderRadius="full">
+									<Td>
+										<Badge variant="outline" fontSize="10px" borderRadius="full" whiteSpace="nowrap" maxW="130px" isTruncated>
 											{(() => {
 												const getStrId = (val) => {
 													if (!val) return null;
@@ -386,15 +387,15 @@ export default function UsersModule({ moduleId }) {
 											})()}
 										</Badge>
 									</Td>
-									<Td fontSize="12px" color="gray.500">
+									<Td fontSize="12px" color="gray.500" whiteSpace="nowrap">
 										{user.joinDate}
 									</Td>
 									<Td>
 										<VStack align="start" spacing={0.5}>
-											<Text fontSize="12px" color="gray.500" isTruncated maxW="180px">
+											<Text fontSize="12px" color="gray.500" whiteSpace="nowrap">
 												{user.lastLogin}
 											</Text>
-											<Text fontSize="11px" color="gray.400" isTruncated maxW="180px">
+											<Text fontSize="11px" color="gray.400" whiteSpace="nowrap">
 												IP: {user.lastIp}
 											</Text>
 										</VStack>
@@ -406,6 +407,7 @@ export default function UsersModule({ moduleId }) {
 											fontSize="11px"
 											borderRadius="full"
 											px={3}
+											whiteSpace="nowrap"
 										>
 											{user.verified ? "Verified" : "Unverified"}
 										</Badge>

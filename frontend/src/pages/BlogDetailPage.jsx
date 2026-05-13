@@ -30,6 +30,23 @@ import {
 } from "react-icons/fa";
 import API from "../services/api";
 import { useQuery } from "@tanstack/react-query";
+import { motion } from "framer-motion";
+
+const MotionBox = motion(Box);
+const MotionVStack = motion(VStack);
+
+const fadeInUp = {
+	initial: { opacity: 0, y: 20 },
+	animate: { opacity: 1, y: 0, transition: { duration: 0.6 } },
+};
+
+const staggerContainer = {
+	animate: {
+		transition: {
+			staggerChildren: 0.1,
+		},
+	},
+};
 
 const fetchBlogBySlug = async (slug) => {
 	const res = await API.get(`/blogs/${slug}`);
@@ -82,32 +99,34 @@ export default function BlogDetailPage() {
 			{/* Immersive Header Section */}
 			<Box pt={10} pb={20} bg="gray.50">
 				<Container maxW="container.md">
-					<VStack align="start" spacing={8}>
-						<Breadcrumb
-							spacing="8px"
-							separator={<Icon as={FaChevronRight} color="gray.400" fontSize="10px" />}
-							fontSize="xs"
-							fontWeight="bold"
-							textTransform="uppercase"
-							letterSpacing="widest"
-							color="gray.400"
-						>
-							<BreadcrumbItem>
-								<BreadcrumbLink as={Link} to="/">
-									Home
-								</BreadcrumbLink>
-							</BreadcrumbItem>
-							<BreadcrumbItem>
-								<BreadcrumbLink as={Link} to="/blog">
-									Blog
-								</BreadcrumbLink>
-							</BreadcrumbItem>
-							<BreadcrumbItem isCurrentPage>
-								<BreadcrumbLink color={accentColor}>{post.category}</BreadcrumbLink>
-							</BreadcrumbItem>
-						</Breadcrumb>
+					<MotionVStack align="start" spacing={8} initial="initial" animate="animate" variants={staggerContainer}>
+						<MotionBox variants={fadeInUp}>
+							<Breadcrumb
+								spacing="8px"
+								separator={<Icon as={FaChevronRight} color="gray.400" fontSize="10px" />}
+								fontSize="xs"
+								fontWeight="bold"
+								textTransform="uppercase"
+								letterSpacing="widest"
+								color="gray.400"
+							>
+								<BreadcrumbItem>
+									<BreadcrumbLink as={Link} to="/">
+										Home
+									</BreadcrumbLink>
+								</BreadcrumbItem>
+								<BreadcrumbItem>
+									<BreadcrumbLink as={Link} to="/blog">
+										Blog
+									</BreadcrumbLink>
+								</BreadcrumbItem>
+								<BreadcrumbItem isCurrentPage>
+									<BreadcrumbLink color={accentColor}>{post.category}</BreadcrumbLink>
+								</BreadcrumbItem>
+							</Breadcrumb>
+						</MotionBox>
 
-						<VStack align="start" spacing={6}>
+						<MotionVStack align="start" spacing={6} variants={fadeInUp}>
 							<Badge
 								px={4}
 								py={1.5}
@@ -160,28 +179,36 @@ export default function BlogDetailPage() {
 									</HStack>
 								</HStack>
 							</Stack>
-						</VStack>
-					</VStack>
+						</MotionVStack>
+					</MotionVStack>
 				</Container>
 			</Box>
 
 			{/* Hero Visual */}
 			<Container maxW="container.lg" mt="-60px" position="relative" zIndex={2}>
-				<Box borderRadius="3xl" overflow="hidden" boxShadow="0 30px 60px -12px rgba(0,0,0,0.25)">
+				<MotionBox
+					borderRadius="3xl"
+					overflow="hidden"
+					boxShadow="0 30px 60px -12px rgba(0,0,0,0.25)"
+					initial={{ opacity: 0, scale: 0.95 }}
+					animate={{ opacity: 1, scale: 1 }}
+					transition={{ duration: 0.8 }}
+				>
 					<Image src={post.image} alt={post.title} w="full" maxH="600px" objectFit="cover" />
-				</Box>
+				</MotionBox>
 			</Container>
 
 			{/* Editorial Content */}
 			<Container maxW="container.md" pt={16}>
-				<VStack align="start" spacing={10}>
-					<Box
+				<MotionVStack align="start" spacing={10} initial="initial" whileInView="animate" viewport={{ once: true }} variants={staggerContainer}>
+					<MotionBox
 						fontSize="18px"
 						lineHeight="1.9"
 						color="gray.700"
 						className="blog-editorial-content"
 						dangerouslySetInnerHTML={{ __html: post.content }}
 						w="full"
+						variants={fadeInUp}
 						sx={{
 							p: { mb: 6 },
 							h3: { fontSize: "2xl", fontWeight: "900", mt: 10, mb: 4, color: "gray.900" },
@@ -204,7 +231,7 @@ export default function BlogDetailPage() {
 					<Divider />
 
 					{/* Engagement Section */}
-					<VStack
+					<MotionVStack
 						w="full"
 						py={12}
 						spacing={8}
@@ -213,6 +240,7 @@ export default function BlogDetailPage() {
 						textAlign="center"
 						border="1px solid"
 						borderColor="blue.100"
+						variants={fadeInUp}
 					>
 						<VStack spacing={2}>
 							<Heading size="md" color="blue.900" fontWeight="900">
@@ -242,7 +270,7 @@ export default function BlogDetailPage() {
 								Back to Insights
 							</Button>
 						</HStack>
-					</VStack>
+					</MotionVStack>
 
 					{/* Prev/Next Navigation (Placeholder Logic) */}
 					<HStack w="full" justify="space-between" pt={10}>
@@ -263,7 +291,7 @@ export default function BlogDetailPage() {
 							Next Discussion
 						</Button>
 					</HStack>
-				</VStack>
+				</MotionVStack>
 			</Container>
 		</Box>
 	);

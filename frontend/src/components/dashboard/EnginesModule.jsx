@@ -169,10 +169,11 @@ export default function EnginesModule() {
 				</Center>
 			) : (
 				<Box overflowX="auto" borderRadius="xl" border="1px solid" borderColor="gray.100">
-					<Table variant="simple" size="md">
+					<Table variant="simple" size="md" layout="fixed" minW="1000px">
 						<Thead bg="gray.50">
 							<Tr>
 								<Th
+									w="300px"
 									fontSize="11px"
 									fontWeight="800"
 									textTransform="uppercase"
@@ -182,6 +183,7 @@ export default function EnginesModule() {
 									Product Info
 								</Th>
 								<Th
+									w="250px"
 									fontSize="11px"
 									fontWeight="800"
 									textTransform="uppercase"
@@ -191,6 +193,7 @@ export default function EnginesModule() {
 									Specifications
 								</Th>
 								<Th
+									w="120px"
 									fontSize="11px"
 									fontWeight="800"
 									textTransform="uppercase"
@@ -200,6 +203,7 @@ export default function EnginesModule() {
 									Price
 								</Th>
 								<Th
+									w="150px"
 									fontSize="11px"
 									fontWeight="800"
 									textTransform="uppercase"
@@ -210,6 +214,7 @@ export default function EnginesModule() {
 								</Th>
 								{!isViewer && (
 									<Th
+										w="120px"
 										fontSize="11px"
 										fontWeight="800"
 										textTransform="uppercase"
@@ -225,8 +230,8 @@ export default function EnginesModule() {
 							{filteredProducts.map((p) => (
 								<Tr key={p._id} _hover={{ bg: "gray.50/50" }}>
 									<Td>
-										<VStack align="flex-start" spacing={0}>
-											<Text fontWeight="800" color="gray.800" fontSize="14px">
+										<VStack align="flex-start" spacing={0} maxW="280px">
+											<Text fontWeight="800" color="gray.800" fontSize="14px" isTruncated w="full">
 												{p.name}
 											</Text>
 											<Text fontSize="12px" color="gray.500">
@@ -235,13 +240,15 @@ export default function EnginesModule() {
 										</VStack>
 									</Td>
 									<Td>
-										<HStack spacing={2}>
+										<HStack spacing={2} whiteSpace="nowrap">
 											<Badge
 												variant="subtle"
 												colorScheme="blue"
 												fontSize="10px"
 												px={2}
 												borderRadius="md"
+												maxW="110px"
+												isTruncated
 											>
 												{p.make || "Any Make"}
 											</Badge>
@@ -251,13 +258,15 @@ export default function EnginesModule() {
 												fontSize="10px"
 												px={2}
 												borderRadius="md"
+												maxW="110px"
+												isTruncated
 											>
 												{p.model || "Any Model"}
 											</Badge>
 										</HStack>
 									</Td>
 									<Td>
-										<Text fontWeight="900" color="#D90404" fontSize="15px">
+										<Text fontWeight="900" color="#D90404" fontSize="15px" whiteSpace="nowrap">
 											{p.currency || "£"}
 											{p.price?.toLocaleString() || "0.00"}
 										</Text>
@@ -271,13 +280,14 @@ export default function EnginesModule() {
 											py={1}
 											textTransform="uppercase"
 											variant="solid"
+											whiteSpace="nowrap"
 										>
 											{p.isSold ? "Sold" : "Available"}
 										</Badge>
 									</Td>
 									{!isViewer && (
 										<Td>
-											<HStack spacing={1}>
+											<HStack spacing={1} whiteSpace="nowrap">
 												<IconButton
 													icon={<EditIcon />}
 													size="sm"

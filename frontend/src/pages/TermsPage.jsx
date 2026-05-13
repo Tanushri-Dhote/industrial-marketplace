@@ -23,6 +23,23 @@ import {
 import { Helmet } from 'react-helmet-async';
 import { FaCheckCircle, FaGavel, FaShieldAlt } from 'react-icons/fa';
 import { MdGavel } from 'react-icons/md';
+import { motion } from 'framer-motion';
+
+const MotionBox = motion(Box);
+const MotionVStack = motion(VStack);
+
+const fadeInUp = {
+  initial: { opacity: 0, y: 20 },
+  animate: { opacity: 1, y: 0, transition: { duration: 0.6 } },
+};
+
+const staggerContainer = {
+  animate: {
+    transition: {
+      staggerChildren: 0.1,
+    },
+  },
+};
 
 export default function TermsPage() {
   const accentColor = "#D90404";
@@ -51,11 +68,11 @@ export default function TermsPage() {
         <meta name="description" content="Read our Terms and Conditions to understand the rules and guidelines for using Re-Conditioned Engine engine price comparison platform." />
       </Helmet>
 
-      {/* Hero Section - Same style as Privacy Page */}
+      {/* Hero Section */}
       <Box bg={darkBg} color="white" py={12} mb={8}>
         <Container maxW="container.xl">
-          <VStack spacing={3} textAlign="center">
-            <Box
+          <MotionVStack spacing={3} textAlign="center" initial="initial" animate="animate" variants={staggerContainer}>
+            <MotionBox
               bg={accentColor}
               color="white"
               px={4}
@@ -63,29 +80,37 @@ export default function TermsPage() {
               borderRadius="full"
               fontSize="12px"
               fontWeight="600"
+              variants={fadeInUp}
             >
               LEGAL
-            </Box>
-            <Heading fontSize="36px" fontWeight="800">
-              Terms &amp; Conditions
-            </Heading>
-            <Text fontSize="16px" maxW="2xl" opacity={0.9}>
-              Please read these terms carefully before using Re-Conditioned Engine
-            </Text>
-            <Text fontSize="14px" opacity={0.7}>Last updated: April 17, 2026</Text>
-          </VStack>
+            </MotionBox>
+            <MotionBox variants={fadeInUp}>
+              <Heading fontSize="36px" fontWeight="800">
+                Terms &amp; Conditions
+              </Heading>
+            </MotionBox>
+            <MotionBox variants={fadeInUp}>
+              <Text fontSize="16px" maxW="2xl" opacity={0.9}>
+                Please read these terms carefully before using Re-Conditioned Engine
+              </Text>
+            </MotionBox>
+            <MotionBox variants={fadeInUp}>
+              <Text fontSize="14px" opacity={0.7}>Last updated: April 17, 2026</Text>
+            </MotionBox>
+          </MotionVStack>
         </Container>
       </Box>
 
       <Container maxW="container.lg" py={4} mb={12}>
-        <VStack align="stretch" spacing={8}>
+        <MotionVStack align="stretch" spacing={8} initial="initial" whileInView="animate" viewport={{ once: true }} variants={staggerContainer}>
 
           {/* Warning Banner */}
-          <Box
+          <MotionBox
             bg="red.50"
             p={6}
             borderRadius="lg"
             borderLeft="5px solid #D90404"
+            variants={fadeInUp}
           >
             <HStack spacing={4} align="start">
               <Icon as={MdGavel} boxSize={7} color="#D90404" mt={1} />
@@ -94,10 +119,10 @@ export default function TermsPage() {
                 If you do not agree with these terms, you must immediately exit and not use this website.
               </Text>
             </HStack>
-          </Box>
+          </MotionBox>
 
-          {/* Main Content - Accordion Style (Same as Privacy Page) */}
-          <Box>
+          {/* Main Content - Accordion Style */}
+          <MotionBox variants={fadeInUp}>
             {sections.map((section) => (
               <Accordion key={section.id} allowToggle mb={4}>
                 <AccordionItem
@@ -144,8 +169,6 @@ export default function TermsPage() {
                           </Link>{" "}
                           and all its pages.
                         </Text>
-                        {/* <Text><strong>“Provider”</strong> – means third-party suppliers offering engines and parts.</Text>
-                        <Text><strong>“Quote”</strong> – means a price offer received from a supplier via our platform.</Text> */}
                       </VStack>
                     )}
 
@@ -235,15 +258,16 @@ export default function TermsPage() {
                 </AccordionItem>
               </Accordion>
             ))}
-          </Box>
+          </MotionBox>
 
           {/* Final Note */}
-          <Box
+          <MotionBox
             bg={darkBg}
             color="white"
             p={8}
             borderRadius="xl"
             textAlign="center"
+            variants={fadeInUp}
           >
             <VStack spacing={4}>
               <Icon as={FaShieldAlt} boxSize={10} color={accentColor} />
@@ -255,9 +279,9 @@ export default function TermsPage() {
                 </Text>
               </Text>
             </VStack>
-          </Box>
+          </MotionBox>
 
-        </VStack>
+        </MotionVStack>
       </Container>
     </>
   );

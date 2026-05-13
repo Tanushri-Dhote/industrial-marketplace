@@ -290,16 +290,16 @@ export default function InquiriesModule({ moduleId }) {
 				</Flex>
 			) : (
 				<Box overflowX="auto" borderRadius="xl" border="1px solid" borderColor="gray.100">
-					<Table variant="simple" size="sm">
+					<Table variant="simple" size="sm" layout="fixed" minW="1100px">
 						<Thead>
 							<Tr bg={DARK}>
-								<Th color="whiteAlpha.700" fontSize="11px" fontWeight="700" textTransform="uppercase" letterSpacing="1px" py={3}>Ref #</Th>
-								<Th color="whiteAlpha.700" fontSize="11px" fontWeight="700" textTransform="uppercase" letterSpacing="1px">VRM</Th>
-								<Th color="whiteAlpha.700" fontSize="11px" fontWeight="700" textTransform="uppercase" letterSpacing="1px">Customer</Th>
-								<Th color="whiteAlpha.700" fontSize="11px" fontWeight="700" textTransform="uppercase" letterSpacing="1px">Category</Th>
-								<Th color="whiteAlpha.700" fontSize="11px" fontWeight="700" textTransform="uppercase" letterSpacing="1px">Location</Th>
-								<Th color="whiteAlpha.700" fontSize="11px" fontWeight="700" textTransform="uppercase" letterSpacing="1px">Date</Th>
-								<Th color="whiteAlpha.700" fontSize="11px" fontWeight="700" textTransform="uppercase" letterSpacing="1px">Actions</Th>
+								<Th w="100px" color="whiteAlpha.700" fontSize="11px" fontWeight="700" textTransform="uppercase" letterSpacing="1px" py={4}>Ref #</Th>
+								<Th w="120px" color="whiteAlpha.700" fontSize="11px" fontWeight="700" textTransform="uppercase" letterSpacing="1px">VRM</Th>
+								<Th w="220px" color="whiteAlpha.700" fontSize="11px" fontWeight="700" textTransform="uppercase" letterSpacing="1px">Customer</Th>
+								<Th w="150px" color="whiteAlpha.700" fontSize="11px" fontWeight="700" textTransform="uppercase" letterSpacing="1px">Category</Th>
+								<Th w="120px" color="whiteAlpha.700" fontSize="11px" fontWeight="700" textTransform="uppercase" letterSpacing="1px">Location</Th>
+								<Th w="150px" color="whiteAlpha.700" fontSize="11px" fontWeight="700" textTransform="uppercase" letterSpacing="1px">Date</Th>
+								<Th w="220px" color="whiteAlpha.700" fontSize="11px" fontWeight="700" textTransform="uppercase" letterSpacing="1px">Actions</Th>
 							</Tr>
 						</Thead>
 						<Tbody>
@@ -311,7 +311,7 @@ export default function InquiriesModule({ moduleId }) {
 									transition="background 0.15s"
 								>
 									<Td>
-										<Text fontSize="12px" fontWeight="700" color="gray.500" fontFamily="mono">
+										<Text fontSize="12px" fontWeight="700" color="gray.500" fontFamily="mono" whiteSpace="nowrap">
 											{inquiry.refNumber}
 										</Text>
 									</Td>
@@ -319,25 +319,25 @@ export default function InquiriesModule({ moduleId }) {
 										<UKPlate vrm={inquiry.registrationNumber} />
 									</Td>
 									<Td>
-										<VStack align="flex-start" spacing={0}>
-											<Text fontSize="13px" fontWeight="700" color={DARK}>{inquiry.name}</Text>
-											<Text fontSize="11px" color="gray.400">{inquiry.email}</Text>
+										<VStack align="flex-start" spacing={0} maxW="200px">
+											<Text fontSize="13px" fontWeight="700" color={DARK} isTruncated w="full">{inquiry.name}</Text>
+											<Text fontSize="11px" color="gray.400" isTruncated w="full">{inquiry.email}</Text>
 										</VStack>
 									</Td>
 									<Td>
-										<Badge colorScheme="blue" variant="subtle" fontSize="11px" px={2} borderRadius="full">
+										<Badge colorScheme="blue" variant="subtle" fontSize="11px" px={2} borderRadius="full" whiteSpace="nowrap">
 											{inquiry.category}
 										</Badge>
 									</Td>
 									<Td>
-										<HStack spacing={1}>
+										<HStack spacing={1} whiteSpace="nowrap">
 											<Icon as={MapPin} size={12} color="gray.400" />
 											<Text fontSize="12px" color="gray.600">{inquiry.postcode}</Text>
 										</HStack>
 									</Td>
-									<Td fontSize="12px" color="gray.500">{inquiry.date}</Td>
+									<Td fontSize="12px" color="gray.500" whiteSpace="nowrap">{inquiry.date}</Td>
 									<Td>
-										<HStack spacing={1}>
+										<HStack spacing={1} whiteSpace="nowrap">
 											{/* View details */}
 											<Tooltip label="View Details" placement="top">
 												<IconButton

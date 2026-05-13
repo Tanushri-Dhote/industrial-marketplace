@@ -267,47 +267,47 @@ export default function LeadsModule() {
 					<Spinner size="xl" color="#D90404" thickness="4px" />
 				</Center>
 			) : (
-				<Box overflowX="auto">
-					<Table variant="simple" size="sm">
-						<Thead>
+				<Box overflowX="auto" borderRadius="xl" border="1px solid" borderColor="gray.100">
+					<Table variant="simple" size="sm" layout="fixed" minW="1000px">
+						<Thead bg="gray.50">
 							<Tr>
-								<Th fontSize="12px" fontWeight="800" textTransform="uppercase" letterSpacing="1px">
+								<Th w="160px" fontSize="12px" fontWeight="800" textTransform="uppercase" letterSpacing="1px" py={4}>
 									Name
 								</Th>
-								<Th fontSize="12px" fontWeight="800" textTransform="uppercase" letterSpacing="1px">
+								<Th w="180px" fontSize="12px" fontWeight="800" textTransform="uppercase" letterSpacing="1px">
 									Email
 								</Th>
-								<Th fontSize="12px" fontWeight="800" textTransform="uppercase" letterSpacing="1px">
+								<Th w="180px" fontSize="12px" fontWeight="800" textTransform="uppercase" letterSpacing="1px">
 									Product
 								</Th>
-								<Th fontSize="12px" fontWeight="800" textTransform="uppercase" letterSpacing="1px">
+								<Th w="140px" fontSize="12px" fontWeight="800" textTransform="uppercase" letterSpacing="1px">
 									Website
 								</Th>
-								<Th fontSize="12px" fontWeight="800" textTransform="uppercase" letterSpacing="1px">
+								<Th w="140px" fontSize="12px" fontWeight="800" textTransform="uppercase" letterSpacing="1px">
 									Status
 								</Th>
-								<Th fontSize="12px" fontWeight="800" textTransform="uppercase" letterSpacing="1px">
+								<Th w="100px" fontSize="12px" fontWeight="800" textTransform="uppercase" letterSpacing="1px">
 									Date
 								</Th>
-								<Th fontSize="12px" fontWeight="800" textTransform="uppercase" letterSpacing="1px">
+								<Th w="100px" fontSize="12px" fontWeight="800" textTransform="uppercase" letterSpacing="1px">
 									Actions
 								</Th>
 							</Tr>
 						</Thead>
 						<Tbody>
 							{filteredLeads.map((lead) => (
-								<Tr key={lead.id}>
-									<Td fontSize="13px" fontWeight="600">
+								<Tr key={lead.id} _hover={{ bg: "gray.50" }}>
+									<Td fontSize="13px" fontWeight="600" isTruncated>
 										{lead.name}
 									</Td>
-									<Td fontSize="13px">{lead.email}</Td>
-									<Td fontSize="13px">{lead.product}</Td>
-									<Td fontSize="13px">{lead.websiteName}</Td>
+									<Td fontSize="13px" isTruncated>{lead.email}</Td>
+									<Td fontSize="13px" isTruncated>{lead.product}</Td>
+									<Td fontSize="13px" isTruncated>{lead.websiteName}</Td>
 									<Td>
 										<Select
 											value={lead.status}
 											size="sm"
-											width="130px"
+											width="120px"
 											fontSize="12px"
 											borderRadius="md"
 											onChange={(e) => handleStatusChange(lead.id, e.target.value)}
@@ -320,9 +320,9 @@ export default function LeadsModule() {
 											))}
 										</Select>
 									</Td>
-									<Td fontSize="13px">{lead.date}</Td>
+									<Td fontSize="13px" whiteSpace="nowrap">{lead.date}</Td>
 									<Td>
-										<HStack spacing={1}>
+										<HStack spacing={1} whiteSpace="nowrap">
 											<IconButton
 												icon={<ViewIcon />}
 												size="sm"
