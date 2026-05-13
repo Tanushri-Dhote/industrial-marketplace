@@ -214,7 +214,14 @@ export default function ModelsModule() {
 					<Spinner color={ACCENT} size="lg" thickness="4px" />
 				</Center>
 			) : (
-				<Box overflowX="auto" bg="white" borderRadius="xl" boxShadow="sm" border="1px solid" borderColor="gray.100">
+				<Box
+					overflowX="auto"
+					bg="white"
+					borderRadius="xl"
+					boxShadow="sm"
+					border="1px solid"
+					borderColor="gray.100"
+				>
 					<Table variant="simple" size="sm" layout="fixed" minW="900px">
 						<Thead bg="gray.50" borderBottom="2px solid" borderColor="gray.100">
 							<Tr>
