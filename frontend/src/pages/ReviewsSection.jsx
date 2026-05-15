@@ -43,36 +43,38 @@ export default function ReviewsSection() {
 
   const testimonials = [
     {
-      name: "Rajesh Sharma",
-      role: "Plant Manager",
-      company: "SteelTech Industries, Pune",
-      text: "We purchased a 500kVA reconditioned generator from Reconditioned Engine. Excellent quality and outstanding technical support.",
+      name: "James Walker",
+      role: "Operations Manager",
+      company: "London Industrial Solutions, UK",
+      text: "We sourced a reconditioned diesel generator and the performance has exceeded expectations. Excellent support and fast delivery across the UK.",
       rating: 5,
-      image: "https://randomuser.me/api/portraits/men/32.jpg",
+      image: "https://randomuser.me/api/portraits/men/41.jpg",
     },
     {
-      name: "Priya Malhotra",
-      role: "Procurement Head",
-      company: "Aqua Pumps & Systems, Ahmedabad",
-      text: "Saved almost 35% compared to direct pricing. Very transparent process and reliable suppliers.",
+      name: "Charlotte Evans",
+      role: "Procurement Lead",
+      company: "Manchester Engineering Group, UK",
+      text: "Professional service from start to finish. The machinery quality was outstanding and helped us reduce operational costs significantly.",
       rating: 5,
-      image: "https://randomuser.me/api/portraits/women/44.jpg",
+      image: "https://randomuser.me/api/portraits/women/68.jpg",
     },
     {
-      name: "Sanjay Verma",
-      role: "Operations Director",
-      company: "Bharat Construction Pvt Ltd, Delhi",
-      text: "Bought a reconditioned excavator. Delivered in perfect condition with full documentation.",
+      name: "Oliver Thompson",
+      role: "Site Operations Director",
+      company: "Birmingham Construction Ltd, UK",
+      text: "Purchased reconditioned construction equipment for multiple projects. Reliable machines, fair pricing, and excellent after-sales support.",
       rating: 4,
-      image: "https://randomuser.me/api/portraits/men/45.jpg",
+      image: "https://randomuser.me/api/portraits/men/52.jpg",
     },
+
+
   ];
 
   return (
     <Box bg="gray.50" py={16} overflow="hidden">
       <Container maxW="container.xl">
         <VStack spacing={12}>
-          <MotionBox 
+          <MotionBox
             textAlign="center"
             initial={{ opacity: 0, y: -10 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -96,6 +98,7 @@ export default function ReviewsSection() {
             columns={{ base: 1, md: 3 }}
             spacing={6}
             w="full"
+            justifyItems="center"
             display={{ base: "none", md: "grid" }}
             variants={containerVariants}
             initial="hidden"
@@ -110,10 +113,10 @@ export default function ReviewsSection() {
                 borderRadius="lg"
                 boxShadow="sm"
                 variants={cardVariants}
-                whileHover={{ 
-                  y: -5, 
+                whileHover={{
+                  y: -5,
                   boxShadow: "0 10px 20px rgba(0,0,0,0.05)",
-                  borderColor: "#D9040430" 
+                  borderColor: "#D9040430"
                 }}
                 border="1px solid transparent"
                 transition={{ duration: 0.2 }}
@@ -147,11 +150,11 @@ export default function ReviewsSection() {
           {/* Mobile Slider */}
           <Box display={{ base: "block", md: "none" }} maxW="500px" mx="auto" w="full">
             <AnimatePresence mode="wait">
-              <MotionBox 
+              <MotionBox
                 key={currentIndex}
-                bg="white" 
-                p={{ base: 6, md: 8 }} 
-                borderRadius="xl" 
+                bg="white"
+                p={{ base: 6, md: 8 }}
+                borderRadius="xl"
                 boxShadow="md"
                 initial={{ opacity: 0, x: 20 }}
                 animate={{ opacity: 1, x: 0 }}
@@ -201,4 +204,4 @@ export default function ReviewsSection() {
       </Container>
     </Box>
   );
-}
+}
