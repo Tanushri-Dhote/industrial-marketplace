@@ -10,6 +10,10 @@ import BrandModelSelectorSection from "./BrandModelSelectorSection";
 import Areacbar from "./Areabar";
 import TopEnginesSection from "./TopEnginesSection";
 import FAQSection from "./FAQSection";
+import BuiltToHighestStandard from "./BuiltToHighestStandard";
+import WarrantyBannerSection from "./WarrantyBannerSection";
+import HelpBannerSection from "./HelpBannerSection";
+import HomeAbout from "./HomeAbout";
 
 export default function HomePage() {
 	const location = useLocation();
@@ -27,13 +31,18 @@ export default function HomePage() {
 	return (
 		<>
 			<HeroSection category={category} />
+			<BuiltToHighestStandard />
 			<TrustBar />
+			<HomeAbout />
 			<EasyStepsSection />
 			{/* <BrandModelSelectorSection /> */}
 			{!searchParams.get("brand") && <TopEnginesSection category={category} />}
 			{/* <Areacbar /> */}
+
 			<ReviewsSection />
-			<FAQSection />
+			<WarrantyBannerSection />
+			<HelpBannerSection />
+			{/* <FAQSection /> */}
 		</>
 	);
 }

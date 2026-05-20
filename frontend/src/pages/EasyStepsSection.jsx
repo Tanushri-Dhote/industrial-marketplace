@@ -2,255 +2,271 @@ import React from "react";
 import {
 	Box,
 	Container,
-	Heading,
-	Text,
 	VStack,
-	SimpleGrid,
-	Icon,
+	Text,
+	Heading,
 	Circle,
-	Image,
-	HStack,
+	Icon,
+	Flex,
 	useColorModeValue,
 } from "@chakra-ui/react";
 import { motion } from "framer-motion";
-import { FaSearch, FaHandshake, FaTruck } from "react-icons/fa";
+import { keyframes } from "@emotion/react";
+import {
+	FaSearch,
+	FaTools,
+	FaCogs,
+	FaCheckCircle,
+	FaCar,
+} from "react-icons/fa";
 
 const MotionBox = motion(Box);
-const MotionSimpleGrid = motion(SimpleGrid);
 
-const containerVariants = {
-	hidden: { opacity: 0 },
-	visible: {
-		opacity: 1,
-		transition: {
-			staggerChildren: 0.2,
-		},
-	},
-};
+const moveDash = keyframes`
+  0% {
+    background-position: 0 0;
+  }
+  100% {
+    background-position: 120px 0;
+  }
+`;
 
-const itemVariants = {
-	hidden: { opacity: 0, y: 30 },
-	visible: {
-		opacity: 1,
-		y: 0,
-		transition: {
-			duration: 0.6,
-			ease: [0.25, 0.1, 0.25, 1.0],
-		},
-	},
-};
-
-const steps = [
+const processSteps = [
 	{
-		number: "01",
 		icon: FaSearch,
-		title: "Enter Your Vehicle Details",
-		description:
-			"Provide your registration number or engine details so we can identify the right engine for your vehicle.",
-		image:
-			"https://images.unsplash.com/photo-1517524206127-48bbd363f3d7?auto=format&fit=crop&w=1200&q=80",
+		title: "Inspection",
+		description: "Engine is fully inspected and assessed",
 	},
 	{
-		number: "02",
-		icon: FaHandshake,
-		title: "We Review Your Request",
-		description:
-			"Our team carefully reviews your enquiry and helps match you with the most suitable engine solution.",
-		image:
-			"https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?auto=format&fit=crop&w=1200&q=80",
+		icon: FaTools,
+		title: "Disassembly",
+		description: "Carefully stripped down and all parts checked",
 	},
 	{
-		number: "03",
-		icon: FaTruck,
-		title: "Confirm & Get Delivery",
-		description:
-			"Once everything is confirmed, your engine is prepared for fast delivery or local fitting support.",
-		image:
-			"https://images.unsplash.com/photo-1616432043562-3671ea2e5242?auto=format&fit=crop&w=1200&q=80",
+		icon: FaCogs,
+		title: "Reconditioning",
+		description: "Parts are machined, refurbished or replaced as needed",
+	},
+	{
+		icon: FaCheckCircle,
+		title: "Testing",
+		description: "Engine is tested under load for maximum reliability",
+	},
+	{
+		icon: FaCar,
+		title: "Ready to Go",
+		description: "Fully reassembled and ready for safe vehicle use",
 	},
 ];
 
-export default function EasyStepsSection() {
+export default function EngineProcessSection() {
 	const accentColor = "#D90404";
-	const cardBg = useColorModeValue("white", "gray.900");
-	const lineColor = useColorModeValue("gray.200", "gray.700");
+
 	const sectionBg = useColorModeValue(
-		"linear-gradient(180deg, #fff8f6 0%, #ffffff 70%)",
-		"linear-gradient(180deg, #171717 0%, #111111 70%)",
+		"linear-gradient(180deg, #fff8f7 0%, #ffffff 100%)",
+		"gray.900"
 	);
-	const headingColor = useColorModeValue("gray.900", "whiteAlpha.900");
-	const bodyColor = useColorModeValue("gray.600", "gray.300");
-	const cardBorder = useColorModeValue("gray.100", "whiteAlpha.200");
-	const stepNumberMuted = useColorModeValue("gray.100", "whiteAlpha.300");
 
 	return (
-		<Box bgGradient={sectionBg} py={{ base: 14, md: 20 }} overflow="hidden">
-			<Container maxW="container.xl">
-				<VStack spacing={{ base: 10, md: 14 }}>
+		<Box
+			bgGradient={sectionBg}
+			py={{ base: 16, md: 14 }}
+			position="relative"
+			overflow="hidden"
+		>
+			{/* Decorative circles */}
+			<Circle
+				position="absolute"
+				top="-80px"
+				left="-80px"
+				size="250px"
+				bg="red.50"
+				opacity={0.5}
+			/>
+			<Circle
+				position="absolute"
+				bottom="-100px"
+				right="-80px"
+				size="280px"
+				bg="red.50"
+				opacity={0.4}
+			/>
+
+			<Container maxW="1300px" position="relative" zIndex={2}>
+				<VStack spacing={16}>
 					{/* Header */}
 					<MotionBox
-						initial={{ opacity: 0, y: 20 }}
+						initial={{ opacity: 0, y: 25 }}
 						whileInView={{ opacity: 1, y: 0 }}
-						viewport={{ once: true, margin: "-100px" }}
-						transition={{ duration: 0.6 }}
+						viewport={{ once: true }}
+						transition={{ duration: 0.7 }}
 						textAlign="center"
-						maxW="800px"
-						mx="auto"
 					>
-						<VStack spacing={4}>
+						<VStack spacing={5}>
 							<Text
 								fontSize="14px"
-								fontWeight="700"
+								fontWeight="800"
 								color={accentColor}
 								letterSpacing="2px"
 								textTransform="uppercase"
 							>
-								SUPER SIMPLE PROCESS
+								OUR PROCESS
 							</Text>
 
 							<Heading
-								fontSize={{ base: "26px", md: "42px" }}
-								fontWeight="700"
+								fontSize={{ base: "28px", md: "46px" }}
+								fontWeight="800"
+								color="gray.900"
 								lineHeight="1.2"
-								color={headingColor}
 							>
-								Get Your Perfect Engine in Just{" "}
-								<Text as="span" color={accentColor}>
-									3 Easy Steps
-								</Text>
+								Engine Reconditioning Process
 							</Heading>
 
-							<Text fontSize={{ base: "14px", md: "18px" }} color={bodyColor} maxW="680px">
-								From searching to delivery — we’ve made buying the right engine faster,
-								transparent, and hassle-free.
+							<Text
+								maxW="700px"
+								color="gray.600"
+								fontSize={{ base: "15px", md: "18px" }}
+								lineHeight="1.8"
+							>
+								Our trusted process ensures every engine meets the highest
+								standards of quality and performance.
 							</Text>
 						</VStack>
 					</MotionBox>
 
-					{/* Steps Grid */}
-					<Box w="full" maxW="1100px" mx="auto" position="relative">
-						<MotionSimpleGrid
-							columns={{ base: 1, md: 3 }}
-							spacing={{ base: 12, md: 10 }}
+					{/* Timeline */}
+					<Box position="relative" w="full" role="group">
+						{/* Desktop animated dashed line */}
+						<MotionBox
+							position="absolute"
+							top="42px"
+							left="10%"
+							right="10%"
+							h="2px"
+							zIndex={1}
+							display={{ base: "none", md: "block" }}
+							bgImage={`
+                repeating-linear-gradient(
+                  to right,
+                  #D90404 0px,
+                  #D90404 36px,
+                  transparent 36px,
+                  transparent 52px
+                )
+              `}
+							bgSize="120px 2px"
+							borderRadius="full"
+							_groupHover={{
+								animation: `${moveDash} 1s linear infinite`,
+							}}
+						/>
+
+						{/* Steps */}
+						<Flex
+							direction={{ base: "column", md: "row" }}
+							justify="space-between"
+							align="flex-start"
+							gap={{ base: 8, md: 4 }}
 							position="relative"
-							variants={containerVariants}
-							initial="hidden"
-							whileInView="visible"
-							viewport={{ once: true, margin: "-100px" }}
+							zIndex={2}
 						>
-							{steps.map((step, index) => (
+							{processSteps.map((step, index) => (
 								<MotionBox
 									key={index}
-									variants={itemVariants}
-									role="group"
-									position="relative"
-									zIndex={2}
-									bg={cardBg}
-									borderRadius="2xl"
-									overflow="hidden"
-									border="1px solid"
-									borderColor={cardBorder}
-									boxShadow="0 12px 40px rgba(0, 0, 0, 0.08)"
-									transition="all 0.35s ease"
-									_hover={{
-										transform: "translateY(-8px)",
-										boxShadow: "0 20px 48px rgba(0, 0, 0, 0.14)",
-										borderColor: "rgba(217, 4, 4, 0.35)",
+									flex="1"
+									w="full"
+									textAlign={{ base: "left", md: "center" }}
+									initial={{ opacity: 0, y: 40 }}
+									whileInView={{ opacity: 1, y: 0 }}
+									viewport={{ once: true }}
+									transition={{
+										duration: 0.6,
+										delay: index * 0.15,
 									}}
+									position="relative"
 								>
-									<Box position="relative" h="180px" overflow="hidden">
-										<Image
-											src={step.image}
-											alt={step.title}
-											w="full"
-											h="full"
-											objectFit="cover"
-											transition="transform 0.45s ease"
-											_groupHover={{ transform: "scale(1.05)" }}
-										/>
+									{/* Mobile vertical line */}
+									{index !== processSteps.length - 1 && (
 										<Box
+											display={{ base: "block", md: "none" }}
 											position="absolute"
-											inset={0}
-											bgGradient="linear(to-t, blackAlpha.700, transparent)"
+											left="27px"
+											top="55px"
+											bottom="-32px"
+											w="2px"
+											bg="red.100"
 										/>
+									)}
 
-										<HStack position="absolute" top={4} left={4} spacing={3}>
+									<Flex
+										direction={{ base: "row", md: "column" }}
+										align={{ base: "flex-start", md: "center" }}
+										gap={{ base: 4, md: 0 }}
+									>
+										{/* Icon */}
+										<Box position="relative" zIndex={2}>
 											<Circle
-												size="46px"
-												bg={accentColor}
-												color="white"
-												fontSize="20px"
-												fontWeight="700"
-												boxShadow="0 10px 22px rgba(217, 4, 4, 0.45)"
+												size={{ base: "56px", md: "84px" }}
+												bg="white"
+												border="3px solid"
+												borderColor="red.100"
+												boxShadow="0 12px 28px rgba(0,0,0,0.08)"
+												flexShrink={0}
+												transition="all 0.3s ease"
+												_hover={{
+													transform: "translateY(-8px)",
+													boxShadow: "0 20px 35px rgba(217,4,4,0.18)",
+													borderColor: "red.300",
+												}}
 											>
-												{step.number}
+												<Circle size={{ base: "34px", md: "50px" }} bg="red.50">
+													<Icon
+														as={step.icon}
+														boxSize={{ base: 4, md: 6 }}
+														color={accentColor}
+													/>
+												</Circle>
 											</Circle>
+										</Box>
 
-											<Circle size="38px" bg="white" color={accentColor} boxShadow="md">
-												<Icon as={step.icon} boxSize={4} />
-											</Circle>
-										</HStack>
-
-										<Text
-											position="absolute"
-											bottom={4}
-											left={4}
-											fontSize="12px"
-											fontWeight="800"
-											letterSpacing="0.12em"
-											textTransform="uppercase"
-											color="white"
+										{/* Content */}
+										<Box
+											pt={{ base: 1, md: 0 }}
+											textAlign={{ base: "left", md: "center" }}
 										>
-											Step {step.number}
-										</Text>
-									</Box>
+											{/* Desktop connector */}
+											<Box
+												w="2px"
+												h="16px"
+												bg="gray.300"
+												mx="auto"
+												mt={4}
+												mb={4}
+												display={{ base: "none", md: "block" }}
+											/>
 
-									<VStack spacing={3} align="start" p={6} minH="200px">
-										<Heading
-											fontSize="28px"
-											lineHeight="1"
-											fontWeight="900"
-											color={stepNumberMuted}
-										>
-											{step.number}
-										</Heading>
+											<Text
+												fontSize={{ base: "17px", md: "19px" }}
+												fontWeight="700"
+												color="gray.900"
+											>
+												{step.title}
+											</Text>
 
-										<Heading
-											fontSize={{ base: "20px", md: "20px" }}
-											fontWeight="700"
-											color={headingColor}
-											lineHeight="1.25"
-										>
-											{step.title}
-										</Heading>
-
-										<Text fontSize={{ base: "14px", md: "15px" }} color={bodyColor} lineHeight="1.7">
-											{step.description}
-										</Text>
-									</VStack>
-
-									<Box h="5px" bgGradient="linear(to-r, #D90404, #ff7b00)" />
+											<Text
+												fontSize={{ base: "13px", md: "14px" }}
+												color="gray.600"
+												lineHeight="1.7"
+												maxW={{ base: "full", md: "180px" }}
+												mt={2}
+											>
+												{step.description}
+											</Text>
+										</Box>
+									</Flex>
 								</MotionBox>
 							))}
-
-							{/* Connecting Line */}
-							<MotionBox
-								display={{ base: "none", md: "block" }}
-								position="absolute"
-								top="23px"
-								left="16%"
-								right="16%"
-								h="4px"
-								bg={lineColor}
-								zIndex={1}
-								borderRadius="full"
-								opacity={0.8}
-								initial={{ scaleX: 0 }}
-								whileInView={{ scaleX: 1 }}
-								viewport={{ once: true }}
-								transition={{ duration: 1, delay: 0.5 }}
-							/>
-						</MotionSimpleGrid>
+						</Flex>
 					</Box>
 				</VStack>
 			</Container>

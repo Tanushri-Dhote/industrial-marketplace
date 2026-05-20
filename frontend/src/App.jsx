@@ -28,6 +28,7 @@ import CallSellerPage from "./pages/CallSellerPage";
 import ProductsPage from "./pages/ProductsPage";
 import RefreshPopUp from "./components/common/RefreshPopUp";
 import ScrollToTop from "./components/layout/ScrollToTop";
+import AllEnginesPage from "./pages/AllEnginesPage";
 
 function App() {
 	const { pathname } = useLocation();
@@ -37,7 +38,7 @@ function App() {
 	return (
 		<UserProvider>
 			<Box minH="100vh" display="flex" flexDirection="column">
-				{!hideGlobalLayout && <RefreshPopUp />}
+				{/* {!hideGlobalLayout && <RefreshPopUp />} */}
 				{!hideGlobalLayout && <Header />}
 				<ScrollToTop />
 
@@ -65,6 +66,7 @@ function App() {
 						<Route path="/blog/:slug" element={<BlogDetailPage />} />
 						<Route path="/products" element={<ProductsPage />} />
 						<Route path="/products/:id" element={<ProductDetailPage />} />
+						<Route path="/all-engines" element={<AllEnginesPage />} />
 
 						<Route
 							path="/dashboard"
