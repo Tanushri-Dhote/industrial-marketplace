@@ -41,6 +41,7 @@ import {
   FaFileContract,
   FaShieldAlt,
   FaCar,
+  FaPhoneAlt,
 } from 'react-icons/fa';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import AdminHeader from './AdminHeader';
@@ -116,6 +117,7 @@ export default function Header() {
   // Navigation items configuration
   const navItems = [
     { path: "/", label: "Home", icon: FaHome },
+    { path: "/all-engines", label: "All Engines", icon: FaCar },
     { path: "/about", label: "About Us", icon: FaInfoCircle },
     { path: "/terms-and-conditions", label: "Terms & Conditions", icon: FaFileContract },
     { path: "/privacy-policy", label: "Privacy Policy", icon: FaShieldAlt },
@@ -135,7 +137,7 @@ export default function Header() {
       willChange="transform"
     >
       {/* Top Bar - Contact Info (Only visible when not scrolled) */}
-      <Box
+      {/* <Box
         bg={darkColor}
         color="white"
         py={2}
@@ -147,9 +149,9 @@ export default function Header() {
         pointerEvents={!scrolled ? "auto" : "none"}
       >
         <Container maxW="container.xl" px={{ base: 2, md: 6 }}>
-          <Flex 
-            justify={{ base: "center", md: "space-between" }} 
-            align="center" 
+          <Flex
+            justify={{ base: "center", md: "space-between" }}
+            align="center"
             fontSize={{ base: "10px", sm: "12px" }}
             direction={{ base: "column", sm: "row" }}
             gap={{ base: 1, sm: 0 }}
@@ -192,7 +194,7 @@ export default function Header() {
             </HStack>
           </Flex>
         </Container>
-      </Box>
+      </Box> */}
 
       {/* Main Header */}
       <Box
@@ -270,26 +272,37 @@ export default function Header() {
             {/* Buttons - Desktop (Always visible) */}
             <HStack spacing={3} display={{ base: 'none', md: 'flex' }}>
               {/* Register Here Button */}
-              <Button
-                bg={accentColor}
-                color="white"
-                size="md"
-                height="42px"
-                px={6}
-                fontSize="14px"
-                fontWeight="600"
-                leftIcon={<FaCar />}
-                _hover={{
-                  bg: "#B70303",
-                  transform: "translateY(-1px)",
-                  boxShadow: "md"
-                }}
-                _active={{ transform: "translateY(0)" }}
-                transition="all 0.2s ease"
-                onClick={onCallSellerOpen}
+              <Box
+                bg="gray.100"
+                px={4}
+                py={2}
+                borderRadius="md"
+                border="1px solid"
+                borderColor="gray.200"
               >
-                Register Here
-              </Button>
+                <HStack spacing={3}>
+                  <Box
+                    bg="#c40000"
+                    color="white"
+                    boxSize="34px"
+                    borderRadius="full"
+                    display="flex"
+                    alignItems="center"
+                    justifyContent="center"
+                  >
+                    <FaPhoneAlt size={14} />
+                  </Box>
+
+                  <VStack spacing={0} align="start" lineHeight="1">
+                    <Text fontWeight="700" fontSize="14px" color="gray.800">
+                      +44 20 8133 4040
+                    </Text>
+                    <Text fontSize="11px" color="gray.500">
+                      Mon - Sat: 8:00 AM - 6:00 PM
+                    </Text>
+                  </VStack>
+                </HStack>
+              </Box>
 
               <Button
                 as={Link}
