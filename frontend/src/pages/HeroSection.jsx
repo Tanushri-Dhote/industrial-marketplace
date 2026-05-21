@@ -31,6 +31,7 @@ import {
 	FaCar,
 	FaCogs,
 } from "react-icons/fa";
+import { MdLibraryBooks } from "react-icons/md";
 import { Link as RouterLink } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
@@ -193,14 +194,14 @@ export default function HeroSection() {
 								color={DARK}
 								size="lg"
 								px={8}
-								leftIcon={<FaCar />}
+								leftIcon={<MdLibraryBooks />}
 								border="1px solid"
 								borderColor="gray.300"
 								_hover={{ bg: "gray.50" }}
 								borderRadius="md"
 								onClick={onOpen}
 							>
-								Register Here
+								Get A Quote
 							</Button>
 						</HStack>
 					</VStack>
@@ -290,7 +291,7 @@ export default function HeroSection() {
 							fontSize="xs"
 							color="gray.600"
 							flexShrink={0}
-							mb="40px"
+							mb={{ base: 0, md: "40px" }}
 						>
 							OR
 						</Circle>
@@ -346,7 +347,7 @@ export default function HeroSection() {
 							_hover={{ bg: "#c40000" }}
 							borderRadius="md"
 							flexShrink={0}
-							mb="40px"
+							mb={{ base: 0, md: "40px" }}
 							leftIcon={<FaSearch />}
 							onClick={handleSearch}
 						>

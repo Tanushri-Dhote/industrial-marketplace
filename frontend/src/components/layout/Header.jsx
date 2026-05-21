@@ -365,21 +365,37 @@ export default function Header() {
 
               <Divider my={2} />
 
-              <Button
-                bg={accentColor}
-                color="white"
-                leftIcon={<FaCar />}
-                onClick={() => {
-                  onToggle();
-                  onCallSellerOpen();
-                }}
-                mt={2}
-                mb={2}
-                size="md"
-                _hover={{ bg: "#B70303" }}
+              <Box
+                bg="gray.100"
+                px={4}
+                py={2}
+                borderRadius="md"
+                border="1px solid"
+                borderColor="gray.200"
               >
-                Register Here
-              </Button>
+                <HStack spacing={3}>
+                  <Box
+                    bg="#c40000"
+                    color="white"
+                    boxSize="34px"
+                    borderRadius="full"
+                    display="flex"
+                    alignItems="center"
+                    justifyContent="center"
+                  >
+                    <FaPhoneAlt size={14} />
+                  </Box>
+
+                  <VStack spacing={0} align="start" lineHeight="1">
+                    <Text fontWeight="700" fontSize="14px" color="gray.800">
+                      +44 20 8133 4040
+                    </Text>
+                    <Text fontSize="11px" color="gray.500">
+                      Mon - Sat: 8:00 AM - 6:00 PM
+                    </Text>
+                  </VStack>
+                </HStack>
+              </Box>
 
               <Button
                 as={Link}
