@@ -51,10 +51,10 @@ const HelpBannerSection = () => {
                             flex={1}
                         >
                             <Heading
-                                fontSize={{ base: "28px", md: "36px", lg: "42px" }}
+                                fontSize={{ base: "22px", md: "36px", lg: "42px" }}
                                 fontWeight="800"
                                 color="#111111"
-                                lineHeight="1.2"
+                                lineHeight={{ base: "1.3", md: "1.2" }}
                             >
                                 Need Help Finding <br />
                                 the Right Engine?

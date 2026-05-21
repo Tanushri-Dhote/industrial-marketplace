@@ -27,17 +27,17 @@ const WarrantyBannerSection = () => {
                         bg="#E10600"
                         borderRadius="2xl"
                         px={{ base: 6, md: 8 }}
-                        py={{ base: 2, md: 4 }}
+                        py={{ base: 5, md: 4 }}
                         color="white"
                         boxShadow="lg"
                     >
                         <Flex
                             direction={{ base: "column", md: "row" }}
                             align={{ base: "flex-start", md: "center" }}
-                            gap={{ base: 6, md: 8 }}
+                            gap={{ base: 4, md: 8 }}
                         >
                             <Box flexShrink={0}>
-                                <Icon as={FaShieldAlt} boxSize={{ base: "60px", md: "40px" }} />
+                                <Icon as={FaShieldAlt} boxSize={{ base: "42px", md: "40px" }} />
                             </Box>
 
                             <VStack align="start" spacing={2} flex={1}>
@@ -50,12 +50,16 @@ const WarrantyBannerSection = () => {
                                     12 MONTHS WARRANTY
                                 </Text>
                                 <Heading
-                                    fontSize={{ base: "26px", md: "22px", lg: "28px" }}
+                                    fontSize={{ base: "18px", md: "22px", lg: "28px" }}
                                     fontWeight="800"
                                 >
                                     Peace of Mind with Every Engine
                                 </Heading>
-                                <Text fontSize={{ base: "14px", md: "14px" }} mt={0}>
+                                <Text
+                                    fontSize={{ base: "13px", md: "14px" }}
+                                    lineHeight="1.6"
+                                    mt={0}
+                                >
                                     All our engines come with a 12 months warranty for your peace of mind.
                                 </Text>
                             </VStack>
@@ -72,10 +76,10 @@ const WarrantyBannerSection = () => {
                         borderColor="gray.100"
                     >
                         <Flex
-                            direction={{ base: "column", md: "row" }}
+                            wrap="wrap"
                             justify="space-between"
-                            align="center"
-                            gap={6}
+                            align="stretch"
+                            gap={{ base: 0, md: 2 }}
                         >
                             <FeatureItem icon={FaTruck} title="Nationwide Delivery" />
                             <Divider />
@@ -96,10 +100,18 @@ const WarrantyBannerSection = () => {
 const FeatureItem = ({ icon, title }) => {
     const parts = title.split(" ");
     return (
-        <VStack spacing={3} flex={1} textAlign="center" w="full">
-            <Icon as={icon} boxSize={8} color="#E10600" />
-            <Text fontWeight="800" fontSize="15px" color="#111111" lineHeight="1.3">
-                {parts[0]} <br /> {parts.slice(1).join(" ")}
+        <VStack
+            spacing={2}
+            flex={{ base: "0 0 48%", md: 1 }}
+            maxW={{ base: "48%", md: "unset" }}
+            py={{ base: 4, md: 0 }}
+            textAlign="center"
+        >
+            <Icon as={icon} boxSize={{ base: 5, md: 8 }} color="#E10600" />
+            <Text fontWeight="800" fontSize={{ base: "13px", md: "15px" }} color="#111111" lineHeight="1.3">
+                <Box display={{ base: "block", md: "block" }}>
+                    {title}
+                </Box>
             </Text>
         </VStack>
     );

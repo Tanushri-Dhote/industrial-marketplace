@@ -85,14 +85,14 @@ const BuiltToHighestStandard = () => {
                 {/* ── FEATURE CARDS ── */}
                 <Grid
                     templateColumns={{ base: "1fr", sm: "repeat(2, 1fr)", lg: "repeat(4, 1fr)" }}
-                    gap={6}
+                    gap={{ base: 4, md: 6 }}
                     mb={10}
                 >
                     {features.map((feature, index) => (
                         <Box
                             key={index}
                             bg="white"
-                            p={6}
+                            p={{ base: 4, md: 6 }}
                             borderRadius="16px"
                             boxShadow="0 2px 8px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.02)"
                             transition="transform 0.2s, box-shadow 0.2s"
@@ -112,164 +112,166 @@ const BuiltToHighestStandard = () => {
                 </Grid>
 
                 {/* ── BOTTOM ROW: Video Card + 3 Stat Cards ── */}
-                <Flex
-                    direction={{ base: "column", md: "row" }}
-                    borderRadius="16px"
-                    overflow="hidden"
-                    boxShadow="0 4px 12px rgba(0,0,0,0.08)"
+                {/* ── VIDEO + STATS SECTION ── */}
+                <Box
                     bg="white"
-                    align="stretch"
+                    borderRadius="20px"
+                    overflow="hidden"
+                    boxShadow="0 4px 14px rgba(0,0,0,0.06)"
                 >
-                    {/* Watch Our Process card */}
-                    <Box
-                        flex="1.8"
-                        overflow="hidden"
+                    {/* Video Card */}
+                    <Flex
+                        direction={{ base: "column", md: "row" }}
                         cursor="pointer"
                         onClick={() => setIsVideoOpen(true)}
-                        minH="130px"
                     >
-                        <HStack gap={0} align="stretch" h="100%">
-                            {/* Thumbnail with overlay + play button */}
+                        {/* Thumbnail */}
+                        <Box
+                            position="relative"
+                            w={{ base: "100%", md: "220px", lg: "260px" }}
+                            minW={{ base: "100%", md: "220px", lg: "260px" }}
+                            h={{ base: "180px", md: "auto" }}
+                            flexShrink={0}
+                        >
+                            <Image
+                                src={videoThumbnailUrl}
+                                alt="Engine Process"
+                                objectFit="cover"
+                                w="100%"
+                                h="100%"
+                            />
+
                             <Box
-                                position="relative"
-                                w={{ base: "120px", md: "145px" }}
-                                minW={{ base: "120px", md: "145px" }}
-                                flexShrink={0}
+                                position="absolute"
+                                inset={0}
+                                bg="blackAlpha.500"
+                            />
+
+                            {/* Play Button */}
+                            <Flex
+                                position="absolute"
+                                top="50%"
+                                left="50%"
+                                transform="translate(-50%, -50%)"
+                                w="58px"
+                                h="58px"
+                                borderRadius="full"
+                                bg={RED}
+                                align="center"
+                                justifyContent="center"
+                                boxShadow="0 10px 25px rgba(0,0,0,0.25)"
+                                _hover={{
+                                    transform: "translate(-50%, -50%) scale(1.08)",
+                                }}
                             >
-                                <Image
-                                    src={videoThumbnailUrl}
-                                    alt="Engine Reconditioning Process"
-                                    objectFit="cover"
-                                    w="100%"
-                                    h="100%"
-                                    fallbackSrc="https://placehold.co/400x300/222/555?text=Engine"
-                                />
-                                {/* Dark overlay */}
-                                <Box
-                                    position="absolute"
-                                    inset={0}
-                                    bg="blackAlpha.500"
-                                />
-                                {/* Red play button */}
-                                <Flex
-                                    position="absolute"
-                                    top="50%"
-                                    left="50%"
-                                    transform="translate(-50%, -50%)"
-                                    w="44px"
-                                    h="44px"
-                                    borderRadius="full"
-                                    bg={RED}
-                                    align="center"
-                                    justify="center"
-                                    transition="all 0.2s ease"
-                                    _hover={{ bg: "#c40000", transform: "translate(-50%, -50%) scale(1.08)" }}
-                                    boxShadow="0 4px 12px rgba(0,0,0,0.25)"
-                                >
-                                    <Icon as={FaPlay} color="white" boxSize={3.5} ml="2px" />
-                                </Flex>
-                            </Box>
+                                <Icon as={FaPlay} color="white" boxSize={4} ml="2px" />
+                            </Flex>
+                        </Box>
 
-                            {/* Text side */}
-                            <VStack align="flex-start" gap={2} p={4} justify="center" flex={1}>
-                                <Text fontWeight="700" fontSize="15px" color="#111111">
-                                    Watch Our Process
+                        {/* Content */}
+                        <VStack
+                            align="flex-start"
+                            justify="center"
+                            spacing={3}
+                            p={{ base: 5, md: 8, lg: 10 }}
+                            flex={1}
+                        >
+                            <Text
+                                fontSize={{ base: "20px", md: "22px" }}
+                                fontWeight="800"
+                                color="#111"
+                            >
+                                Watch Our Process
+                            </Text>
+
+                            <Text
+                                color="#666"
+                                fontSize={{ base: "14px", md: "15px" }}
+                                lineHeight="1.7"
+                                maxW={{ base: "100%", lg: "620px" }}
+                            >
+                                See how we professionally recondition engines using
+                                advanced testing and premium quality components.
+                            </Text>
+
+                            <Button
+                                bg={RED}
+                                color="white"
+                                size="sm"
+                                borderRadius="10px"
+                                px={5}
+                                _hover={{ bg: "#c40000" }}
+                                leftIcon={<FaPlay />}
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    setIsVideoOpen(true);
+                                }}
+                            >
+                                Play Video
+                            </Button>
+                        </VStack>
+                    </Flex>
+
+                    {/* Stats */}
+                    <Grid
+                        templateColumns={{ base: "1fr", sm: "repeat(3, 1fr)" }}
+                        borderTop="1px solid #ECECEC"
+                    >
+                        {[
+                            {
+                                number: "10,000+",
+                                label: "Engines Supplied",
+                            },
+                            {
+                                number: "20+",
+                                label: "Years Experience",
+                            },
+                            {
+                                number: "99%",
+                                label: "Customer Satisfaction",
+                            },
+                        ].map((item, index) => (
+                            <Flex
+                                key={index}
+                                direction="column"
+                                align="center"
+                                justify="center"
+                                py={{ base: 6, md: 8 }}
+                                px={4}
+                                borderRight={{
+                                    base: "none",
+                                    sm: index !== 2 ? "1px solid #ECECEC" : "none",
+                                }}
+                                borderBottom={{
+                                    base: index !== 2 ? "1px solid #ECECEC" : "none",
+                                    sm: "none",
+                                }}
+                            >
+                                <Text
+                                    fontSize={{ base: "28px", md: "32px", lg: "36px" }}
+                                    fontWeight="900"
+                                    lineHeight="1"
+                                    color="#111"
+                                    whiteSpace="nowrap"
+                                >
+                                    {item.number}
                                 </Text>
-                                <Text color="#777777" fontSize="12px" lineHeight="1.5">
-                                    See how we recondition engines to the highest standards.
-                                </Text>
-                                <Button
-                                    size="xs"
-                                    bg={RED}
-                                    color="white"
-                                    _hover={{ bg: "#c40000" }}
-                                    borderRadius="6px"
+
+                                <Text
+                                    mt={2}
                                     fontSize="11px"
-                                    px={3}
-                                    leftIcon={<Icon as={FaPlay} boxSize={2} />}
-                                    onClick={(e) => { e.stopPropagation(); setIsVideoOpen(true); }}
+                                    fontWeight="700"
+                                    letterSpacing="1px"
+                                    textTransform="uppercase"
+                                    color="#777"
+                                    textAlign="center"
                                 >
-                                    Play Video
-                                </Button>
-                            </VStack>
-                        </HStack>
-                    </Box>
-
-                    {/* Inset grey divider */}
-                    <Box display={{ base: "none", md: "flex" }} alignSelf="stretch" alignItems="stretch">
-                        <Box w="1px" bg="#D9D9D9" my={5} />
-                    </Box>
-
-                    {/* Stat 1 */}
-                    <Box
-                        flex="1"
-                        py={6}
-                        px={3}
-                        textAlign="center"
-                        display="flex"
-                        alignItems="center"
-                        justifyContent="center"
-                    >
-                        <VStack gap={1}>
-                            <Text fontSize={{ base: "28px", md: "34px" }} fontWeight="800" color="#111111" lineHeight="1.2">
-                                10,000+
-                            </Text>
-                            <Text color="#777777" fontWeight="600" fontSize={{ base: "11px", md: "12px" }} textTransform="uppercase">
-                                Engines Supplied
-                            </Text>
-                        </VStack>
-                    </Box>
-
-                    {/* Inset grey divider */}
-                    <Box display={{ base: "none", md: "flex" }} alignSelf="stretch" alignItems="stretch">
-                        <Box w="1px" bg="#D9D9D9" my={5} />
-                    </Box>
-
-                    {/* Stat 2 */}
-                    <Box
-                        flex="1"
-                        py={6}
-                        px={3}
-                        textAlign="center"
-                        display="flex"
-                        alignItems="center"
-                        justifyContent="center"
-                    >
-                        <VStack gap={1}>
-                            <Text fontSize={{ base: "28px", md: "34px" }} fontWeight="800" color="#111111" lineHeight="1.2">
-                                20+
-                            </Text>
-                            <Text color="#777777" fontWeight="600" fontSize={{ base: "11px", md: "12px" }} textTransform="uppercase">
-                                Years Experience
-                            </Text>
-                        </VStack>
-                    </Box>
-
-                    {/* Inset grey divider */}
-                    <Box display={{ base: "none", md: "flex" }} alignSelf="stretch" alignItems="stretch">
-                        <Box w="1px" bg="#D9D9D9" my={5} />
-                    </Box>
-
-                    {/* Stat 3 */}
-                    <Box
-                        flex="1"
-                        py={6}
-                        px={3}
-                        textAlign="center"
-                        display="flex"
-                        alignItems="center"
-                        justifyContent="center"
-                    >
-                        <VStack gap={1}>
-                            <Text fontSize={{ base: "28px", md: "34px" }} fontWeight="800" color="#111111" lineHeight="1.2">
-                                99%
-                            </Text>
-                            <Text color="#777777" fontWeight="600" fontSize={{ base: "11px", md: "12px" }} textTransform="uppercase">
-                                Customer Satisfaction
-                            </Text>
-                        </VStack>
-                    </Box>
-                </Flex>
+                                    {item.label}
+                                </Text>
+                            </Flex>
+                        ))}
+                    </Grid>
+                </Box>
 
             </Container>
 
