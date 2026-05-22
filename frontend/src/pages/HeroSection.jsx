@@ -19,6 +19,7 @@ import {
 	ModalCloseButton,
 	ModalBody,
 	useDisclosure,
+	Select,
 } from "@chakra-ui/react";
 import { motion } from "framer-motion";
 import {
@@ -36,6 +37,8 @@ import { Link as RouterLink } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import CallSellerPage from "./CallSellerPage";
+import API from "../services/api";
+import { useEffect } from "react";
 
 const MotionBox = motion(Box);
 
@@ -44,18 +47,31 @@ const DARK = "#111111";
 
 export default function HeroSection() {
 	const [regNumber, setRegNumber] = useState("");
-	const [engineCode, setEngineCode] = useState("");
+	const [selectedBrand, setSelectedBrand] = useState("");
+	const [brands, setBrands] = useState([]);
 	const navigate = useNavigate();
 	const { isOpen, onOpen, onClose } = useDisclosure();
 
+	useEffect(() => {
+		const fetchBrands = async () => {
+			try {
+				const res = await API.get("/brands");
+				setBrands(res.data.data || []);
+			} catch (error) {
+				console.error("Failed to fetch brands", error);
+			}
+		};
+
+		fetchBrands();
+	}, []);
 
 	const handleSearch = () => {
-		if (!regNumber && !engineCode) return;
+		if (!regNumber && !selectedBrand) return;
 
 		const query = new URLSearchParams();
 
-		if (regNumber) query.append("reg", regNumber);
-		if (engineCode) query.append("code", engineCode);
+		if (regNumber) query.append("search", regNumber);
+		if (selectedBrand) query.append("brand", selectedBrand);
 
 		navigate(`/all-engines?${query.toString()}`);
 	};
@@ -245,7 +261,9 @@ export default function HeroSection() {
 					</Text>
 
 					<Text fontSize="sm" color="gray.500" mb={4}>
-						Search by make, model, reg number or engine code
+						{/* Search by make, model, reg number or engine code */}
+						Search by make, model or select brand
+
 					</Text>
 
 					<Flex
@@ -256,7 +274,7 @@ export default function HeroSection() {
 						{/* Reg Number */}
 						<Box flex="1">
 							<Input
-								placeholder="e.g. VW Golf or ABC 123"
+								placeholder="e.g. VW Golf"
 								value={regNumber}
 								onChange={(e) => setRegNumber(e.target.value)}
 								bg="#FFD400"
@@ -275,10 +293,10 @@ export default function HeroSection() {
 							/>
 							<VStack spacing={0} align="flex-start" mt={1}>
 								<Text fontSize="xs" color="gray.500" fontWeight="600">
-									Search by Make, Model or Reg
+									Search by Make, Model
 								</Text>
 								<Text fontSize="xs" color={RED}>
-									e.g. VW Golf or ABC 123
+									e.g. VW Golf
 								</Text>
 							</VStack>
 						</Box>
@@ -296,44 +314,38 @@ export default function HeroSection() {
 							OR
 						</Circle>
 
-						{/* Engine Code */}
+
+						{/* Brand Dropdown */}
 						<Box flex="1">
-							<HStack spacing={0}>
-								<Input
-									placeholder="e.g. C20DTH"
-									value={engineCode}
-									onChange={(e) => setEngineCode(e.target.value)}
-									bg="gray.100"
-									h="52px"
-									border="none"
-									fontWeight="600"
-									borderRadius="md"
-									borderRightRadius={0}
-									textAlign="center"
-									_placeholder={{
-										textAlign: "center",
-										color: "gray.500",
-										fontSize: "md",
-									}}
-								/>
-								<Button
-									bg="gray.200"
-									h="52px"
-									px={3}
-									borderLeftRadius={0}
-									borderRightRadius="md"
-									_hover={{ bg: "gray.300" }}
-									minW="44px"
-								>
-									<Icon as={FaPlus} boxSize={3} color="gray.600" />
-								</Button>
-							</HStack>
+							<Select
+								placeholder="Select Brand"
+								value={selectedBrand}
+								onChange={(e) => setSelectedBrand(e.target.value)}
+								bg="gray.100"
+								h={{ base: "46px", md: "52px", lg: "56px" }}
+								border="none"
+								fontWeight="600"
+								borderRadius="md"
+								fontSize={{ base: "14px", md: "15px", lg: "16px" }}
+								_placeholder={{
+									color: "gray.600",
+									fontSize: { base: "14px", md: "15px", lg: "16px" },
+									fontWeight: "500",
+								}}
+							>
+								{brands.map((brand) => (
+									<option key={brand._id} value={brand.slug}>
+										{brand.name}
+									</option>
+								))}
+							</Select>
+
 							<VStack spacing={0} align="flex-start" mt={1}>
 								<Text fontSize="xs" color="gray.500" fontWeight="600">
-									Search by Engine Code
+									Filter by Brand
 								</Text>
 								<Text fontSize="xs" color={RED}>
-									e.g. C20DTH
+									e.g. Mercedes-Benz
 								</Text>
 							</VStack>
 						</Box>
