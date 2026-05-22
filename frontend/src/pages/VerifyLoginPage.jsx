@@ -2,15 +2,16 @@ import { useEffect, useState, useRef } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import {
     Box,
-    Container,
-    VStack,
-    Heading,
-    Text,
-    Spinner,
-    Icon,
-    Flex,
     Button,
     Center,
+    Container,
+    Flex,
+    Heading,
+    HStack,
+    Icon,
+    Spinner,
+    Text,
+    VStack,
     CircularProgress,
     CircularProgressLabel,
 } from "@chakra-ui/react";
@@ -19,12 +20,14 @@ import { toast } from 'sonner';
 import API from "../services/api";
 import { useUser } from "../context/UserContext";
 
+const RED = "#E10600";
+const DARK = "#111111";
+
 export default function VerifyLoginPage() {
     const { setUser } = useUser();
     const [searchParams] = useSearchParams();
     const navigate = useNavigate();
-    const [status, setStatus] = useState('idle');
-    // idle | verifying | success | error
+    const [status, setStatus] = useState('idle'); // idle | verifying | success | error
     const [errorMessage, setErrorMessage] = useState('');
     const [progress, setProgress] = useState(0);
     const hasVerified = useRef(false);
@@ -42,7 +45,6 @@ export default function VerifyLoginPage() {
 
         setStatus('verifying');
 
-        // Simulate progress for better UX
         const interval = setInterval(() => {
             setProgress(prev => {
                 if (prev >= 90) return 90;
@@ -66,19 +68,12 @@ export default function VerifyLoginPage() {
                     navigate("/dashboard");
                 }, 2000);
 
-            }
-            catch (error) {
+            } catch (error) {
                 clearInterval(interval);
 
                 const msg =
                     error.response?.data?.message ||
                     "Verification failed. Please try again.";
-
-                if (msg.includes("expired") || msg.includes("Invalid")) {
-                    setStatus("idle");
-                } else {
-                    setStatus("error");
-                }
 
                 setErrorMessage(msg);
                 toast.error(msg);
@@ -93,64 +88,18 @@ export default function VerifyLoginPage() {
     // Verifying State
     if (status === 'verifying') {
         return (
-            <Center minH="100vh" bgGradient="linear(to-br, blue.50, purple.50)" position="relative" overflow="hidden">
-                {/* Animated Background using sx prop */}
-                <Box
-                    position="absolute"
-                    w="300px"
-                    h="300px"
-                    borderRadius="full"
-                    bg="blue.200"
-                    opacity="0.3"
-                    top="-100px"
-                    left="-100px"
-                    sx={{
-                        animation: 'pulse 3s ease-in-out infinite',
-                        '@keyframes pulse': {
-                            '0%': { opacity: 0.6, transform: 'scale(1)' },
-                            '50%': { opacity: 1, transform: 'scale(1.05)' },
-                            '100%': { opacity: 0.6, transform: 'scale(1)' },
-                        }
-                    }}
-                />
-                <Box
-                    position="absolute"
-                    w="400px"
-                    h="400px"
-                    borderRadius="full"
-                    bg="purple.200"
-                    opacity="0.3"
-                    bottom="-150px"
-                    right="-150px"
-                    sx={{
-                        animation: 'pulse 4s ease-in-out infinite',
-                        '@keyframes pulse': {
-                            '0%': { opacity: 0.6, transform: 'scale(1)' },
-                            '50%': { opacity: 1, transform: 'scale(1.05)' },
-                            '100%': { opacity: 0.6, transform: 'scale(1)' },
-                        }
-                    }}
-                />
-
+            <Center minH="100vh" bg="#f7f7f7">
                 <Container maxW="md">
                     <Box
                         bg="white"
                         borderRadius="2xl"
-                        boxShadow="2xl"
-                        p={8}
+                        boxShadow="xl"
+                        p={10}
                         textAlign="center"
-                        sx={{
-                            animation: 'fadeInUp 0.5s ease-out',
-                            '@keyframes fadeInUp': {
-                                from: { opacity: 0, transform: 'translateY(20px)' },
-                                to: { opacity: 1, transform: 'translateY(0)' },
-                            }
-                        }}
                     >
                         <VStack spacing={6}>
-                            {/* Lock Icon with Spinner Overlay */}
                             <Box position="relative" display="inline-block">
-                                <Icon as={LockIcon} w={16} h={16} color="blue.500" />
+                                <Icon as={LockIcon} w={16} h={16} color={RED} />
                                 <Box
                                     position="absolute"
                                     top="-8px"
@@ -158,9 +107,9 @@ export default function VerifyLoginPage() {
                                     bottom="-8px"
                                     left="-8px"
                                     borderRadius="full"
-                                    border="2px solid"
-                                    borderColor="blue.200"
-                                    borderTopColor="blue.500"
+                                    border="3px solid"
+                                    borderColor="gray.100"
+                                    borderTopColor={RED}
                                     sx={{
                                         animation: 'spin 1s linear infinite',
                                         '@keyframes spin': {
@@ -171,7 +120,7 @@ export default function VerifyLoginPage() {
                                 />
                             </Box>
 
-                            <Heading size="lg" color="gray.800">
+                            <Heading size="lg" color={DARK}>
                                 Verifying Login
                             </Heading>
 
@@ -179,25 +128,23 @@ export default function VerifyLoginPage() {
                                 Please wait while we verify your credentials...
                             </Text>
 
-                            {/* Progress Indicator */}
-                            <Box w="100%">
-                                <CircularProgress value={progress} size="60px" thickness="8px" color="blue.500">
-                                    <CircularProgressLabel>{progress}%</CircularProgressLabel>
-                                </CircularProgress>
-                            </Box>
+                            <CircularProgress value={progress} size="70px" thickness="8px" color={RED}>
+                                <CircularProgressLabel fontWeight="700" color={DARK}>
+                                    {progress}%
+                                </CircularProgressLabel>
+                            </CircularProgress>
 
-                            {/* Loading Bar */}
-                            <Box w="100%" h="2px" bg="gray.100" borderRadius="full" overflow="hidden">
+                            <Box w="100%" h="3px" bg="gray.100" borderRadius="full" overflow="hidden">
                                 <Box
                                     w={`${progress}%`}
                                     h="100%"
-                                    bgGradient="linear(to-r, blue.400, purple.500)"
+                                    bg={RED}
                                     borderRadius="full"
                                     transition="width 0.3s ease"
                                 />
                             </Box>
 
-                            <Text fontSize="sm" color="gray.400">
+                            <Text fontSize="sm" color="gray.500">
                                 This will only take a moment
                             </Text>
                         </VStack>
@@ -210,40 +157,21 @@ export default function VerifyLoginPage() {
     // Success State
     if (status === 'success') {
         return (
-            <Center minH="100vh" bgGradient="linear(to-br, green.50, teal.50)">
+            <Center minH="100vh" bg="#f7f7f7">
                 <Container maxW="md">
                     <Box
                         bg="white"
                         borderRadius="2xl"
-                        boxShadow="2xl"
-                        p={8}
+                        boxShadow="xl"
+                        p={10}
                         textAlign="center"
-                        sx={{
-                            animation: 'fadeInUp 0.5s ease-out',
-                            '@keyframes fadeInUp': {
-                                from: { opacity: 0, transform: 'translateY(20px)' },
-                                to: { opacity: 1, transform: 'translateY(0)' },
-                            }
-                        }}
                     >
                         <VStack spacing={5}>
-                            <Box
-                                bg="green.100"
-                                borderRadius="full"
-                                p={3}
-                                sx={{
-                                    animation: 'pulse 1s ease-in-out infinite',
-                                    '@keyframes pulse': {
-                                        '0%': { transform: 'scale(1)' },
-                                        '50%': { transform: 'scale(1.1)' },
-                                        '100%': { transform: 'scale(1)' },
-                                    }
-                                }}
-                            >
-                                <Icon as={CheckCircleIcon} w={16} h={16} color="green.500" />
+                            <Box bg="red.50" borderRadius="full" p={4}>
+                                <Icon as={CheckCircleIcon} w={16} h={16} color={RED} />
                             </Box>
 
-                            <Heading size="lg" color="gray.800">
+                            <Heading size="lg" color={DARK}>
                                 Login Successful!
                             </Heading>
 
@@ -252,7 +180,7 @@ export default function VerifyLoginPage() {
                             </Text>
 
                             <Flex gap={2} align="center" justify="center">
-                                <Spinner size="sm" color="green.500" thickness="3px" />
+                                <Spinner size="sm" color={RED} thickness="3px" />
                                 <Text fontSize="sm" color="gray.500">
                                     Redirecting in 2 seconds
                                 </Text>
@@ -260,11 +188,13 @@ export default function VerifyLoginPage() {
 
                             <Button
                                 onClick={() => navigate("/dashboard")}
-                                colorScheme="green"
-                                variant="ghost"
-                                size="sm"
+                                bg={RED}
+                                color="white"
+                                w="full"
+                                h="48px"
+                                _hover={{ bg: "#c40000" }}
                             >
-                                Go now
+                                Go to Dashboard Now
                             </Button>
                         </VStack>
                     </Box>
@@ -273,80 +203,62 @@ export default function VerifyLoginPage() {
         );
     }
 
-    // Error State - Updated to prompt Gmail check
+    // Error / Verification Required State
     return (
-        <Center minH="100vh" bgGradient="linear(to-br, yellow.50, orange.50)">
+        <Center minH="100vh" bg="#f7f7f7">
             <Container maxW="md">
                 <Box
                     bg="white"
                     borderRadius="2xl"
-                    boxShadow="2xl"
-                    p={8}
-                    sx={{
-                        animation: 'fadeInUp 0.5s ease-out',
-                        '@keyframes fadeInUp': {
-                            from: { opacity: 0, transform: 'translateY(20px)' },
-                            to: { opacity: 1, transform: 'translateY(0)' },
-                        }
-                    }}
+                    boxShadow="xl"
+                    p={10}
                 >
-                    <VStack spacing={5}>
-                        <Box bg="blue.100" borderRadius="full" p={3}>
-                            <Icon as={EmailIcon} w={16} h={16} color="blue.500" />
+                    <VStack spacing={6} textAlign="center">
+                        <Box bg="red.50" borderRadius="full" p={4}>
+                            <Icon as={EmailIcon} w={16} h={16} color={RED} />
                         </Box>
 
-                        <Heading size="lg" color="gray.800">
-                            Verification Required
+                        <Heading size="lg" color={DARK}>
+                            Verify Your Email
                         </Heading>
 
                         <Box
-                            bg="blue.50"
-                            p={5}
-                            borderRadius="lg"
-                            textAlign="center"
+                            bg="red.50"
+                            p={6}
+                            borderRadius="xl"
+                            border="1px solid"
+                            borderColor="red.100"
                             w="100%"
                         >
-                            <VStack spacing={3}>
-                                <Text color="blue.800" fontSize="md" fontWeight="semibold">
-                                    Please check your Gmail account
+                            <VStack spacing={3} align="stretch">
+                                <Text color="gray.700" fontSize="md" fontWeight="500">
+                                    We've sent a verification link to your email.
                                 </Text>
                                 <Text color="gray.600" fontSize="sm">
-                                    We've sent a verification link to your email address.
-                                    Please click the link in the email to complete your login.
+                                    Please check your inbox (and spam folder) and click the link to complete login.
                                 </Text>
-                                <Flex gap={2} mt={2}>
-                                    <Button
-                                        size="xs"
-                                        colorScheme="blue"
-                                        variant="link"
-                                        onClick={() => window.open('https://gmail.com', '_blank')}
-                                    >
-                                        Open Gmail
-                                    </Button>
-                                    {/* <Text color="gray.400">•</Text> */}
-                                    {/* <Button
-                                        size="xs"
-                                        colorScheme="blue"
-                                        variant="link"
-                                        onClick={() => window.location.reload()}
-                                    >
-                                        Resend Email
-                                    </Button> */}
-                                </Flex>
                             </VStack>
                         </Box>
 
-                        <Text fontSize="sm" color="gray.500" textAlign="center">
-                            Didn't receive the email? Check your spam folder"
-                        </Text>
+                        <Button
+                            onClick={() => window.open("https://gmail.com", "_blank")}
+                            bg={RED}
+                            color="white"
+                            w="full"
+                            h="48px"
+                            leftIcon={<EmailIcon />}
+                            _hover={{ bg: "#c40000" }}
+                        >
+                            Open Gmail
+                        </Button>
 
-                        <Flex gap={4} pt={4} w="100%">
+                        <HStack spacing={4} w="full">
                             <Button
                                 onClick={() => navigate("/login")}
-                                colorScheme="blue"
+                                variant="ghost"
+                                colorScheme="gray"
                                 flex={1}
-                                _hover={{ transform: "translateY(-2px)" }}
-                                transition="all 0.2s"
+                                h="44px"
                             >
                                 Back to Login
                             </Button>
@@ -354,14 +266,14 @@ export default function VerifyLoginPage() {
                             <Button
                                 onClick={() => window.location.reload()}
                                 variant="outline"
-                                colorScheme="blue"
+                                borderColor={RED}
+                                color={RED}
                                 flex={1}
-                                _hover={{ transform: "translateY(-2px)" }}
-                                transition="all 0.2s"
+                                h="44px"
                             >
                                 Try Again
                             </Button>
-                        </Flex>
+                        </HStack>
                     </VStack>
                 </Box>
             </Container>
