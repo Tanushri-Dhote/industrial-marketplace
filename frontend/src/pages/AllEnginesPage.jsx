@@ -46,35 +46,44 @@ export default function AllEnginesPage({ category }) {
     const location = useLocation();
     const searchParams = new URLSearchParams(location.search);
 
-    const reg = searchParams.get("reg") || "";
-    const code = searchParams.get("code") || "";
+    const search = searchParams.get("search") || "";
+    const brand = searchParams.get("brand") || "";
     const accentColor = "#D90404";
 
     const { data: engines = [], isLoading: loading } = useQuery({
-        queryKey: ["all-products", { category, reg, code }],
+        queryKey: ["all-products", { category, search, brand }],
         queryFn: async () => {
             const res = await API.get("/products");
             const products = res.data.data || res.data || [];
 
             let filtered = [...products];
 
-            // Dynamic Search Filter
-            const searchValue = reg || code;
+            // Search by model / make / engine code / reg
+            if (search) {
+                const query = search.toLowerCase();
 
-            if (searchValue) {
-                const query = searchValue.toLowerCase();
                 filtered = filtered.filter((p) => {
-                    const matchesName = p.name?.toLowerCase().includes(query);
-                    const matchesMake = p.make?.toLowerCase().includes(query);
-                    const matchesModel = p.model?.toLowerCase().includes(query);
-                    const matchesEngineCode = p.engineCode?.toLowerCase().includes(query);
-                    const matchesReg = p.registrationNumber?.toLowerCase().includes(query);
-
-                    return matchesName || matchesMake || matchesModel || matchesEngineCode || matchesReg;
+                    return (
+                        p.name?.toLowerCase().includes(query) ||
+                        p.make?.toLowerCase().includes(query) ||
+                        p.model?.toLowerCase().includes(query) ||
+                        p.engineCode?.toLowerCase().includes(query) ||
+                        p.registrationNumber?.toLowerCase().includes(query)
+                    );
                 });
             }
 
-            // Filter by category
+            // Brand filter
+            if (brand) {
+                filtered = filtered.filter(
+                    (p) =>
+                        p.brand?.slug === brand ||   // if brand object
+                        p.brand === brand ||         // if string
+                        p.make?.toLowerCase() === brand.toLowerCase()
+                );
+            }
+
+            // Category filter
             if (category && category !== "Industrial Engines") {
                 filtered = filtered.filter(
                     (p) =>
