@@ -4,7 +4,6 @@ import {
 	Container,
 	Heading,
 	Text,
-	Grid,
 	VStack,
 	HStack,
 	Button,
@@ -17,7 +16,6 @@ import {
 	Icon,
 	Divider,
 	SimpleGrid,
-	useToast,
 } from "@chakra-ui/react";
 import {
 	CheckCircleIcon,
@@ -28,29 +26,13 @@ import {
 } from "@chakra-ui/icons";
 import { MapPin, Settings, Package, User, MessageSquare, Truck, ShieldCheck } from "lucide-react";
 import { useLocation, useNavigate } from "react-router-dom";
-
 import { motion, AnimatePresence } from "framer-motion";
+import { toast } from "sonner";
 
-
-const DARK = "#0F172A";
-const RED = "#D90404";
+const RED = "#E10600";
+const DARK = "#111111";
 
 const MotionBox = motion(Box);
-const MotionVStack = motion(VStack);
-const MotionSimpleGrid = motion(SimpleGrid);
-
-const fadeInUp = {
-	initial: { opacity: 0, y: 20 },
-	animate: { opacity: 1, y: 0, transition: { duration: 0.5 } },
-};
-
-const staggerContainer = {
-	animate: {
-		transition: {
-			staggerChildren: 0.1,
-		},
-	},
-};
 
 export default function CallSellerPage({ isModal = false, onCloseModal }) {
 	const [step, setStep] = useState(1);
@@ -58,9 +40,7 @@ export default function CallSellerPage({ isModal = false, onCloseModal }) {
 	const [fittingOptions, setFittingOptions] = useState([]);
 	const location = useLocation();
 	const navigate = useNavigate();
-	const toast = useToast();
 
-	// Ensure location.state is an object
 	let locState = location.state;
 	if (typeof locState !== "object" || locState === null) {
 		locState = { vrm: locState };
@@ -76,19 +56,6 @@ export default function CallSellerPage({ isModal = false, onCloseModal }) {
 	const [manualVrm, setManualVrm] = useState(toText(vrm));
 	const finalVehicleVrm = (manualVrm || "").trim() || safeVrm || "";
 
-	useEffect(() => {
-		if (!location.state && !isModal) {
-			toast({
-				title: "Start from the quote form",
-				description: "Please begin on the homepage so we can capture your vehicle details.",
-				status: "warning",
-				position: "top-right",
-				duration: 3000,
-			});
-			navigate("/", { replace: true });
-		}
-	}, [location.state, navigate, toast, isModal]);
-
 	const [form, setForm] = useState({
 		postcode: "",
 		notes: "",
@@ -97,35 +64,33 @@ export default function CallSellerPage({ isModal = false, onCloseModal }) {
 		phone: "+44 ",
 	});
 
+	useEffect(() => {
+		if (!location.state && !isModal) {
+			toast.error("Please start from the homepage to capture vehicle details.");
+			navigate("/", { replace: true });
+		}
+	}, [location.state, navigate, isModal]);
+
 	const handleEngineSelect = (value) => {
 		setEngineOptions((prev) =>
-			prev.includes(value) ? prev.filter((item) => item !== value) : [...prev, value],
+			prev.includes(value) ? prev.filter((item) => item !== value) : [...prev, value]
 		);
 	};
 
 	const handleFittingSelect = (value) => {
 		setFittingOptions((prev) =>
-			prev.includes(value) ? prev.filter((item) => item !== value) : [...prev, value],
+			prev.includes(value) ? prev.filter((item) => item !== value) : [...prev, value]
 		);
 	};
 
 	const handleNext = () => {
 		if (!finalVehicleVrm.trim() && !brand) {
-			return toast({
-				title: "Enter registration number",
-				status: "warning",
-			});
+			return toast.error("Please enter registration number");
 		}
 		if (step === 1) {
-			if (engineOptions.length === 0)
-				return toast({ title: "Please select a condition", status: "warning" });
-			if (fittingOptions.length === 0)
-				return toast({ title: "Please select a fitting option", status: "warning" });
-			if (!form.postcode) return toast({ title: "Postcode is required", status: "warning" });
-			const ukPostcodeRegex = /^[A-Z]{1,2}[0-9][A-Z0-9]? ?[0-9][A-Z]{2}$/i;
-			if (!ukPostcodeRegex.test(form.postcode)) {
-				return toast({ title: "Invalid UK postcode", status: "warning" });
-			}
+			if (engineOptions.length === 0) return toast.error("Please select condition");
+			if (fittingOptions.length === 0) return toast.error("Please select fitting option");
+			if (!form.postcode) return toast.error("Postcode is required");
 		}
 		setStep(step + 1);
 		window.scrollTo(0, 0);
@@ -136,19 +101,12 @@ export default function CallSellerPage({ isModal = false, onCloseModal }) {
 		window.scrollTo(0, 0);
 	};
 
-	const API_URL = import.meta.env.VITE_API_URL;
-
 	const handleGetQuote = async () => {
 		if (!finalVehicleVrm && !brand) {
-			toast({
-				title: "Enter registration number",
-				status: "warning",
-				position: "top-right",
-			});
-			return;
+			return toast.error("Enter registration number");
 		}
-
 		try {
+			const API_URL = import.meta.env.VITE_API_URL;
 			const res = await fetch(`${API_URL}/validate-vrm`, {
 				method: "POST",
 				headers: { "Content-Type": "application/json" },
@@ -166,403 +124,323 @@ export default function CallSellerPage({ isModal = false, onCloseModal }) {
 			});
 
 			const data = await res.json();
-			if (!res.ok || !data.success) throw new Error(data.message || "Something went wrong");
+			if (!res.ok || !data.success) throw new Error(data.message || "Failed to submit");
+
 			setStep(3);
+			toast.success("Quote request submitted successfully!");
 		} catch (err) {
-			toast({ title: "Error", description: err.message, status: "error" });
+			toast.error(err.message || "Something went wrong");
 		}
 	};
 
-	function VehicleSummary({
-		hasVehicle,
-		safeVrm,
-		safeBrand,
-		safeModel,
-		safeYear,
-		manualVrm,
-		setManualVrm,
-	}) {
-		return (
-			<MotionBox
-				bg="white"
-				borderRadius="2xl"
-				p={6}
-				mb={8}
-				border="1px solid"
-				borderColor="gray.200"
-				boxShadow="sm"
-				variants={fadeInUp}
-			>
-				<HStack spacing={4} align="start">
-					<Box bg={DARK} color="white" p={3} borderRadius="xl">
-						<Settings size={24} />
-					</Box>
-
-					<VStack align="flex-start" spacing={3} flex="1">
-						<Text
-							fontSize="xs"
-							fontWeight="800"
-							color="gray.400"
-							textTransform="uppercase"
-							letterSpacing="wider"
-						>
-							Vehicle Selected
-						</Text>
-
-						{hasVehicle ? (
-							<Heading size="md" color={DARK}>
-								{safeVrm || `${safeBrand} ${safeModel} ${safeYear}`}
-							</Heading>
-						) : (
-							<Input
-								placeholder="Enter Registration Number"
-								value={manualVrm}
-								onChange={(e) => setManualVrm(e.target.value.toUpperCase().replace(/\s+/g, ""))}
-								maxW="320px"
-								bg="gray.50"
-								borderColor="gray.300"
-								_focus={{
-									borderColor: RED,
-									boxShadow: `0 0 0 1px ${RED}`,
-								}}
-							/>
-						)}
-					</VStack>
-				</HStack>
-			</MotionBox>
-		);
-	}
-	const Progress = () => (
-		<HStack w="full" spacing={2} mb={8}>
+	const ProgressBar = () => (
+		<HStack w="full" spacing={4} mb={10}>
 			{[1, 2, 3].map((i) => (
 				<Box
 					key={i}
 					flex={1}
-					h="6px"
-					bg={step >= i ? RED : "gray.200"}
+					h="8px"
+					bg={step >= i ? RED : "#E5E7EB"}
 					borderRadius="full"
-					transition="all 0.5s ease-in-out"
 				/>
 			))}
 		</HStack>
 	);
 
 	return (
-		<Box bg="#F8FAFC" minH={isModal ? "auto" : "100vh"} py={{ base: 6, md: 12 }}>
+		<Box bg="#f7f7f7" minH={isModal ? "auto" : "100vh"} py={{ base: 8, md: 16 }}>
 			<Container maxW="container.md">
-				<Progress />
+				<ProgressBar />
 
 				<AnimatePresence mode="wait">
+					{/* STEP 1 */}
 					{step === 1 && (
 						<MotionBox
 							key="step1"
-							initial={{ opacity: 0, x: -20 }}
-							animate={{ opacity: 1, x: 0 }}
-							exit={{ opacity: 0, x: 20 }}
-							transition={{ duration: 0.3 }}
+							initial={{ opacity: 0, y: 40 }}
+							animate={{ opacity: 1, y: 0 }}
+							exit={{ opacity: 0, y: -40 }}
 						>
-							<VehicleSummary
-								hasVehicle={hasVehicle}
-								safeVrm={safeVrm}
-								safeBrand={safeBrand}
-								safeModel={safeModel}
-								safeYear={safeYear}
-								manualVrm={manualVrm}
-								setManualVrm={setManualVrm}
-							/>
-							<VStack spacing={8} align="stretch">
+							{/* Vehicle Info */}
+							<Box bg="white" borderRadius="3xl" p={8} mb={10} boxShadow="lg">
+								<HStack spacing={5}>
+									<Box bg={RED} color="white" p={5} borderRadius="2xl">
+										<Settings size={32} />
+									</Box>
+									<VStack align="start" spacing={1}>
+										<Text fontSize="sm" fontWeight="700" color="gray.500" textTransform="uppercase" letterSpacing="1px">
+											YOUR VEHICLE
+										</Text>
+										<Heading size="lg" color={DARK}>
+											{hasVehicle ? (safeVrm || `${safeBrand} ${safeModel} ${safeYear}`) : "Enter Registration"}
+										</Heading>
+									</VStack>
+								</HStack>
+
+								{!hasVehicle && (
+									<Input
+										mt={6}
+										size="lg"
+										placeholder="Enter Registration Number (e.g. AB12CDE)"
+										value={manualVrm}
+										onChange={(e) => setManualVrm(e.target.value.toUpperCase().replace(/\s+/g, ""))}
+										borderRadius="xl"
+										_focus={{ borderColor: RED }}
+									/>
+								)}
+							</Box>
+
+							<VStack spacing={10} align="stretch">
 								<Box>
-									<Heading size="lg" mb={2} color={DARK}>
-										1. Request Details
-									</Heading>
-									<Text color="gray.500">Tailor your request to get the most accurate quotes.</Text>
+									<Heading size="xl" mb={2} color={DARK}>Tell Us What You Need</Heading>
+									<Text color="gray.600">Select your preferences to get accurate quotes</Text>
 								</Box>
 
+								{/* Condition Selection */}
 								<Box>
-									<Text fontWeight="800" mb={4} fontSize="sm" color="gray.600" textTransform="uppercase">
-										What condition do you need?
+									<Text fontWeight="700" mb={5} color="gray.700">
+										Preferred Condition
 									</Text>
-									<MotionSimpleGrid columns={{ base: 1, sm: 2 }} gap={4} variants={staggerContainer} initial="initial" animate="animate">
+
+									<SimpleGrid
+										columns={{ base: 1, md: 2 }}
+										gap={5}
+									>
 										{[
-											{ title: "Reconditioned/Rebuild", desc: "Premium quality", icon: ShieldCheck },
-											{ title: "Used (low mileage)", desc: "Best value", icon: Package },
-											{ title: "New", desc: "Manufacturer standard", icon: CheckCircleIcon },
-											{ title: "Will consider all", desc: "Show me all options", icon: MessageSquare },
+											{
+												title: "Reconditioned/Rebuild",
+												desc: "Premium quality",
+												icon: ShieldCheck,
+											},
+											{
+												title: "Used (low mileage)",
+												desc: "Best value",
+												icon: Package,
+											},
+											{
+												title: "New",
+												desc: "Factory standard",
+												icon: CheckCircleIcon,
+											},
+											{
+												title: "Will consider all",
+												desc: "Flexible",
+												icon: MessageSquare,
+											},
 										].map((item) => {
 											const isSelected = engineOptions.includes(item.title);
+
 											return (
-												<MotionBox
+												<Box
 													key={item.title}
-													p={4}
+													p={6}
 													bg="white"
-													borderRadius="xl"
-													cursor="pointer"
+													borderRadius="2xl"
 													border="2px solid"
-													borderColor={isSelected ? RED : "white"}
-													boxShadow="sm"
+													borderColor={isSelected ? RED : "gray.100"}
+													cursor="pointer"
 													onClick={() => handleEngineSelect(item.title)}
-													whileHover={{ y: -2, boxShadow: "md" }}
-													whileTap={{ scale: 0.98 }}
-													variants={fadeInUp}
+													transition="all 0.2s ease"
+													_hover={{
+														borderColor: RED,
+														transform: "translateY(-4px)",
+													}}
 												>
-													<HStack spacing={3}>
-														<Box color={isSelected ? RED : "gray.400"}>
-															<Icon as={item.icon} boxSize={5} />
-														</Box>
-														<VStack align="flex-start" spacing={0}>
-															<Text fontWeight="700" fontSize="14px">{item.title}</Text>
-															<Text fontSize="12px" color="gray.500">{item.desc}</Text>
+													<HStack spacing={4}>
+														<Icon
+															as={item.icon}
+															color={isSelected ? RED : "gray.400"}
+															boxSize={7}
+														/>
+
+														<VStack align="start" spacing={0.5}>
+															<Text fontWeight="700" fontSize="15px">
+																{item.title}
+															</Text>
+
+															<Text fontSize="sm" color="gray.500">
+																{item.desc}
+															</Text>
 														</VStack>
 													</HStack>
-												</MotionBox>
+												</Box>
 											);
 										})}
-									</MotionSimpleGrid>
+									</SimpleGrid>
 								</Box>
 
+								{/* Fitting Options */}
 								<Box>
-									<Text fontWeight="800" mb={4} fontSize="sm" color="gray.600" textTransform="uppercase">
+									<Text fontWeight="700" mb={5} color="gray.700">
 										Supply & Fitting
 									</Text>
-									<MotionSimpleGrid columns={{ base: 1, sm: 3 }} gap={4} variants={staggerContainer} initial="initial" animate="animate">
+
+									<SimpleGrid
+										columns={{ base: 1, md: 3 }}
+										gap={5}
+									>
 										{[
 											{ title: "Supplied & Fitted", icon: Settings },
 											{ title: "Supplied Only", icon: Truck },
 											{ title: "Will consider both", icon: Package },
 										].map((item) => {
 											const isSelected = fittingOptions.includes(item.title);
+
 											return (
-												<MotionBox
+												<Box
 													key={item.title}
-													p={4}
+													p={6}
 													bg="white"
-													borderRadius="xl"
-													cursor="pointer"
+													borderRadius="2xl"
 													border="2px solid"
-													borderColor={isSelected ? RED : "white"}
-													boxShadow="sm"
+													borderColor={isSelected ? RED : "gray.100"}
+													textAlign="center"
+													cursor="pointer"
 													onClick={() => handleFittingSelect(item.title)}
-													whileHover={{ y: -2, boxShadow: "md" }}
-													whileTap={{ scale: 0.98 }}
-													variants={fadeInUp}
+													transition="0.3s ease"
+													_hover={{
+														borderColor: RED,
+														transform: "translateY(-4px)",
+													}}
 												>
-													<VStack spacing={2}>
-														<Box color={isSelected ? RED : "gray.400"}>
-															<Icon as={item.icon} boxSize={5} />
-														</Box>
-														<Text fontWeight="700" fontSize="13px" textAlign="center">{item.title}</Text>
-													</VStack>
-												</MotionBox>
+													<Icon
+														as={item.icon}
+														color={isSelected ? RED : "gray.400"}
+														boxSize={8}
+														mb={3}
+													/>
+
+													<Text fontWeight="700" fontSize="14px">
+														{item.title}
+													</Text>
+												</Box>
 											);
 										})}
-									</MotionSimpleGrid>
+									</SimpleGrid>
 								</Box>
 
-								<MotionBox bg="white" p={6} borderRadius="2xl" boxShadow="sm" variants={fadeInUp}>
-									<Text fontWeight="800" mb={4} fontSize="sm" color="gray.600" textTransform="uppercase">
-										Location & Additional Notes
-									</Text>
-									<VStack spacing={4}>
-										<InputGroup size="lg">
-											<InputLeftElement color="gray.400">
-												<MapPin size={20} />
+								{/* Postcode & Notes */}
+								<Box bg="white" p={8} borderRadius="3xl" boxShadow="sm">
+									<VStack spacing={6}>
+										<InputGroup>
+											<InputLeftElement h="52px" pointerEvents="none">
+												<MapPin color="#E10600" />
 											</InputLeftElement>
 											<Input
-												placeholder="Your Postcode (e.g. SW1A 1AA)"
+												size="lg"
+												placeholder="Your Postcode"
 												borderRadius="xl"
-												bg="gray.50"
-												border="none"
-												_focus={{ bg: "white", boxShadow: "0 0 0 2px " + RED }}
 												value={form.postcode}
 												onChange={(e) => setForm({ ...form, postcode: e.target.value.toUpperCase() })}
 											/>
 										</InputGroup>
+
 										<Textarea
-											placeholder="Any specific requirements or engine codes?"
+											placeholder="Additional requirements or notes..."
+											rows={4}
 											borderRadius="xl"
-											bg="gray.50"
-											border="none"
-											_focus={{ bg: "white", boxShadow: "0 0 0 2px " + RED }}
-											rows={3}
 											value={form.notes}
 											onChange={(e) => setForm({ ...form, notes: e.target.value })}
 										/>
 									</VStack>
-								</MotionBox>
+								</Box>
 
 								<Button
 									size="lg"
 									bg={RED}
 									color="white"
-									h="60px"
+									h="66px"
 									fontSize="18px"
-									fontWeight="800"
-									borderRadius="xl"
+									fontWeight="700"
+									borderRadius="2xl"
 									rightIcon={<ChevronRightIcon />}
 									onClick={handleNext}
-									_hover={{ bg: "#B70303", transform: "scale(1.02)" }}
-									transition="all 0.2s"
 								>
-									Continue
+									Continue to Contact Details
 								</Button>
 							</VStack>
 						</MotionBox>
 					)}
 
+					{/* STEP 2 */}
 					{step === 2 && (
-						<MotionBox
-							key="step2"
-							initial={{ opacity: 0, x: -20 }}
-							animate={{ opacity: 1, x: 0 }}
-							exit={{ opacity: 0, x: 20 }}
-							transition={{ duration: 0.3 }}
-						>
-							<VStack spacing={8} align="stretch">
-								<Box>
-									<Button leftIcon={<ChevronLeftIcon />} variant="ghost" onClick={handleBack} mb={4} color="gray.500">
-										Back
-									</Button>
-									<Heading size="lg" mb={2} color={DARK}>
-										2. Contact Information
-									</Heading>
-									<Text color="gray.500">Suppliers will use these details to send your quotes.</Text>
-								</Box>
+						<MotionBox key="step2" initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }}>
+							<Button leftIcon={<ChevronLeftIcon />} variant="ghost" mb={6} onClick={handleBack}>
+								Back
+							</Button>
 
-								<VStack spacing={4} bg="white" p={8} borderRadius="2xl" boxShadow="md">
-									<InputGroup size="lg">
-										<InputLeftElement color={DARK}>
-											<User size={20} />
-										</InputLeftElement>
-										<Input
-											placeholder="Full Name"
-											borderRadius="xl"
-											value={form.name}
-											onChange={(e) => setForm({ ...form, name: e.target.value })}
-										/>
+							<Heading size="xl" mb={3} color={DARK}>Contact Information</Heading>
+							<Text color="gray.600" mb={8}>We'll use this to connect you with suppliers</Text>
+
+							<Box bg="white" p={10} borderRadius="3xl" boxShadow="lg">
+								<VStack spacing={6}>
+									<InputGroup>
+										<InputLeftElement h="52px"><User color="#E10600" /></InputLeftElement>
+										<Input size="lg" placeholder="Full Name" borderRadius="xl" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
 									</InputGroup>
 
-									<InputGroup size="lg">
-										<InputLeftElement color={DARK}>
-											<EmailIcon />
-										</InputLeftElement>
-										<Input
-											type="email"
-											placeholder="Email Address"
-											borderRadius="xl"
-											value={form.email}
-											onChange={(e) => setForm({ ...form, email: e.target.value })}
-										/>
+									<InputGroup>
+										<InputLeftElement h="52px"><EmailIcon color="#E10600" /></InputLeftElement>
+										<Input size="lg" type="email" placeholder="Email Address" borderRadius="xl" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} />
 									</InputGroup>
 
-									<Box w="full">
-										<InputGroup size="lg">
-											<InputLeftElement color={DARK}>
-												<PhoneIcon />
-											</InputLeftElement>
-											<Input
-												type="tel"
-												placeholder="+44 7700 900000"
-												borderRadius="xl"
-												value={form.phone}
-												onChange={(e) => {
-													let val = e.target.value.replace(/[^\d+]/g, "");
-													if (val.startsWith("0")) val = "+44" + val.substring(1);
-													if (val.length > 0 && !val.startsWith("+")) val = "+44" + val;
-
-													let formatted = val;
-													if (val.startsWith("+44")) {
-														let rest = val.substring(3);
-														if (rest.length > 0) {
-															formatted = "+44 " + rest.substring(0, 4);
-															if (rest.length > 4) {
-																formatted += " " + rest.substring(4, 10);
-															}
-														}
-													}
-													setForm({ ...form, phone: formatted });
-												}}
-											/>
-										</InputGroup>
-										<Text fontSize="10px" color="gray.400" mt={1} ml={1} fontWeight="600">
-											Format: +44 7XXX XXXXXX
-										</Text>
-									</Box>
-
-									<Divider py={4} />
-
-									<Text fontSize="xs" color="gray.500">
-										By clicking below, you agree to our Terms and allow verified suppliers to contact
-										you regarding your request.
-									</Text>
+									<InputGroup>
+										<InputLeftElement h="52px"><PhoneIcon color="#E10600" /></InputLeftElement>
+										<Input size="lg" type="tel" placeholder="+44 7700 900000" borderRadius="xl" value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} />
+									</InputGroup>
 
 									<Button
 										w="full"
 										size="lg"
 										bg={RED}
 										color="white"
-										h="60px"
+										h="66px"
 										fontSize="18px"
-										fontWeight="800"
-										borderRadius="xl"
+										fontWeight="700"
+										borderRadius="2xl"
 										onClick={handleGetQuote}
-										isDisabled={
-											!form.name ||
-											!form.email ||
-											!form.phone ||
-											!/^(?:(?:\+44\s?|0)7\d{3}\s?\d{6}|(?:\+44\s?|0)1\d{2}\s?\d{7}|(?:\+44\s?|0)2\d{1}\s?\d{8})$/.test(
-												form.phone.replace(/\s+/g, ""),
-											)
-										}
-										_hover={{ bg: "#B70303" }}
+										isDisabled={!form.name || !form.email || !form.phone}
 									>
-										Get My Free Quotes
+										Submit Request
 									</Button>
 								</VStack>
-							</VStack>
+							</Box>
 						</MotionBox>
 					)}
 
+					{/* STEP 3 - Success */}
 					{step === 3 && (
-						<MotionBox
-							key="step3"
-							initial={{ opacity: 0, scale: 0.9 }}
-							animate={{ opacity: 1, scale: 1 }}
-							transition={{ duration: 0.5, type: "spring", damping: 12 }}
-						>
-							<VStack spacing={8} textAlign="center" py={10}>
-								<Box bg="green.500" color="white" p={6} borderRadius="full">
-									<CheckCircleIcon boxSize={12} />
-								</Box>
-								<Box>
-									<Heading size="xl" mb={4}>Request Received!</Heading>
-									<Text fontSize="lg" color="gray.600">
-										We've securely shared your request with our network of specialists.
-									</Text>
-								</Box>
+						<MotionBox key="step3" initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} textAlign="center" py={12}>
+							<Box mx="auto" w="120px" h="120px" bg="green.100" borderRadius="full" display="flex" alignItems="center" justifyContent="center" mb={8}>
+								<CheckCircleIcon boxSize={16} color="green.500" />
+							</Box>
 
-								<SimpleGrid columns={{ base: 1, md: 3 }} gap={4} w="full">
-									{[
-										{ title: "Step 1", desc: "Suppliers contact you via phone or email.", icon: "📞" },
-										{ title: "Step 2", desc: "Compare multiple offers and warranties.", icon: "💰" },
-										{ title: "Step 3", desc: "Choose the best deal and save up to 50%.", icon: "✅" },
-									].map((s, i) => (
-										<Box key={i} p={6} bg="white" borderRadius="2xl" boxShadow="sm">
-											<Text fontSize="24px" mb={2}>{s.icon}</Text>
-											<Text fontWeight="700" mb={1}>{s.title}</Text>
-											<Text fontSize="sm" color="gray.500">{s.desc}</Text>
-										</Box>
-									))}
-								</SimpleGrid>
+							<Heading size="2xl" mb={4} color={DARK}>Request Sent Successfully!</Heading>
+							<Text fontSize="lg" color="gray.600" maxW="500px" mx="auto" mb={12}>
+								Our network of specialists has received your request. You should hear back shortly.
+							</Text>
 
-								<Button
-									variant="link"
-									color={DARK}
-									onClick={() => (isModal && onCloseModal ? onCloseModal() : navigate("/"))}
-									textDecoration="underline"
-								>
-									{isModal ? "Close" : "Return to Homepage"}
-								</Button>
-							</VStack>
+							<SimpleGrid columns={{ base: 1, md: 3 }} gap={6} mb={12}>
+								{[
+									{ icon: "📞", title: "Contact", desc: "Suppliers will reach out soon" },
+									{ icon: "💰", title: "Compare", desc: "Multiple quotes to choose from" },
+									{ icon: "✅", title: "Save", desc: "Get the best deal" },
+								].map((item, i) => (
+									<Box key={i} bg="white" p={8} borderRadius="2xl" boxShadow="md">
+										<Text fontSize="42px" mb={4}>{item.icon}</Text>
+										<Text fontWeight="700" mb={2}>{item.title}</Text>
+										<Text color="gray.500">{item.desc}</Text>
+									</Box>
+								))}
+							</SimpleGrid>
+
+							<Button
+								size="lg"
+								onClick={() => isModal && onCloseModal ? onCloseModal() : navigate("/")}
+								colorScheme="gray"
+							>
+								{isModal ? "Close" : "Back to Homepage"}
+							</Button>
 						</MotionBox>
 					)}
 				</AnimatePresence>
