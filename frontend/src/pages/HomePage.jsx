@@ -9,6 +9,7 @@ import VehicleSelectorSection from "./VehicleSelectorSection";
 import BrandModelSelectorSection from "./BrandModelSelectorSection";
 import Areacbar from "./Areabar";
 import TopEnginesSection from "./TopEnginesSection";
+import CuratedListingsSection from "./CuratedListingsSection";
 import FAQSection from "./FAQSection";
 import BuiltToHighestStandard from "./BuiltToHighestStandard";
 import WarrantyBannerSection from "./WarrantyBannerSection";
@@ -26,17 +27,18 @@ export default function HomePage() {
 		"/gearboxes": "Gearboxes",
 	};
 
-	const category = categoryMap[location.pathname] || "Industrial Engines";
+	const category = categoryMap[location.pathname] || "Engines";
 
 	return (
 		<>
 			<HeroSection category={category} />
+			{!searchParams.get("brand") && <BrandModelSelectorSection />}
 			<BuiltToHighestStandard />
 			<TrustBar />
 			<HomeAbout />
 			<EasyStepsSection />
-			{/* <BrandModelSelectorSection /> */}
 			{!searchParams.get("brand") && <TopEnginesSection category={category} />}
+			{!searchParams.get("brand") && <CuratedListingsSection category={category} />}
 			{/* <Areacbar /> */}
 
 			<ReviewsSection />

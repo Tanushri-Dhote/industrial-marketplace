@@ -48,11 +48,16 @@ export default function AllEnginesPage({ category }) {
 
     const search = searchParams.get("search") || "";
     const brand = searchParams.get("brand") || "";
+    const model = searchParams.get("model") || "";
     const accentColor = "#D90404";
 
     const { data: engines = [], isLoading: loading } = useQuery({
-        queryKey: ["all-products", { category, search, brand }],
+        queryKey: ["all-products", { category, search, brand, model }],
         queryFn: async () => {
+            // Fetch brands to resolve slug to name/make mappings
+            const brandsRes = await API.get("/brands");
+            const brands = brandsRes.data?.data || brandsRes.data || [];
+
             const res = await API.get("/products");
             const products = res.data.data || res.data || [];
 
@@ -75,16 +80,45 @@ export default function AllEnginesPage({ category }) {
 
             // Brand filter
             if (brand) {
+                const brandObj = brands.find((b) => b.slug === brand);
+                const possibleMakes = [
+                    brand.toLowerCase(),
+                    brandObj?.name?.toLowerCase(),
+                    brandObj?.productMake?.toLowerCase(),
+                ].filter(Boolean);
+
+                filtered = filtered.filter((p) => {
+                    if (!p.make) return false;
+                    const pm = p.make.toLowerCase();
+                    return (
+                        p.brand?.slug === brand ||
+                        p.brand === brand ||
+                        possibleMakes.some(
+                            (make) =>
+                                pm === make ||
+                                pm.includes(make) ||
+                                make.includes(pm) ||
+                                (pm === "vw" && make === "volkswagen") ||
+                                (pm === "volkswagen" && make === "vw") ||
+                                (pm === "mercedes" && make === "mercedes-benz") ||
+                                (pm === "mercedes-benz" && make === "mercedes")
+                        )
+                    );
+                });
+            }
+
+            // Model filter
+            if (model) {
+                const targetModelSlug = model.toLowerCase().replace(/[\s_-]+/g, "-");
                 filtered = filtered.filter(
                     (p) =>
-                        p.brand?.slug === brand ||   // if brand object
-                        p.brand === brand ||         // if string
-                        p.make?.toLowerCase() === brand.toLowerCase()
+                        p.model?.toLowerCase().replace(/[\s_-]+/g, "-") === targetModelSlug ||
+                        p.model?.toLowerCase() === model.toLowerCase()
                 );
             }
 
             // Category filter
-            if (category && category !== "Industrial Engines") {
+            if (category && category !== "Engines") {
                 filtered = filtered.filter(
                     (p) =>
                         p.category?.name === category ||

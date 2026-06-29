@@ -65,11 +65,11 @@ const HomeAbout = () => {
                             </HStack>
                             <HStack spacing={3}>
                                 <Icon as={FaCheckCircle} color="#E10600" boxSize={5} />
-                                <Text fontWeight="600" color="#333333">12 months warranty on all engines</Text>
+                                <Text fontWeight="600" color="#333333">06 months warranty on all engines</Text>
                             </HStack>
                             <HStack spacing={3}>
                                 <Icon as={FaCheckCircle} color="#E10600" boxSize={5} />
-                                <Text fontWeight="600" color="#333333">Nationwide delivery available</Text>
+                                <Text fontWeight="600" color="#333333">Nationwide collection and delivery available.</Text>
                             </HStack>
                         </VStack>
 

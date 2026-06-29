@@ -49,6 +49,8 @@ export default function HeroSection() {
 	const [regNumber, setRegNumber] = useState("");
 	const [selectedBrand, setSelectedBrand] = useState("");
 	const [brands, setBrands] = useState([]);
+	const [models, setModels] = useState([]);
+	const [selectedModel, setSelectedModel] = useState("");
 	const navigate = useNavigate();
 	const { isOpen, onOpen, onClose } = useDisclosure();
 
@@ -65,6 +67,32 @@ export default function HeroSection() {
 		fetchBrands();
 	}, []);
 
+	useEffect(() => {
+		const fetchModels = async () => {
+			if (!selectedBrand) {
+				setModels([]);
+				setSelectedModel("");
+				return;
+			}
+			try {
+				const brandObj = brands.find((b) => b.slug === selectedBrand);
+				if (brandObj) {
+					const res = await API.get(`/models/${brandObj._id}`);
+					setModels(res.data?.data || res.data || []);
+				} else {
+					setModels([]);
+					setSelectedModel("");
+				}
+			} catch (error) {
+				console.error("Failed to fetch models", error);
+				setModels([]);
+				setSelectedModel("");
+			}
+		};
+
+		fetchModels();
+	}, [selectedBrand, brands]);
+
 	const handleSearch = () => {
 		if (!regNumber && !selectedBrand) return;
 
@@ -72,6 +100,7 @@ export default function HeroSection() {
 
 		if (regNumber) query.append("search", regNumber);
 		if (selectedBrand) query.append("brand", selectedBrand);
+		if (selectedModel) query.append("model", selectedModel);
 
 		navigate(`/all-engines?${query.toString()}`);
 	};
@@ -163,7 +192,7 @@ export default function HeroSection() {
 								<Icon as={FaTools} color={RED} boxSize={5} mt="2px" />
 								<VStack align="start" spacing={0}>
 									<Text fontWeight="700" fontSize="xs">
-										12 Months Warranty
+										06 Months Warranty
 									</Text>
 									<Text fontSize="xs" color="gray.500">
 										For Peace of Mind
@@ -175,10 +204,10 @@ export default function HeroSection() {
 								<Icon as={FaTruck} color={RED} boxSize={5} mt="2px" />
 								<VStack align="start" spacing={0}>
 									<Text fontWeight="700" fontSize="xs">
-										Nationwide Delivery
+										Nationwide collection and delivery available.
 									</Text>
 									<Text fontSize="xs" color="gray.500">
-										Fast &amp; Reliable
+										We can arrange the collection of your vehicle from anywhere in the UK
 									</Text>
 								</VStack>
 							</HStack>
@@ -320,7 +349,10 @@ export default function HeroSection() {
 							<Select
 								placeholder="Select Brand"
 								value={selectedBrand}
-								onChange={(e) => setSelectedBrand(e.target.value)}
+								onChange={(e) => {
+									setSelectedBrand(e.target.value);
+									setSelectedModel("");
+								}}
 								bg="gray.100"
 								h={{ base: "46px", md: "52px", lg: "56px" }}
 								border="none"
@@ -349,6 +381,43 @@ export default function HeroSection() {
 								</Text>
 							</VStack>
 						</Box>
+
+						{/* Model Dropdown */}
+						{selectedBrand && models.length > 0 && (
+							<Box flex="1">
+								<Select
+									placeholder="Select Model"
+									value={selectedModel}
+									onChange={(e) => setSelectedModel(e.target.value)}
+									bg="gray.100"
+									h={{ base: "46px", md: "52px", lg: "56px" }}
+									border="none"
+									fontWeight="600"
+									borderRadius="md"
+									fontSize={{ base: "14px", md: "15px", lg: "16px" }}
+									_placeholder={{
+										color: "gray.600",
+										fontSize: { base: "14px", md: "15px", lg: "16px" },
+										fontWeight: "500",
+									}}
+								>
+									{models.map((model) => (
+										<option key={model._id} value={model.slug}>
+											{model.name}
+										</option>
+									))}
+								</Select>
+
+								<VStack spacing={0} align="flex-start" mt={1}>
+									<Text fontSize="xs" color="gray.500" fontWeight="600">
+										Filter by Model
+									</Text>
+									<Text fontSize="xs" color={RED}>
+										e.g. C-Class
+									</Text>
+								</VStack>
+							</Box>
+						)}
 
 						{/* Search Button */}
 						<Button

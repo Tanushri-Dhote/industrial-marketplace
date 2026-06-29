@@ -47,7 +47,7 @@ const WarrantyBannerSection = () => {
                                     textTransform="uppercase"
                                     letterSpacing="0.05em"
                                 >
-                                    12 MONTHS WARRANTY
+                                    06 MONTHS WARRANTY
                                 </Text>
                                 <Heading
                                     fontSize={{ base: "18px", md: "22px", lg: "28px" }}
@@ -60,7 +60,7 @@ const WarrantyBannerSection = () => {
                                     lineHeight="1.6"
                                     mt={0}
                                 >
-                                    All our engines come with a 12 months warranty for your peace of mind.
+                                    All our engines come with a 06 months warranty for your peace of mind.
                                 </Text>
                             </VStack>
                         </Flex>
@@ -81,7 +81,7 @@ const WarrantyBannerSection = () => {
                             align="stretch"
                             gap={{ base: 0, md: 2 }}
                         >
-                            <FeatureItem icon={FaTruck} title="Nationwide Delivery" />
+                            <FeatureItem icon={FaTruck} title="Nationwide Collection & Delivery" />
                             <Divider />
                             <FeatureItem icon={FaBoxOpen} title="Secure Packaging" />
                             <Divider />

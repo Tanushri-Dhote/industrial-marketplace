@@ -214,23 +214,13 @@ function EngineProductCard({ engine }) {
 
 				<Box h="1px" w="full" bg="gray.100" />
 
-				<Text
-					fontSize={{ base: "26px", md: "28px" }}
-					fontWeight="900"
-					color="gray.900"
-					lineHeight="1"
-					mt={1}
-				>
-					£{Number(engine.price || 0).toLocaleString("en-GB")}
-				</Text>
-
-				<Flex w="full" justify="space-between" align="center" pt={1}>
+				<Flex w="full" justify="space-between" align="center" pt={1} mt="auto">
 					<Text fontSize="10px" color="gray.500" fontWeight="500">
 						Shipping available
 					</Text>
 					<HStack spacing={1} color={accentColor}>
 						<Text fontSize="12px" fontWeight="700">
-							View
+							Get Quote
 						</Text>
 						<FaArrowRight size={10} />
 					</HStack>
@@ -350,9 +340,9 @@ export default function BrandModelSelectorSection() {
 								"Select Your Car Brand"
 							)}
 						</Heading>
-						<Text fontSize={{ base: "sm", md: "md" }} color="gray.600" maxW="600px">
+							<Text fontSize={{ base: "sm", md: "md" }} color="gray.600" maxW="600px">
 							{selectedModel
-								? `Browse available engines and price table for ${selectedBrand?.name} ${selectedModel.name}`
+								? `Browse available engines for ${selectedBrand?.name} ${selectedModel.name}`
 								: showModels && selectedBrand
 									? "Choose a model to find compatible engines"
 									: "Click on your car brand to view all available models"}
@@ -360,7 +350,7 @@ export default function BrandModelSelectorSection() {
 					</VStack>
 
 					<AnimatePresence mode="wait">
-						{/* State 2: Engines & Price Table */}
+						{/* State 2: Engines & Available Catalog */}
 						{selectedModel ? (
 							<MotionVStack
 								key="engines-view"
@@ -389,7 +379,7 @@ export default function BrandModelSelectorSection() {
 
 										<Box>
 											<Heading fontSize="26px" mb={8} color={darkColor} textAlign="center" fontWeight="800">
-												{selectedBrand?.name} {selectedModel.name} Engine Prices
+												Available {selectedBrand?.name} {selectedModel.name} Engines
 											</Heading>
 											<TableContainer
 												bg="white"
@@ -405,7 +395,6 @@ export default function BrandModelSelectorSection() {
 															<Th color="gray.600">Engine Details</Th>
 															<Th color="gray.600">Condition</Th>
 															<Th color="gray.600">Model Fit</Th>
-															<Th color="gray.600" isNumeric>Price</Th>
 															<Th color="gray.600"></Th>
 														</Tr>
 													</Thead>
@@ -419,9 +408,6 @@ export default function BrandModelSelectorSection() {
 																	</Badge>
 																</Td>
 																<Td fontSize="sm">{engine.model}</Td>
-																<Td isNumeric fontWeight="900" fontSize="lg">
-																	£{Number(engine.price || 0).toLocaleString("en-GB")}
-																</Td>
 																<Td isNumeric>
 																	<Button
 																		as={RouterLink}

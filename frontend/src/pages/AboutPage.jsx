@@ -92,13 +92,13 @@ const features = [
   },
   {
     icon: FaShieldAlt,
-    title: "12 Months Warranty",
+    title: "06 Months Warranty",
     text: "All engines come with comprehensive warranty coverage for complete peace of mind and protection.",
   },
   {
     icon: FaTruck,
-    title: "Nationwide Delivery",
-    text: "Fast and secure delivery available across the UK with real-time tracking and insurance.",
+    title: "Nationwide collection and delivery available.",
+    text: "We can arrange the collection of your vehicle from anywhere in the UK",
   },
   {
     icon: FaUsers,
@@ -346,7 +346,7 @@ const AboutPage = () => {
                 {[
                   "Premium quality parts",
                   "Fully tested & certified",
-                  "12 months warranty",
+                  "06 months warranty",
                   "Free technical support",
                 ].map((item, idx) => (
                   <HStack key={idx} spacing={2}>

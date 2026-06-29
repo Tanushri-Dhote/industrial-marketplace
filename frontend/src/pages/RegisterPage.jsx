@@ -165,8 +165,8 @@ export default function RegisterPage() {
         <VStack align="flex-start" spacing={5} mb={8}>
           {[
             { icon: FaShieldAlt, label: "Quality Tested", sub: "100% Inspected" },
-            { icon: FaTools, label: "12 Months Warranty", sub: "For Peace of Mind" },
-            { icon: FaTruck, label: "Nationwide Delivery", sub: "Fast & Reliable" },
+            { icon: FaTools, label: "06 Months Warranty", sub: "For Peace of Mind" },
+            { icon: FaTruck, label: "Nationwide collection and delivery available.", sub: "We can arrange the collection of your vehicle from anywhere in the UK" },
           ].map(({ icon, label, sub }) => (
             <HStack key={label} spacing={4}>
               <Box

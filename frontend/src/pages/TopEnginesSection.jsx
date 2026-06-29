@@ -52,7 +52,7 @@ export default function TopEnginesSection({ category }) {
 
 			let filtered = products;
 
-			if (category && category !== "Industrial Engines") {
+			if (category && category !== "Engines") {
 				filtered = products.filter(
 					(p) =>
 						p.category?.name === category ||

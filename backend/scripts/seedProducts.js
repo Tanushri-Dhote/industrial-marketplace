@@ -75,7 +75,7 @@ const seedData = async () => {
         "Fuel Type": "Diesel",
         "Engine Size": "2.0L",
         "Condition": "Used / Fully Tested",
-        "Warranty": "12 Months",
+        "Warranty": "06 Months",
         "Gearbox": "Manual / DSG Compatible"
       },
       compatibility: [

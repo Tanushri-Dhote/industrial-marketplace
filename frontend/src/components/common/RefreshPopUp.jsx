@@ -119,7 +119,9 @@ const RefreshPopUp = () => {
 		}
 
 		if (!selectedPartType) {
-			setSelectedPartType(defaultPartTypeId || partTypes[0]._id);
+			const enginePart = partTypes.find((type) => type.name?.toLowerCase().includes("engine"));
+			const defaultId = enginePart ? enginePart._id : partTypes[0]._id;
+			setSelectedPartType(defaultPartTypeId || defaultId);
 		}
 	}, [defaultPartTypeId, isOpen, partTypes, selectedPartType]);
 
@@ -206,11 +208,13 @@ const RefreshPopUp = () => {
 							{/* Data */}
 							{!loadingPartTypes &&
 								partTypes.length > 0 &&
-								partTypes.map((type) => (
-									<option key={type._id} value={type._id}>
-										{type.name}
-									</option>
-								))}
+								partTypes
+									.filter((type) => type.name?.toLowerCase().includes("engine"))
+									.map((type) => (
+										<option key={type._id} value={type._id}>
+											{type.name}
+										</option>
+									))}
 						</Select>
 
 						<Box textAlign="center" pt={2}>
@@ -374,8 +378,10 @@ const RefreshPopUp = () => {
 
 	useEffect(() => {
 		if (partTypes.length > 0 && !defaultPartTypeId) {
-			setDefaultPartTypeId(partTypes[0]._id);
-			setSelectedPartType(partTypes[0]._id);
+			const enginePart = partTypes.find((type) => type.name?.toLowerCase().includes("engine"));
+			const defaultId = enginePart ? enginePart._id : partTypes[0]._id;
+			setDefaultPartTypeId(defaultId);
+			setSelectedPartType(defaultId);
 		}
 	}, [partTypes, defaultPartTypeId]);
 

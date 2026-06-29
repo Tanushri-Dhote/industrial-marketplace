@@ -281,8 +281,8 @@ export default function ProductDetailPage() {
 				<Flex wrap="wrap" gap={6} mt={12}>
 					{[
 						{ icon: FaCertificate, text: "Quality Tested & Certified" },
-						{ icon: FaTruck, text: "Nationwide Delivery" },
-						{ icon: FaShieldAlt, text: "12 Months Warranty" },
+						{ icon: FaTruck, text: "Nationwide collection and delivery available." },
+						{ icon: FaShieldAlt, text: "06 Months Warranty" },
 						{ icon: FaCheckCircle, text: "Satisfaction Guaranteed" },
 					].map((item, i) => (
 						<Box key={i} flex="1" minW="240px" bg="white" p={6} borderRadius="2xl" boxShadow="sm">
