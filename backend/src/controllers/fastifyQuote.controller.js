@@ -1,4 +1,48 @@
 const Quote = require("../models/Quote");
+const sendEmail = require("../utils/sendEmail");
+
+const sendQuoteProposalEmail = async (quote) => {
+	if (!quote.customer?.email) return;
+
+	const { refNumber, customer, vehicle, pricing, warranty, condition, mileage, notes } = quote;
+
+	const subject = `Your Engine Quote Proposal - Ref: ${refNumber}`;
+	const text = `Hello ${customer.name},
+
+Here is your detailed quote proposal for your replacement engine request.
+
+Quote Reference: ${refNumber}
+Vehicle Description: ${vehicle?.vehicleDesc || "N/A"}
+VRM: ${vehicle?.vrm || "N/A"}
+Engine Code: ${vehicle?.engineCode || "N/A"}
+Condition: ${condition || "Reconditioned"}
+Warranty: ${warranty || "6 Months"}
+Mileage: ${mileage || "N/A"}
+
+Pricing Details:
+- Engine Price: £${pricing?.engine || 0}
+- Exchange Charge: £${pricing?.exchange || 0}
+- Delivery: £${pricing?.delivery || 0}
+- Recovery: £${pricing?.recovery || 0}
+- Fitting: £${pricing?.fitting || 0}
+- VAT: £${pricing?.vat || 0}
+
+Total Price: £${pricing?.total || 0}
+
+${notes ? `Additional Notes:\n${notes}\n` : ""}
+If you would like to proceed with this quote, please contact our team directly at +44 20 8133 4040.
+
+Best regards,
+The Engines Team
+`;
+
+	try {
+		await sendEmail(customer.email, subject, text);
+		console.log(`Quote email sent successfully to ${customer.email} for ref: ${refNumber}`);
+	} catch (err) {
+		console.error("Failed to send quote proposal email:", err);
+	}
+};
 
 exports.getQuotes = async (request, reply) => {
 	try {
@@ -66,6 +110,10 @@ exports.createQuote = async (request, reply) => {
 			status: payload.status || "Sent",
 		});
 
+		if (quote.status === "Sent") {
+			await sendQuoteProposalEmail(quote);
+		}
+
 		return reply.status(201).send({
 			success: true,
 			message: "Quote created successfully",
@@ -98,6 +146,10 @@ exports.updateQuote = async (request, reply) => {
 			new: true,
 			runValidators: true,
 		});
+
+		if (quote.status === "Sent") {
+			await sendQuoteProposalEmail(quote);
+		}
 
 		return reply.send({ success: true, message: "Quote updated", data: quote });
 	} catch (error) {

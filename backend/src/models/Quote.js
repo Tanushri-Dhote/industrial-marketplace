@@ -9,6 +9,7 @@ const quoteSchema = new mongoose.Schema(
 		},
 		customer: {
 			name: { type: String, required: true, trim: true },
+			email: { type: String, trim: true },
 			phone: { type: String, trim: true },
 			postcode: { type: String, trim: true },
 		},

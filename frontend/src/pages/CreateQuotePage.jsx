@@ -224,7 +224,7 @@ export default function CreateQuotePage() {
 		engineCode: "",
 	});
 
-	const [customer, setCustomer] = useState({ name: "", phone: "+44 ", postcode: "" });
+	const [customer, setCustomer] = useState({ name: "", email: "", phone: "+44 ", postcode: "" });
 
 	const [lines, setLines] = useState({
 		engine: 0,
@@ -263,6 +263,7 @@ export default function CreateQuotePage() {
 			importedRef.current = true;
 			setCustomer({
 				name: s.customer.name || "",
+				email: s.customer.email || "",
 				phone: s.customer.phone || "+44 ",
 				postcode: s.customer.address || "",
 			});
@@ -536,6 +537,7 @@ export default function CreateQuotePage() {
 				refNumber: meta.refNumber,
 				customer: {
 					name: customer.name,
+					email: customer.email,
 					phone: customer.phone,
 					postcode: customer.postcode,
 				},
@@ -934,6 +936,32 @@ export default function CreateQuotePage() {
 									<Text fontSize="10px" color="gray.400" mt={1} ml={1} fontWeight="600">
 										Format: +44 7XXX XXXXXX
 									</Text>
+								</Box>
+								<Box>
+									<Text
+										fontSize="11px"
+										fontWeight="700"
+										color="gray.500"
+										textTransform="uppercase"
+										letterSpacing="0.5px"
+										mb={1.5}
+									>
+										Email Address
+									</Text>
+									<Input
+										value={customer.email || ""}
+										onChange={(e) => setCustomer((p) => ({ ...p, email: e.target.value }))}
+										placeholder="customer@example.com"
+										size="md"
+										borderRadius="xl"
+										borderColor="gray.200"
+										_focus={{
+											borderColor: RED,
+											boxShadow: `0 0 0 3px ${RED}15`,
+											bg: "white"
+										}}
+										fontWeight="600"
+									/>
 								</Box>
 								<Box>
 									<Text
