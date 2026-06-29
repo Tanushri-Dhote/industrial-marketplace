@@ -20,6 +20,7 @@ import {
 	ModalBody,
 	useDisclosure,
 	Select,
+	SimpleGrid,
 } from "@chakra-ui/react";
 import { motion } from "framer-motion";
 import {
@@ -35,10 +36,10 @@ import {
 import { MdLibraryBooks } from "react-icons/md";
 import { Link as RouterLink } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { ChevronRightIcon, CheckCircleIcon } from "@chakra-ui/icons";
 import CallSellerPage from "./CallSellerPage";
 import API from "../services/api";
-import { useEffect } from "react";
 
 const MotionBox = motion(Box);
 
@@ -51,8 +52,27 @@ export default function HeroSection() {
 	const [brands, setBrands] = useState([]);
 	const [models, setModels] = useState([]);
 	const [selectedModel, setSelectedModel] = useState("");
+	const [selectedYear, setSelectedYear] = useState("");
+	const [selectedEngineSize, setSelectedEngineSize] = useState("");
+	const [selectedPart, setSelectedPart] = useState("Engine");
 	const navigate = useNavigate();
 	const { isOpen, onOpen, onClose } = useDisclosure();
+
+	const yearsList = ["2026", "2025", "2024", "2023", "2022", "2021", "2020", "2019", "2018", "2017", "2016", "2015", "2014", "2013", "2012", "2011", "2010", "2009", "2008", "2007", "2006", "2005", "2004", "2003", "2002", "2001", "2000"];
+
+	const engineSizesList = [
+		"1.0L Petrol",
+		"1.2L Petrol",
+		"1.4L Petrol",
+		"1.6L Diesel",
+		"1.6L Petrol",
+		"2.0L Diesel",
+		"2.0L Petrol",
+		"3.0L Diesel",
+		"3.0L Petrol",
+		"Petrol (Other)",
+		"Diesel (Other)"
+	];
 
 	useEffect(() => {
 		const fetchBrands = async () => {
@@ -103,6 +123,35 @@ export default function HeroSection() {
 		if (selectedModel) query.append("model", selectedModel);
 
 		navigate(`/all-engines?${query.toString()}`);
+	};
+
+	const handleGetQuotesSubmit = () => {
+		if (!selectedBrand) {
+			return toast.error("Please select a brand");
+		}
+		if (!selectedModel) {
+			return toast.error("Please select a model");
+		}
+		if (!selectedYear) {
+			return toast.error("Please select a year");
+		}
+		if (!selectedEngineSize) {
+			return toast.error("Please select engine size/type");
+		}
+
+		const brandObj = brands.find((b) => b.slug === selectedBrand);
+		const modelObj = models.find((m) => m.slug === selectedModel);
+
+		navigate("/call-seller", {
+			state: {
+				brand: brandObj ? brandObj.name : selectedBrand,
+				model: modelObj ? modelObj.name : selectedModel,
+				year: selectedYear,
+				type: selectedEngineSize,
+				category: selectedPart,
+				searchType: "manual",
+			},
+		});
 	};
 	return (
 		<Box bg="#f7f7f7" pt={{ base: 8, md: 12 }} pb={0} overflow="hidden">
@@ -270,82 +319,25 @@ export default function HeroSection() {
 					</MotionBox>
 				</Flex>
 
-				{/* ── SEARCH CARD (full-width below hero) ── */}
+				{/* ── MANUAL VEHICLE SELECTOR CARD ── */}
 				<Box
 					bg="white"
 					px={{ base: 5, md: 8 }}
-					py={5}
+					py={8}
 					borderRadius="2xl"
-					boxShadow="md"
+					boxShadow="lg"
+					border="1px solid"
+					borderColor="gray.100"
+					maxW="820px"
+					mx="auto"
 				>
-					<Text
-						color={RED}
-						fontWeight="800"
-						fontSize="sm"
-						mb={0}
-						textTransform="uppercase"
-						letterSpacing="wider"
-					>
-						Find Your Engine
-					</Text>
+					<VStack spacing={6} align="center">
+						<Heading as="h2" fontSize={{ base: "22px", md: "28px" }} color="gray.800" fontWeight="800" textAlign="center">
+							Select Your Vehicle Manually
+						</Heading>
 
-					<Text fontSize="sm" color="gray.500" mb={4}>
-						{/* Search by make, model, reg number or engine code */}
-						Search by make, model or select brand
-
-					</Text>
-
-					<Flex
-						direction={{ base: "column", md: "row" }}
-						align={{ base: "stretch", md: "flex-end" }}
-						gap={3}
-					>
-						{/* Reg Number */}
-						<Box flex="1">
-							<Input
-								placeholder="e.g. VW Golf"
-								value={regNumber}
-								onChange={(e) => setRegNumber(e.target.value)}
-								bg="#FFD400"
-								fontWeight="900"
-								fontSize="2xl"
-								textAlign="center"
-								border="none"
-								h="52px"
-								borderRadius="md"
-								_placeholder={{
-									color: "gray.600",
-									fontSize: "md",
-									fontWeight: "500",
-								}}
-								color="black"
-							/>
-							<VStack spacing={0} align="flex-start" mt={1}>
-								<Text fontSize="xs" color="gray.500" fontWeight="600">
-									Search by Make, Model
-								</Text>
-								<Text fontSize="xs" color={RED}>
-									e.g. VW Golf
-								</Text>
-							</VStack>
-						</Box>
-
-						{/* OR */}
-						<Circle
-							size="44px"
-							bg="gray.100"
-							fontWeight="700"
-							fontSize="xs"
-							color="gray.600"
-							flexShrink={0}
-							mb={{ base: 0, md: "40px" }}
-						>
-							OR
-						</Circle>
-
-
-						{/* Brand Dropdown */}
-						<Box flex="1">
+						<SimpleGrid columns={{ base: 1, md: 2 }} spacing={4} w="full">
+							{/* Brand Select */}
 							<Select
 								placeholder="Select Brand"
 								value={selectedBrand}
@@ -353,17 +345,14 @@ export default function HeroSection() {
 									setSelectedBrand(e.target.value);
 									setSelectedModel("");
 								}}
-								bg="gray.100"
-								h={{ base: "46px", md: "52px", lg: "56px" }}
-								border="none"
+								size="lg"
+								h="52px"
+								bg="white"
+								borderColor="gray.300"
+								borderRadius="xl"
+								_hover={{ borderColor: RED }}
+								_focus={{ borderColor: RED, boxShadow: `0 0 0 3px rgba(225,6,0,0.15)` }}
 								fontWeight="600"
-								borderRadius="md"
-								fontSize={{ base: "14px", md: "15px", lg: "16px" }}
-								_placeholder={{
-									color: "gray.600",
-									fontSize: { base: "14px", md: "15px", lg: "16px" },
-									fontWeight: "500",
-								}}
 							>
 								{brands.map((brand) => (
 									<option key={brand._id} value={brand.slug}>
@@ -372,69 +361,163 @@ export default function HeroSection() {
 								))}
 							</Select>
 
-							<VStack spacing={0} align="flex-start" mt={1}>
-								<Text fontSize="xs" color="gray.500" fontWeight="600">
-									Filter by Brand
-								</Text>
-								<Text fontSize="xs" color={RED}>
-									e.g. Mercedes-Benz
-								</Text>
-							</VStack>
-						</Box>
+							{/* Model Select */}
+							<Select
+								placeholder="Select Model"
+								value={selectedModel}
+								onChange={(e) => setSelectedModel(e.target.value)}
+								isDisabled={!selectedBrand}
+								size="lg"
+								h="52px"
+								bg="white"
+								borderColor="gray.300"
+								borderRadius="xl"
+								_hover={{ borderColor: RED }}
+								_focus={{ borderColor: RED, boxShadow: `0 0 0 3px rgba(225,6,0,0.15)` }}
+								fontWeight="600"
+							>
+								{models.map((model) => (
+									<option key={model._id} value={model.slug}>
+										{model.name}
+									</option>
+								))}
+							</Select>
 
-						{/* Model Dropdown */}
-						{selectedBrand && models.length > 0 && (
-							<Box flex="1">
-								<Select
-									placeholder="Select Model"
-									value={selectedModel}
-									onChange={(e) => setSelectedModel(e.target.value)}
-									bg="gray.100"
-									h={{ base: "46px", md: "52px", lg: "56px" }}
-									border="none"
-									fontWeight="600"
-									borderRadius="md"
-									fontSize={{ base: "14px", md: "15px", lg: "16px" }}
-									_placeholder={{
-										color: "gray.600",
-										fontSize: { base: "14px", md: "15px", lg: "16px" },
-										fontWeight: "500",
-									}}
-								>
-									{models.map((model) => (
-										<option key={model._id} value={model.slug}>
-											{model.name}
-										</option>
-									))}
-								</Select>
+							{/* Year Select */}
+							<Select
+								placeholder="Select Year"
+								value={selectedYear}
+								onChange={(e) => setSelectedYear(e.target.value)}
+								size="lg"
+								h="52px"
+								bg="white"
+								borderColor="gray.300"
+								borderRadius="xl"
+								_hover={{ borderColor: RED }}
+								_focus={{ borderColor: RED, boxShadow: `0 0 0 3px rgba(225,6,0,0.15)` }}
+								fontWeight="600"
+							>
+								{yearsList.map((y) => (
+									<option key={y} value={y}>
+										{y === "2011" ? "2011 11/61 reg" : y}
+									</option>
+								))}
+							</Select>
 
-								<VStack spacing={0} align="flex-start" mt={1}>
-									<Text fontSize="xs" color="gray.500" fontWeight="600">
-										Filter by Model
-									</Text>
-									<Text fontSize="xs" color={RED}>
-										e.g. C-Class
-									</Text>
-								</VStack>
-							</Box>
-						)}
+							{/* Engine Size Select */}
+							<Select
+								placeholder="Select Engine Size/Type"
+								value={selectedEngineSize}
+								onChange={(e) => setSelectedEngineSize(e.target.value)}
+								size="lg"
+								h="52px"
+								bg="white"
+								borderColor="gray.300"
+								borderRadius="xl"
+								_hover={{ borderColor: RED }}
+								_focus={{ borderColor: RED, boxShadow: `0 0 0 3px rgba(225,6,0,0.15)` }}
+								fontWeight="600"
+							>
+								{engineSizesList.map((size) => (
+									<option key={size} value={size}>
+										{size}
+									</option>
+								))}
+							</Select>
 
-						{/* Search Button */}
+							{/* Part Select */}
+							<Select
+								value={selectedPart}
+								onChange={(e) => setSelectedPart(e.target.value)}
+								size="lg"
+								h="52px"
+								bg="white"
+								borderColor="gray.300"
+								borderRadius="xl"
+								_hover={{ borderColor: RED }}
+								_focus={{ borderColor: RED, boxShadow: `0 0 0 3px rgba(225,6,0,0.15)` }}
+								fontWeight="600"
+							>
+								<option value="Engine">Engine</option>
+							</Select>
+						</SimpleGrid>
+
 						<Button
 							bg={RED}
 							color="white"
-							h="52px"
+							borderRadius="full"
+							h="56px"
 							px={10}
-							_hover={{ bg: "#c40000" }}
-							borderRadius="md"
-							flexShrink={0}
-							mb={{ base: 0, md: "40px" }}
-							leftIcon={<FaSearch />}
-							onClick={handleSearch}
+							fontSize="lg"
+							fontWeight="800"
+							_hover={{ bg: "#c40000", transform: "translateY(-2px)" }}
+							_active={{ transform: "translateY(0)" }}
+							transition="all 0.2s"
+							rightIcon={
+								<Circle size="24px" bg="white" color={RED} display="inline-flex" alignItems="center" justifyContent="center">
+									<ChevronRightIcon size={18} />
+								</Circle>
+							}
+							onClick={handleGetQuotesSubmit}
+							mt={4}
+							boxShadow="lg"
 						>
-							Search
+							Get Free Quotes
 						</Button>
-					</Flex>
+
+						{/* Bullet points & badge */}
+						<Flex
+							direction={{ base: "column", sm: "row" }}
+							justify="space-between"
+							align="center"
+							w="full"
+							pt={4}
+							gap={6}
+						>
+							<VStack align="flex-start" spacing={2.5} fontSize="14px" fontWeight="700" color="gray.700">
+								<HStack spacing={2.5}>
+									<Text color="#10B981" fontSize="16px">✓</Text>
+									<Text>Supply and Fitting Offered</Text>
+								</HStack>
+								<HStack spacing={2.5}>
+									<Text color="#10B981" fontSize="16px">✓</Text>
+									<Text>Unlimited Mileage Warranty*</Text>
+								</HStack>
+								<HStack spacing={2.5}>
+									<Text color="#10B981" fontSize="16px">✓</Text>
+									<Text>It Only Takes a Minute</Text>
+								</HStack>
+							</VStack>
+
+							<Box
+								border="3px double #10B981"
+								color="#10B981"
+								borderRadius="full"
+								px={4}
+								py={2}
+								fontWeight="900"
+								fontSize="11px"
+								textTransform="uppercase"
+								transform="rotate(-8deg)"
+								letterSpacing="1px"
+								textAlign="center"
+								lineHeight="1.1"
+								w="100px"
+								h="100px"
+								display="flex"
+								flexDirection="column"
+								alignItems="center"
+								justifyContent="center"
+								boxShadow="0 0 0 3px white, 0 0 0 5px #10B981"
+								mr={{ sm: 4 }}
+								bg="white"
+							>
+								<Text fontSize="8px">GUARANTEED</Text>
+								<Text fontSize="15px" fontWeight="950" my={0.5}>LOWEST</Text>
+								<Text fontSize="9px">PRICES</Text>
+							</Box>
+						</Flex>
+					</VStack>
 				</Box>
 
 

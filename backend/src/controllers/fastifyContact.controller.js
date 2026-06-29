@@ -1,4 +1,5 @@
 const ContactSubmission = require("../models/ContactSubmission");
+const sendEmail = require("../utils/sendEmail");
 
 const buildFilter = (request) => {
 	const filter = {};
@@ -33,6 +34,39 @@ exports.submitContact = async (request, reply) => {
 			ipAddress: request.ip || "",
 			userAgent: request.headers["user-agent"] || "",
 		});
+
+		// Send emails asynchronously
+		try {
+			const adminSubject = `New Contact Submission: ${subject}`;
+			const adminText = `
+You have received a new contact submission:
+
+Name: ${name}
+Email: ${email}
+Subject: ${subject}
+Message:
+${message}
+`;
+			await sendEmail(process.env.EMAIL_USER, adminSubject, adminText);
+
+			const customerSubject = `Thank you for contacting us`;
+			const customerText = `
+Hello ${name},
+
+Thank you for reaching out to us. We have received your message regarding "${subject}" and our team will get back to you as soon as possible.
+
+Here is a copy of your message:
+----------------------------------------
+${message}
+----------------------------------------
+
+Best regards,
+The Engines Team
+`;
+			await sendEmail(email, customerSubject, customerText);
+		} catch (emailErr) {
+			console.error("Failed to send contact emails:", emailErr);
+		}
 
 		return {
 			success: true,

@@ -45,7 +45,9 @@ export default function CallSellerPage({ isModal = false, onCloseModal }) {
 	if (typeof locState !== "object" || locState === null) {
 		locState = { vrm: locState };
 	}
-	const { vrm, category, brand, model, year, type, searchType } = locState || {};
+	const { vrm, category, brand: stateBrand, make, model, year, type, engineType, searchType } = locState || {};
+	const brand = stateBrand || make || "";
+	const actualType = type || engineType || "";
 	const toText = (value) => (value === null || value === undefined ? "" : String(value));
 
 	const safeVrm = toText(vrm).trim();
@@ -115,7 +117,7 @@ export default function CallSellerPage({ isModal = false, onCloseModal }) {
 					brand,
 					model,
 					year,
-					engineType: type,
+					engineType: actualType,
 					category,
 					engineOptions,
 					fittingOptions,
@@ -177,11 +179,11 @@ export default function CallSellerPage({ isModal = false, onCloseModal }) {
 									</VStack>
 								</HStack>
 
-								{!hasVehicle && (
+								{!safeVrm && (
 									<Input
 										mt={6}
 										size="lg"
-										placeholder="Enter Registration Number (e.g. AB12CDE)"
+										placeholder="Enter Registration Number (Optional) (e.g. AB12CDE)"
 										value={manualVrm}
 										onChange={(e) => setManualVrm(e.target.value.toUpperCase().replace(/\s+/g, ""))}
 										borderRadius="xl"
