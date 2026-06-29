@@ -32,6 +32,7 @@ import {
 	InputGroup,
 	InputLeftElement,
 	Textarea,
+	Image,
 } from "@chakra-ui/react";
 import { AddIcon, EditIcon, DeleteIcon, SearchIcon } from "@chakra-ui/icons";
 import { Package } from "lucide-react";
@@ -230,14 +231,27 @@ export default function EnginesModule() {
 							{filteredProducts.map((p) => (
 								<Tr key={p._id} _hover={{ bg: "gray.50/50" }}>
 									<Td>
-										<VStack align="flex-start" spacing={0} maxW="280px">
-											<Text fontWeight="800" color="gray.800" fontSize="14px" isTruncated w="full">
-												{p.name}
-											</Text>
-											<Text fontSize="12px" color="gray.500">
-												ID: {p._id.substring(0, 8)}...
-											</Text>
-										</VStack>
+										<HStack spacing={3} maxW="280px">
+											<Image
+												src={p.images?.[0] || "https://images.unsplash.com/photo-1486006920555-c77dcf18193c?auto=format&fit=crop&w=80&q=80"}
+												alt={p.name}
+												boxSize="40px"
+												borderRadius="lg"
+												objectFit="cover"
+												bg="gray.50"
+												border="1px solid"
+												borderColor="gray.100"
+												fallback={<Center boxSize="40px" bg="gray.100" borderRadius="lg"><Icon as={Package} color="gray.400" /></Center>}
+											/>
+											<VStack align="flex-start" spacing={0} isTruncated w="full">
+												<Text fontWeight="800" color="gray.800" fontSize="14px" isTruncated w="full">
+													{p.name}
+												</Text>
+												<Text fontSize="12px" color="gray.500">
+													ID: {p._id.substring(0, 8)}...
+												</Text>
+											</VStack>
+										</HStack>
 									</Td>
 									<Td>
 										<HStack spacing={2} whiteSpace="nowrap">
@@ -331,6 +345,7 @@ function EngineModal({ isOpen, onClose, onSave, engine }) {
 		year: "",
 		condition: "Used",
 		isSold: false,
+		images: [],
 	});
 
 	useEffect(() => {
@@ -344,6 +359,7 @@ function EngineModal({ isOpen, onClose, onSave, engine }) {
 				year: engine.year || "",
 				condition: engine.condition || "Used",
 				isSold: engine.isSold || false,
+				images: engine.images || [],
 			});
 		} else {
 			setFormData({
@@ -355,6 +371,7 @@ function EngineModal({ isOpen, onClose, onSave, engine }) {
 				year: "",
 				condition: "Used",
 				isSold: false,
+				images: [],
 			});
 		}
 	}, [engine, isOpen]);
@@ -477,6 +494,100 @@ function EngineModal({ isOpen, onClose, onSave, engine }) {
 								</Select>
 							</FormControl>
 						</SimpleGrid>
+
+						<FormControl>
+							<FormLabel
+								fontWeight="700"
+								fontSize="12px"
+								color="gray.500"
+								textTransform="uppercase"
+							>
+								PRODUCT IMAGES
+							</FormLabel>
+							<VStack align="stretch" spacing={4}>
+								{/* Image Preview Grid */}
+								{formData.images && formData.images.length > 0 && (
+									<SimpleGrid columns={4} spacing={3}>
+										{formData.images.map((img, idx) => (
+											<Box
+												key={idx}
+												position="relative"
+												borderRadius="xl"
+												overflow="hidden"
+												border="1px solid"
+												borderColor="gray.200"
+												h="80px"
+											>
+												<Image
+													src={img}
+													alt={`Product Image ${idx + 1}`}
+													w="full"
+													h="full"
+													objectFit="cover"
+												/>
+												<IconButton
+													icon={<DeleteIcon />}
+													size="xs"
+													colorScheme="red"
+													position="absolute"
+													top={1}
+													right={1}
+													borderRadius="full"
+													onClick={() => {
+														const updated = formData.images.filter((_, i) => i !== idx);
+														updateField("images", updated);
+													}}
+													aria-label="Remove Image"
+												/>
+											</Box>
+										))}
+									</SimpleGrid>
+								)}
+								
+								{/* File Upload Zone */}
+								<Box
+									border="2px dashed"
+									borderColor="gray.200"
+									borderRadius="xl"
+									p={4}
+									textAlign="center"
+									cursor="pointer"
+									_hover={{ borderColor: "#D90404", bg: "gray.50" }}
+									onClick={() => document.getElementById("product-image-upload").click()}
+									position="relative"
+								>
+									<VStack spacing={1}>
+										<Text fontSize="14px" fontWeight="600" color="gray.600">
+											Click to upload images
+										</Text>
+										<Text fontSize="11px" color="gray.400">
+											PNG, JPG, JPEG (Base64 saved)
+										</Text>
+									</VStack>
+									<input
+										id="product-image-upload"
+										type="file"
+										multiple
+										accept="image/*"
+										style={{ display: "none" }}
+										onChange={(e) => {
+											const files = Array.from(e.target.files || []);
+											files.forEach((file) => {
+												const reader = new FileReader();
+												reader.onloadend = () => {
+													setFormData((prev) => ({
+														...prev,
+														images: [...(prev.images || []), reader.result]
+													}));
+												};
+												reader.readAsDataURL(file);
+											});
+											e.target.value = ""; // Reset
+										}}
+									/>
+								</Box>
+							</VStack>
+						</FormControl>
 
 						<FormControl>
 							<FormLabel
