@@ -55,6 +55,12 @@ export default function HeroSection() {
 	const [selectedYear, setSelectedYear] = useState("");
 	const [selectedEngineSize, setSelectedEngineSize] = useState("");
 	const [selectedPart, setSelectedPart] = useState("Engine");
+	
+	const [dynamicYears, setDynamicYears] = useState([]);
+	const [dynamicEngines, setDynamicEngines] = useState([]);
+	const [loadingModels, setLoadingModels] = useState(false);
+	const [loadingProducts, setLoadingProducts] = useState(false);
+	
 	const navigate = useNavigate();
 	const { isOpen, onOpen, onClose } = useDisclosure();
 
@@ -92,8 +98,13 @@ export default function HeroSection() {
 			if (!selectedBrand) {
 				setModels([]);
 				setSelectedModel("");
+				setDynamicYears([]);
+				setSelectedYear("");
+				setDynamicEngines([]);
+				setSelectedEngineSize("");
 				return;
 			}
+			setLoadingModels(true);
 			try {
 				const brandObj = brands.find((b) => b.slug === selectedBrand);
 				if (brandObj) {
@@ -101,17 +112,89 @@ export default function HeroSection() {
 					setModels(res.data?.data || res.data || []);
 				} else {
 					setModels([]);
-					setSelectedModel("");
 				}
+				setSelectedModel("");
+				setDynamicYears([]);
+				setSelectedYear("");
+				setDynamicEngines([]);
+				setSelectedEngineSize("");
 			} catch (error) {
 				console.error("Failed to fetch models", error);
 				setModels([]);
 				setSelectedModel("");
+			} finally {
+				setLoadingModels(false);
 			}
 		};
 
 		fetchModels();
 	}, [selectedBrand, brands]);
+
+	useEffect(() => {
+		const fetchModelDetails = async () => {
+			if (!selectedBrand || !selectedModel) {
+				setDynamicYears([]);
+				setSelectedYear("");
+				setDynamicEngines([]);
+				setSelectedEngineSize("");
+				return;
+			}
+			setLoadingProducts(true);
+			try {
+				const brandObj = brands.find((b) => b.slug === selectedBrand);
+				const modelObj = models.find((m) => m.slug === selectedModel);
+				
+				const makeFilter = brandObj ? brandObj.name : selectedBrand;
+				const modelName = modelObj ? modelObj.name : selectedModel;
+				
+				const res = await API.get("/products", {
+					params: { make: makeFilter, model: modelName }
+				});
+				const products = res.data?.data || res.data || [];
+				
+				if (products.length > 0) {
+					const years = [...new Set(products.map(p => p.year).filter(Boolean))]
+						.map(Number)
+						.sort((a, b) => b - a)
+						.map(String);
+						
+					let engines = [];
+					products.forEach(p => {
+						if (p.engineType) engines.push(p.engineType);
+						if (p.specifications) {
+							const specsObj = p.specifications instanceof Map 
+								? Object.fromEntries(p.specifications) 
+								: p.specifications;
+								
+							const size = specsObj["Engine Size"] || specsObj["Engine Size/Type"] || specsObj["engineSize"];
+							if (size) engines.push(size);
+						}
+						if (p.compatibility && Array.isArray(p.compatibility)) {
+							p.compatibility.forEach(c => {
+								if (c.engine) engines.push(c.engine);
+								if (c.code) engines.push(c.code);
+							});
+						}
+					});
+					const uniqueEngines = [...new Set(engines.filter(Boolean))].sort();
+					
+					setDynamicYears(years.length > 0 ? years : yearsList);
+					setDynamicEngines(uniqueEngines.length > 0 ? uniqueEngines : engineSizesList);
+				} else {
+					setDynamicYears(yearsList);
+					setDynamicEngines(engineSizesList);
+				}
+			} catch (error) {
+				console.error("Failed to fetch matching products", error);
+				setDynamicYears(yearsList);
+				setDynamicEngines(engineSizesList);
+			} finally {
+				setLoadingProducts(false);
+			}
+		};
+
+		fetchModelDetails();
+	}, [selectedModel, selectedBrand, brands, models]);
 
 	const handleSearch = () => {
 		if (!regNumber && !selectedBrand) return;
@@ -319,24 +402,31 @@ export default function HeroSection() {
 					</MotionBox>
 				</Flex>
 
-				{/* ── MANUAL VEHICLE SELECTOR CARD ── */}
+				{/* ── REDESIGNED VEHICLE SELECTOR CARD ── */}
 				<Box
 					bg="white"
-					px={{ base: 5, md: 8 }}
-					py={8}
-					borderRadius="2xl"
-					boxShadow="lg"
+					px={{ base: 6, md: 10 }}
+					py={{ base: 8, md: 10 }}
+					borderRadius="3xl"
+					boxShadow="2xl"
 					border="1px solid"
-					borderColor="gray.100"
-					maxW="820px"
+					borderColor="gray.200"
+					maxW="960px"
 					mx="auto"
+					position="relative"
+					zIndex={5}
 				>
-					<VStack spacing={6} align="center">
-						<Heading as="h2" fontSize={{ base: "22px", md: "28px" }} color="gray.800" fontWeight="800" textAlign="center">
-							Select Your Vehicle Manually
-						</Heading>
+					<VStack spacing={8} align="center">
+						<VStack spacing={2} textAlign="center">
+							<Heading as="h2" fontSize={{ base: "24px", md: "32px" }} color="gray.900" fontWeight="900" letterSpacing="-0.5px">
+								Select Your Vehicle Manually
+							</Heading>
+							<Text fontSize="md" color="gray.500" fontWeight="500">
+								Quickly find matching engines and get premium quotes in a minute
+							</Text>
+						</VStack>
 
-						<SimpleGrid columns={{ base: 1, md: 2 }} spacing={4} w="full">
+						<SimpleGrid columns={{ base: 1, md: 3 }} spacing={5} w="full">
 							{/* Brand Select */}
 							<Select
 								placeholder="Select Brand"
@@ -346,13 +436,14 @@ export default function HeroSection() {
 									setSelectedModel("");
 								}}
 								size="lg"
-								h="52px"
-								bg="white"
-								borderColor="gray.300"
+								h="54px"
+								bg="gray.50"
+								borderColor="gray.200"
 								borderRadius="xl"
-								_hover={{ borderColor: RED }}
-								_focus={{ borderColor: RED, boxShadow: `0 0 0 3px rgba(225,6,0,0.15)` }}
+								_hover={{ borderColor: "gray.300", bg: "white" }}
+								_focus={{ borderColor: RED, bg: "white", boxShadow: `0 0 0 3px rgba(225,6,0,0.1)` }}
 								fontWeight="600"
+								fontSize="15px"
 							>
 								{brands.map((brand) => (
 									<option key={brand._id} value={brand.slug}>
@@ -363,18 +454,19 @@ export default function HeroSection() {
 
 							{/* Model Select */}
 							<Select
-								placeholder="Select Model"
+								placeholder={loadingModels ? "Loading Models..." : "Select Model"}
 								value={selectedModel}
 								onChange={(e) => setSelectedModel(e.target.value)}
-								isDisabled={!selectedBrand}
+								isDisabled={!selectedBrand || loadingModels}
 								size="lg"
-								h="52px"
-								bg="white"
-								borderColor="gray.300"
+								h="54px"
+								bg="gray.50"
+								borderColor="gray.200"
 								borderRadius="xl"
-								_hover={{ borderColor: RED }}
-								_focus={{ borderColor: RED, boxShadow: `0 0 0 3px rgba(225,6,0,0.15)` }}
+								_hover={{ borderColor: "gray.300", bg: "white" }}
+								_focus={{ borderColor: RED, bg: "white", boxShadow: `0 0 0 3px rgba(225,6,0,0.1)` }}
 								fontWeight="600"
+								fontSize="15px"
 							>
 								{models.map((model) => (
 									<option key={model._id} value={model.slug}>
@@ -385,19 +477,21 @@ export default function HeroSection() {
 
 							{/* Year Select */}
 							<Select
-								placeholder="Select Year"
+								placeholder={loadingProducts ? "Loading Years..." : "Select Year"}
 								value={selectedYear}
 								onChange={(e) => setSelectedYear(e.target.value)}
+								isDisabled={!selectedModel || loadingProducts}
 								size="lg"
-								h="52px"
-								bg="white"
-								borderColor="gray.300"
+								h="54px"
+								bg="gray.50"
+								borderColor="gray.200"
 								borderRadius="xl"
-								_hover={{ borderColor: RED }}
-								_focus={{ borderColor: RED, boxShadow: `0 0 0 3px rgba(225,6,0,0.15)` }}
+								_hover={{ borderColor: "gray.300", bg: "white" }}
+								_focus={{ borderColor: RED, bg: "white", boxShadow: `0 0 0 3px rgba(225,6,0,0.1)` }}
 								fontWeight="600"
+								fontSize="15px"
 							>
-								{yearsList.map((y) => (
+								{dynamicYears.map((y) => (
 									<option key={y} value={y}>
 										{y === "2011" ? "2011 11/61 reg" : y}
 									</option>
@@ -406,19 +500,21 @@ export default function HeroSection() {
 
 							{/* Engine Size Select */}
 							<Select
-								placeholder="Select Engine Size/Type"
+								placeholder={loadingProducts ? "Loading Engines..." : "Select Engine Size/Type"}
 								value={selectedEngineSize}
 								onChange={(e) => setSelectedEngineSize(e.target.value)}
+								isDisabled={!selectedYear || loadingProducts}
 								size="lg"
-								h="52px"
-								bg="white"
-								borderColor="gray.300"
+								h="54px"
+								bg="gray.50"
+								borderColor="gray.200"
 								borderRadius="xl"
-								_hover={{ borderColor: RED }}
-								_focus={{ borderColor: RED, boxShadow: `0 0 0 3px rgba(225,6,0,0.15)` }}
+								_hover={{ borderColor: "gray.300", bg: "white" }}
+								_focus={{ borderColor: RED, bg: "white", boxShadow: `0 0 0 3px rgba(225,6,0,0.1)` }}
 								fontWeight="600"
+								fontSize="15px"
 							>
-								{engineSizesList.map((size) => (
+								{dynamicEngines.map((size) => (
 									<option key={size} value={size}>
 										{size}
 									</option>
@@ -429,41 +525,44 @@ export default function HeroSection() {
 							<Select
 								value={selectedPart}
 								onChange={(e) => setSelectedPart(e.target.value)}
+								isDisabled={!selectedEngineSize}
 								size="lg"
-								h="52px"
-								bg="white"
-								borderColor="gray.300"
+								h="54px"
+								bg="gray.50"
+								borderColor="gray.200"
 								borderRadius="xl"
-								_hover={{ borderColor: RED }}
-								_focus={{ borderColor: RED, boxShadow: `0 0 0 3px rgba(225,6,0,0.15)` }}
+								_hover={{ borderColor: "gray.300", bg: "white" }}
+								_focus={{ borderColor: RED, bg: "white", boxShadow: `0 0 0 3px rgba(225,6,0,0.1)` }}
 								fontWeight="600"
+								fontSize="15px"
 							>
 								<option value="Engine">Engine</option>
 							</Select>
-						</SimpleGrid>
 
-						<Button
-							bg={RED}
-							color="white"
-							borderRadius="full"
-							h="56px"
-							px={10}
-							fontSize="lg"
-							fontWeight="800"
-							_hover={{ bg: "#c40000", transform: "translateY(-2px)" }}
-							_active={{ transform: "translateY(0)" }}
-							transition="all 0.2s"
-							rightIcon={
-								<Circle size="24px" bg="white" color={RED} display="inline-flex" alignItems="center" justifyContent="center">
-									<ChevronRightIcon size={18} />
-								</Circle>
-							}
-							onClick={handleGetQuotesSubmit}
-							mt={4}
-							boxShadow="lg"
-						>
-							Get Free Quotes
-						</Button>
+							{/* Get Free Quotes Button aligned in Grid */}
+							<Button
+								bg={RED}
+								color="white"
+								borderRadius="xl"
+								h="54px"
+								w="full"
+								fontSize="md"
+								fontWeight="800"
+								isDisabled={!selectedBrand || !selectedModel || !selectedYear || !selectedEngineSize}
+								_hover={{ bg: "#c40000", transform: "translateY(-1px)", boxShadow: "lg" }}
+								_active={{ transform: "translateY(0)" }}
+								transition="all 0.15s ease"
+								rightIcon={
+									<Circle size="24px" bg="white" color={RED} display="inline-flex" alignItems="center" justifyContent="center">
+										<ChevronRightIcon size={18} />
+									</Circle>
+								}
+								onClick={handleGetQuotesSubmit}
+								boxShadow="md"
+							>
+								Get Free Quotes
+							</Button>
+						</SimpleGrid>
 
 						{/* Bullet points & badge */}
 						<Flex
@@ -471,20 +570,22 @@ export default function HeroSection() {
 							justify="space-between"
 							align="center"
 							w="full"
-							pt={4}
+							pt={6}
+							borderTop="1px solid"
+							borderColor="gray.100"
 							gap={6}
 						>
-							<VStack align="flex-start" spacing={2.5} fontSize="14px" fontWeight="700" color="gray.700">
-								<HStack spacing={2.5}>
-									<Text color="#10B981" fontSize="16px">✓</Text>
+							<VStack align="flex-start" spacing={3} fontSize="15px" fontWeight="700" color="gray.700">
+								<HStack spacing={3}>
+									<Text color="#10B981" fontSize="18px">✓</Text>
 									<Text>Supply and Fitting Offered</Text>
 								</HStack>
-								<HStack spacing={2.5}>
-									<Text color="#10B981" fontSize="16px">✓</Text>
+								<HStack spacing={3}>
+									<Text color="#10B981" fontSize="18px">✓</Text>
 									<Text>Unlimited Mileage Warranty*</Text>
 								</HStack>
-								<HStack spacing={2.5}>
-									<Text color="#10B981" fontSize="16px">✓</Text>
+								<HStack spacing={3}>
+									<Text color="#10B981" fontSize="18px">✓</Text>
 									<Text>It Only Takes a Minute</Text>
 								</HStack>
 							</VStack>
@@ -493,28 +594,29 @@ export default function HeroSection() {
 								border="3px double #10B981"
 								color="#10B981"
 								borderRadius="full"
-								px={4}
+								px={2}
 								py={2}
 								fontWeight="900"
 								fontSize="11px"
 								textTransform="uppercase"
 								transform="rotate(-8deg)"
-								letterSpacing="1px"
+								letterSpacing="0.8px"
 								textAlign="center"
-								lineHeight="1.1"
-								w="100px"
-								h="100px"
+								lineHeight="1.2"
+								w="115px"
+								h="115px"
 								display="flex"
 								flexDirection="column"
 								alignItems="center"
 								justifyContent="center"
-								boxShadow="0 0 0 3px white, 0 0 0 5px #10B981"
-								mr={{ sm: 4 }}
+								boxShadow="0 0 0 4px white, 0 0 0 7px #10B981"
+								mr={{ sm: 6 }}
 								bg="white"
+								flexShrink={0}
 							>
-								<Text fontSize="8px">GUARANTEED</Text>
-								<Text fontSize="15px" fontWeight="950" my={0.5}>LOWEST</Text>
-								<Text fontSize="9px">PRICES</Text>
+								<Text fontSize="9px" whiteSpace="nowrap" color="#10B981">GUARANTEED</Text>
+								<Text fontSize="15px" fontWeight="950" my={0.5} whiteSpace="nowrap" color="#10B981">LOWEST</Text>
+								<Text fontSize="10px" whiteSpace="nowrap" color="#10B981">PRICES</Text>
 							</Box>
 						</Flex>
 					</VStack>
