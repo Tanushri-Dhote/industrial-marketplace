@@ -88,12 +88,24 @@ async function update() {
 				.replace(/[^a-z0-9]+/g, "-")
 				.replace(/(^-|-$)/g, "");
 
+			// Determine sprite position
+			const nameLower = name.toLowerCase();
+			let spritePosition = { x: -135, y: -228 }; // Default: M-series / general saloon-coupe position
+			
+			if (nameLower.startsWith("x") || nameLower.startsWith("ix")) {
+				spritePosition = { x: -945, y: -836 }; // SUV sprite position
+			}
+
 			return {
 				brandId: brand._id,
 				name,
 				year: yearStr,
 				type: m.type,
 				slug,
+				spriteClass: `bg-${slug}`,
+				spriteSheetUrl: "/images/car_sprites.png",
+				spritePosition,
+				spriteSize: { width: 135, height: 76 },
 				isActive: true,
 			};
 		});

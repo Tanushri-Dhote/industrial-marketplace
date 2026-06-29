@@ -81,12 +81,20 @@ async function update() {
 				.replace(/[^a-z0-9]+/g, "-")
 				.replace(/(^-|-$)/g, "");
 
+			// Determine sprite position
+			const isSuv = name.toLowerCase().startsWith("q");
+			const spritePosition = isSuv ? { x: -270, y: -760 } : { x: -945, y: -532 };
+
 			return {
 				brandId: brand._id,
 				name,
 				year: yearStr,
 				type: m.type,
 				slug,
+				spriteClass: `bg-${slug}`,
+				spriteSheetUrl: "/images/car_sprites.png",
+				spritePosition,
+				spriteSize: { width: 135, height: 76 },
 				isActive: true,
 			};
 		});
