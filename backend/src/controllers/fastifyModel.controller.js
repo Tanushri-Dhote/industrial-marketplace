@@ -50,7 +50,7 @@ exports.getAllModels = async (request, reply) => {
 
 exports.createModel = async (request, reply) => {
 	try {
-		const { brandId, name, slug, imageUrl, spriteClass, spriteSheetUrl, spritePosition, spriteSize } =
+		const { brandId, name, slug, imageUrl, spriteClass, spriteSheetUrl, spritePosition, spriteSize, year, type } =
 			request.body;
 
 		if (!brandId || !name || !slug) {
@@ -74,6 +74,8 @@ exports.createModel = async (request, reply) => {
 			name,
 			slug: slug.toLowerCase(),
 			imageUrl: imageUrl || null,
+			year: year || "",
+			type: type || "",
 			spriteClass: spriteClass || "",
 			spriteSheetUrl: spriteSheetUrl || "",
 			spritePosition: {

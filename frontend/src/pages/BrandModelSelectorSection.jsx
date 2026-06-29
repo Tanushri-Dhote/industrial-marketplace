@@ -500,9 +500,19 @@ export default function BrandModelSelectorSection() {
 												<Spinner color={accentColor} size="lg" thickness="4px" />
 											</Center>
 										) : models.length > 0 ? (
-											models.map((model) => (
-												<ModelCard key={model._id} model={model} onSelect={handleModelSelect} />
-											))
+											(() => {
+												const uniqueModels = [];
+												const modelNamesSeen = new Set();
+												for (const m of models) {
+													if (!modelNamesSeen.has(m.name)) {
+														modelNamesSeen.add(m.name);
+														uniqueModels.push(m);
+													}
+												}
+												return uniqueModels.map((model) => (
+													<ModelCard key={model._id} model={model} onSelect={handleModelSelect} />
+												));
+											})()
 										) : (
 											<Center py={20} gridColumn="1 / -1">
 												<VStack spacing={3}>

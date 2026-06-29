@@ -130,7 +130,6 @@ export default function HeroSection() {
 
 		fetchModels();
 	}, [selectedBrand, brands]);
-
 	useEffect(() => {
 		const fetchModelDetails = async () => {
 			if (!selectedBrand || !selectedModel) {
@@ -140,6 +139,22 @@ export default function HeroSection() {
 				setSelectedEngineSize("");
 				return;
 			}
+
+			const hasYearType = models.some(m => m.year || m.type);
+			if (hasYearType) {
+				const years = [...new Set(
+					models
+						.filter(m => m.name === selectedModel)
+						.map(m => m.year)
+						.filter(Boolean)
+				)].sort((a, b) => b.localeCompare(a, undefined, { numeric: true }));
+				setDynamicYears(years);
+				setSelectedYear("");
+				setDynamicEngines([]);
+				setSelectedEngineSize("");
+				return;
+			}
+
 			setLoadingProducts(true);
 			try {
 				const brandObj = brands.find((b) => b.slug === selectedBrand);
@@ -197,6 +212,19 @@ export default function HeroSection() {
 		fetchModelDetails();
 	}, [selectedModel, selectedBrand, brands, models]);
 
+	useEffect(() => {
+		const hasYearType = models.some(m => m.year || m.type);
+		if (hasYearType && selectedModel && selectedYear) {
+			const types = [...new Set(
+				models
+					.filter(m => m.name === selectedModel && m.year === selectedYear)
+					.flatMap(m => m.type ? m.type.split("; ") : [])
+			)].sort();
+			setDynamicEngines(types);
+			setSelectedEngineSize("");
+		}
+	}, [selectedYear, selectedModel, models]);
+
 	const handleSearch = () => {
 		if (!regNumber && !selectedBrand) return;
 
@@ -224,7 +252,10 @@ export default function HeroSection() {
 		}
 
 		const brandObj = brands.find((b) => b.slug === selectedBrand);
-		const modelObj = models.find((m) => m.slug === selectedModel);
+		const hasYearType = models.some(m => m.year || m.type);
+		const modelObj = hasYearType
+			? models.find((m) => m.name === selectedModel)
+			: models.find((m) => m.slug === selectedModel);
 
 		navigate("/call-seller", {
 			state: {
@@ -469,11 +500,21 @@ export default function HeroSection() {
 								fontWeight="600"
 								fontSize="15px"
 							>
-								{models.map((model) => (
-									<option key={model._id} value={model.slug}>
-										{model.name}
-									</option>
-								))}
+								{models.some(m => m.year || m.type) ? (
+									[...new Set(models.map(m => m.name))]
+										.sort((a, b) => a.localeCompare(b, undefined, { numeric: true }))
+										.map((name) => (
+											<option key={name} value={name}>
+												{name}
+											</option>
+										))
+								) : (
+									models.map((model) => (
+										<option key={model._id} value={model.slug}>
+											{model.name}
+										</option>
+									))
+								)}
 							</Select>
 
 							{/* Year Select */}

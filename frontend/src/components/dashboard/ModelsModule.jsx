@@ -51,6 +51,8 @@ export default function ModelsModule() {
 		name: "",
 		slug: "",
 		imageUrl: "",
+		year: "",
+		type: "",
 		isActive: true,
 		spritePosition: { x: 0, y: 0 },
 	});
@@ -112,6 +114,8 @@ export default function ModelsModule() {
 			name: "",
 			slug: "",
 			imageUrl: "",
+			year: "",
+			type: "",
 			isActive: true,
 			spritePosition: { x: 0, y: 0 },
 		});
@@ -222,25 +226,31 @@ export default function ModelsModule() {
 					border="1px solid"
 					borderColor="gray.100"
 				>
-					<Table variant="simple" size="sm" layout="fixed" minW="900px">
+					<Table variant="simple" size="sm" layout="fixed" minW="1000px">
 						<Thead bg="gray.50" borderBottom="2px solid" borderColor="gray.100">
 							<Tr>
-								<Th w="100px" fontSize="12px" fontWeight="700" color="gray.600" py={4}>
+								<Th w="80px" fontSize="12px" fontWeight="700" color="gray.600" py={4}>
 									Image
 								</Th>
-								<Th w="200px" fontSize="12px" fontWeight="700" color="gray.600">
+								<Th w="150px" fontSize="12px" fontWeight="700" color="gray.600">
 									Name
 								</Th>
-								<Th w="180px" fontSize="12px" fontWeight="700" color="gray.600">
-									Slug
+								<Th w="120px" fontSize="12px" fontWeight="700" color="gray.600">
+									Year
 								</Th>
 								<Th w="150px" fontSize="12px" fontWeight="700" color="gray.600">
-									Brand
+									Type
+								</Th>
+								<Th w="150px" fontSize="12px" fontWeight="700" color="gray.600">
+									Slug
 								</Th>
 								<Th w="120px" fontSize="12px" fontWeight="700" color="gray.600">
+									Brand
+								</Th>
+								<Th w="100px" fontSize="12px" fontWeight="700" color="gray.600">
 									Status
 								</Th>
-								<Th w="130px" fontSize="12px" fontWeight="700" color="gray.600" textAlign="center">
+								<Th w="100px" fontSize="12px" fontWeight="700" color="gray.600" textAlign="center">
 									Actions
 								</Th>
 							</Tr>
@@ -248,7 +258,7 @@ export default function ModelsModule() {
 						<Tbody>
 							{filteredModels.length === 0 ? (
 								<Tr>
-									<Td colSpan={6}>
+									<Td colSpan={8}>
 										<Center py={8}>
 											<Text color="gray.400" fontSize="14px">
 												No models found
@@ -288,6 +298,16 @@ export default function ModelsModule() {
 										<Td>
 											<Text fontSize="14px" fontWeight="600" color="gray.900" isTruncated>
 												{model.name}
+											</Text>
+										</Td>
+										<Td>
+											<Text fontSize="13px" color="gray.600" isTruncated>
+												{model.year || "-"}
+											</Text>
+										</Td>
+										<Td>
+											<Text fontSize="13px" color="gray.600" isTruncated>
+												{model.type || "-"}
 											</Text>
 										</Td>
 										<Td>
@@ -380,9 +400,37 @@ export default function ModelsModule() {
 									Model Name
 								</FormLabel>
 								<Input
-									placeholder="e.g., BMW 3 Series"
+									placeholder="e.g., A1"
 									value={formData.name}
 									onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+									borderRadius="lg"
+									fontSize="14px"
+									h="40px"
+								/>
+							</FormControl>
+
+							<FormControl>
+								<FormLabel fontSize="13px" fontWeight="700">
+									Year / Range (Optional)
+								</FormLabel>
+								<Input
+									placeholder="e.g., 2010 - 2018 or 2018 - Present"
+									value={formData.year}
+									onChange={(e) => setFormData({ ...formData, year: e.target.value })}
+									borderRadius="lg"
+									fontSize="14px"
+									h="40px"
+								/>
+							</FormControl>
+
+							<FormControl>
+								<FormLabel fontSize="13px" fontWeight="700">
+									Body Type (Optional)
+								</FormLabel>
+								<Input
+									placeholder="e.g., Hatchback; Sportback"
+									value={formData.type}
+									onChange={(e) => setFormData({ ...formData, type: e.target.value })}
 									borderRadius="lg"
 									fontSize="14px"
 									h="40px"

@@ -25,6 +25,16 @@ const modelSchema = new mongoose.Schema(
 			default: null,
 		},
 
+		year: {
+			type: String,
+			default: "",
+		},
+
+		type: {
+			type: String,
+			default: "",
+		},
+
 		spriteClass: {
 			type: String,
 			default: "",
