@@ -66,6 +66,30 @@ export default function CallSellerPage({ isModal = false, onCloseModal }) {
 		phone: "+44 ",
 	});
 
+	const handlePhoneChange = (val) => {
+		// Allow only numbers, +, and space
+		let cleaned = val.replace(/[^\d+ ]/g, "");
+
+		// Only one '+' allowed at the beginning
+		if (cleaned.includes("+")) {
+			cleaned = "+" + cleaned.replace(/\+/g, "");
+		}
+
+		// Prevent typing beyond standard UK numbers (max digits)
+		const digits = cleaned.replace(/\D/g, "");
+		if (cleaned.startsWith("+44")) {
+			if (digits.length > 12) return; // +44 followed by 10 digits
+		} else if (cleaned.startsWith("+")) {
+			if (digits.length > 11) return;
+		} else if (cleaned.startsWith("0")) {
+			if (digits.length > 11) return; // 0 followed by 10 digits
+		} else {
+			if (digits.length > 11) return;
+		}
+
+		setForm((prev) => ({ ...prev, phone: cleaned }));
+	};
+
 	useEffect(() => {
 		if (!location.state && !isModal) {
 			toast.error("Please start from the homepage to capture vehicle details.");
@@ -388,7 +412,7 @@ export default function CallSellerPage({ isModal = false, onCloseModal }) {
 
 									<InputGroup>
 										<InputLeftElement h="52px"><PhoneIcon color="#E10600" /></InputLeftElement>
-										<Input size="lg" type="tel" placeholder="+44 7700 900000" borderRadius="xl" value={form.phone} onChange={(e) => setForm({ ...form, phone: e.target.value })} />
+										<Input size="lg" type="tel" placeholder="+44 7700 900000" borderRadius="xl" value={form.phone} onChange={(e) => handlePhoneChange(e.target.value)} />
 									</InputGroup>
 
 									<Button
