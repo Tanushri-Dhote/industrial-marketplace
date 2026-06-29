@@ -608,7 +608,7 @@ export default function BrandModelSelectorSection() {
 									Best Prices
 								</Text>
 								<Text fontSize="sm" color="gray.600">
-									Compare and get the best deals on engines
+									Get the best quotes on premium engines
 								</Text>
 							</VStack>
 						</SimpleGrid>

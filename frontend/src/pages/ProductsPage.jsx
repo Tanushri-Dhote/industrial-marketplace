@@ -360,7 +360,7 @@ export default function ProductsPage() {
 										Market Overview
 									</Text>
 									<Heading fontSize="22px" color={darkColor}>
-										{currentBrand?.name} {currentModel?.name || ""} Comparison Table
+										{currentBrand?.name} {currentModel?.name || ""} Specifications
 									</Heading>
 								</VStack>
 								<TableContainer 

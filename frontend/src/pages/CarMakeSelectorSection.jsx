@@ -563,12 +563,12 @@ export default function CarMakeSelectorSection() {
 						>
 							Pick Your Car Make and
 							<Text as="span" color={accentColor} ml={2}>
-								Compare Engine Prices Fast
+								Find Engine Quotes Fast
 							</Text>
 						</Heading>
 
 						<Text maxW="680px" fontSize={{ base: "14px", md: "16px" }} color="gray.600">
-							Tap any brand to open its cars, popular engines, and price table from the database.
+							Tap any brand to open its cars and popular engines from the database.
 						</Text>
 					</VStack>
 

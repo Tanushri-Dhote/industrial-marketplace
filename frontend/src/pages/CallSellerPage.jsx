@@ -449,7 +449,7 @@ export default function CallSellerPage({ isModal = false, onCloseModal }) {
 							<SimpleGrid columns={{ base: 1, md: 3 }} gap={6} mb={12}>
 								{[
 									{ icon: "📞", title: "Contact", desc: "Suppliers will reach out soon" },
-									{ icon: "💰", title: "Compare", desc: "Multiple quotes to choose from" },
+									{ icon: "💰", title: "Quotes", desc: "Get competitive offers directly" },
 									{ icon: "✅", title: "Save", desc: "Get the best deal" },
 								].map((item, i) => (
 									<Box key={i} bg="white" p={8} borderRadius="2xl" boxShadow="md">
