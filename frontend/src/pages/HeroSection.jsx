@@ -21,6 +21,7 @@ import {
 	useDisclosure,
 	Select,
 	SimpleGrid,
+	GridItem,
 } from "@chakra-ui/react";
 import { motion } from "framer-motion";
 import {
@@ -237,7 +238,7 @@ export default function HeroSection() {
 		});
 	};
 	return (
-		<Box bg="#f7f7f7" pt={{ base: 8, md: 12 }} pb={0} overflow="hidden">
+		<Box bg="#f7f7f7" pt={{ base: 8, md: 12 }} pb={{ base: 16, md: 24 }} overflow="visible">
 			<Container maxW="container.xl">
 				{/* ── HERO ROW ── */}
 				<Flex
@@ -521,47 +522,31 @@ export default function HeroSection() {
 								))}
 							</Select>
 
-							{/* Part Select */}
-							<Select
-								value={selectedPart}
-								onChange={(e) => setSelectedPart(e.target.value)}
-								isDisabled={!selectedEngineSize}
-								size="lg"
-								h="54px"
-								bg="gray.50"
-								borderColor="gray.200"
-								borderRadius="xl"
-								_hover={{ borderColor: "gray.300", bg: "white" }}
-								_focus={{ borderColor: RED, bg: "white", boxShadow: `0 0 0 3px rgba(225,6,0,0.1)` }}
-								fontWeight="600"
-								fontSize="15px"
-							>
-								<option value="Engine">Engine</option>
-							</Select>
-
-							{/* Get Free Quotes Button aligned in Grid */}
-							<Button
-								bg={RED}
-								color="white"
-								borderRadius="xl"
-								h="54px"
-								w="full"
-								fontSize="md"
-								fontWeight="800"
-								isDisabled={!selectedBrand || !selectedModel || !selectedYear || !selectedEngineSize}
-								_hover={{ bg: "#c40000", transform: "translateY(-1px)", boxShadow: "lg" }}
-								_active={{ transform: "translateY(0)" }}
-								transition="all 0.15s ease"
-								rightIcon={
-									<Circle size="24px" bg="white" color={RED} display="inline-flex" alignItems="center" justifyContent="center">
-										<ChevronRightIcon size={18} />
-									</Circle>
-								}
-								onClick={handleGetQuotesSubmit}
-								boxShadow="md"
-							>
-								Get Free Quotes
-							</Button>
+							{/* Get Free Quotes Button aligned in Grid spanning 2 columns */}
+							<GridItem colSpan={{ base: 1, md: 2 }}>
+								<Button
+									bg={RED}
+									color="white"
+									borderRadius="xl"
+									h="54px"
+									w="full"
+									fontSize="md"
+									fontWeight="800"
+									isDisabled={!selectedBrand || !selectedModel || !selectedYear || !selectedEngineSize}
+									_hover={{ bg: "#c40000", transform: "translateY(-1px)", boxShadow: "lg" }}
+									_active={{ transform: "translateY(0)" }}
+									transition="all 0.15s ease"
+									rightIcon={
+										<Circle size="24px" bg="white" color={RED} display="inline-flex" alignItems="center" justifyContent="center">
+											<ChevronRightIcon size={18} />
+										</Circle>
+									}
+									onClick={handleGetQuotesSubmit}
+									boxShadow="md"
+								>
+									Get Free Quotes
+								</Button>
+							</GridItem>
 						</SimpleGrid>
 
 						{/* Bullet points & badge */}
