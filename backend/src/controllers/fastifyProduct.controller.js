@@ -45,12 +45,28 @@ exports.getProductById = async (request, reply) => {
 	}
 };
 
+const slugify = (text) => {
+	const base = text
+		.toString()
+		.toLowerCase()
+		.trim()
+		.replace(/\s+/g, "-")
+		.replace(/[^\w\-]+/g, "")
+		.replace(/\-\-+/g, "-")
+		.replace(/^-+/, "")
+		.replace(/-+$/, "");
+	return `${base}-${Math.floor(1000 + Math.random() * 9000)}`;
+};
+
 // ================= CREATE PRODUCT =================
 exports.createProduct = async (request, reply) => {
 	try {
-		const { name, description, price, make, model, year, condition, category } = request.body;
+		const payload = { ...request.body };
+		if (!payload.slug && payload.name) {
+			payload.slug = slugify(payload.name);
+		}
 		const product = await Product.create({
-			...request.body,
+			...payload,
 			website_id: request.tenantId,
 			createdBy: request.user.id,
 		});
@@ -64,9 +80,13 @@ exports.createProduct = async (request, reply) => {
 exports.updateProduct = async (request, reply) => {
 	try {
 		const { id } = request.params;
+		const payload = { ...request.body };
+		if (!payload.slug && payload.name) {
+			payload.slug = slugify(payload.name);
+		}
 		const product = await Product.findOneAndUpdate(
 			{ _id: id, website_id: request.tenantId },
-			request.body,
+			payload,
 			{ new: true },
 		);
 		if (!product) return reply.status(404).send({ message: "Product not found" });
