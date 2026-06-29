@@ -346,6 +346,7 @@ function EngineModal({ isOpen, onClose, onSave, engine }) {
 		condition: "Used",
 		isSold: false,
 		images: [],
+		mileage: "",
 	});
 
 	useEffect(() => {
@@ -360,6 +361,7 @@ function EngineModal({ isOpen, onClose, onSave, engine }) {
 				condition: engine.condition || "Used",
 				isSold: engine.isSold || false,
 				images: engine.images || [],
+				mileage: engine.mileage || "",
 			});
 		} else {
 			setFormData({
@@ -372,6 +374,7 @@ function EngineModal({ isOpen, onClose, onSave, engine }) {
 				condition: "Used",
 				isSold: false,
 				images: [],
+				mileage: "",
 			});
 		}
 	}, [engine, isOpen]);
@@ -453,7 +456,7 @@ function EngineModal({ isOpen, onClose, onSave, engine }) {
 						</SimpleGrid>
 
 						<SimpleGrid columns={2} spacing={6}>
-							<FormControl isRequired>
+							<FormControl>
 								<FormLabel
 									fontWeight="700"
 									fontSize="12px"
@@ -472,6 +475,27 @@ function EngineModal({ isOpen, onClose, onSave, engine }) {
 									placeholder="1500"
 								/>
 							</FormControl>
+							<FormControl isRequired>
+								<FormLabel
+									fontWeight="700"
+									fontSize="12px"
+									color="gray.500"
+									textTransform="uppercase"
+								>
+									MILEAGE
+								</FormLabel>
+								<Input
+									size="lg"
+									borderRadius="xl"
+									focusBorderColor="#D90404"
+									value={formData.mileage}
+									onChange={(e) => updateField("mileage", e.target.value)}
+									placeholder="e.g. 45,000 miles"
+								/>
+							</FormControl>
+						</SimpleGrid>
+
+						<SimpleGrid columns={2} spacing={6}>
 							<FormControl>
 								<FormLabel
 									fontWeight="700"
@@ -589,7 +613,7 @@ function EngineModal({ isOpen, onClose, onSave, engine }) {
 							</VStack>
 						</FormControl>
 
-						<FormControl>
+						<FormControl isRequired>
 							<FormLabel
 								fontWeight="700"
 								fontSize="12px"
@@ -620,7 +644,13 @@ function EngineModal({ isOpen, onClose, onSave, engine }) {
 							color="white"
 							_hover={{ bg: "#c00404" }}
 							onClick={() => onSave(formData)}
-							isDisabled={!formData.name || !formData.price}
+							isDisabled={
+								!formData.name?.trim() ||
+								!formData.description?.trim() ||
+								!formData.mileage?.trim() ||
+								!formData.images ||
+								formData.images.length === 0
+							}
 							borderRadius="lg"
 							px={8}
 						>

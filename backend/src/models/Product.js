@@ -55,6 +55,9 @@ const productSchema = new mongoose.Schema(
 		engineType: {
 			type: String,
 		},
+		mileage: {
+			type: String,
+		},
 		category: {
 			type: mongoose.Schema.Types.ObjectId,
 			ref: "Category",
