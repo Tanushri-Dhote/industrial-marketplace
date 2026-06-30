@@ -94,7 +94,8 @@ function BrandCard({ brand, onSelect, isSelected }) {
 	);
 }
 
-function ModelCard({ model, onSelect }) {
+// function ModelCard({ model, onSelect }) {
+function ModelCard({ model, onSelect, brandName }) {
 	return (
 		<MotionBox
 			variants={itemVariants}
@@ -138,9 +139,12 @@ function ModelCard({ model, onSelect }) {
 					<FaCarSide size={30} color="gray.300" />
 				</Center>
 			)}
-			<Text fontSize="14px" fontWeight="700" color={darkColor} noOfLines={2}>
+			{/* <Text fontSize="14px" fontWeight="700" color={darkColor} noOfLines={2}>
 				{model.name}
-			</Text>
+			</Text> */}
+			<Text fontSize="14px" fontWeight="700" color={darkColor} noOfLines={2}>
+    {brandName} {model.name}
+</Text>
 		</MotionBox>
 	);
 }
@@ -340,7 +344,7 @@ export default function BrandModelSelectorSection() {
 								"Select Your Car Brand"
 							)}
 						</Heading>
-							<Text fontSize={{ base: "sm", md: "md" }} color="gray.600" maxW="600px">
+						<Text fontSize={{ base: "sm", md: "md" }} color="gray.600" maxW="600px">
 							{selectedModel
 								? `Browse available engines for ${selectedBrand?.name} ${selectedModel.name}`
 								: showModels && selectedBrand
@@ -510,7 +514,12 @@ export default function BrandModelSelectorSection() {
 													}
 												}
 												return uniqueModels.map((model) => (
-													<ModelCard key={model._id} model={model} onSelect={handleModelSelect} />
+													<ModelCard 
+													key={model._id} 
+													model={model} 
+													onSelect={handleModelSelect}
+													 brandName={selectedBrand?.name}
+													  />
 												));
 											})()
 										) : (

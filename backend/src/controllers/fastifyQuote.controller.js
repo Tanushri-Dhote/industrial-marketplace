@@ -30,7 +30,7 @@ Pricing Details:
 Total Price: £${pricing?.total || 0}
 
 ${notes ? `Additional Notes:\n${notes}\n` : ""}
-If you would like to proceed with this quote, please contact our team directly at +44 20 8133 4040.
+If you would like to proceed with this quote, please contact our team directly at +44 2071129397.
 
 Best regards,
 The Engines Team
