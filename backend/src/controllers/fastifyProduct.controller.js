@@ -67,7 +67,7 @@ exports.createProduct = async (request, reply) => {
 		}
 		const product = await Product.create({
 			...payload,
-			website_id: request.tenantId,
+			website_id: request.tenantId || payload.website_id,
 			createdBy: request.user.id,
 		});
 		reply.status(201).send({ message: "Product created", data: product });
@@ -85,8 +85,12 @@ exports.updateProduct = async (request, reply) => {
 		if (!payload.slug && payload.name) {
 			payload.slug = slugify(payload.name);
 		}
+		const query = { _id: id };
+		if (request.tenantId) {
+			query.website_id = request.tenantId;
+		}
 		const product = await Product.findOneAndUpdate(
-			{ _id: id, website_id: request.tenantId },
+			query,
 			payload,
 			{ new: true },
 		);
@@ -101,7 +105,11 @@ exports.updateProduct = async (request, reply) => {
 exports.deleteProduct = async (request, reply) => {
 	try {
 		const { id } = request.params;
-		const product = await Product.findOneAndDelete({ _id: id, website_id: request.tenantId });
+		const query = { _id: id };
+		if (request.tenantId) {
+			query.website_id = request.tenantId;
+		}
+		const product = await Product.findOneAndDelete(query);
 		if (!product) return reply.status(404).send({ message: "Product not found" });
 		return { message: "Product deleted" };
 	} catch (error) {

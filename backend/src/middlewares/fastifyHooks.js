@@ -17,7 +17,25 @@ const tenantHook = async (request, reply) => {
 		}
 
 		if (request.user.role === "super_admin") {
-			request.tenantId = null;
+			let tenantId = request.headers["x-tenant-id"] || request.headers["x-website-id"] || request.body?.website_id;
+			if (!tenantId) {
+				const host = request.headers["x-forwarded-host"] || request.headers.host;
+				if (host) {
+					const cleanHost = host.split(":")[0].toLowerCase();
+					const Website = require("../models/Website");
+					let website = await Website.findOne({ domain: cleanHost });
+					if (!website && cleanHost.includes("localhost")) {
+						website = await Website.findOne({ status: "active" });
+					} else if (!website) {
+						const baseDomain = cleanHost.replace(/^(dev|www)\./, "");
+						website = await Website.findOne({ domain: new RegExp(baseDomain, "i") });
+					}
+					if (website) {
+						tenantId = website._id;
+					}
+				}
+			}
+			request.tenantId = tenantId;
 			return;
 		}
 
