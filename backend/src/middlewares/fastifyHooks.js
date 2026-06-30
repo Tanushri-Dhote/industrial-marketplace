@@ -17,7 +17,7 @@ const tenantHook = async (request, reply) => {
 		}
 
 		if (request.user.role === "super_admin") {
-			let tenantId = request.headers["x-tenant-id"] || request.headers["x-website-id"] || request.body?.website_id;
+			let tenantId = request.headers["x-tenant-id"] || request.headers["x-website-id"] || request.body?.website_id || request.user.website_id;
 			if (!tenantId) {
 				const host = request.headers["x-forwarded-host"] || request.headers.host;
 				if (host) {
@@ -35,6 +35,7 @@ const tenantHook = async (request, reply) => {
 					}
 				}
 			}
+			console.log(`[tenantHook] Resolved tenantId for super_admin: ${tenantId}`);
 			request.tenantId = tenantId;
 			return;
 		}
