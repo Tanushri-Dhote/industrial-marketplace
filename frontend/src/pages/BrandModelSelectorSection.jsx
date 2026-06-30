@@ -244,7 +244,12 @@ export default function BrandModelSelectorSection() {
 		queryKey: ["brands"],
 		queryFn: async () => {
 			const res = await API.get("/brands");
-			return (res.data?.data || res.data || []).filter((b) => b.isActive !== false);
+			// return (res.data?.data || res.data || []).filter((b) => b.isActive !== false);
+			return (res.data?.data || res.data || []).filter(
+			(brand) =>
+				brand.isActive !== false &&
+				brand.slug !== "mercedes-benz"
+		);
 		},
 		staleTime: 1000 * 60 * 30,
 	});

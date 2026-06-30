@@ -81,18 +81,38 @@ export default function HeroSection() {
 		"Diesel (Other)"
 	];
 
-	useEffect(() => {
-		const fetchBrands = async () => {
-			try {
-				const res = await API.get("/brands");
-				setBrands(res.data.data || []);
-			} catch (error) {
-				console.error("Failed to fetch brands", error);
-			}
-		};
+	// useEffect(() => {
+	// 	const fetchBrands = async () => {
+	// 		try {
+	// 			const res = await API.get("/brands");
+	// 			setBrands(res.data.data || []);
+	// 		} catch (error) {
+	// 			console.error("Failed to fetch brands", error);
+	// 		}
+	// 	};
 
-		fetchBrands();
-	}, []);
+	// 	fetchBrands();
+	// }, []);
+
+
+	useEffect(() => {
+	const fetchBrands = async () => {
+		try {
+			const res = await API.get("/brands");
+
+			// Hide BMW only
+			const filteredBrands = (res.data.data || []).filter(
+	(brand) => brand.slug !== "mercedes-benz"
+);
+
+			setBrands(filteredBrands);
+		} catch (error) {
+			console.error("Failed to fetch brands", error);
+		}
+	};
+
+	fetchBrands();
+}, []);
 
 	useEffect(() => {
 		const fetchModels = async () => {
