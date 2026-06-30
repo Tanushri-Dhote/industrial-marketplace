@@ -133,12 +133,76 @@ function EngineProductCard({ engine }) {
 	);
 }
 
+const getMercedesClass = (modelName) => {
+	const nameUpper = modelName.toUpperCase();
+	if (nameUpper.startsWith("A ")) return "A-Class";
+	if (nameUpper.startsWith("B ")) return "B-Class";
+	if (nameUpper.startsWith("C ")) {
+		if (nameUpper.startsWith("CLK")) return "CLK";
+		if (nameUpper.startsWith("CLS")) return "CLS";
+		if (nameUpper.startsWith("CLC")) return "CLC-Class";
+		if (nameUpper.startsWith("CITAN")) return "Citan";
+		return "C-Class";
+	}
+	if (nameUpper.startsWith("E ")) return "E-Class";
+	if (nameUpper.startsWith("S ")) {
+		if (nameUpper.startsWith("SLC")) return "SLC";
+		if (nameUpper.startsWith("SLK")) return "SLK";
+		if (nameUpper.startsWith("SLS")) return "SLS AMG";
+		if (nameUpper.startsWith("SL")) return "SL";
+		return "S-Class";
+	}
+	if (nameUpper.startsWith("G ")) {
+		if (nameUpper.startsWith("GLA")) return "GLA-Class";
+		if (nameUpper.startsWith("GLB")) return "GLB-Class";
+		if (nameUpper.startsWith("GLC")) return "GLC-Class";
+		if (nameUpper.startsWith("GLE")) return "GLE";
+		if (nameUpper.startsWith("GLS")) return "GLS";
+		if (nameUpper.startsWith("GLK")) return "GLK-Class";
+		if (nameUpper.startsWith("GL")) return "GL-Class";
+		return "G-Class";
+	}
+	if (nameUpper.startsWith("GLA ")) return "GLA-Class";
+	if (nameUpper.startsWith("GLB ")) return "GLB-Class";
+	if (nameUpper.startsWith("GLC ")) return "GLC-Class";
+	if (nameUpper.startsWith("GLE ")) return "GLE";
+	if (nameUpper.startsWith("GLS ")) return "GLS";
+	if (nameUpper.startsWith("GLK ")) return "GLK-Class";
+	if (nameUpper.startsWith("GL ")) return "GL-Class";
+	if (nameUpper.startsWith("CLK ")) return "CLK";
+	if (nameUpper.startsWith("CLS ")) return "CLS";
+	if (nameUpper.startsWith("SL ")) return "SL";
+	if (nameUpper.startsWith("SLK ")) return "SLK";
+	if (nameUpper.startsWith("SLC ")) return "SLC";
+	if (nameUpper.startsWith("AMG GT")) return "AMG GT";
+	if (nameUpper.startsWith("CLA ")) return "CLA";
+	if (nameUpper.startsWith("SPRINTER ")) return "Sprinter";
+	if (nameUpper.startsWith("VITO ")) return "Vito";
+	if (nameUpper.startsWith("VIANO ")) return "Viano";
+	if (nameUpper.startsWith("CITAN ")) return "Citan";
+	if (nameUpper.startsWith("X ")) return "X-Class";
+	if (nameUpper.startsWith("MB 100") || nameUpper.startsWith("MB100")) return "MB100";
+	if (nameUpper.startsWith("MB 140") || nameUpper.startsWith("MB140")) return "MB140";
+	if (nameUpper.startsWith("R ")) return "R-Class";
+	if (nameUpper.startsWith("VANEO ")) return "Vaneo";
+	if (nameUpper.startsWith("VARIO ")) return "Vario";
+	if (nameUpper.startsWith("SLS ")) return "SLS AMG";
+	if (nameUpper.startsWith("CLC ")) return "CLC-Class";
+	if (nameUpper.startsWith("ML ") || nameUpper.startsWith("ML-") || nameUpper.startsWith("M-")) return "M-Class";
+	return "Other";
+};
+
 export default function ProductsPage() {
 	const [searchParams, setSearchParams] = useSearchParams();
 	const navigate = useNavigate();
+	const [selectedClass, setSelectedClass] = useState(null);
 	
 	const brandSlug = searchParams.get("brand");
 	const modelSlug = searchParams.get("model");
+
+	useEffect(() => {
+		setSelectedClass(null);
+	}, [brandSlug]);
 
 	// Fetch all brands
 	const { data: brands = [], isLoading: loadingBrands } = useQuery({
@@ -299,32 +363,120 @@ export default function ProductsPage() {
 					{/* Models Selection */}
 					{!modelSlug && models.length > 0 && (
 						<MotionBox variants={fadeInUp}>
-							<Heading fontSize="20px" mb={5} color={darkColor}>
-								Popular {currentBrand?.name} Models
-							</Heading>
-							<SimpleGrid columns={{ base: 2, sm: 3, md: 4, lg: 6 }} spacing={4}>
-								{models.map((model) => (
-									<MotionBox
-										key={model._id}
-										onClick={() => handleModelSelect(model.slug)}
-										cursor="pointer"
-										bg="white"
-										p={4}
-										borderRadius="xl"
-										border="1px solid"
-										borderColor="gray.200"
-										textAlign="center"
-										transition="all 0.2s"
-										whileHover={{ 
-											y: -4, 
-											borderColor: accentColor,
-											boxShadow: "0 4px 12px rgba(217, 4, 4, 0.1)"
-										}}
-									>
-										<Text fontWeight="700">{model.name}</Text>
-									</MotionBox>
-								))}
-							</SimpleGrid>
+							{currentBrand?.slug === "mercedes-benz" ? (
+								!selectedClass ? (
+									<>
+										<Heading fontSize="20px" mb={5} color={darkColor}>
+											Browse {currentBrand?.name} by Class
+										</Heading>
+										<SimpleGrid columns={{ base: 2, sm: 3, md: 4, lg: 6 }} spacing={4}>
+											{(() => {
+												const classMap = {};
+												models.forEach((m) => {
+													const className = getMercedesClass(m.name);
+													if (!classMap[className]) {
+														classMap[className] = [];
+													}
+													classMap[className].push(m);
+												});
+												const sortedClassNames = Object.keys(classMap).sort();
+												return sortedClassNames.map((className) => (
+													<MotionBox
+														key={`class-${className}`}
+														onClick={() => setSelectedClass(className)}
+														cursor="pointer"
+														bg="white"
+														p={4}
+														borderRadius="xl"
+														border="1px solid"
+														borderColor="gray.200"
+														textAlign="center"
+														transition="all 0.2s"
+														whileHover={{ 
+															y: -4, 
+															borderColor: accentColor,
+															boxShadow: "0 4px 12px rgba(217, 4, 4, 0.1)"
+														}}
+													>
+														<Text fontWeight="700">{className}</Text>
+													</MotionBox>
+												));
+											})()}
+										</SimpleGrid>
+									</>
+								) : (
+									<>
+										<HStack justify="space-between" mb={5} flexWrap="wrap" gap={3}>
+											<Heading fontSize="20px" color={darkColor}>
+												Popular {currentBrand?.name} {selectedClass} Models
+											</Heading>
+											<Button 
+												size="sm" 
+												variant="ghost" 
+												onClick={() => setSelectedClass(null)} 
+												leftIcon={<FaArrowLeft />}
+												colorScheme="red"
+											>
+												Back to Classes
+											</Button>
+										</HStack>
+										<SimpleGrid columns={{ base: 2, sm: 3, md: 4, lg: 6 }} spacing={4}>
+											{models
+												.filter((m) => getMercedesClass(m.name) === selectedClass)
+												.map((model) => (
+													<MotionBox
+														key={model._id}
+														onClick={() => handleModelSelect(model.slug)}
+														cursor="pointer"
+														bg="white"
+														p={4}
+														borderRadius="xl"
+														border="1px solid"
+														borderColor="gray.200"
+														textAlign="center"
+														transition="all 0.2s"
+														whileHover={{ 
+															y: -4, 
+															borderColor: accentColor,
+															boxShadow: "0 4px 12px rgba(217, 4, 4, 0.1)"
+														}}
+													>
+														<Text fontWeight="700">{model.name}</Text>
+													</MotionBox>
+												))}
+										</SimpleGrid>
+									</>
+								)
+							) : (
+								<>
+									<Heading fontSize="20px" mb={5} color={darkColor}>
+										Popular {currentBrand?.name} Models
+									</Heading>
+									<SimpleGrid columns={{ base: 2, sm: 3, md: 4, lg: 6 }} spacing={4}>
+										{models.map((model) => (
+											<MotionBox
+												key={model._id}
+												onClick={() => handleModelSelect(model.slug)}
+												cursor="pointer"
+												bg="white"
+												p={4}
+												borderRadius="xl"
+												border="1px solid"
+												borderColor="gray.200"
+												textAlign="center"
+												transition="all 0.2s"
+												whileHover={{ 
+													y: -4, 
+													borderColor: accentColor,
+													boxShadow: "0 4px 12px rgba(217, 4, 4, 0.1)"
+												}}
+											>
+												<Text fontWeight="700">{model.name}</Text>
+											</MotionBox>
+										))}
+									</SimpleGrid>
+								</>
+							)}
 						</MotionBox>
 					)}
 

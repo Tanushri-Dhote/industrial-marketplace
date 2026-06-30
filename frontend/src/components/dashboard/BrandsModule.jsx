@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useRef } from "react";
 import {
 	Table,
 	Thead,
@@ -44,6 +44,8 @@ const ACCENT = "#D90404";
 
 export default function BrandsModule() {
 	const queryClient = useQueryClient();
+	const logoInputRef = useRef(null);
+	const heroInputRef = useRef(null);
 	const [searchTerm, setSearchTerm] = useState("");
 	const [editingBrand, setEditingBrand] = useState(null);
 	const [formData, setFormData] = useState({
@@ -72,10 +74,11 @@ export default function BrandsModule() {
 	// Create/Update mutation
 	const saveMutation = useMutation({
 		mutationFn: async (payload) => {
+			const { _id, createdAt, updatedAt, __v, ...cleanPayload } = payload;
 			if (editingBrand) {
-				return API.put(`/brands/admin/${editingBrand._id}`, payload);
+				return API.put(`/brands/admin/${editingBrand._id}`, cleanPayload);
 			} else {
-				return API.post("/brands/admin/create", payload);
+				return API.post("/brands/admin/create", cleanPayload);
 			}
 		},
 		onSuccess: () => {
@@ -397,7 +400,7 @@ export default function BrandsModule() {
 
 							<FormControl>
 								<FormLabel fontSize="13px" fontWeight="700">
-									Logo URL (Fallback)
+									Logo URL
 								</FormLabel>
 								<Input
 									placeholder="https://example.com/logo.png"
@@ -407,11 +410,18 @@ export default function BrandsModule() {
 									fontSize="14px"
 									h="40px"
 								/>
+								<input
+									type="file"
+									ref={logoInputRef}
+									style={{ display: "none" }}
+									accept="image/*"
+									onChange={(e) => handleImageUpload(e, "logoUrl")}
+								/>
 								<Button
 									mt={2}
 									size="sm"
 									variant="outline"
-									onClick={(e) => handleImageUpload(e, "logoUrl")}
+									onClick={() => logoInputRef.current?.click()}
 								>
 									Upload Logo
 								</Button>
@@ -530,11 +540,18 @@ export default function BrandsModule() {
 									fontSize="14px"
 									h="40px"
 								/>
+								<input
+									type="file"
+									ref={heroInputRef}
+									style={{ display: "none" }}
+									accept="image/*"
+									onChange={(e) => handleImageUpload(e, "heroImage")}
+								/>
 								<Button
 									mt={2}
 									size="sm"
 									variant="outline"
-									onClick={(e) => handleImageUpload(e, "heroImage")}
+									onClick={() => heroInputRef.current?.click()}
 								>
 									Upload Hero Image
 								</Button>

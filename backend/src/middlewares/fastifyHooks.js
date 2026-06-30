@@ -42,6 +42,9 @@ const rolePermissions = {
 		websites: ["read"],
 		blogs: ["create", "read"],
 		inquiries: ["create", "read"],
+		brands: ["create", "read", "update", "delete"],
+		models: ["create", "read", "update", "delete"],
+		"part-types": ["create", "read", "update", "delete"],
 	},
 	website_manager: {
 		products: ["create", "read", "update", "delete"],
@@ -53,6 +56,9 @@ const rolePermissions = {
 		websites: ["read"],
 		blogs: ["create", "read", "update", "delete"],
 		inquiries: ["create", "read", "update", "delete"],
+		brands: ["create", "read", "update", "delete"],
+		models: ["create", "read", "update", "delete"],
+		"part-types": ["create", "read", "update", "delete"],
 	},
 	sales_manager: {
 		products: ["read"],
@@ -64,6 +70,7 @@ const rolePermissions = {
 		websites: ["read"],
 		blogs: ["read"],
 		inquiries: ["read", "update"],
+		"part-types": ["read"],
 	},
 	viewer: {
 		products: ["read"],
@@ -75,6 +82,7 @@ const rolePermissions = {
 		websites: ["read"],
 		blogs: ["read"],
 		inquiries: ["read"],
+		"part-types": ["read"],
 	},
 };
 

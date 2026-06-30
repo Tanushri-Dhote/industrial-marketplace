@@ -9,9 +9,9 @@ export function getCurrentRole() {
 
 export function canModify() {
 	const role = getCurrentRole();
-	// Admin users are not allowed to edit or delete anything per policy
 	if (!role) return false;
-	return role !== "admin";
+	// Viewers are read-only and cannot modify any dashboard entities
+	return role !== "viewer";
 }
 
 export function isSuperAdmin() {

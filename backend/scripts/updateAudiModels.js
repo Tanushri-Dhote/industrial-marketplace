@@ -81,9 +81,44 @@ async function update() {
 				.replace(/[^a-z0-9]+/g, "-")
 				.replace(/(^-|-$)/g, "");
 
-			// Determine sprite position
-			const isSuv = name.toLowerCase().startsWith("q");
-			const spritePosition = isSuv ? { x: -270, y: -760 } : { x: -945, y: -532 };
+			// Determine sprite position using matching data
+			const modelNameLower = name.toLowerCase();
+			let spriteFields = {};
+
+			const audiModelData = [
+				{ name: "a1", x: -1485, y: -760 },
+				{ name: "a2", x: -3105, y: -2280 },
+				{ name: "a3", x: -1620, y: -2736 },
+				{ name: "a4", x: -945, y: -1672 },
+				{ name: "a5", x: -945, y: -532 },
+				{ name: "a6", x: -1215, y: -1444 },
+				{ name: "a7", x: -810, y: -2888 },
+				{ name: "a8", x: -2835, y: -2356 },
+				{ name: "q2", x: -270, y: -760 },
+				{ name: "q3", x: -1755, y: -2280 },
+				{ name: "q5", x: -2430, y: -2736 },
+				{ name: "q7", x: -2025, y: -2508 },
+				{ name: "q8", x: -3105, y: -2356 },
+				{ name: "tt", x: -1215, y: -1748 },
+				{ name: "r8", x: -2835, y: -2812 }
+			];
+
+			const match = audiModelData.find(d => {
+				const spriteName = d.name.toLowerCase();
+				return modelNameLower === spriteName || 
+					modelNameLower.startsWith(spriteName + " ") ||
+					modelNameLower.startsWith(spriteName + "-") ||
+					(spriteName.length > 1 && modelNameLower.startsWith(spriteName));
+			});
+
+			if (match) {
+				spriteFields = {
+					spriteClass: `bg-${match.name}`,
+					spriteSheetUrl: "/images/car_sprites.png",
+					spritePosition: { x: match.x, y: match.y },
+					spriteSize: { width: 135, height: 76 }
+				};
+			}
 
 			return {
 				brandId: brand._id,
@@ -91,10 +126,7 @@ async function update() {
 				year: yearStr,
 				type: m.type,
 				slug,
-				spriteClass: `bg-${slug}`,
-				spriteSheetUrl: "/images/car_sprites.png",
-				spritePosition,
-				spriteSize: { width: 135, height: 76 },
+				...spriteFields,
 				isActive: true,
 			};
 		});

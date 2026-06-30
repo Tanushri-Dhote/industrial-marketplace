@@ -234,8 +234,68 @@ function EngineProductCard({ engine }) {
 	);
 }
 
+const getMercedesClass = (modelName) => {
+	const nameUpper = modelName.toUpperCase();
+	if (nameUpper.startsWith("A ")) return "A-Class";
+	if (nameUpper.startsWith("B ")) return "B-Class";
+	if (nameUpper.startsWith("C ")) {
+		if (nameUpper.startsWith("CLK")) return "CLK";
+		if (nameUpper.startsWith("CLS")) return "CLS";
+		if (nameUpper.startsWith("CLC")) return "CLC-Class";
+		if (nameUpper.startsWith("CITAN")) return "Citan";
+		return "C-Class";
+	}
+	if (nameUpper.startsWith("E ")) return "E-Class";
+	if (nameUpper.startsWith("S ")) {
+		if (nameUpper.startsWith("SLC")) return "SLC";
+		if (nameUpper.startsWith("SLK")) return "SLK";
+		if (nameUpper.startsWith("SLS")) return "SLS AMG";
+		if (nameUpper.startsWith("SL")) return "SL";
+		return "S-Class";
+	}
+	if (nameUpper.startsWith("G ")) {
+		if (nameUpper.startsWith("GLA")) return "GLA-Class";
+		if (nameUpper.startsWith("GLB")) return "GLB-Class";
+		if (nameUpper.startsWith("GLC")) return "GLC-Class";
+		if (nameUpper.startsWith("GLE")) return "GLE";
+		if (nameUpper.startsWith("GLS")) return "GLS";
+		if (nameUpper.startsWith("GLK")) return "GLK-Class";
+		if (nameUpper.startsWith("GL")) return "GL-Class";
+		return "G-Class";
+	}
+	if (nameUpper.startsWith("GLA ")) return "GLA-Class";
+	if (nameUpper.startsWith("GLB ")) return "GLB-Class";
+	if (nameUpper.startsWith("GLC ")) return "GLC-Class";
+	if (nameUpper.startsWith("GLE ")) return "GLE";
+	if (nameUpper.startsWith("GLS ")) return "GLS";
+	if (nameUpper.startsWith("GLK ")) return "GLK-Class";
+	if (nameUpper.startsWith("GL ")) return "GL-Class";
+	if (nameUpper.startsWith("CLK ")) return "CLK";
+	if (nameUpper.startsWith("CLS ")) return "CLS";
+	if (nameUpper.startsWith("SL ")) return "SL";
+	if (nameUpper.startsWith("SLK ")) return "SLK";
+	if (nameUpper.startsWith("SLC ")) return "SLC";
+	if (nameUpper.startsWith("AMG GT")) return "AMG GT";
+	if (nameUpper.startsWith("CLA ")) return "CLA";
+	if (nameUpper.startsWith("SPRINTER ")) return "Sprinter";
+	if (nameUpper.startsWith("VITO ")) return "Vito";
+	if (nameUpper.startsWith("VIANO ")) return "Viano";
+	if (nameUpper.startsWith("CITAN ")) return "Citan";
+	if (nameUpper.startsWith("X ")) return "X-Class";
+	if (nameUpper.startsWith("MB 100") || nameUpper.startsWith("MB100")) return "MB100";
+	if (nameUpper.startsWith("MB 140") || nameUpper.startsWith("MB140")) return "MB140";
+	if (nameUpper.startsWith("R ")) return "R-Class";
+	if (nameUpper.startsWith("VANEO ")) return "Vaneo";
+	if (nameUpper.startsWith("VARIO ")) return "Vario";
+	if (nameUpper.startsWith("SLS ")) return "SLS AMG";
+	if (nameUpper.startsWith("CLC ")) return "CLC-Class";
+	if (nameUpper.startsWith("ML ") || nameUpper.startsWith("ML-") || nameUpper.startsWith("M-")) return "M-Class";
+	return "Other";
+};
+
 export default function BrandModelSelectorSection() {
 	const [selectedBrand, setSelectedBrand] = useState(null);
+	const [selectedClass, setSelectedClass] = useState(null);
 	const [selectedModel, setSelectedModel] = useState(null);
 	const [showModels, setShowModels] = useState(false);
 
@@ -246,10 +306,8 @@ export default function BrandModelSelectorSection() {
 			const res = await API.get("/brands");
 			// return (res.data?.data || res.data || []).filter((b) => b.isActive !== false);
 			return (res.data?.data || res.data || []).filter(
-			(brand) =>
-				brand.isActive !== false &&
-				brand.slug !== "mercedes-benz"
-		);
+				(brand) => brand.isActive !== false
+			);
 		},
 		staleTime: 1000 * 60 * 30,
 	});
@@ -288,6 +346,11 @@ export default function BrandModelSelectorSection() {
 		setSelectedBrand(brand);
 		setShowModels(true);
 		setSelectedModel(null);
+		setSelectedClass(null);
+	};
+
+	const handleClassSelect = (classObj) => {
+		setSelectedClass(classObj.name);
 	};
 
 	const handleModelSelect = (model) => {
@@ -298,11 +361,17 @@ export default function BrandModelSelectorSection() {
 		setShowModels(false);
 		setSelectedBrand(null);
 		setSelectedModel(null);
+		setSelectedClass(null);
+	};
+
+	const handleBackToClasses = () => {
+		setSelectedClass(null);
 	};
 
 	const handleBackToModels = () => {
 		setSelectedModel(null);
 	};
+
 
 	if (loadingBrands) {
 		return (
@@ -333,18 +402,48 @@ export default function BrandModelSelectorSection() {
 									<Text>{selectedModel.name} Engines</Text>
 								</HStack>
 							) : showModels && selectedBrand ? (
-								<HStack justify="center" spacing={3}>
-									<Button
-										size="sm"
-										variant="ghost"
-										onClick={handleBackToBrands}
-										leftIcon={<FaTimes />}
-										colorScheme="red"
-									>
-										Back
-									</Button>
-									<Text>{selectedBrand.name} Models</Text>
-								</HStack>
+								selectedBrand.slug === "mercedes-benz" ? (
+									selectedClass ? (
+										<HStack justify="center" spacing={3}>
+											<Button
+												size="sm"
+												variant="ghost"
+												onClick={handleBackToClasses}
+												leftIcon={<FaArrowLeft />}
+												colorScheme="red"
+											>
+												Back
+											</Button>
+											<Text>{selectedBrand.name} {selectedClass} Models</Text>
+										</HStack>
+									) : (
+										<HStack justify="center" spacing={3}>
+											<Button
+												size="sm"
+												variant="ghost"
+												onClick={handleBackToBrands}
+												leftIcon={<FaTimes />}
+												colorScheme="red"
+											>
+												Back
+											</Button>
+											<Text>{selectedBrand.name} Classes</Text>
+										</HStack>
+									)
+								) : (
+									<HStack justify="center" spacing={3}>
+										<Button
+											size="sm"
+											variant="ghost"
+											onClick={handleBackToBrands}
+											leftIcon={<FaTimes />}
+											colorScheme="red"
+										>
+											Back
+										</Button>
+										<Text>{selectedBrand.name} Models</Text>
+									</HStack>
+								)
 							) : (
 								"Select Your Car Brand"
 							)}
@@ -353,7 +452,11 @@ export default function BrandModelSelectorSection() {
 							{selectedModel
 								? `Browse available engines for ${selectedBrand?.name} ${selectedModel.name}`
 								: showModels && selectedBrand
-									? "Choose a model to find compatible engines"
+									? selectedBrand.slug === "mercedes-benz"
+										? selectedClass
+											? `Choose a ${selectedClass} model to find compatible engines`
+											: "Choose a Mercedes-Benz class to view available models"
+										: "Choose a model to find compatible engines"
 									: "Click on your car brand to view all available models"}
 						</Text>
 					</VStack>
@@ -483,7 +586,7 @@ export default function BrandModelSelectorSection() {
 						) : /* State 1: Model Grid */
 							showModels && selectedBrand ? (
 								<MotionVStack
-									key="models-view"
+									key={selectedClass ? "models-view" : "classes-view"}
 									variants={containerVariants}
 									initial="hidden"
 									animate="show"
@@ -491,7 +594,11 @@ export default function BrandModelSelectorSection() {
 									align="stretch"
 								>
 									<Heading fontSize="26px" color={darkColor} textAlign="center" fontWeight="800">
-										Most Popular <Text as="span" color={accentColor}>{selectedBrand.name}</Text> Engines
+										{selectedBrand.slug === "mercedes-benz" && !selectedClass ? (
+											<>Browse <Text as="span" color={accentColor}>{selectedBrand.name}</Text> by Class</>
+										) : (
+											<>Most Popular <Text as="span" color={accentColor}>{selectedBrand.name}</Text> Engines</>
+										)}
 									</Heading>
 									<MotionGrid
 										variants={containerVariants}
@@ -510,22 +617,70 @@ export default function BrandModelSelectorSection() {
 											</Center>
 										) : models.length > 0 ? (
 											(() => {
-												const uniqueModels = [];
-												const modelNamesSeen = new Set();
-												for (const m of models) {
-													if (!modelNamesSeen.has(m.name)) {
-														modelNamesSeen.add(m.name);
-														uniqueModels.push(m);
+												if (selectedBrand.slug === "mercedes-benz") {
+													if (!selectedClass) {
+														// Group models by class
+														const classMap = {};
+														models.forEach((m) => {
+															const className = getMercedesClass(m.name);
+															if (!classMap[className]) {
+																classMap[className] = [];
+															}
+															classMap[className].push(m);
+														});
+
+														const sortedClassNames = Object.keys(classMap).sort();
+														const classesToRender = sortedClassNames.map((className) => {
+															const classModels = classMap[className];
+															const repModel = classModels.find((m) => m.spriteSheetUrl || m.imageUrl);
+															return {
+																_id: `class-${className}`,
+																name: className,
+																spriteSheetUrl: repModel?.spriteSheetUrl || null,
+																spritePosition: repModel?.spritePosition || null,
+																spriteSize: repModel?.spriteSize || null,
+																imageUrl: repModel?.imageUrl || null,
+															};
+														});
+
+														return classesToRender.map((classObj) => (
+															<ModelCard key={classObj._id} model={classObj} onSelect={handleClassSelect} />
+														));
+													} else {
+														// Render models in selected class
+														const filteredModels = models.filter(
+															(m) => getMercedesClass(m.name) === selectedClass
+														);
+														const uniqueModels = [];
+														const modelNamesSeen = new Set();
+														for (const m of filteredModels) {
+															if (!modelNamesSeen.has(m.name)) {
+																modelNamesSeen.add(m.name);
+																uniqueModels.push(m);
+															}
+														}
+														return uniqueModels.map((model) => (
+															<ModelCard key={model._id} model={model} onSelect={handleModelSelect} />
+														));
 													}
+												} else {
+													const uniqueModels = [];
+													const modelNamesSeen = new Set();
+													for (const m of models) {
+														if (!modelNamesSeen.has(m.name)) {
+															modelNamesSeen.add(m.name);
+															uniqueModels.push(m);
+														}
+													}
+													return uniqueModels.map((model) => (
+														<ModelCard 
+															key={model._id} 
+															model={model} 
+															onSelect={handleModelSelect} 
+															brandName={selectedBrand?.name}
+														/>
+													));
 												}
-												return uniqueModels.map((model) => (
-													<ModelCard 
-													key={model._id} 
-													model={model} 
-													onSelect={handleModelSelect}
-													 brandName={selectedBrand?.name}
-													  />
-												));
 											})()
 										) : (
 											<Center py={20} gridColumn="1 / -1">

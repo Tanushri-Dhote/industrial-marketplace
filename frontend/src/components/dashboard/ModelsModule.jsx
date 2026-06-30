@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import {
 	Table,
 	Thead,
@@ -44,6 +44,7 @@ const ACCENT = "#D90404";
 
 export default function ModelsModule() {
 	const queryClient = useQueryClient();
+	const modelInputRef = useRef(null);
 	const [searchTerm, setSearchTerm] = useState("");
 	const [editingModel, setEditingModel] = useState(null);
 	const [formData, setFormData] = useState({
@@ -79,10 +80,11 @@ export default function ModelsModule() {
 	// Create/Update mutation
 	const saveMutation = useMutation({
 		mutationFn: async (payload) => {
+			const { _id, createdAt, updatedAt, __v, ...cleanPayload } = payload;
 			if (editingModel) {
-				return API.put(`/models/admin/${editingModel._id}`, payload);
+				return API.put(`/models/admin/${editingModel._id}`, cleanPayload);
 			} else {
-				return API.post("/models/admin/create", payload);
+				return API.post("/models/admin/create", cleanPayload);
 			}
 		},
 		onSuccess: () => {
@@ -275,20 +277,20 @@ export default function ModelsModule() {
 										borderColor="gray.100"
 									>
 										<Td>
-											{model.spritePosition ? (
+											{model.imageUrl ? (
+												<Image src={model.imageUrl} alt={model.name} h="40px" objectFit="contain" />
+											) : model.spritePosition ? (
 												<Box
 													w="60px"
 													h="40px"
 													backgroundImage="url(/images/car_sprites.png)"
-													backgroundPosition={`${model.spritePosition.x}px ${model.spritePosition.y}px`}
+													backgroundPosition={`${model.spritePosition.x || 0}px ${model.spritePosition.y || 0}px`}
 													backgroundRepeat="no-repeat"
 													backgroundSize="auto"
 													border="1px solid"
 													borderColor="gray.200"
 													borderRadius="md"
 												/>
-											) : model.imageUrl ? (
-												<Image src={model.imageUrl} alt={model.name} h="40px" objectFit="contain" />
 											) : (
 												<Text fontSize="12px" color="gray.400">
 													No image
@@ -463,7 +465,14 @@ export default function ModelsModule() {
 									fontSize="14px"
 									h="40px"
 								/>
-								<Button mt={2} size="sm" variant="outline" onClick={handleImageUpload}>
+								<input
+									type="file"
+									ref={modelInputRef}
+									style={{ display: "none" }}
+									accept="image/*"
+									onChange={handleImageUpload}
+								/>
+								<Button mt={2} size="sm" variant="outline" onClick={() => modelInputRef.current?.click()}>
 									Upload Image
 								</Button>
 								{formData.imageUrl && (
@@ -475,52 +484,52 @@ export default function ModelsModule() {
 										borderRadius="md"
 									/>
 								)}
+							</FormControl>
 
-								<FormControl>
-									<FormLabel fontSize="13px" fontWeight="700">
-										Sprite Position X (pixels)
-									</FormLabel>
-									<Input
-										type="number"
-										placeholder="0"
-										value={formData.spritePosition?.x || 0}
-										onChange={(e) =>
-											setFormData({
-												...formData,
-												spritePosition: {
-													...formData.spritePosition,
-													x: parseInt(e.target.value) || 0,
-												},
-											})
-										}
-										borderRadius="lg"
-										fontSize="14px"
-										h="40px"
-									/>
-								</FormControl>
+							<FormControl>
+								<FormLabel fontSize="13px" fontWeight="700">
+									Sprite Position X (pixels)
+								</FormLabel>
+								<Input
+									type="number"
+									placeholder="0"
+									value={formData.spritePosition?.x || 0}
+									onChange={(e) =>
+										setFormData({
+											...formData,
+											spritePosition: {
+												...formData.spritePosition,
+												x: parseInt(e.target.value) || 0,
+											},
+										})
+									}
+									borderRadius="lg"
+									fontSize="14px"
+									h="40px"
+								/>
+							</FormControl>
 
-								<FormControl>
-									<FormLabel fontSize="13px" fontWeight="700">
-										Sprite Position Y (pixels)
-									</FormLabel>
-									<Input
-										type="number"
-										placeholder="0"
-										value={formData.spritePosition?.y || 0}
-										onChange={(e) =>
-											setFormData({
-												...formData,
-												spritePosition: {
-													...formData.spritePosition,
-													y: parseInt(e.target.value) || 0,
-												},
-											})
-										}
-										borderRadius="lg"
-										fontSize="14px"
-										h="40px"
-									/>
-								</FormControl>
+							<FormControl>
+								<FormLabel fontSize="13px" fontWeight="700">
+									Sprite Position Y (pixels)
+								</FormLabel>
+								<Input
+									type="number"
+									placeholder="0"
+									value={formData.spritePosition?.y || 0}
+									onChange={(e) =>
+										setFormData({
+											...formData,
+											spritePosition: {
+												...formData.spritePosition,
+												y: parseInt(e.target.value) || 0,
+											},
+										})
+									}
+									borderRadius="lg"
+									fontSize="14px"
+									h="40px"
+								/>
 							</FormControl>
 
 							<FormControl display="flex" alignItems="center">

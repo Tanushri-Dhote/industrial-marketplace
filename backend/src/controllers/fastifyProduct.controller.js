@@ -107,3 +107,25 @@ exports.deleteProduct = async (request, reply) => {
 		reply.status(500).send({ message: error.message });
 	}
 };
+
+// ================= CREATE PRODUCTS BULK =================
+exports.createProductsBulk = async (request, reply) => {
+	try {
+		const products = request.body.products;
+		if (!Array.isArray(products)) {
+			return reply.status(400).send({ message: "Invalid payload: products must be an array" });
+		}
+
+		const productsToInsert = products.map((p) => ({
+			...p,
+			slug: p.slug || slugify(p.name),
+			website_id: request.tenantId,
+			createdBy: request.user.id,
+		}));
+
+		const result = await Product.insertMany(productsToInsert);
+		return { success: true, message: `Successfully imported ${result.length} products`, count: result.length };
+	} catch (error) {
+		reply.status(500).send({ message: error.message });
+	}
+};

@@ -47,11 +47,71 @@ const MotionBox = motion(Box);
 const RED = "#E10600";
 const DARK = "#111111";
 
+const getMercedesClass = (modelName) => {
+	const nameUpper = modelName.toUpperCase();
+	if (nameUpper.startsWith("A ")) return "A-Class";
+	if (nameUpper.startsWith("B ")) return "B-Class";
+	if (nameUpper.startsWith("C ")) {
+		if (nameUpper.startsWith("CLK")) return "CLK";
+		if (nameUpper.startsWith("CLS")) return "CLS";
+		if (nameUpper.startsWith("CLC")) return "CLC-Class";
+		if (nameUpper.startsWith("CITAN")) return "Citan";
+		return "C-Class";
+	}
+	if (nameUpper.startsWith("E ")) return "E-Class";
+	if (nameUpper.startsWith("S ")) {
+		if (nameUpper.startsWith("SLC")) return "SLC";
+		if (nameUpper.startsWith("SLK")) return "SLK";
+		if (nameUpper.startsWith("SLS")) return "SLS AMG";
+		if (nameUpper.startsWith("SL")) return "SL";
+		return "S-Class";
+	}
+	if (nameUpper.startsWith("G ")) {
+		if (nameUpper.startsWith("GLA")) return "GLA-Class";
+		if (nameUpper.startsWith("GLB")) return "GLB-Class";
+		if (nameUpper.startsWith("GLC")) return "GLC-Class";
+		if (nameUpper.startsWith("GLE")) return "GLE";
+		if (nameUpper.startsWith("GLS")) return "GLS";
+		if (nameUpper.startsWith("GLK")) return "GLK-Class";
+		if (nameUpper.startsWith("GL")) return "GL-Class";
+		return "G-Class";
+	}
+	if (nameUpper.startsWith("GLA ")) return "GLA-Class";
+	if (nameUpper.startsWith("GLB ")) return "GLB-Class";
+	if (nameUpper.startsWith("GLC ")) return "GLC-Class";
+	if (nameUpper.startsWith("GLE ")) return "GLE";
+	if (nameUpper.startsWith("GLS ")) return "GLS";
+	if (nameUpper.startsWith("GLK ")) return "GLK-Class";
+	if (nameUpper.startsWith("GL ")) return "GL-Class";
+	if (nameUpper.startsWith("CLK ")) return "CLK";
+	if (nameUpper.startsWith("CLS ")) return "CLS";
+	if (nameUpper.startsWith("SL ")) return "SL";
+	if (nameUpper.startsWith("SLK ")) return "SLK";
+	if (nameUpper.startsWith("SLC ")) return "SLC";
+	if (nameUpper.startsWith("AMG GT")) return "AMG GT";
+	if (nameUpper.startsWith("CLA ")) return "CLA";
+	if (nameUpper.startsWith("SPRINTER ")) return "Sprinter";
+	if (nameUpper.startsWith("VITO ")) return "Vito";
+	if (nameUpper.startsWith("VIANO ")) return "Viano";
+	if (nameUpper.startsWith("CITAN ")) return "Citan";
+	if (nameUpper.startsWith("X ")) return "X-Class";
+	if (nameUpper.startsWith("MB 100") || nameUpper.startsWith("MB100")) return "MB100";
+	if (nameUpper.startsWith("MB 140") || nameUpper.startsWith("MB140")) return "MB140";
+	if (nameUpper.startsWith("R ")) return "R-Class";
+	if (nameUpper.startsWith("VANEO ")) return "Vaneo";
+	if (nameUpper.startsWith("VARIO ")) return "Vario";
+	if (nameUpper.startsWith("SLS ")) return "SLS AMG";
+	if (nameUpper.startsWith("CLC ")) return "CLC-Class";
+	if (nameUpper.startsWith("ML ") || nameUpper.startsWith("ML-") || nameUpper.startsWith("M-")) return "M-Class";
+	return "Other";
+};
+
 export default function HeroSection() {
 	const [regNumber, setRegNumber] = useState("");
 	const [selectedBrand, setSelectedBrand] = useState("");
 	const [brands, setBrands] = useState([]);
 	const [models, setModels] = useState([]);
+	const [selectedClass, setSelectedClass] = useState("");
 	const [selectedModel, setSelectedModel] = useState("");
 	const [selectedYear, setSelectedYear] = useState("");
 	const [selectedEngineSize, setSelectedEngineSize] = useState("");
@@ -100,11 +160,7 @@ export default function HeroSection() {
 		try {
 			const res = await API.get("/brands");
 
-			// Hide BMW only
-			const filteredBrands = (res.data.data || []).filter(
-	(brand) => brand.slug !== "mercedes-benz"
-);
-
+			const filteredBrands = (res.data.data || []);
 			setBrands(filteredBrands);
 		} catch (error) {
 			console.error("Failed to fetch brands", error);
@@ -118,6 +174,7 @@ export default function HeroSection() {
 		const fetchModels = async () => {
 			if (!selectedBrand) {
 				setModels([]);
+				setSelectedClass("");
 				setSelectedModel("");
 				setDynamicYears([]);
 				setSelectedYear("");
@@ -134,6 +191,7 @@ export default function HeroSection() {
 				} else {
 					setModels([]);
 				}
+				setSelectedClass("");
 				setSelectedModel("");
 				setDynamicYears([]);
 				setSelectedYear("");
@@ -142,6 +200,7 @@ export default function HeroSection() {
 			} catch (error) {
 				console.error("Failed to fetch models", error);
 				setModels([]);
+				setSelectedClass("");
 				setSelectedModel("");
 			} finally {
 				setLoadingModels(false);
@@ -315,6 +374,12 @@ export default function HeroSection() {
 			},
 		});
 	};
+
+	const filteredModels = selectedBrand === "mercedes-benz"
+		? (selectedClass ? models.filter(m => getMercedesClass(m.name) === selectedClass) : [])
+		: models;
+
+
 	return (
 		<Box bg="#f7f7f7" pt={{ base: 8, md: 12 }} pb={{ base: 16, md: 24 }} overflow="visible">
 			<Container maxW="container.xl">
@@ -513,6 +578,7 @@ export default function HeroSection() {
 								onChange={(e) => {
 									setSelectedBrand(e.target.value);
 									setSelectedModel("");
+									setSelectedClass("");
 								}}
 								size="lg"
 								h="54px"
@@ -531,12 +597,39 @@ export default function HeroSection() {
 								))}
 							</Select>
 
+							{/* Class Select (Mercedes-Benz only) */}
+							{selectedBrand === "mercedes-benz" && (
+								<Select
+									placeholder="Select Class"
+									value={selectedClass}
+									onChange={(e) => {
+										setSelectedClass(e.target.value);
+										setSelectedModel("");
+									}}
+									size="lg"
+									h="54px"
+									bg="gray.50"
+									borderColor="gray.200"
+									borderRadius="xl"
+									_hover={{ borderColor: "gray.300", bg: "white" }}
+									_focus={{ borderColor: RED, bg: "white", boxShadow: `0 0 0 3px rgba(225,6,0,0.1)` }}
+									fontWeight="600"
+									fontSize="15px"
+								>
+									{[...new Set(models.map((m) => getMercedesClass(m.name)))].sort().map((cls) => (
+										<option key={cls} value={cls}>
+											{cls}
+										</option>
+									))}
+								</Select>
+							)}
+
 							{/* Model Select */}
 							<Select
 								placeholder={loadingModels ? "Loading Models..." : "Select Model"}
 								value={selectedModel}
 								onChange={(e) => setSelectedModel(e.target.value)}
-								isDisabled={!selectedBrand || loadingModels}
+								isDisabled={!selectedBrand || loadingModels || (selectedBrand === "mercedes-benz" && !selectedClass)}
 								size="lg"
 								h="54px"
 								bg="gray.50"
@@ -547,8 +640,8 @@ export default function HeroSection() {
 								fontWeight="600"
 								fontSize="15px"
 							>
-								{models.some(m => m.year || m.type) ? (
-									[...new Set(models.map(m => m.name))]
+								{filteredModels.some(m => m.year || m.type) ? (
+									[...new Set(filteredModels.map(m => m.name))]
 										.sort((a, b) => a.localeCompare(b, undefined, { numeric: true }))
 										.map((name) => (
 											<option key={name} value={name}>
@@ -556,7 +649,7 @@ export default function HeroSection() {
 											</option>
 										))
 								) : (
-									models.map((model) => (
+									filteredModels.map((model) => (
 										<option key={model._id} value={model.slug}>
 											{model.name}
 										</option>
@@ -614,8 +707,8 @@ export default function HeroSection() {
 								))}
 							</Select>
 
-							{/* Get Free Quotes Button aligned in Grid spanning 2 columns */}
-							<GridItem colSpan={{ base: 1, md: 2 }}>
+							{/* Get Free Quotes Button aligned in Grid */}
+							<GridItem colSpan={{ base: 1, md: selectedBrand === "mercedes-benz" ? 1 : 2 }}>
 								<Button
 									bg={RED}
 									color="white"

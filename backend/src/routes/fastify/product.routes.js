@@ -14,6 +14,12 @@ async function productRoutes(fastify, options) {
 		handler: controller.createProduct
 	});
 
+	// CREATE BULK (Protected)
+	fastify.post("/bulk", {
+		preHandler: [authHook, tenantHook, permissionHook("products", "create")],
+		handler: controller.createProductsBulk
+	});
+
 	// UPDATE (Protected)
 	fastify.put("/:id", {
 		preHandler: [authHook, tenantHook, permissionHook("products", "update")],

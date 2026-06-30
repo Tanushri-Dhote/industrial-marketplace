@@ -25,6 +25,11 @@ fastify.register(require("@fastify/cors"), {
 fastify.register(require("@fastify/jwt"), {
 	secret: process.env.JWT_SECRET || "supersecret",
 });
+fastify.register(require("@fastify/multipart"), {
+	limits: {
+		fileSize: 10 * 1024 * 1024, // 10MB limit
+	},
+});
 
 // Register Models (Mongoose)
 require("./models/Category");
@@ -53,6 +58,7 @@ fastify.addHook("onRequest", async (request, reply) => {
 
 // Register Routes
 fastify.register(require("./routes/fastify/admin.routes"), { prefix: "/api" });
+fastify.register(require("./routes/fastify/upload.routes"), { prefix: "/api/upload" });
 fastify.register(require("./routes/fastify/auth.routes"), { prefix: "/api/auth" });
 fastify.register(require("./routes/fastify/blog.routes"), { prefix: "/api/blogs" });
 fastify.register(require("./routes/fastify/brand.routes"), { prefix: "/api/brands" });

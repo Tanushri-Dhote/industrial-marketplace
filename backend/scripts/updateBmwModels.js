@@ -88,12 +88,51 @@ async function update() {
 				.replace(/[^a-z0-9]+/g, "-")
 				.replace(/(^-|-$)/g, "");
 
-			// Determine sprite position
+			// Determine sprite position using matching data
 			const nameLower = name.toLowerCase();
-			let spritePosition = { x: -135, y: -228 }; // Default: M-series / general saloon-coupe position
-			
-			if (nameLower.startsWith("x") || nameLower.startsWith("ix")) {
-				spritePosition = { x: -945, y: -836 }; // SUV sprite position
+			let spriteFields = {};
+
+			const bmwModelData = [
+				{ name: "m8", x: 0, y: -76 },
+				{ name: "m6", x: -270, y: -152 },
+				{ name: "m-series", x: -135, y: -228 },
+				{ name: "m5", x: -540, y: -76 },
+				{ name: "m4", x: -540, y: -152 },
+				{ name: "m3", x: -540, y: -228 },
+				{ name: "1 series", x: -135, y: -2280 },
+				{ name: "2 series", x: -1080, y: -1596 },
+				{ name: "3 series", x: -2565, y: -2736 },
+				{ name: "4 series", x: -810, y: -1900 },
+				{ name: "5 series", x: -675, y: -1672 },
+				{ name: "6 series", x: -2025, y: -1596 },
+				{ name: "7 series", x: -2025, y: -2204 },
+				{ name: "8 series", x: -3105, y: -532 },
+				{ name: "x1", x: -2160, y: -304 },
+				{ name: "x3", x: -1620, y: -2128 },
+				{ name: "x4", x: -675, y: -1976 },
+				{ name: "x5", x: -1620, y: -1900 },
+				{ name: "x6", x: -135, y: -1824 },
+				{ name: "x7", x: -3105, y: -1216 },
+				{ name: "z4", x: -2430, y: -304 }
+			];
+
+			const match = bmwModelData.find(d => {
+				const spriteName = d.name.toLowerCase();
+				return nameLower === spriteName || 
+					nameLower.startsWith(spriteName + " ") ||
+					nameLower.startsWith(spriteName + "-") ||
+					(spriteName.length > 1 && nameLower.startsWith(spriteName));
+			});
+
+			if (match) {
+				let className = match.name.toLowerCase().replace(/\s+/g, "-");
+				if (className === "x3") className = "x3-";
+				spriteFields = {
+					spriteClass: `bg-${className}`,
+					spriteSheetUrl: "/images/car_sprites.png",
+					spritePosition: { x: match.x, y: match.y },
+					spriteSize: { width: 135, height: 76 }
+				};
 			}
 
 			return {
@@ -102,10 +141,7 @@ async function update() {
 				year: yearStr,
 				type: m.type,
 				slug,
-				spriteClass: `bg-${slug}`,
-				spriteSheetUrl: "/images/car_sprites.png",
-				spritePosition,
-				spriteSize: { width: 135, height: 76 },
+				...spriteFields,
 				isActive: true,
 			};
 		});

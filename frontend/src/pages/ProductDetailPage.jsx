@@ -153,11 +153,11 @@ export default function ProductDetailPage() {
 					</HStack>
 				</Flex>
 
-				<Flex direction={{ base: "column", lg: "row" }} gap={10}>
+				<Flex direction={{ base: "column", lg: "row" }} gap={8}>
 
 					{/* LEFT - Image Gallery */}
 					<Box flex="1">
-						<Box bg="white" borderRadius="2xl" p={6} boxShadow="sm" mb={8}>
+						<Box bg="white" borderRadius="2xl" p={6} boxShadow="sm">
 							{/* Thumbnails */}
 							{product.images?.length > 1 && (
 								<HStack spacing={3} mb={6} overflowX="auto" pb={2}>
@@ -205,17 +205,19 @@ export default function ProductDetailPage() {
 
 						<SimpleGrid columns={{ base: 2, md: 4 }} gap={6} mb={8}>
 							{[
-								{ icon: FaTachometerAlt, label: "Make & Model", value: `${product.make} ${product.model}` },
+								{ icon: FaTachometerAlt, label: "Make & Model", value: [product.make, product.model].filter(Boolean).join(" ") },
 								{ icon: FaCalendarAlt, label: "Year", value: product.year },
 								{ icon: FaGasPump, label: "Engine", value: product.engineType },
 								{ icon: FaCog, label: "Condition", value: product.condition },
-							].map((item, i) => (
-								<Box key={i} bg="white" p={5} borderRadius="xl" boxShadow="sm">
-									<Icon as={item.icon} color={RED} mb={3} boxSize={6} />
-									<Text fontSize="13px" color="gray.500">{item.label}</Text>
-									<Text fontWeight="700" fontSize="16px" color={DARK}>{item.value}</Text>
-								</Box>
-							))}
+							]
+								.filter((item) => item.value && String(item.value).trim() !== "")
+								.map((item, i) => (
+									<Box key={i} bg="white" p={5} borderRadius="xl" boxShadow="sm">
+										<Icon as={item.icon} color={RED} mb={3} boxSize={6} />
+										<Text fontSize="13px" color="gray.500">{item.label}</Text>
+										<Text fontWeight="700" fontSize="16px" color={DARK}>{item.value}</Text>
+									</Box>
+								))}
 						</SimpleGrid>
 
 						<Button
@@ -234,62 +236,122 @@ export default function ProductDetailPage() {
 					</Box>
 				</Flex>
 
-				{/* Rest of the content remains the same */}
-				<Flex direction={{ base: "column", lg: "row" }} gap={8} mt={12}>
-					<Box flex="1" bg="white" p={8} borderRadius="2xl" boxShadow="sm">
-						<Heading size="md" mb={4} color={DARK}>Product Overview</Heading>
-						<Text fontSize="15.5px" lineHeight="1.8" color="gray.600">
-							{product.description}
-						</Text>
-					</Box>
-
-					<Box w={{ base: "100%", lg: "360px" }} bg="white" p={8} borderRadius="2xl" boxShadow="sm">
-						<HStack mb={5}>
-							<Icon as={FaMapMarkerAlt} color={RED} />
-							<Heading size="md" color={DARK}>Seller Information</Heading>
-						</HStack>
-						{product.seller && (
-							<>
-								<Text fontWeight="600" fontSize="17px">{product.seller.name}</Text>
-								<Text color="gray.500" mt={1}>Gearbox Specialists</Text>
-								<Text color="gray.500" mt={1}>{product.shipping?.location || "United Kingdom"}</Text>
-							</>
+				{/* Two-Column Details Layout */}
+				<Flex direction={{ base: "column", lg: "row" }} gap={8} mt={6} align="start">
+					{/* Left Column — 65% on large screens */}
+					<VStack flex="3" align="stretch" spacing={8} w="full">
+						{/* Product Overview */}
+						{product.description && (
+							<Box bg="white" p={8} borderRadius="2xl" boxShadow="sm" border="1px solid" borderColor="gray.100">
+								<Heading size="md" mb={4} color={DARK}>Product Overview</Heading>
+								<Box 
+									fontSize="15px" 
+									lineHeight="1.8" 
+									color="gray.600"
+									dangerouslySetInnerHTML={{ __html: product.description }}
+									sx={{
+										"ul, ol": { paddingLeft: "20px", marginY: "10px" },
+										"li": { marginY: "5px" },
+										"p": { marginY: "10px" },
+										"h3": { fontSize: "17px", fontWeight: "bold", marginY: "12px", color: DARK }
+									}}
+								/>
+							</Box>
 						)}
-					</Box>
-				</Flex>
 
-				{/* Technical Specifications */}
-				<Box mt={12} bg="white" p={8} borderRadius="2xl" boxShadow="sm">
-					<Heading size="md" mb={6} color={DARK}>Technical Specifications</Heading>
-					<SimpleGrid columns={{ base: 1, md: 2 }} spacing={6}>
-						{[
-							{ label: "Make", value: product.make },
-							{ label: "Model", value: product.model },
-							{ label: "Year", value: product.year },
-							{ label: "Engine Type", value: product.engineType },
-							{ label: "Condition", value: product.condition },
-						].map((item, i) => (
-							<HStack key={i} justify="space-between" py={4} borderBottom="1px solid" borderColor="gray.100">
-								<Text color="gray.600">{item.label}</Text>
-								<Text fontWeight="600" color={DARK}>{item.value}</Text>
-							</HStack>
-						))}
-					</SimpleGrid>
-				</Box>
+						{/* Additional Details */}
+						{product.additionalDetails && (
+							<Box bg="white" p={8} borderRadius="2xl" boxShadow="sm" border="1px solid" borderColor="gray.100">
+								<Heading size="md" mb={4} color={DARK}>Additional Details</Heading>
+								<Box 
+									fontSize="15px" 
+									lineHeight="1.8" 
+									color="gray.600"
+									dangerouslySetInnerHTML={{ __html: product.additionalDetails }}
+									sx={{
+										"ul, ol": { paddingLeft: "20px", marginY: "10px" },
+										"li": { marginY: "5px" },
+										"p": { marginY: "10px" },
+										"h3": { fontSize: "17px", fontWeight: "bold", marginY: "12px", color: DARK }
+									}}
+								/>
+							</Box>
+						)}
 
-				{/* Benefits */}
-				<Flex wrap="wrap" gap={6} mt={12}>
-					{[
-						{ icon: FaCertificate, text: "Quality Tested & Certified" },
-						{ icon: FaTruck, text: "Nationwide collection and delivery available." },
-						{ icon: FaShieldAlt, text: "06 Months Warranty" },
-						{ icon: FaCheckCircle, text: "Satisfaction Guaranteed" },
-					].map((item, i) => (
-						<Box key={i} flex="1" minW="240px" bg="white" p={6} borderRadius="2xl" boxShadow="sm">
-							<Icon as={item.icon} color={RED} boxSize={9} mb={4} />
-							<Text fontWeight="600" fontSize="16px">{item.text}</Text>
+						{/* Compatible Vehicles */}
+						{product.compatibility && product.compatibility.length > 0 && (
+							<Box bg="white" p={8} borderRadius="2xl" boxShadow="sm" border="1px solid" borderColor="gray.100">
+								<Heading size="md" mb={6} color={DARK}>Compatible Vehicles</Heading>
+								<Flex wrap="wrap" gap={3}>
+									{product.compatibility.map((c, i) => (
+										<Badge
+											key={i}
+											colorScheme="red"
+											px={4}
+											py={2}
+											borderRadius="lg"
+											fontSize="13px"
+											fontWeight="bold"
+											variant="subtle"
+										>
+											{c.make} {c.model}
+										</Badge>
+									))}
+								</Flex>
+							</Box>
+						)}
+					</VStack>
+
+					{/* Right Column — 35% on large screens (Sticky Sidebar) */}
+					<VStack flex="2" align="stretch" spacing={8} w="full" position={{ lg: "sticky" }} top="100px">
+						{/* Technical Specifications */}
+						{(() => {
+							const specs = [
+								{ label: "Make", value: product.make },
+								{ label: "Model", value: product.model },
+								{ label: "Year", value: product.year },
+								{ label: "Engine Type", value: product.engineType },
+								{ label: "Condition", value: product.condition },
+							].filter((item) => item.value && String(item.value).trim() !== "");
+
+							if (specs.length === 0) return null;
+
+							return (
+								<Box bg="white" p={6} borderRadius="2xl" boxShadow="sm" border="1px solid" borderColor="gray.100">
+									<Heading size="md" mb={6} color={DARK}>Technical Specifications</Heading>
+									<VStack align="stretch" spacing={4}>
+										{specs.map((item, i) => (
+											<HStack key={i} justify="space-between" pb={3} borderBottom={i < specs.length - 1 ? "1px solid" : "none"} borderColor="gray.100">
+												<Text color="gray.500" fontSize="14px">{item.label}</Text>
+												<Text fontWeight="600" color={DARK} fontSize="14px">{item.value}</Text>
+											</HStack>
+										))}
+									</VStack>
+								</Box>
+							);
+						})()}
+
+						{/* Why Buy From Us Card */}
+						<Box bg="white" p={6} borderRadius="2xl" boxShadow="sm" border="1px solid" borderColor="gray.100">
+							<Heading size="md" mb={6} color={DARK}>Why Buy From Us?</Heading>
+							<VStack align="stretch" spacing={5}>
+								{[
+									{ icon: FaCertificate, text: "Quality Tested & Certified", desc: "Every unit is thoroughly inspected." },
+									{ icon: FaTruck, text: "Nationwide collection & delivery", desc: "Fast shipping options available." },
+									{ icon: FaShieldAlt, text: "06 Months Warranty", desc: "Comes with premium warranty coverage." },
+									{ icon: FaCheckCircle, text: "Satisfaction Guaranteed", desc: "We ensure total product quality." },
+								].map((item, i) => (
+									<HStack key={i} spacing={4} align="start">
+										<Icon as={item.icon} color={RED} boxSize={5} mt={0.5} />
+										<VStack align="flex-start" spacing={0}>
+											<Text fontWeight="600" fontSize="14px" color={DARK}>{item.text}</Text>
+											<Text fontSize="12px" color="gray.500">{item.desc}</Text>
+										</VStack>
+									</HStack>
+								))}
+							</VStack>
 						</Box>
-					))}
+					</VStack>
 				</Flex>
 
 				{/* Similar Products */}
