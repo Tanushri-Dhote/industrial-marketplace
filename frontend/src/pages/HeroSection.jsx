@@ -56,12 +56,12 @@ export default function HeroSection() {
 	const [selectedYear, setSelectedYear] = useState("");
 	const [selectedEngineSize, setSelectedEngineSize] = useState("");
 	const [selectedPart, setSelectedPart] = useState("Engine");
-	
+
 	const [dynamicYears, setDynamicYears] = useState([]);
 	const [dynamicEngines, setDynamicEngines] = useState([]);
 	const [loadingModels, setLoadingModels] = useState(false);
 	const [loadingProducts, setLoadingProducts] = useState(false);
-	
+
 	const navigate = useNavigate();
 	const { isOpen, onOpen, onClose } = useDisclosure();
 
@@ -81,18 +81,38 @@ export default function HeroSection() {
 		"Diesel (Other)"
 	];
 
-	useEffect(() => {
-		const fetchBrands = async () => {
-			try {
-				const res = await API.get("/brands");
-				setBrands(res.data.data || []);
-			} catch (error) {
-				console.error("Failed to fetch brands", error);
-			}
-		};
+	// useEffect(() => {
+	// 	const fetchBrands = async () => {
+	// 		try {
+	// 			const res = await API.get("/brands");
+	// 			setBrands(res.data.data || []);
+	// 		} catch (error) {
+	// 			console.error("Failed to fetch brands", error);
+	// 		}
+	// 	};
 
-		fetchBrands();
-	}, []);
+	// 	fetchBrands();
+	// }, []);
+
+
+	useEffect(() => {
+	const fetchBrands = async () => {
+		try {
+			const res = await API.get("/brands");
+
+			// Hide BMW only
+			const filteredBrands = (res.data.data || []).filter(
+	(brand) => brand.slug !== "mercedes-benz"
+);
+
+			setBrands(filteredBrands);
+		} catch (error) {
+			console.error("Failed to fetch brands", error);
+		}
+	};
+
+	fetchBrands();
+}, []);
 
 	useEffect(() => {
 		const fetchModels = async () => {
@@ -142,12 +162,39 @@ export default function HeroSection() {
 
 			const hasYearType = models.some(m => m.year || m.type);
 			if (hasYearType) {
-				const years = [...new Set(
-					models
-						.filter(m => m.name === selectedModel)
-						.map(m => m.year)
-						.filter(Boolean)
-				)].sort((a, b) => b.localeCompare(a, undefined, { numeric: true }));
+				// const years = [...new Set(
+				// 	models
+				// 		.filter(m => m.name === selectedModel)
+				// 		.map(m => m.year)
+				// 		.filter(Boolean)
+				// )].sort((a, b) => b.localeCompare(a, undefined, { numeric: true }));
+
+				const years = [
+					...new Set(
+						models
+							.filter((m) => m.name === selectedModel)
+							.flatMap((m) => {
+								if (!m.year) return [];
+
+								// Handle ranges like "2009 - 2025"
+								if (m.year.includes("-")) {
+									const [start, end] = m.year.split("-").map((y) => parseInt(y.trim(), 10));
+
+									if (!isNaN(start) && !isNaN(end)) {
+										const arr = [];
+										for (let y = start; y <= end; y++) {
+											arr.push(String(y));
+										}
+										return arr;
+									}
+								}
+
+								return [m.year.trim()];
+							})
+					)
+				].sort((a, b) => Number(a) - Number(b));
+
+				setDynamicYears(years);
 				setDynamicYears(years);
 				setSelectedYear("");
 				setDynamicEngines([]);
@@ -159,29 +206,29 @@ export default function HeroSection() {
 			try {
 				const brandObj = brands.find((b) => b.slug === selectedBrand);
 				const modelObj = models.find((m) => m.slug === selectedModel);
-				
+
 				const makeFilter = brandObj ? brandObj.name : selectedBrand;
 				const modelName = modelObj ? modelObj.name : selectedModel;
-				
+
 				const res = await API.get("/products", {
 					params: { make: makeFilter, model: modelName }
 				});
 				const products = res.data?.data || res.data || [];
-				
+
 				if (products.length > 0) {
 					const years = [...new Set(products.map(p => p.year).filter(Boolean))]
 						.map(Number)
 						.sort((a, b) => b - a)
 						.map(String);
-						
+
 					let engines = [];
 					products.forEach(p => {
 						if (p.engineType) engines.push(p.engineType);
 						if (p.specifications) {
-							const specsObj = p.specifications instanceof Map 
-								? Object.fromEntries(p.specifications) 
+							const specsObj = p.specifications instanceof Map
+								? Object.fromEntries(p.specifications)
 								: p.specifications;
-								
+
 							const size = specsObj["Engine Size"] || specsObj["Engine Size/Type"] || specsObj["engineSize"];
 							if (size) engines.push(size);
 						}
@@ -193,7 +240,7 @@ export default function HeroSection() {
 						}
 					});
 					const uniqueEngines = [...new Set(engines.filter(Boolean))].sort();
-					
+
 					setDynamicYears(years.length > 0 ? years : yearsList);
 					setDynamicEngines(uniqueEngines.length > 0 ? uniqueEngines : engineSizesList);
 				} else {
@@ -534,8 +581,12 @@ export default function HeroSection() {
 								fontSize="15px"
 							>
 								{dynamicYears.map((y) => (
+									// <option key={y} value={y}>
+									// 	{y === "2011" ? "2011 11/61 reg" : y}
+									// </option>
+
 									<option key={y} value={y}>
-										{y === "2011" ? "2011 11/61 reg" : y}
+										{y}
 									</option>
 								))}
 							</Select>

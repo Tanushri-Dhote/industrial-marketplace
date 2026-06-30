@@ -159,7 +159,7 @@ export default function Header() {
             <HStack spacing={{ base: 2, sm: 4 }} wrap="wrap" justify="center">
               <HStack spacing={1.5}>
                 <FaPhone size="10px" />
-                <Text>+44 20 8133 4040</Text>
+                <Text>+44 2071129397</Text>
               </HStack>
               <HStack spacing={1.5}>
                 <FaEnvelope size="10px" />
@@ -295,7 +295,7 @@ export default function Header() {
 
                   <VStack spacing={0} align="start" lineHeight="1">
                     <Text fontWeight="700" fontSize="14px" color="gray.800">
-                      +44 20 8133 4040
+                      +44 2071129397
                     </Text>
                     <Text fontSize="11px" color="gray.500">
                       Mon - Sat: 8:00 AM - 6:00 PM
@@ -388,7 +388,7 @@ export default function Header() {
 
                   <VStack spacing={0} align="start" lineHeight="1">
                     <Text fontWeight="700" fontSize="14px" color="gray.800">
-                      +44 20 8133 4040
+                      +44 2071129397
                     </Text>
                     <Text fontSize="11px" color="gray.500">
                       Mon - Sat: 8:00 AM - 6:00 PM

@@ -113,14 +113,14 @@ export default function Footer() {
             <HStack align="start">
               <Icon as={MdLocationOn} color={accentColor} mt={1} />
               <Text fontSize="14px" color="gray.400">
-                38 Fowler Rd, Ilford IG6 3UT, UK
+                44 Fowler Road, Hainault Business Park, Ilford London, IG6 3UT
               </Text>
             </HStack>
 
             <HStack>
               <Icon as={MdPhone} color={accentColor} />
               <Text fontSize="14px" color="gray.400">
-                +44 20 8133 4040
+                +44 2071129397
               </Text>
             </HStack>
 

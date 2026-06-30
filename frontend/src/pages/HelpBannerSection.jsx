@@ -97,7 +97,7 @@ const HelpBannerSection = () => {
                                     leftIcon={<Icon as={FaPhoneAlt} color="#E10600" boxSize={4} />}
                                     boxShadow="sm"
                                 >
-                                    +44 20 8133 4040
+                                    +44 2071129397
                                 </Button>
                             </HStack>
                         </VStack>
