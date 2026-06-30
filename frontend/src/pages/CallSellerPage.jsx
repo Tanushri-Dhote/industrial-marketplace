@@ -204,15 +204,70 @@ export default function CallSellerPage({ isModal = false, onCloseModal }) {
 								</HStack>
 
 								{!safeVrm && (
-									<Input
-										mt={6}
-										size="lg"
-										placeholder="Enter Registration Number (Optional) (e.g. AB12CDE)"
-										value={manualVrm}
-										onChange={(e) => setManualVrm(e.target.value.toUpperCase().replace(/\s+/g, ""))}
+									<Box
+										position="relative"
+										bg="#FFD300"
+										border="3px solid #111111"
 										borderRadius="xl"
-										_focus={{ borderColor: RED }}
-									/>
+										h="76px"
+										w="full"
+										overflow="hidden"
+										boxShadow="md"
+										display="flex"
+										alignItems="center"
+										mt={6}
+									>
+										{/* Blue UK Band */}
+										<VStack
+											bg="#003399"
+											w="50px"
+											h="full"
+											justify="center"
+											spacing={1.5}
+											px={2}
+											flexShrink={0}
+											borderRight="1px solid #111111"
+										>
+											{/* SVG Union Jack */}
+											<Box w="28px" h="16px" borderRadius="xs" overflow="hidden">
+												<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 30" width="100%" height="100%">
+													<clipPath id="s">
+														<path d="M0,0 L60,0 L60,30 L0,30 Z"/>
+													</clipPath>
+													<clipPath id="t">
+														<path d="M30,15 L0,0 L0,30 Z"/>
+													</clipPath>
+													<path d="M0,0 L60,30 M60,0 L0,30" stroke="#fff" strokeWidth="6"/>
+													<path d="M0,0 L60,30 M60,0 L0,30" stroke="#c8102e" strokeWidth="4"/>
+													<path d="M30,0 L30,30 M0,15 L60,15" stroke="#fff" strokeWidth="10"/>
+													<path d="M30,0 L30,30 M0,15 L60,15" stroke="#c8102e" strokeWidth="6"/>
+												</svg>
+											</Box>
+											<Text color="#FFD300" fontSize="11px" fontWeight="900" lineHeight="1" letterSpacing="0.5px">
+												UK
+											</Text>
+										</VStack>
+
+										{/* Input Field */}
+										<Input
+											value={manualVrm}
+											onChange={(e) => setManualVrm(e.target.value.toUpperCase().replace(/\s+/g, ""))}
+											placeholder="ENTER YOUR REG"
+											border="none"
+											bg="transparent"
+											h="full"
+											flex="1"
+											color="#111111"
+											fontSize="28px"
+											fontWeight="bold"
+											fontFamily="'Impact', 'Arial Black', sans-serif"
+											letterSpacing="4px"
+											textAlign="center"
+											_focus={{ boxShadow: "none" }}
+											_placeholder={{ color: "rgba(17, 17, 17, 0.35)", letterSpacing: "2px" }}
+											textTransform="uppercase"
+										/>
+									</Box>
 								)}
 							</Box>
 

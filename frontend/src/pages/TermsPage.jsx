@@ -156,7 +156,7 @@ const sections = [
     title: "Warranty Terms",
     icon: FaShieldAlt,
     content: [
-      "All our reconditioned engines come with a comprehensive 12-month warranty.",
+      "All our reconditioned engines come with a comprehensive 06-month warranty.",
       "Warranty covers manufacturing defects and workmanship issues.",
       "Regular maintenance as specified in the vehicle manual must be followed.",
       "Warranty may be voided if the engine is modified or improperly installed.",
