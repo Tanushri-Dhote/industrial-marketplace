@@ -31,7 +31,7 @@ export default function ContactPage() {
 	const [formData, setFormData] = useState({
 		name: "",
 		email: "",
-		phone: "",
+		phone: "+44",
 		subject: "",
 		message: "",
 	});
@@ -56,7 +56,7 @@ export default function ContactPage() {
 				duration: 5000,
 				isClosable: true,
 			});
-			setFormData({ name: "", email: "", phone: "", subject: "", message: "" });
+			setFormData({ name: "", email: "", phone: "+44", subject: "", message: "" });
 		} catch (error) {
 			toast({
 				title: "Error",
@@ -147,12 +147,12 @@ export default function ContactPage() {
 						{
 							icon: MdLocationOn,
 							title: "ADDRESS",
-							content: "38 Fowler Rd, Ilford IG6 3UT, UK",
+							content: "44 Fowler Road, Hainault Business Park, Ilford London, IG6 3UT",
 						},
 						{
 							icon: FaPhoneAlt,
 							title: "PHONE",
-							content: "+44 20 8133 4040\nMon - Sat: 8:00 AM - 6:00 PM",
+							content: "+44 2071129397\nMon - Sat: 8:00 AM - 6:00 PM",
 						},
 						{
 							icon: MdEmail,
@@ -281,15 +281,20 @@ export default function ContactPage() {
 											onChange={(e) => {
 												let value = e.target.value;
 
-												// Allow only numbers and +
-												value = value.replace(/[^\d+]/g, "");
+												// Always keep +44 at the beginning
+												if (!value.startsWith("+44")) {
+													value = "+44";
+												}
 
-												// Restrict length (UK numbers max)
+												// Allow only digits after +44
+												value = "+44" + value.slice(3).replace(/\D/g, "");
+
+												// Limit to +44 followed by 10 digits
 												if (value.length <= 13) {
 													setFormData({ ...formData, phone: value });
 												}
 											}}
-											placeholder="+44 20 8133 4040"
+											placeholder="+44 2071129397"
 											size="lg"
 											h="54px"
 											type="tel"
@@ -430,7 +435,7 @@ export default function ContactPage() {
 							transition="all 0.3s ease"
 							boxShadow="lg"
 						>
-							+44 20 8133 4040
+							+44 2071129397
 						</Button>
 					</Flex>
 				</Box>
