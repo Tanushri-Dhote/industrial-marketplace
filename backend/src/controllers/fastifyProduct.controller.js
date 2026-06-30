@@ -72,6 +72,7 @@ exports.createProduct = async (request, reply) => {
 		});
 		reply.status(201).send({ message: "Product created", data: product });
 	} catch (error) {
+		console.error("ERROR: Failed to create product. Reason:", error);
 		reply.status(500).send({ message: error.message });
 	}
 };
@@ -126,6 +127,7 @@ exports.createProductsBulk = async (request, reply) => {
 		const result = await Product.insertMany(productsToInsert);
 		return { success: true, message: `Successfully imported ${result.length} products`, count: result.length };
 	} catch (error) {
+		console.error("ERROR: Failed to create products in bulk. Reason:", error);
 		reply.status(500).send({ message: error.message });
 	}
 };
