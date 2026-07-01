@@ -226,10 +226,10 @@ export default function EnginesModule() {
 	const startIndex = (currentPage - 1) * itemsPerPage;
 
 	useEffect(() => {
-		if (currentPage > 1 && currentPage > totalPages) {
-			setCurrentPage(totalPages);
+		if (productsData.pagination && currentPage > totalPages) {
+			setCurrentPage(Math.max(totalPages, 1));
 		}
-	}, [totalPages, currentPage]);
+	}, [totalPages, currentPage, productsData.pagination]);
 
 	return (
 		<ModuleFrame
