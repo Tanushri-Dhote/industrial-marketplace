@@ -1,5 +1,6 @@
 const Model = require("../models/Model");
 const Brand = require("../models/Brand");
+const Product = require("../models/Product");
 
 // Public endpoint
 exports.getModelsByBrand = async (request, reply) => {
@@ -17,11 +18,23 @@ exports.getModelsByBrand = async (request, reply) => {
 
 		const models = await Model.find({
 			brandId: brand._id,
-		}).sort({ name: 1 });
+		}).sort({ name: 1 }).lean();
+
+		// Find distinct model names for this brand's make
+		const distinctModels = await Product.distinct("model", {
+			make: { $in: [brand.productMake, brand.name] }
+		});
+		const distinctModelsLower = distinctModels.map((m) => (m || "").toLowerCase());
+
+		const filteredModels = models.filter((m) => {
+			const mn = (m.name || "").toLowerCase();
+			const ms = (m.slug || "").toLowerCase();
+			return distinctModelsLower.includes(mn) || distinctModelsLower.includes(ms);
+		});
 
 		return reply.send({
 			success: true,
-			data: models,
+			data: filteredModels,
 		});
 	} catch (error) {
 		return reply.code(500).send({

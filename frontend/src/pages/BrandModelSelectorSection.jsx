@@ -422,7 +422,7 @@ export default function BrandModelSelectorSection() {
 												size="sm"
 												variant="ghost"
 												onClick={handleBackToBrands}
-												leftIcon={<FaTimes />}
+												leftIcon={<FaArrowLeft />}
 												colorScheme="red"
 											>
 												Back
@@ -436,7 +436,7 @@ export default function BrandModelSelectorSection() {
 											size="sm"
 											variant="ghost"
 											onClick={handleBackToBrands}
-											leftIcon={<FaTimes />}
+											leftIcon={<FaArrowLeft />}
 											colorScheme="red"
 										>
 											Back

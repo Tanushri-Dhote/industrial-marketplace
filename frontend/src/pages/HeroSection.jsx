@@ -41,6 +41,7 @@ import { useState, useEffect } from "react";
 import { ChevronRightIcon, CheckCircleIcon } from "@chakra-ui/icons";
 import CallSellerPage from "./CallSellerPage";
 import API from "../services/api";
+import { toast } from "sonner";
 
 const MotionBox = motion(Box);
 
@@ -353,7 +354,7 @@ export default function HeroSection() {
 		if (!selectedYear) {
 			return toast.error("Please select a year");
 		}
-		if (!selectedEngineSize) {
+		if (showEngineSizeSelect && !selectedEngineSize) {
 			return toast.error("Please select engine size/type");
 		}
 
@@ -378,6 +379,9 @@ export default function HeroSection() {
 	const filteredModels = selectedBrand === "mercedes-benz"
 		? (selectedClass ? models.filter(m => getMercedesClass(m.name) === selectedClass) : [])
 		: models;
+
+	const showClassSelect = selectedBrand === "mercedes-benz";
+	const showEngineSizeSelect = !selectedYear || dynamicEngines.length > 0;
 
 
 	return (
@@ -685,30 +689,32 @@ export default function HeroSection() {
 							</Select>
 
 							{/* Engine Size Select */}
-							<Select
-								placeholder={loadingProducts ? "Loading Engines..." : "Select Engine Size/Type"}
-								value={selectedEngineSize}
-								onChange={(e) => setSelectedEngineSize(e.target.value)}
-								isDisabled={!selectedYear || loadingProducts}
-								size="lg"
-								h="54px"
-								bg="gray.50"
-								borderColor="gray.200"
-								borderRadius="xl"
-								_hover={{ borderColor: "gray.300", bg: "white" }}
-								_focus={{ borderColor: RED, bg: "white", boxShadow: `0 0 0 3px rgba(225,6,0,0.1)` }}
-								fontWeight="600"
-								fontSize="15px"
-							>
-								{dynamicEngines.map((size) => (
-									<option key={size} value={size}>
-										{size}
-									</option>
-								))}
-							</Select>
+							{showEngineSizeSelect && (
+								<Select
+									placeholder={loadingProducts ? "Loading Engines..." : "Select Engine Size/Type"}
+									value={selectedEngineSize}
+									onChange={(e) => setSelectedEngineSize(e.target.value)}
+									isDisabled={!selectedYear || loadingProducts}
+									size="lg"
+									h="54px"
+									bg="gray.50"
+									borderColor="gray.200"
+									borderRadius="xl"
+									_hover={{ borderColor: "gray.300", bg: "white" }}
+									_focus={{ borderColor: RED, bg: "white", boxShadow: `0 0 0 3px rgba(225,6,0,0.1)` }}
+									fontWeight="600"
+									fontSize="15px"
+								>
+									{dynamicEngines.map((size) => (
+										<option key={size} value={size}>
+											{size}
+										</option>
+									))}
+								</Select>
+							)}
 
 							{/* Get Free Quotes Button aligned in Grid */}
-							<GridItem colSpan={{ base: 1, md: selectedBrand === "mercedes-benz" ? 1 : 2 }}>
+							<GridItem colSpan={{ base: 1, md: 3 - ((3 + (showClassSelect ? 1 : 0) + (showEngineSizeSelect ? 1 : 0)) % 3) }}>
 								<Button
 									bg={RED}
 									color="white"
@@ -717,7 +723,7 @@ export default function HeroSection() {
 									w="full"
 									fontSize="md"
 									fontWeight="800"
-									isDisabled={!selectedBrand || !selectedModel || !selectedYear || !selectedEngineSize}
+									isDisabled={!selectedBrand || !selectedModel || !selectedYear || (showEngineSizeSelect && !selectedEngineSize)}
 									_hover={{ bg: "#c40000", transform: "translateY(-1px)", boxShadow: "lg" }}
 									_active={{ transform: "translateY(0)" }}
 									transition="all 0.15s ease"

@@ -1,10 +1,49 @@
 const Brand = require("../models/Brand");
+const Product = require("../models/Product");
 
 // Public endpoints
 exports.getBrands = async (request, reply) => {
 	try {
 		const brands = await Brand.find({ isActive: true }).sort({ name: 1 }).lean();
-		return reply.code(200).send({ success: true, data: brands });
+
+		// Find all models and group their names by brandId
+		const Model = require("../models/Model");
+		const models = await Model.find({ isActive: { $ne: false } }).lean();
+		const brandModelsMap = {};
+		models.forEach((model) => {
+			const bId = String(model.brandId);
+			if (!brandModelsMap[bId]) {
+				brandModelsMap[bId] = [];
+			}
+			brandModelsMap[bId].push((model.name || "").toLowerCase());
+			brandModelsMap[bId].push((model.slug || "").toLowerCase());
+		});
+
+		// Find distinct products grouped by make and model
+		const distinctProductPairs = await Product.aggregate([
+			{ $group: { _id: { make: "$make", model: "$model" } } },
+		]);
+
+		const filteredBrands = brands.filter((brand) => {
+			const pm = (brand.productMake || "").toLowerCase();
+			const bn = (brand.name || "").toLowerCase();
+			const bId = String(brand._id);
+
+			// Find if there is any product matching this brand's make AND matching at least one of its models
+			const allowedModels = brandModelsMap[bId] || [];
+
+			return distinctProductPairs.some((pair) => {
+				const pairMake = (pair._id.make || "").toLowerCase();
+				const pairModel = (pair._id.model || "").toLowerCase();
+
+				const makeMatches = pairMake === pm || pairMake === bn;
+				const modelMatches = allowedModels.includes(pairModel);
+
+				return makeMatches && modelMatches;
+			});
+		});
+
+		return reply.code(200).send({ success: true, data: filteredBrands });
 	} catch (error) {
 		return reply.code(500).send({ message: error.message });
 	}
