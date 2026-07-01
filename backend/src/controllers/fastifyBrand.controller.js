@@ -6,6 +6,11 @@ exports.getBrands = async (request, reply) => {
 	try {
 		const brands = await Brand.find({ isActive: true }).sort({ name: 1 }).lean();
 
+		const { all } = request.query || {};
+		if (all === "true") {
+			return reply.code(200).send({ success: true, data: brands });
+		}
+
 		// Find all models and group their names by brandId
 		const Model = require("../models/Model");
 		const models = await Model.find({ isActive: { $ne: false } }).lean();

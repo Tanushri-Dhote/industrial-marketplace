@@ -20,6 +20,14 @@ exports.getModelsByBrand = async (request, reply) => {
 			brandId: brand._id,
 		}).sort({ name: 1 }).lean();
 
+		const { all } = request.query || {};
+		if (all === "true") {
+			return reply.send({
+				success: true,
+				data: models,
+			});
+		}
+
 		// Find distinct model names for this brand's make
 		const distinctModels = await Product.distinct("model", {
 			make: { $in: [brand.productMake, brand.name] }

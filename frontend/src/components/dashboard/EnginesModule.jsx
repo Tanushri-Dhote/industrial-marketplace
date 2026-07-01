@@ -588,9 +588,9 @@ function EngineModal({ isOpen, onClose, onSave, engine }) {
 
 	// Fetch all brands
 	const { data: brands = [] } = useQuery({
-		queryKey: ["brands"],
+		queryKey: ["brands", "all"],
 		queryFn: async () => {
-			const res = await API.get("/brands");
+			const res = await API.get("/brands?all=true");
 			return res.data?.data || res.data || [];
 		},
 		enabled: isOpen,
@@ -605,10 +605,10 @@ function EngineModal({ isOpen, onClose, onSave, engine }) {
 
 	// Fetch models for the selected brand
 	const { data: models = [], isLoading: loadingModels } = useQuery({
-		queryKey: ["models", selectedBrandObj?._id],
+		queryKey: ["models", selectedBrandObj?._id, "all"],
 		queryFn: async () => {
 			if (!selectedBrandObj?._id) return [];
-			const res = await API.get(`/models/${selectedBrandObj._id}`);
+			const res = await API.get(`/models/${selectedBrandObj._id}?all=true`);
 			return res.data?.data || res.data || [];
 		},
 		enabled: isOpen && !!selectedBrandObj?._id,
@@ -622,10 +622,10 @@ function EngineModal({ isOpen, onClose, onSave, engine }) {
 	);
 
 	const { data: compModels = [], isLoading: loadingCompModels } = useQuery({
-		queryKey: ["compModels", compBrandObj?._id],
+		queryKey: ["compModels", compBrandObj?._id, "all"],
 		queryFn: async () => {
 			if (!compBrandObj?._id) return [];
-			const res = await API.get(`/models/${compBrandObj._id}`);
+			const res = await API.get(`/models/${compBrandObj._id}?all=true`);
 			return res.data?.data || res.data || [];
 		},
 		enabled: isOpen && !!compBrandObj?._id,
