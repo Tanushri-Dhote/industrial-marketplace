@@ -104,7 +104,6 @@ exports.createProduct = async (request, reply) => {
 		reply.status(500).send({ message: error.message });
 	}
 };
-
 // ================= UPDATE PRODUCT =================
 exports.updateProduct = async (request, reply) => {
 	try {
@@ -114,7 +113,7 @@ exports.updateProduct = async (request, reply) => {
 			payload.slug = slugify(payload.name);
 		}
 		const query = { _id: id };
-		if (request.tenantId) {
+		if (request.tenantId && request.user?.role !== "super_admin") {
 			query.website_id = request.tenantId;
 		}
 		const product = await Product.findOneAndUpdate(
@@ -134,7 +133,7 @@ exports.deleteProduct = async (request, reply) => {
 	try {
 		const { id } = request.params;
 		const query = { _id: id };
-		if (request.tenantId) {
+		if (request.tenantId && request.user?.role !== "super_admin") {
 			query.website_id = request.tenantId;
 		}
 		const product = await Product.findOneAndDelete(query);
