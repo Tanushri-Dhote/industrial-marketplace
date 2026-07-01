@@ -166,13 +166,22 @@ export default function EnginesModule() {
 		e.target.value = ""; // Reset
 	};
 
-	const { data: products = [], isLoading } = useQuery({
-		queryKey: ["products"],
+	const { data: productsData = {}, isLoading } = useQuery({
+		queryKey: ["products", currentPage, searchTerm],
 		queryFn: async () => {
-			const res = await API.get("/products");
-			return Array.isArray(res.data) ? res.data : res.data.data || [];
+			const res = await API.get("/products", {
+				params: {
+					page: currentPage,
+					limit: itemsPerPage,
+					search: searchTerm || undefined
+				}
+			});
+			return res.data || {};
 		},
 	});
+
+	const products = productsData.data || [];
+	const pagination = productsData.pagination || { total: 0, pages: 1 };
 
 	const saveMutation = useMutation({
 		mutationFn: async (payload) => {
@@ -212,22 +221,15 @@ export default function EnginesModule() {
 		deleteMutation.mutate(id);
 	};
 
-	const filteredProducts = products.filter(
-		(p) =>
-			p.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-			(p.make && p.make.toLowerCase().includes(searchTerm.toLowerCase())) ||
-			(p.model && p.model.toLowerCase().includes(searchTerm.toLowerCase())),
-	);
-
-	const totalPages = Math.ceil(filteredProducts.length / itemsPerPage);
+	const totalPages = pagination.pages || 1;
+	const totalProducts = pagination.total || 0;
 	const startIndex = (currentPage - 1) * itemsPerPage;
-	const paginatedProducts = filteredProducts.slice(startIndex, startIndex + itemsPerPage);
 
 	useEffect(() => {
-		if (currentPage > 1 && startIndex >= filteredProducts.length) {
-			setCurrentPage(Math.max(Math.ceil(filteredProducts.length / itemsPerPage), 1));
+		if (currentPage > 1 && currentPage > totalPages) {
+			setCurrentPage(totalPages);
 		}
-	}, [filteredProducts.length, currentPage, startIndex]);
+	}, [totalPages, currentPage]);
 
 	return (
 		<ModuleFrame
@@ -305,7 +307,7 @@ export default function EnginesModule() {
 						</Text>
 					</VStack>
 				</Center>
-			) : filteredProducts.length === 0 ? (
+			) : products.length === 0 ? (
 				<Center py={20} bg="gray.50" borderRadius="2xl" border="2px dashed" borderColor="gray.200">
 					<VStack spacing={3}>
 						<Icon as={Package} boxSize={12} color="gray.300" />
@@ -378,7 +380,7 @@ export default function EnginesModule() {
 								</Tr>
 							</Thead>
 							<Tbody>
-								{paginatedProducts.map((p) => (
+								{products.map((p) => (
 									<Tr key={p._id} _hover={{ bg: "gray.50/50" }}>
 										<Td>
 											<HStack spacing={3} maxW="280px">
@@ -482,7 +484,7 @@ export default function EnginesModule() {
 					{totalPages > 1 && (
 						<HStack justify="space-between" mt={2} px={2}>
 							<Text fontSize="sm" color="gray.500" fontWeight="600">
-								Showing {startIndex + 1} to {Math.min(startIndex + itemsPerPage, filteredProducts.length)} of {filteredProducts.length} entries
+								Showing {startIndex + 1} to {Math.min(startIndex + itemsPerPage, totalProducts)} of {totalProducts} entries
 							</Text>
 							<HStack spacing={2}>
 								<Button

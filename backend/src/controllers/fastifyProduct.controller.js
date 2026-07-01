@@ -4,7 +4,7 @@ const Product = require("../models/Product");
 exports.getProducts = async (request, reply) => {
 	try {
 		const filter = {};
-		const { make, model, limit } = request.query || {};
+		const { make, model, limit, page, search } = request.query || {};
 
 		if (make) {
 			filter.make = make;
@@ -14,11 +14,39 @@ exports.getProducts = async (request, reply) => {
 			filter.model = model;
 		}
 
+		if (search) {
+			filter.$or = [
+				{ name: { $regex: search, $options: "i" } },
+				{ make: { $regex: search, $options: "i" } },
+				{ model: { $regex: search, $options: "i" } },
+			];
+		}
+
 		if (request.tenantId) {
 			filter.website_id = request.tenantId;
 		}
 
 		let query = Product.find(filter).populate("category").sort({ price: 1, createdAt: -1 });
+
+		const pageNum = Number(page);
+		const limitNum = Number(limit || 10);
+
+		if (!isNaN(pageNum) && pageNum > 0) {
+			const skipNum = (pageNum - 1) * limitNum;
+			const total = await Product.countDocuments(filter);
+			query = query.skip(skipNum).limit(limitNum);
+			const products = await query;
+			return {
+				success: true,
+				data: products,
+				pagination: {
+					total,
+					page: pageNum,
+					limit: limitNum,
+					pages: Math.ceil(total / limitNum),
+				},
+			};
+		}
 
 		if (limit) {
 			query = query.limit(Number(limit));
