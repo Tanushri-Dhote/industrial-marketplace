@@ -21,7 +21,7 @@ exports.getModelsByBrand = async (request, reply) => {
 		}).sort({ name: 1 }).lean();
 
 		const { all } = request.query || {};
-		if (all === "true") {
+		if (all === "true" || all === true) {
 			return reply.send({
 				success: true,
 				data: models,

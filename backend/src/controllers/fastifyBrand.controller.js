@@ -7,7 +7,7 @@ exports.getBrands = async (request, reply) => {
 		const brands = await Brand.find({ isActive: true }).sort({ name: 1 }).lean();
 
 		const { all } = request.query || {};
-		if (all === "true") {
+		if (all === "true" || all === true) {
 			return reply.code(200).send({ success: true, data: brands });
 		}
 
