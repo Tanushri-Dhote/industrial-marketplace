@@ -86,6 +86,12 @@ export default function EnginesModule() {
 	const [searchTerm, setSearchTerm] = useState("");
 	const [editingProduct, setEditingProduct] = useState(null);
 	const { isOpen, onOpen, onClose } = useDisclosure();
+	const [currentPage, setCurrentPage] = useState(1);
+	const itemsPerPage = 10;
+
+	useEffect(() => {
+		setCurrentPage(1);
+	}, [searchTerm]);
 
 	const user = JSON.parse(localStorage.getItem("user") || "{}");
 	const role = user.role || "viewer";
@@ -213,6 +219,16 @@ export default function EnginesModule() {
 			(p.model && p.model.toLowerCase().includes(searchTerm.toLowerCase())),
 	);
 
+	const totalPages = Math.ceil(filteredProducts.length / itemsPerPage);
+	const startIndex = (currentPage - 1) * itemsPerPage;
+	const paginatedProducts = filteredProducts.slice(startIndex, startIndex + itemsPerPage);
+
+	useEffect(() => {
+		if (currentPage > 1 && startIndex >= filteredProducts.length) {
+			setCurrentPage(Math.max(Math.ceil(filteredProducts.length / itemsPerPage), 1));
+		}
+	}, [filteredProducts.length, currentPage, startIndex]);
+
 	return (
 		<ModuleFrame
 			icon={Package}
@@ -302,51 +318,31 @@ export default function EnginesModule() {
 					</VStack>
 				</Center>
 			) : (
-				<Box overflowX="auto" borderRadius="xl" border="1px solid" borderColor="gray.100">
-					<Table variant="simple" size="md" layout="fixed" minW="1000px">
-						<Thead bg="gray.50">
-							<Tr>
-								<Th
-									w="300px"
-									fontSize="11px"
-									fontWeight="800"
-									textTransform="uppercase"
-									color="gray.500"
-									py={4}
-								>
-									Product Info
-								</Th>
-								<Th
-									w="250px"
-									fontSize="11px"
-									fontWeight="800"
-									textTransform="uppercase"
-									color="gray.500"
-									py={4}
-								>
-									Specifications
-								</Th>
-								<Th
-									w="120px"
-									fontSize="11px"
-									fontWeight="800"
-									textTransform="uppercase"
-									color="gray.500"
-									py={4}
-								>
-									Price
-								</Th>
-								<Th
-									w="150px"
-									fontSize="11px"
-									fontWeight="800"
-									textTransform="uppercase"
-									color="gray.500"
-									py={4}
-								>
-									Status
-								</Th>
-								{!isViewer && (
+				<VStack align="stretch" spacing={4}>
+					<Box overflowX="auto" borderRadius="xl" border="1px solid" borderColor="gray.100">
+						<Table variant="simple" size="md" layout="fixed" minW="1000px">
+							<Thead bg="gray.50">
+								<Tr>
+									<Th
+										w="300px"
+										fontSize="11px"
+										fontWeight="800"
+										textTransform="uppercase"
+										color="gray.500"
+										py={4}
+									>
+										Product Info
+									</Th>
+									<Th
+										w="250px"
+										fontSize="11px"
+										fontWeight="800"
+										textTransform="uppercase"
+										color="gray.500"
+										py={4}
+									>
+										Specifications
+									</Th>
 									<Th
 										w="120px"
 										fontSize="11px"
@@ -355,112 +351,181 @@ export default function EnginesModule() {
 										color="gray.500"
 										py={4}
 									>
-										Actions
+										Price
 									</Th>
-								)}
-							</Tr>
-						</Thead>
-						<Tbody>
-							{filteredProducts.map((p) => (
-								<Tr key={p._id} _hover={{ bg: "gray.50/50" }}>
-									<Td>
-										<HStack spacing={3} maxW="280px">
-											<Image
-												src={p.images?.[0] || "https://images.unsplash.com/photo-1486006920555-c77dcf18193c?auto=format&fit=crop&w=80&q=80"}
-												alt={p.name}
-												boxSize="40px"
-												borderRadius="lg"
-												objectFit="cover"
-												bg="gray.50"
-												border="1px solid"
-												borderColor="gray.100"
-												fallback={<Center boxSize="40px" bg="gray.100" borderRadius="lg"><Icon as={Package} color="gray.400" /></Center>}
-											/>
-											<VStack align="flex-start" spacing={0} isTruncated w="full">
-												<Text fontWeight="800" color="gray.800" fontSize="14px" isTruncated w="full">
-													{p.name}
-												</Text>
-												<Text fontSize="12px" color="gray.500">
-													ID: {p._id.substring(0, 8)}...
-												</Text>
-											</VStack>
-										</HStack>
-									</Td>
-									<Td>
-										<HStack spacing={2} whiteSpace="nowrap">
-											<Badge
-												variant="subtle"
-												colorScheme="blue"
-												fontSize="10px"
-												px={2}
-												borderRadius="md"
-												maxW="110px"
-												isTruncated
-											>
-												{p.make || "Any Make"}
-											</Badge>
-											<Badge
-												variant="subtle"
-												colorScheme="purple"
-												fontSize="10px"
-												px={2}
-												borderRadius="md"
-												maxW="110px"
-												isTruncated
-											>
-												{p.model || "Any Model"}
-											</Badge>
-										</HStack>
-									</Td>
-									<Td>
-										<Text fontWeight="900" color="#D90404" fontSize="15px" whiteSpace="nowrap">
-											{p.currency || "£"}
-											{p.price?.toLocaleString() || "0.00"}
-										</Text>
-									</Td>
-									<Td>
-										<Badge
-											colorScheme={p.isSold ? "red" : "green"}
-											fontSize="11px"
-											borderRadius="full"
-											px={3}
-											py={1}
-											textTransform="uppercase"
-											variant="solid"
-											whiteSpace="nowrap"
-										>
-											{p.isSold ? "Sold" : "Available"}
-										</Badge>
-									</Td>
+									<Th
+										w="150px"
+										fontSize="11px"
+										fontWeight="800"
+										textTransform="uppercase"
+										color="gray.500"
+										py={4}
+									>
+										Status
+									</Th>
 									{!isViewer && (
-										<Td>
-											<HStack spacing={1} whiteSpace="nowrap">
-												<IconButton
-													icon={<EditIcon />}
-													size="sm"
-													variant="ghost"
-													onClick={() => {
-														setEditingProduct(p);
-														onOpen();
-													}}
-													aria-label="Edit Engine"
-												/>
-												<IconButton
-													icon={<DeleteIcon />}
-													size="sm"
-													variant="ghost"
-													colorScheme="red"
-													onClick={() => handleDelete(p._id)}
-													aria-label="Delete Engine"
-												/>
-											</HStack>
-										</Td>
+										<Th
+											w="120px"
+											fontSize="11px"
+											fontWeight="800"
+											textTransform="uppercase"
+											color="gray.500"
+											py={4}
+										>
+											Actions
+										</Th>
 									)}
 								</Tr>
-							))}
-						</Tbody>
-					</Table>
-				</Box>
+							</Thead>
+							<Tbody>
+								{paginatedProducts.map((p) => (
+									<Tr key={p._id} _hover={{ bg: "gray.50/50" }}>
+										<Td>
+											<HStack spacing={3} maxW="280px">
+												<Image
+													src={p.images?.[0] || "https://images.unsplash.com/photo-1486006920555-c77dcf18193c?auto=format&fit=crop&w=80&q=80"}
+													alt={p.name}
+													boxSize="40px"
+													borderRadius="lg"
+													objectFit="cover"
+													bg="gray.50"
+													border="1px solid"
+													borderColor="gray.100"
+													fallback={<Center boxSize="40px" bg="gray.100" borderRadius="lg"><Icon as={Package} color="gray.400" /></Center>}
+												/>
+												<VStack align="flex-start" spacing={0} isTruncated w="full">
+													<Text fontWeight="800" color="gray.800" fontSize="14px" isTruncated w="full">
+														{p.name}
+													</Text>
+													<Text fontSize="12px" color="gray.500">
+														ID: {p._id.substring(0, 8)}...
+													</Text>
+												</VStack>
+											</HStack>
+										</Td>
+										<Td>
+											<HStack spacing={2} whiteSpace="nowrap">
+												<Badge
+													variant="subtle"
+													colorScheme="blue"
+													fontSize="10px"
+													px={2}
+													borderRadius="md"
+													maxW="110px"
+													isTruncated
+												>
+													{p.make || "Any Make"}
+												</Badge>
+												<Badge
+													variant="subtle"
+													colorScheme="purple"
+													fontSize="10px"
+													px={2}
+													borderRadius="md"
+													maxW="110px"
+													isTruncated
+												>
+													{p.model || "Any Model"}
+												</Badge>
+											</HStack>
+										</Td>
+										<Td>
+											<Text fontWeight="900" color="#D90404" fontSize="15px" whiteSpace="nowrap">
+												{p.currency || "£"}
+												{p.price?.toLocaleString() || "0.00"}
+											</Text>
+										</Td>
+										<Td>
+											<Badge
+												colorScheme={p.isSold ? "red" : "green"}
+												fontSize="11px"
+												borderRadius="full"
+												px={3}
+												py={1}
+												textTransform="uppercase"
+												variant="solid"
+												whiteSpace="nowrap"
+											>
+												{p.isSold ? "Sold" : "Available"}
+											</Badge>
+										</Td>
+										{!isViewer && (
+											<Td>
+												<HStack spacing={1} whiteSpace="nowrap">
+													<IconButton
+														icon={<EditIcon />}
+														size="sm"
+														variant="ghost"
+														onClick={() => {
+															setEditingProduct(p);
+															onOpen();
+														}}
+														aria-label="Edit Engine"
+													/>
+													<IconButton
+														icon={<DeleteIcon />}
+														size="sm"
+														variant="ghost"
+														colorScheme="red"
+														onClick={() => handleDelete(p._id)}
+														aria-label="Delete Engine"
+													/>
+												</HStack>
+											</Td>
+										)}
+									</Tr>
+								))}
+							</Tbody>
+						</Table>
+					</Box>
+
+					{totalPages > 1 && (
+						<HStack justify="space-between" mt={2} px={2}>
+							<Text fontSize="sm" color="gray.500" fontWeight="600">
+								Showing {startIndex + 1} to {Math.min(startIndex + itemsPerPage, filteredProducts.length)} of {filteredProducts.length} entries
+							</Text>
+							<HStack spacing={2}>
+								<Button
+									size="sm"
+									variant="outline"
+									onClick={() => setCurrentPage((p) => Math.max(p - 1, 1))}
+									isDisabled={currentPage === 1}
+								>
+									Previous
+								</Button>
+								{Array.from({ length: totalPages }, (_, i) => i + 1)
+									.filter(page => page === 1 || page === totalPages || Math.abs(page - currentPage) <= 1)
+									.map((page, index, array) => {
+										const showEllipsis = index > 0 && page - array[index - 1] > 1;
+										return (
+											<React.Fragment key={page}>
+												{showEllipsis && <Text color="gray.400">...</Text>}
+												<Button
+													size="sm"
+													variant={currentPage === page ? "solid" : "outline"}
+													colorScheme={currentPage === page ? "red" : "gray"}
+													bg={currentPage === page ? "#D90404" : "transparent"}
+													color={currentPage === page ? "white" : "gray.600"}
+													_hover={currentPage === page ? { bg: "#c00404" } : undefined}
+													onClick={() => setCurrentPage(page)}
+												>
+													{page}
+												</Button>
+											</React.Fragment>
+										);
+									})}
+								<Button
+									size="sm"
+									variant="outline"
+									onClick={() => setCurrentPage((p) => Math.min(p + 1, totalPages))}
+									isDisabled={currentPage === totalPages}
+								>
+									Next
+								</Button>
+							</HStack>
+						</HStack>
+					)}
+				</VStack>
 			)}
 
 			<EngineModal isOpen={isOpen} onClose={onClose} onSave={handleSave} engine={editingProduct} />
