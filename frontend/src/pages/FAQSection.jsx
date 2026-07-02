@@ -20,31 +20,31 @@ import { FaQuestionCircle, FaChevronRight } from 'react-icons/fa';
 const faqs = [
   {
     question: "How does the engine search work?",
-    answer: "Simply enter your vehicle registration number or engine model to instantly find matching engines from verified sellers nationwide"
+    answer: "Simply enter your vehicle registration number or engine model to instantly find matching engines from our extensive inventory."
   },
   {
     question: "Are the engines original or refurbished?",
-    answer: "We offer both original and high-quality refurbished engines. Each listing clearly mentions the condition along with warranty details."
+    answer: "We offer both original and high-quality refurbished engines. Each engine clearly mentions the condition along with warranty details."
   },
   {
     question: "Do you provide warranty on engines?",
-    answer: "Yes, all engines come with a minimum 6 months to 1 years warranty depending on the seller and condition of the engine."
+    answer: "Yes, all engines come with a 6-month warranty."
   },
   {
     question: "How long does delivery take?",
-    answer: "Delivery usually takes 3-7 working days nationwide Local pickup or fitting options are also available in major cities."
+    answer: "Delivery usually takes 3-7 working days nationwide. Local pickup or fitting options are also available."
   },
   {
     question: "Can I get the engine fitted locally?",
-    answer: "Yes, many of our sellers offer supply + fitting service. You can select this option while comparing quotes."
+    answer: "Yes, we offer professional supply & fitting services. You can select this option while requesting your quote."
   },
   {
     question: "What if I receive a wrong or defective engine?",
-    answer: "If you receive an incorrect or faulty engine, please contact the supplier directly along with our support team within 48 hours of delivery so the issue can be reviewed and resolved."
+    answer: "If you receive an incorrect or faulty engine, please contact our support team within 48 hours of delivery so the issue can be reviewed and resolved."
   },
   {
     question: "How do I find the right engine for my vehicle?",
-    answer: "Simply submit your vehicle or engine details and our team will help connect you with suitable engine options from verified sellers."
+    answer: "Simply submit your vehicle or engine details and our team will help you find the matching engine option from our stock."
   },
 ];
 
