@@ -136,51 +136,39 @@ async function migrate() {
       let insertedCount = 0;
       const startTime = Date.now();
 
-      // Use a cursor stream for all collections to prevent socket/memory buffering hangs (no toArray())
-      let batch = [];
-      const WRITE_CHUNK_SIZE = 100;
-      const totalChunks = Math.ceil(count / WRITE_CHUNK_SIZE);
-      const cursor = sourceDb.collection(colName).find({}).batchSize(WRITE_CHUNK_SIZE);
+      const CHUNK_SIZE = 100;
+      let skip = 0;
+      const totalChunks = Math.ceil(count / CHUNK_SIZE);
+      let chunkNum = 1;
 
-      console.log(`    - [DEBUG] Opened cursor stream from source database...`);
-
-      for await (const doc of cursor) {
-        batch.push(doc);
-        if (batch.length >= WRITE_CHUNK_SIZE) {
-          const chunkNum = Math.floor(insertedCount / WRITE_CHUNK_SIZE) + 1;
-          console.log(`    - [DEBUG] Writing chunk ${chunkNum}/${totalChunks} (size: ${batch.length} documents)...`);
-          const chunkStart = Date.now();
-          try {
-            const res = await targetDb.collection(colName).insertMany(batch, { ordered: false });
-            insertedCount += res.insertedCount;
-            console.log(`      * [DEBUG] Chunk ${chunkNum}/${totalChunks} written successfully in ${Date.now() - chunkStart}ms. Total copied: ${insertedCount}/${count}`);
-            batch = [];
-          } catch (insertErr) {
-            console.error(`      ❌ [DEBUG] Chunk ${chunkNum}/${totalChunks} write failed after ${Date.now() - chunkStart}ms. Error:`, insertErr.message);
-            if (insertErr.result && insertErr.result.nInserted) {
-              insertedCount += insertErr.result.nInserted;
-            }
-            throw insertErr;
-          }
+      // Use stateless page-by-page queries to prevent long-lived open cursor sockets and getMore hangs
+      while (insertedCount < count) {
+        console.log(`    - [DEBUG] Fetching chunk ${chunkNum}/${totalChunks} (skip: ${skip}, limit: ${CHUNK_SIZE}) from source...`);
+        const fetchStart = Date.now();
+        const docs = await sourceDb.collection(colName).find({}).skip(skip).limit(CHUNK_SIZE).toArray();
+        console.log(`    - [DEBUG] Fetched ${docs.length} documents in ${Date.now() - fetchStart}ms.`);
+        
+        if (docs.length === 0) {
+          console.log(`    - [DEBUG] No more documents found. Finishing loop.`);
+          break;
         }
-      }
 
-      // Write any remaining documents in the final chunk
-      if (batch.length > 0) {
-        const chunkNum = Math.floor(insertedCount / WRITE_CHUNK_SIZE) + 1;
-        console.log(`    - [DEBUG] Writing final chunk ${chunkNum}/${totalChunks} (size: ${batch.length} documents)...`);
-        const chunkStart = Date.now();
+        console.log(`    - [DEBUG] Writing chunk ${chunkNum}/${totalChunks} to target (size: ${docs.length})...`);
+        const writeStart = Date.now();
         try {
-          const res = await targetDb.collection(colName).insertMany(batch, { ordered: false });
+          const res = await targetDb.collection(colName).insertMany(docs, { ordered: false });
           insertedCount += res.insertedCount;
-          console.log(`      * [DEBUG] Final chunk ${chunkNum}/${totalChunks} written successfully in ${Date.now() - chunkStart}ms. Total copied: ${insertedCount}/${count}`);
+          console.log(`      * [DEBUG] Chunk ${chunkNum}/${totalChunks} written successfully in ${Date.now() - writeStart}ms. Total copied: ${insertedCount}/${count}`);
         } catch (insertErr) {
-          console.error(`      ❌ [DEBUG] Final chunk ${chunkNum}/${totalChunks} write failed after ${Date.now() - chunkStart}ms. Error:`, insertErr.message);
+          console.error(`      ❌ [DEBUG] Chunk ${chunkNum}/${totalChunks} write failed after ${Date.now() - writeStart}ms. Error:`, insertErr.message);
           if (insertErr.result && insertErr.result.nInserted) {
             insertedCount += insertErr.result.nInserted;
           }
           throw insertErr;
         }
+
+        skip += CHUNK_SIZE;
+        chunkNum++;
       }
 
       console.log(`✅ Collection "${colName}" migrated successfully (${insertedCount} documents, ${indexes.length} indexes, took ${Date.now() - startTime}ms).`);
