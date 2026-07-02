@@ -46,6 +46,10 @@ const faqs = [
     question: "How do I find the right engine for my vehicle?",
     answer: "Simply submit your vehicle or engine details and our team will help you find the matching engine option from our stock."
   },
+  {
+    question: "Do you offer international shipping?",
+    answer: "Currently, we specialize in nationwide collection and delivery across the United Kingdom. Please contact our support team for custom international delivery inquiries."
+  },
 ];
 
 const MotionBox = motion(Box);
