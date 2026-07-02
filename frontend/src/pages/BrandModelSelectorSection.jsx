@@ -482,7 +482,7 @@ export default function BrandModelSelectorSection() {
 											<Heading fontSize="26px" mb={8} color={darkColor} textAlign="center" fontWeight="800">
 												Popular {selectedBrand?.name} {selectedModel.name} engines for sale
 											</Heading>
-											<SimpleGrid columns={{ base: 2, sm: 3, md: 4, lg: 6 }} spacing={4}>
+											<SimpleGrid columns={{ base: 2, sm: 2, md: 3, lg: 4, xl: 6 }} spacing={4}>
 												{products.map((engine) => (
 													<EngineProductCard key={engine._id} engine={engine} />
 												))}
