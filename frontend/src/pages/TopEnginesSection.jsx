@@ -72,25 +72,15 @@ export default function TopEnginesSection({ category }) {
 	const swiperRef = useRef(null);
 
 	const { data: engines = [], isLoading: loading } = useQuery({
-		queryKey: ["products", { category }],
+		queryKey: ["products", { category, limit: 12 }],
 		queryFn: async () => {
-			const res = await API.get("/products");
-			const products = res.data.data || res.data || [];
-
-			let filtered = products;
-
-			if (category && category !== "Engines") {
-				filtered = products.filter(
-					(p) =>
-						p.category?.name === category ||
-						(category === "Used Engines" &&
-							p.condition?.toLowerCase() === "used") ||
-						(category === "Reconditioned Engines" &&
-							p.condition?.toLowerCase() === "reconditioned")
-				);
-			}
-
-			return filtered.slice(0, 12);
+			const res = await API.get("/products", {
+				params: {
+					limit: 12,
+					category: category !== "Engines" ? category : undefined,
+				},
+			});
+			return res.data.data || res.data || [];
 		},
 		staleTime: 1000 * 60 * 5,
 	});

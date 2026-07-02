@@ -78,22 +78,15 @@ export default function CuratedListingsSection({ category }) {
 	const surfaceColor = "#F3F5F8";
 
 	const { data: engines = [], isLoading: loading } = useQuery({
-		queryKey: ['products-curated', { category }],
+		queryKey: ['products-curated', { category, limit: 10 }],
 		queryFn: async () => {
-			const res = await API.get("/products");
-			const products = res.data.data || res.data || [];
-
-			let filtered = products;
-			if (category && category !== "Engines") {
-				filtered = products.filter(
-					(p) =>
-						p.category?.name === category ||
-						(category === "Used Engines" && p.condition?.toLowerCase() === "used") ||
-						(category === "Reconditioned Engines" &&
-							p.condition?.toLowerCase() === "reconditioned"),
-				);
-			}
-			return filtered.slice(0, 10);
+			const res = await API.get("/products", {
+				params: {
+					limit: 10,
+					category: category !== "Engines" ? category : undefined,
+				},
+			});
+			return res.data.data || res.data || [];
 		},
 		staleTime: 1000 * 60 * 5,
 	});

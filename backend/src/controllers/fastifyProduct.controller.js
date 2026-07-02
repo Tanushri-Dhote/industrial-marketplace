@@ -1,5 +1,9 @@
 const Product = require("../models/Product");
 
+const escapeRegex = (string) => {
+	return string.replace(/[-\/\\^$*+?.()|[\]{}]/g, "\\$&");
+};
+
 // ================= GET PRODUCTS =================
 exports.getProducts = async (request, reply) => {
 	try {
@@ -18,36 +22,30 @@ exports.getProducts = async (request, reply) => {
 			conditions
 		} = request.query || {};
 
+		const andConditions = [];
+
 		if (request.tenantId) {
 			filter.website_id = request.tenantId;
 		}
 
-		// Load active brands for slug mapping
-		const Brand = require("../models/Brand");
-		const brands = await Brand.find({ isActive: true }).lean();
-
-		// Fetch products matching basic website_id tenant filter
-		let query = Product.find(filter).populate("category").sort({ price: 1, createdAt: -1 });
-		let products = await query;
-
-		let filtered = [...products];
-
 		// 1. Search filter: model / make / name / engineCode / registrationNumber
 		if (search) {
-			const queryStr = search.toLowerCase();
-			filtered = filtered.filter((p) => {
-				return (
-					p.name?.toLowerCase().includes(queryStr) ||
-					p.make?.toLowerCase().includes(queryStr) ||
-					p.model?.toLowerCase().includes(queryStr) ||
-					p.engineCode?.toLowerCase().includes(queryStr) ||
-					p.registrationNumber?.toLowerCase().includes(queryStr)
-				);
+			const searchRegex = new RegExp(escapeRegex(search), "i");
+			andConditions.push({
+				$or: [
+					{ name: searchRegex },
+					{ make: searchRegex },
+					{ model: searchRegex },
+					{ engineCode: searchRegex },
+					{ registrationNumber: searchRegex }
+				]
 			});
 		}
 
 		// 2. Brand filter (mapping slug to makes)
 		if (brand) {
+			const Brand = require("../models/Brand");
+			const brands = await Brand.find({ isActive: true }).lean();
 			const brandObj = brands.find((b) => b.slug === brand);
 			const possibleMakes = [
 				brand.toLowerCase(),
@@ -55,112 +53,157 @@ exports.getProducts = async (request, reply) => {
 				brandObj?.productMake?.toLowerCase(),
 			].filter(Boolean);
 
-			filtered = filtered.filter((p) => {
-				if (!p.make) return false;
-				const pm = p.make.toLowerCase();
-				return (
-					p.brand?.slug === brand ||
-					p.brand === brand ||
-					possibleMakes.some(
-						(makeName) =>
-							pm === makeName ||
-							pm.includes(makeName) ||
-							makeName.includes(pm) ||
-							(pm === "vw" && makeName === "volkswagen") ||
-							(pm === "volkswagen" && makeName === "vw") ||
-							(pm === "mercedes" && makeName === "mercedes-benz") ||
-							(pm === "mercedes-benz" && makeName === "mercedes")
-					)
-				);
+			const makeConditions = possibleMakes.flatMap((m) => {
+				const conds = [new RegExp(escapeRegex(m), "i")];
+				if (m === "vw") conds.push(/volkswagen/i);
+				if (m === "volkswagen") conds.push(/vw/i);
+				if (m === "mercedes") conds.push(/mercedes-benz/i);
+				if (m === "mercedes-benz") conds.push(/mercedes/i);
+				return conds;
+			});
+
+			andConditions.push({
+				$or: [
+					{ "brand.slug": brand },
+					{ brand: brand },
+					{ make: { $in: makeConditions } }
+				]
 			});
 		}
 
 		// 3. Model filter
 		if (model) {
-			const targetModelSlug = model.toLowerCase().replace(/[\s_-]+/g, "-");
-			filtered = filtered.filter(
-				(p) =>
-					p.model?.toLowerCase().replace(/[\s_-]+/g, "-") === targetModelSlug ||
-					p.model?.toLowerCase() === model.toLowerCase()
-			);
+			const escapedModel = escapeRegex(model);
+			const slugRegexStr = escapedModel.replace(/[\s_-]+/g, "[\\s_-]*");
+			filter.model = { $regex: new RegExp(`^${slugRegexStr}$`, "i") };
 		}
 
 		// 4. Category filter
 		if (category && category !== "Engines") {
-			filtered = filtered.filter(
-				(p) =>
-					p.category?.name === category ||
-					(category === "Used Engines" &&
-						p.condition?.toLowerCase() === "used") ||
-					(category === "Reconditioned Engines" &&
-						p.condition?.toLowerCase() === "reconditioned")
-			);
+			const Category = require("../models/Category");
+			const categoryObj = await Category.findOne({ name: category });
+			
+			const categoryConditions = [];
+			if (categoryObj) {
+				categoryConditions.push({ category: categoryObj._id });
+			}
+			
+			if (category === "Used Engines") {
+				categoryConditions.push({ condition: { $regex: /^used$/i } });
+			} else if (category === "Reconditioned Engines") {
+				categoryConditions.push({ condition: { $regex: /^reconditioned$/i } });
+			}
+
+			if (categoryConditions.length > 0) {
+				andConditions.push({ $or: categoryConditions });
+			}
 		}
 
 		// 5. Price Min Filter
 		if (priceMin) {
-			filtered = filtered.filter((p) => p.price && p.price >= Number(priceMin));
+			filter.price = filter.price || {};
+			filter.price.$gte = Number(priceMin);
 		}
 
 		// 6. Price Max Filter
 		if (priceMax) {
-			filtered = filtered.filter((p) => p.price && p.price <= Number(priceMax));
-		}
-
-		// 7. Mileage Max Filter
-		if (mileageMax) {
-			filtered = filtered.filter((p) => {
-				if (!p.mileage) return false;
-				const miles = Number(p.mileage.replace(/[^\d]/g, ""));
-				return miles && miles <= Number(mileageMax);
-			});
+			filter.price = filter.price || {};
+			filter.price.$lte = Number(priceMax);
 		}
 
 		// 8. Condition Filter
 		if (conditions) {
 			const condList = typeof conditions === "string" ? conditions.split(",") : conditions;
-			const cleanCondList = condList.filter(Boolean).map(c => c.toLowerCase());
+			const cleanCondList = condList.filter(Boolean);
 			if (cleanCondList.length > 0) {
-				filtered = filtered.filter(
-					(p) => p.condition && cleanCondList.includes(p.condition.toLowerCase())
-				);
+				filter.condition = { $in: cleanCondList.map(c => new RegExp(`^${escapeRegex(c)}$`, "i")) };
 			}
 		}
 
 		// 9. Explicit Make filter (for backward compatibility)
 		if (make) {
-			const targetMake = make.toLowerCase();
-			filtered = filtered.filter((p) => p.make && p.make.toLowerCase() === targetMake);
+			filter.make = { $regex: new RegExp(`^${escapeRegex(make)}$`, "i") };
 		}
 
-		// Pagination handling
+		// Apply andConditions if any
+		if (andConditions.length > 0) {
+			filter.$and = andConditions;
+		}
+
 		const pageNum = Number(page);
 		const limitNum = Number(limit || 10);
+		const needsInMemoryFilter = !!mileageMax;
 
-		if (!isNaN(pageNum) && pageNum > 0) {
-			const total = filtered.length;
-			const pages = Math.ceil(total / limitNum);
-			const skipNum = (pageNum - 1) * limitNum;
-			const paginatedProducts = filtered.slice(skipNum, skipNum + limitNum);
+		if (!needsInMemoryFilter) {
+			// Perform everything on the database side for maximum efficiency
+			if (!isNaN(pageNum) && pageNum > 0) {
+				const skipNum = (pageNum - 1) * limitNum;
+				const total = await Product.countDocuments(filter);
+				const products = await Product.find(filter)
+					.populate("category")
+					.sort({ price: 1, createdAt: -1 })
+					.skip(skipNum)
+					.limit(limitNum)
+					.lean();
+				
+				return {
+					success: true,
+					data: products,
+					pagination: {
+						total,
+						page: pageNum,
+						limit: limitNum,
+						pages: Math.ceil(total / limitNum),
+					},
+				};
+			} else {
+				let query = Product.find(filter).populate("category").sort({ price: 1, createdAt: -1 });
+				if (limit) {
+					query = query.limit(Number(limit));
+				}
+				const products = await query.lean();
+				return { success: true, data: products };
+			}
+		} else {
+			// Fallback to in-memory filtering for complex fields (like mileageMax)
+			const products = await Product.find(filter)
+				.populate("category")
+				.sort({ price: 1, createdAt: -1 })
+				.lean();
+			
+			let filtered = [...products];
 
-			return {
-				success: true,
-				data: paginatedProducts,
-				pagination: {
-					total,
-					page: pageNum,
-					limit: limitNum,
-					pages,
-				},
-			};
+			if (mileageMax) {
+				filtered = filtered.filter((p) => {
+					if (!p.mileage) return false;
+					const miles = Number(p.mileage.replace(/[^\d]/g, ""));
+					return miles && miles <= Number(mileageMax);
+				});
+			}
+
+			if (!isNaN(pageNum) && pageNum > 0) {
+				const total = filtered.length;
+				const skipNum = (pageNum - 1) * limitNum;
+				const paginatedProducts = filtered.slice(skipNum, skipNum + limitNum);
+
+				return {
+					success: true,
+					data: paginatedProducts,
+					pagination: {
+						total,
+						page: pageNum,
+						limit: limitNum,
+						pages: Math.ceil(total / limitNum),
+					},
+				};
+			}
+
+			if (limit) {
+				filtered = filtered.slice(0, Number(limit));
+			}
+
+			return { success: true, data: filtered };
 		}
-
-		// If page is not specified, maintain backward compatibility
-		if (limit) {
-			filtered = filtered.slice(0, Number(limit));
-		}
-
-		return { success: true, data: filtered };
 	} catch (error) {
 		reply.status(500).send({ message: error.message });
 	}
