@@ -125,33 +125,41 @@ async function migrate() {
         await targetDb.collection(colName).createIndex(key, { name, ...options });
       }
 
-      // 3. Copy documents in batches
-      console.log(`  - Copying documents...`);
+      // 3. Copy documents
       const count = await sourceDb.collection(colName).countDocuments();
       if (count === 0) {
         console.log(`  - Collection "${colName}" is empty. Skipped copying documents.`);
         continue;
       }
 
-      const cursor = sourceDb.collection(colName).find({});
-      let batch = [];
-      const BATCH_SIZE = 1000;
+      console.log(`  - Copying ${count} documents...`);
       let insertedCount = 0;
 
-      while (await cursor.hasNext()) {
-        const doc = await cursor.next();
-        batch.push(doc);
-        if (batch.length >= BATCH_SIZE) {
-          const res = await targetDb.collection(colName).insertMany(batch);
-          insertedCount += res.insertedCount;
-          batch = [];
-          console.log(`    - Copied ${insertedCount}/${count} documents...`);
-        }
-      }
+      // For small to medium collections, copy all documents in a single roundtrip
+      if (count <= 10000) {
+        const docs = await sourceDb.collection(colName).find({}).toArray();
+        const res = await targetDb.collection(colName).insertMany(docs, { ordered: false });
+        insertedCount = res.insertedCount;
+      } else {
+        // For very large collections, use optimized batching with for-await loop and batchSize
+        let batch = [];
+        const BATCH_SIZE = 1000;
+        const cursor = sourceDb.collection(colName).find({}).batchSize(BATCH_SIZE);
 
-      if (batch.length > 0) {
-        const res = await targetDb.collection(colName).insertMany(batch);
-        insertedCount += res.insertedCount;
+        for await (const doc of cursor) {
+          batch.push(doc);
+          if (batch.length >= BATCH_SIZE) {
+            const res = await targetDb.collection(colName).insertMany(batch, { ordered: false });
+            insertedCount += res.insertedCount;
+            batch = [];
+            console.log(`    - Copied ${insertedCount}/${count} documents...`);
+          }
+        }
+
+        if (batch.length > 0) {
+          const res = await targetDb.collection(colName).insertMany(batch, { ordered: false });
+          insertedCount += res.insertedCount;
+        }
       }
 
       console.log(`✅ Collection "${colName}" migrated successfully (${insertedCount} documents, ${indexes.length} indexes).`);
