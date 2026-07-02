@@ -151,6 +151,7 @@ export default function FAQSection() {
                 fontWeight="800"
                 color="gray.900"
                 lineHeight="1.2"
+                whiteSpace={{ base: "normal", md: "nowrap" }}
               >
                 Got Questions? We've Got Answers
               </Heading>
