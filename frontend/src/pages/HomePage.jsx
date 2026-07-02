@@ -5,9 +5,8 @@ import HeroSection from "./HeroSection";
 import ReviewsSection from "./ReviewsSection";
 import TrustBar from "./TrustBar";
 import EasyStepsSection from "./EasyStepsSection";
-import VehicleSelectorSection from "./VehicleSelectorSection";
 import BrandModelSelectorSection from "./BrandModelSelectorSection";
-import Areacbar from "./Areabar";
+import ServiceAreasSection from "./Areabar";
 import TopEnginesSection from "./TopEnginesSection";
 import CuratedListingsSection from "./CuratedListingsSection";
 import FAQSection from "./FAQSection";
@@ -15,6 +14,7 @@ import BuiltToHighestStandard from "./BuiltToHighestStandard";
 import WarrantyBannerSection from "./WarrantyBannerSection";
 import HelpBannerSection from "./HelpBannerSection";
 import HomeAbout from "./HomeAbout";
+import LatestBlogsSection from "./LatestBlogsSection";
 
 export default function HomePage() {
 	const location = useLocation();
@@ -39,12 +39,12 @@ export default function HomePage() {
 			<EasyStepsSection />
 			{!searchParams.get("brand") && <TopEnginesSection category={category} />}
 			{!searchParams.get("brand") && <CuratedListingsSection category={category} />}
-			{/* <Areacbar /> */}
-
+			{/* <ServiceAreasSection /> */}
 			<ReviewsSection />
+			<FAQSection />
+			<LatestBlogsSection />
 			<WarrantyBannerSection />
 			<HelpBannerSection />
-			{/* <FAQSection /> */}
 		</>
 	);
 }

@@ -16,10 +16,36 @@ import {
 	VStack,
 } from "@chakra-ui/react";
 import { motion } from "framer-motion";
+import { keyframes } from "@emotion/react";
 import { FaArrowRight } from "react-icons/fa";
 import { useQuery } from "@tanstack/react-query";
 import { Link as RouterLink } from "react-router-dom";
 import API from "../services/api";
+
+const pulse = keyframes`
+  0% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba(72, 187, 120, 0.7);
+  }
+  70% {
+    transform: scale(1);
+    box-shadow: 0 0 0 6px rgba(72, 187, 120, 0);
+  }
+  100% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba(72, 187, 120, 0);
+  }
+`;
+
+const PulsingDot = () => (
+	<Box
+		w="6px"
+		h="6px"
+		borderRadius="full"
+		bg="green.500"
+		animation={`${pulse} 2s infinite`}
+	/>
+);
 
 const MotionBox = motion(Box);
 const MotionSimpleGrid = motion(SimpleGrid);
@@ -86,9 +112,9 @@ export default function CuratedListingsSection({ category }) {
 			border="1px solid"
 			borderColor="gray.200"
 			_hover={{
-				transform: "translateY(-5px) scale(1.02)",
-				boxShadow: "0 20px 30px rgba(8, 15, 31, 0.12)",
-				borderColor: "gray.300",
+				transform: "translateY(-6px)",
+				boxShadow: "0 20px 30px rgba(217, 4, 4, 0.08)",
+				borderColor: "rgba(217, 4, 4, 0.3)",
 				textDecoration: "none",
 			}}
 			transition="all 0.3s cubic-bezier(.25,.8,.25,1)"
@@ -157,9 +183,12 @@ export default function CuratedListingsSection({ category }) {
 					<Text fontWeight="700">Fits:</Text>
 					<Text noOfLines={1}>{engine.model || "Universal Fit"}</Text>
 					<Box w="3px" h="3px" borderRadius="full" bg="gray.400" />
-					<Text color="green.700" fontWeight="600" noOfLines={1}>
-						In Stock
-					</Text>
+					<HStack spacing={1} align="center">
+						<PulsingDot />
+						<Text color="green.700" fontWeight="700" noOfLines={1}>
+							In Stock
+						</Text>
+					</HStack>
 				</HStack>
 
 				<Divider borderColor="gray.100" />
@@ -197,7 +226,7 @@ export default function CuratedListingsSection({ category }) {
 	}
 
 	return (
-		<Box bg={surfaceColor} py={{ base: 14, md: 16 }} position="relative" overflow="hidden">
+		<Box bg={surfaceColor} pt={{ base: 4, md: 4 }} pb={{ base: 8, md: 10 }} position="relative" overflow="hidden">
 			<MotionBox
 				position="absolute"
 				top="-120px"
@@ -224,20 +253,20 @@ export default function CuratedListingsSection({ category }) {
 						<VStack align="start" spacing={2}>
 							<Text
 								textTransform="uppercase"
-								letterSpacing="0.1em"
-								fontSize="12px"
-								fontWeight="700"
-								color="gray.600"
+								letterSpacing="1.5px"
+								fontSize="13px"
+								fontWeight="800"
+								color={accentColor}
 							>
 								Curated Listings
 							</Text>
 
 							<Heading
-								fontSize={{ base: "26px", md: "42px" }}
-								fontWeight="900"
+								as="h2"
+								fontSize={{ base: "28px", md: "38px", lg: "42px" }}
+								fontWeight="800"
 								color="gray.900"
-								lineHeight="1.1"
-								letterSpacing="-0.02em"
+								lineHeight="1.2"
 							>
 								Top {category?.toLowerCase()} for Sale in the UK
 							</Heading>

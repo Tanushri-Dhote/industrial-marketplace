@@ -34,10 +34,20 @@ const DARK = "#111111";
 
 const MotionBox = motion(Box);
 
-export default function CallSellerPage({ isModal = false, onCloseModal }) {
+export default function CallSellerPage({ 
+	isModal = false, 
+	onCloseModal,
+	vrm: propVrm,
+	category: propCategory,
+	brand: propBrand,
+	model: propModel,
+	year: propYear,
+	engineType: propEngineType
+}) {
 	const [step, setStep] = useState(1);
 	const [engineOptions, setEngineOptions] = useState([]);
 	const [fittingOptions, setFittingOptions] = useState([]);
+	const [submitting, setSubmitting] = useState(false);
 	const location = useLocation();
 	const navigate = useNavigate();
 
@@ -45,10 +55,25 @@ export default function CallSellerPage({ isModal = false, onCloseModal }) {
 	if (typeof locState !== "object" || locState === null) {
 		locState = { vrm: locState };
 	}
-	const { vrm, category, brand: stateBrand, make, model, year, type, engineType, searchType } = locState || {};
-	const brand = stateBrand || make || "";
-	const actualType = type || engineType || "";
+	const { 
+		vrm: stateVrm, 
+		category: stateCategory, 
+		brand: stateBrand, 
+		make: stateMake, 
+		model: stateModel, 
+		year: stateYear, 
+		type: stateType, 
+		engineType: stateEngineType 
+	} = locState || {};
+
+	const vrm = propVrm !== undefined ? propVrm : stateVrm;
+	const category = propCategory !== undefined ? propCategory : stateCategory;
+	const brand = propBrand !== undefined ? propBrand : (stateBrand || stateMake || "");
+	const model = propModel !== undefined ? propModel : stateModel;
+	const year = propYear !== undefined ? propYear : stateYear;
+	const actualType = propEngineType !== undefined ? propEngineType : (stateType || stateEngineType || "");
 	const toText = (value) => (value === null || value === undefined ? "" : String(value));
+	const [vrmEngineType, setVrmEngineType] = useState(toText(actualType));
 
 	const safeVrm = toText(vrm).trim();
 	const safeBrand = toText(brand).trim();
@@ -110,13 +135,27 @@ export default function CallSellerPage({ isModal = false, onCloseModal }) {
 	};
 
 	const handleNext = () => {
-		if (!finalVehicleVrm.trim() && !brand) {
-			return toast.error("Please enter registration number");
-		}
 		if (step === 1) {
+			if (!brand) {
+				const cleanedVrm = (finalVehicleVrm || "").replace(/\s+/g, "").toUpperCase();
+				if (!cleanedVrm) {
+					return toast.error("Please enter registration number");
+				}
+				const ukVrmRegex = /^[A-Z]{2}[0-9]{2}[A-Z]{3}$|^[A-Z]{1,2}[0-9]{1,4}[A-Z]{1,3}$/;
+				if (!ukVrmRegex.test(cleanedVrm)) {
+					return toast.error("Invalid UK registration number format");
+				}
+			}
+
 			if (engineOptions.length === 0) return toast.error("Please select condition");
 			if (fittingOptions.length === 0) return toast.error("Please select fitting option");
 			if (!form.postcode) return toast.error("Postcode is required");
+
+			const cleanedPostcode = (form.postcode || "").replace(/\s+/g, "").toUpperCase();
+			const ukPostcodeRegex = /^[A-Z]{1,2}[0-9][A-Z0-9]? ?[0-9][A-Z]{2}$/i;
+			if (!ukPostcodeRegex.test(cleanedPostcode)) {
+				return toast.error("Invalid UK postcode format");
+			}
 		}
 		setStep(step + 1);
 		window.scrollTo(0, 0);
@@ -131,6 +170,7 @@ export default function CallSellerPage({ isModal = false, onCloseModal }) {
 		if (!finalVehicleVrm && !brand) {
 			return toast.error("Enter registration number");
 		}
+		setSubmitting(true);
 		try {
 			const API_URL = import.meta.env.VITE_API_URL;
 			const res = await fetch(`${API_URL}/validate-vrm`, {
@@ -141,7 +181,7 @@ export default function CallSellerPage({ isModal = false, onCloseModal }) {
 					brand,
 					model,
 					year,
-					engineType: actualType,
+					engineType: brand ? actualType : vrmEngineType,
 					category,
 					engineOptions,
 					fittingOptions,
@@ -156,6 +196,8 @@ export default function CallSellerPage({ isModal = false, onCloseModal }) {
 			toast.success("Quote request submitted successfully!");
 		} catch (err) {
 			toast.error(err.message || "Something went wrong");
+		} finally {
+			setSubmitting(false);
 		}
 	};
 
@@ -400,7 +442,7 @@ export default function CallSellerPage({ isModal = false, onCloseModal }) {
 									</SimpleGrid>
 								</Box>
 
-								{/* Postcode & Notes */}
+								{/* Postcode, Engine Type & Notes */}
 								<Box bg="white" p={8} borderRadius="3xl" boxShadow="sm">
 									<VStack spacing={6}>
 										<InputGroup>
@@ -415,6 +457,21 @@ export default function CallSellerPage({ isModal = false, onCloseModal }) {
 												onChange={(e) => setForm({ ...form, postcode: e.target.value.toUpperCase() })}
 											/>
 										</InputGroup>
+
+										{!brand && (
+											<InputGroup>
+												<InputLeftElement h="52px" pointerEvents="none">
+													<Settings color="#E10600" />
+												</InputLeftElement>
+												<Input
+													size="lg"
+													placeholder="Engine Type / Code (Optional, e.g. 2.0L Diesel)"
+													borderRadius="xl"
+													value={vrmEngineType}
+													onChange={(e) => setVrmEngineType(e.target.value)}
+												/>
+											</InputGroup>
+										)}
 
 										<Textarea
 											placeholder="Additional requirements or notes..."
@@ -481,6 +538,8 @@ export default function CallSellerPage({ isModal = false, onCloseModal }) {
 										borderRadius="2xl"
 										onClick={handleGetQuote}
 										isDisabled={!form.name || !form.email || !form.phone}
+										isLoading={submitting}
+										loadingText="Submitting Request..."
 									>
 										Submit Request
 									</Button>

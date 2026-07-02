@@ -280,7 +280,7 @@ export default function Header() {
                 border="1px solid"
                 borderColor="gray.200"
               >
-                <HStack spacing={3}>
+                <HStack spacing={3} align="center">
                   <Box
                     bg="#c40000"
                     color="white"
@@ -293,14 +293,9 @@ export default function Header() {
                     <FaPhoneAlt size={14} />
                   </Box>
 
-                  <VStack spacing={0} align="start" lineHeight="1">
-                    <Text fontWeight="700" fontSize="14px" color="gray.800">
-                      +44 2071129397
-                    </Text>
-                    <Text fontSize="11px" color="gray.500">
-                      Mon - Sat: 8:00 AM - 6:00 PM
-                    </Text>
-                  </VStack>
+                  <Text fontWeight="700" fontSize="14px" color="gray.800">
+                    +44 2071129397
+                  </Text>
                 </HStack>
               </Box>
 
@@ -373,7 +368,7 @@ export default function Header() {
                 border="1px solid"
                 borderColor="gray.200"
               >
-                <HStack spacing={3}>
+                <HStack spacing={3} align="center">
                   <Box
                     bg="#c40000"
                     color="white"
@@ -386,14 +381,9 @@ export default function Header() {
                     <FaPhoneAlt size={14} />
                   </Box>
 
-                  <VStack spacing={0} align="start" lineHeight="1">
-                    <Text fontWeight="700" fontSize="14px" color="gray.800">
-                      +44 2071129397
-                    </Text>
-                    <Text fontSize="11px" color="gray.500">
-                      Mon - Sat: 8:00 AM - 6:00 PM
-                    </Text>
-                  </VStack>
+                  <Text fontWeight="700" fontSize="14px" color="gray.800">
+                    +44 2071129397
+                  </Text>
                 </HStack>
               </Box>
 

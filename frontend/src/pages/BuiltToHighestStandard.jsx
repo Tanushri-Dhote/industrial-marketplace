@@ -16,6 +16,7 @@ import {
     ModalBody,
     ModalCloseButton,
     AspectRatio,
+    Heading,
 } from "@chakra-ui/react";
 import {
     FaUserCog,
@@ -25,7 +26,7 @@ import {
     FaPlay,
 } from "react-icons/fa";
 
-const RED = "#E10600";
+const RED = "#D90404";
 
 const features = [
     {
@@ -56,23 +57,32 @@ const BuiltToHighestStandard = () => {
     const videoThumbnailUrl = "https://img.youtube.com/vi/mJfnRV5QOz0/maxresdefault.jpg";
 
     return (
-        <Box bg="#f7f7f7" py={{ base: 12, md: 16 }}>
+        <Box bg="#f7f7f7" py={{ base: 8, md: 10 }}>
             <Container maxW="1200px" px={{ base: 4, md: 6, lg: 8 }}>
 
                 {/* ── HEADING ── */}
-                <VStack gap={4} textAlign="center" mb={12}>
+                <VStack spacing={3} textAlign="center" mb={12}>
                     <Text
-                        fontSize={{ base: "14px", md: "16px" }}
+                        fontSize="13px"
                         fontWeight="800"
                         textTransform="uppercase"
-                        color="#111111"
-                        mb={2}
+                        color={RED}
+                        letterSpacing="1.5px"
+                    >
+                        Quality Assured
+                    </Text>
+                    <Heading
+                        as="h2"
+                        fontSize={{ base: "28px", md: "38px", lg: "42px" }}
+                        fontWeight="800"
+                        color="gray.900"
+                        lineHeight="1.2"
                     >
                         Built to the Highest Standard
-                    </Text>
+                    </Heading>
                     <Text
                         maxW="650px"
-                        color="#666666"
+                        color="gray.600"
                         fontSize={{ base: "14px", md: "15px" }}
                         lineHeight="1.6"
                         fontWeight="400"
@@ -94,16 +104,32 @@ const BuiltToHighestStandard = () => {
                             bg="white"
                             p={{ base: 4, md: 6 }}
                             borderRadius="16px"
-                            boxShadow="0 2px 8px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.02)"
-                            transition="transform 0.2s, box-shadow 0.2s"
-                            _hover={{ transform: "translateY(-2px)", boxShadow: "0 8px 20px rgba(0,0,0,0.06)" }}
+                            border="1px solid"
+                            borderColor="gray.100"
+                            boxShadow="0 2px 8px rgba(0,0,0,0.02)"
+                            transition="all 0.3s ease"
+                            _hover={{ 
+                                transform: "translateY(-4px)", 
+                                borderColor: "rgba(217, 4, 4, 0.3)",
+                                boxShadow: "0 12px 24px rgba(217, 4, 4, 0.08)" 
+                            }}
                         >
-                            <VStack gap={4} align="flex-start">
-                                <Icon as={feature.icon} boxSize={6} color={RED} />
-                                <Text fontWeight="700" fontSize="16px" color="#111111" lineHeight="1.3">
+                            <VStack spacing={4} align="flex-start">
+                                <Box
+                                    p={3}
+                                    borderRadius="full"
+                                    bgGradient="linear-gradient(135deg, rgba(217, 4, 4, 0.08) 0%, rgba(217, 4, 4, 0.01) 100%)"
+                                    display="flex"
+                                    alignItems="center"
+                                    justifyContent="center"
+                                    mb={1}
+                                >
+                                    <Icon as={feature.icon} boxSize={5} color={RED} />
+                                </Box>
+                                <Text fontWeight="700" fontSize="16px" color="gray.900" lineHeight="1.3">
                                     {feature.title}
                                 </Text>
-                                <Text fontSize="13px" color="#777777" lineHeight="1.5">
+                                <Text fontSize="13px" color="gray.600" lineHeight="1.5">
                                     {feature.text}
                                 </Text>
                             </VStack>

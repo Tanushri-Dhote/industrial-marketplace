@@ -12,12 +12,19 @@ const trustItems = [
 export default function TrustBar() {
   return (
     <Box 
-      bg="#f8f9fa" 
-      py={3} 
+      bg="rgba(255, 255, 255, 0.75)" 
+      backdropFilter="blur(10px)"
+      py={4} 
       overflow="hidden" 
-      borderBottom="1px solid" 
-      borderColor="gray.100"
+      borderY="1px solid" 
+      borderColor="rgba(217, 4, 4, 0.08)"
       position="relative"
+      zIndex={6}
+      boxShadow="0 10px 30px -10px rgba(0, 0, 0, 0.05)"
+      mt="-20px"
+      mx="auto"
+      maxW="1200px"
+      borderRadius="xl"
     >
       <Box 
         display="flex" 

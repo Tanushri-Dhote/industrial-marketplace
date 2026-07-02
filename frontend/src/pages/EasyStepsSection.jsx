@@ -70,7 +70,7 @@ export default function EngineProcessSection() {
 	return (
 		<Box
 			bgGradient={sectionBg}
-			py={{ base: 16, md: 14 }}
+			py={{ base: 8, md: 10 }}
 			position="relative"
 			overflow="hidden"
 		>
@@ -104,17 +104,18 @@ export default function EngineProcessSection() {
 					>
 						<VStack spacing={5}>
 							<Text
-								fontSize="14px"
+								fontSize="13px"
 								fontWeight="800"
 								color={accentColor}
-								letterSpacing="2px"
+								letterSpacing="1.5px"
 								textTransform="uppercase"
 							>
-								OUR PROCESS
+								Our Process
 							</Text>
 
 							<Heading
-								fontSize={{ base: "28px", md: "46px" }}
+								as="h2"
+								fontSize={{ base: "28px", md: "38px", lg: "42px" }}
 								fontWeight="800"
 								color="gray.900"
 								lineHeight="1.2"
@@ -125,7 +126,7 @@ export default function EngineProcessSection() {
 							<Text
 								maxW="700px"
 								color="gray.600"
-								fontSize={{ base: "15px", md: "18px" }}
+								fontSize="15px"
 								lineHeight="1.8"
 							>
 								Our trusted process ensures every engine meets the highest

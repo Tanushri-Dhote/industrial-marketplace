@@ -77,7 +77,7 @@ export default function FAQSection() {
   const accentColor = "#D90404";
 
   return (
-    <Box bg="linear-gradient(135deg, #F8FAFC 0%, #F1F5F9 100%)" py={10} position="relative" overflow="hidden">
+    <Box bg="linear-gradient(135deg, #F8FAFC 0%, #F1F5F9 100%)" py={6} position="relative" overflow="hidden">
       {/* Background Decorative Elements */}
       <Box
         position="absolute"
@@ -127,8 +127,8 @@ export default function FAQSection() {
               </Flex>
 
               <Text
-                fontSize="12px"
-                fontWeight="700"
+                fontSize="13px"
+                fontWeight="800"
                 color={accentColor}
                 letterSpacing="1.5px"
                 textTransform="uppercase"
@@ -142,16 +142,16 @@ export default function FAQSection() {
               </Text>
 
               <Heading
-                fontSize={{ base: "22px", md: "30px" }}
+                as="h2"
+                fontSize={{ base: "28px", md: "38px", lg: "42px" }}
                 fontWeight="800"
-                color="gray.800"
-                lineHeight="1.3"
-                letterSpacing="-0.5px"
+                color="gray.900"
+                lineHeight="1.2"
               >
                 Got Questions? We've Got Answers
               </Heading>
 
-              <Text fontSize="14px" color="gray.600">
+              <Text fontSize="15px" color="gray.600">
                 Everything you need to know about finding and buying quality engines
               </Text>
             </VStack>

@@ -16,7 +16,7 @@ import { Link as RouterLink } from "react-router-dom";
 
 const HomeAbout = () => {
     return (
-        <Box bg="white" py={{ base: 12, md: 16 }}>
+        <Box bg="white" py={{ base: 8, md: 10 }}>
             <Container maxW="container.xl">
                 <Flex
                     direction={{ base: "column", lg: "row" }}
@@ -28,18 +28,19 @@ const HomeAbout = () => {
                     <VStack align="flex-start" spacing={6} flex={1}>
                         <VStack align="flex-start" spacing={2}>
                             <Text
-                                fontSize="14px"
+                                fontSize="13px"
                                 fontWeight="800"
-                                color="#E10600"
-                                letterSpacing="1px"
+                                color="#D90404"
+                                letterSpacing="1.5px"
                                 textTransform="uppercase"
                             >
-                                ABOUT US —
+                                About Us
                             </Text>
                             <Heading
-                                fontSize={{ base: "32px", md: "40px", lg: "46px" }}
+                                as="h2"
+                                fontSize={{ base: "28px", md: "38px", lg: "42px" }}
                                 fontWeight="800"
-                                color="#111111"
+                                color="gray.900"
                                 lineHeight="1.2"
                             >
                                 Trusted Experts in Engine Reconditioning
@@ -56,34 +57,34 @@ const HomeAbout = () => {
 
                         <VStack align="flex-start" spacing={3} pt={2} pb={4}>
                             <HStack spacing={3}>
-                                <Icon as={FaCheckCircle} color="#E10600" boxSize={5} />
-                                <Text fontWeight="600" color="#333333">Only high quality parts used</Text>
+                                <Icon as={FaCheckCircle} color="#D90404" boxSize={5} />
+                                <Text fontWeight="600" color="gray.700">Only high quality parts used</Text>
                             </HStack>
                             <HStack spacing={3}>
-                                <Icon as={FaCheckCircle} color="#E10600" boxSize={5} />
-                                <Text fontWeight="600" color="#333333">Thousands of engines supplied</Text>
+                                <Icon as={FaCheckCircle} color="#D90404" boxSize={5} />
+                                <Text fontWeight="600" color="gray.700">Thousands of engines supplied</Text>
                             </HStack>
                             <HStack spacing={3}>
-                                <Icon as={FaCheckCircle} color="#E10600" boxSize={5} />
-                                <Text fontWeight="600" color="#333333">06 months warranty on all engines</Text>
+                                <Icon as={FaCheckCircle} color="#D90404" boxSize={5} />
+                                <Text fontWeight="600" color="gray.700">06 months warranty on all engines</Text>
                             </HStack>
                             <HStack spacing={3}>
-                                <Icon as={FaCheckCircle} color="#E10600" boxSize={5} />
-                                <Text fontWeight="600" color="#333333">Nationwide collection and delivery available.</Text>
+                                <Icon as={FaCheckCircle} color="#D90404" boxSize={5} />
+                                <Text fontWeight="600" color="gray.700">Nationwide collection and delivery available.</Text>
                             </HStack>
                         </VStack>
 
                         <Button
                             as={RouterLink}
                             to="/about"
-                            bg="#E10600"
+                            bg="#D90404"
                             color="white"
                             size="lg"
                             px={8}
                             py={6}
                             fontWeight="700"
                             borderRadius="md"
-                            _hover={{ bg: "#c40000" }}
+                            _hover={{ bg: "#b50303" }}
                             boxShadow="md"
                         >
                             Learn More About Us
@@ -95,17 +96,39 @@ const HomeAbout = () => {
                         flex={1}
                         w="full"
                         position="relative"
-                        borderRadius="2xl"
-                        overflow="hidden"
-                        boxShadow="lg"
+                        p={3}
                     >
-                        <Image
-                            src="/home-about.png"
-                            alt="Engine Reconditioning Experts"
-                            objectFit="cover"
-                            w="full"
-                            h={{ base: "300px", md: "350px", lg: "450px" }}
+                        {/* Offset red gradient frame */}
+                        <Box
+                            position="absolute"
+                            top="20px"
+                            left="20px"
+                            right="0px"
+                            bottom="0px"
+                            bgGradient="linear-gradient(135deg, #D90404 0%, #b50303 100%)"
+                            borderRadius="2xl"
+                            zIndex={1}
+                            opacity={0.9}
                         />
+
+                        {/* Image Box */}
+                        <Box
+                            position="relative"
+                            zIndex={2}
+                            borderRadius="2xl"
+                            overflow="hidden"
+                            boxShadow="2xl"
+                            transition="all 0.3s ease"
+                            _hover={{ transform: "translate(-6px, -6px)" }}
+                        >
+                            <Image
+                                src="/home-about.png"
+                                alt="Engine Reconditioning Experts"
+                                objectFit="cover"
+                                w="full"
+                                h={{ base: "300px", md: "350px", lg: "450px" }}
+                            />
+                        </Box>
                     </Box>
                 </Flex>
             </Container>

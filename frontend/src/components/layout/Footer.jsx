@@ -34,7 +34,14 @@ export default function Footer() {
   const darkBlue = "#0A1927";
 
   return (
-    <Box as="footer" bg={darkBlue} color="white" pt={14} pb={6}>
+    <Box 
+      as="footer" 
+      bgGradient="linear-gradient(180deg, #090D16 0%, #111827 100%)" 
+      borderTop="4px solid #D90404"
+      color="white" 
+      pt={14} 
+      pb={6}
+    >
       <Container maxW="container.xl">
 
         {/* Top Footer */}
@@ -71,8 +78,10 @@ export default function Footer() {
           {/* Quick Links */}
           <Stack spacing={5}>
             <Heading
-              size="sm"
-              color={accentColor}
+              fontSize="13px"
+              fontWeight="700"
+              color="white"
+              letterSpacing="1px"
               textTransform="uppercase"
             >
               Quick Links
@@ -87,8 +96,10 @@ export default function Footer() {
           {/* Legal */}
           <Stack spacing={5}>
             <Heading
-              size="sm"
-              color={accentColor}
+              fontSize="13px"
+              fontWeight="700"
+              color="white"
+              letterSpacing="1px"
               textTransform="uppercase"
             >
               Legal
@@ -103,40 +114,37 @@ export default function Footer() {
           {/* Contact */}
           <Stack spacing={5}>
             <Heading
-              size="sm"
-              color={accentColor}
+              fontSize="13px"
+              fontWeight="700"
+              color="white"
+              letterSpacing="1px"
               textTransform="uppercase"
             >
               Contact Info
             </Heading>
 
             <HStack align="start">
-              <Icon as={MdLocationOn} color={accentColor} mt={1} />
+              <Icon as={MdLocationOn} color="gray.400" mt={1} />
               <Text fontSize="14px" color="gray.400">
                 44 Fowler Road, Hainault Business Park, Ilford London, IG6 3UT
               </Text>
             </HStack>
 
             <HStack>
-              <Icon as={MdPhone} color={accentColor} />
+              <Icon as={MdPhone} color="gray.400" />
               <Text fontSize="14px" color="gray.400">
                 +44 2071129397
               </Text>
             </HStack>
 
             <HStack>
-              <Icon as={MdEmail} color={accentColor} />
+              <Icon as={MdEmail} color="gray.400" />
               <Text fontSize="14px" color="gray.400">
                 info@reconditionedengine.co.uk
               </Text>
             </HStack>
 
-            <HStack>
-              <Icon as={MdAccessTime} color={accentColor} />
-              <Text fontSize="14px" color="gray.400">
-                Mon - Sat: 8:00 AM - 6:00 PM
-              </Text>
-            </HStack>
+
           </Stack>
         </SimpleGrid>
 
@@ -159,7 +167,8 @@ export default function Footer() {
             <Link
               href="https://rssctech.com"
               isExternal
-              color={accentColor}
+              color="gray.400"
+              _hover={{ color: "white" }}
               fontWeight="600"
             >
               RSSC Technologies Pvt Ltd
@@ -180,7 +189,7 @@ const SocialIcon = ({ icon }) => (
     bg="whiteAlpha.100"
     color="white"
     _hover={{
-      bg: "#D90404",
+      bg: "whiteAlpha.300",
     }}
     borderRadius="md"
     aria-label="Social Link"
@@ -193,8 +202,11 @@ const FooterLink = ({ to, children }) => (
     to={to}
     fontSize="14px"
     color="gray.400"
+    display="inline-block"
+    transition="all 0.25s ease"
     _hover={{
-      color: "#D90404",
+      color: "white",
+      transform: "translateX(4px)",
       textDecoration: "none",
     }}
   >

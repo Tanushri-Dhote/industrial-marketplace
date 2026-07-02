@@ -95,13 +95,13 @@ Notes: ${notes || "None"}
 `;
         await sendEmail(process.env.EMAIL_USER, adminSubject, adminText);
 
-        const customerSubject = `Quote Request Received - ${brand || ''} ${model || ''}`;
+        const customerSubject = `Quote Request Received - ${brand || model ? `${brand || ""} ${model || ""}` : (vrm || "Inquiry")}`;
         const customerText = `
 Hello ${name},
 
 Thank you for requesting a quote. We have received your inquiry for the following vehicle:
 
-Vehicle: ${brand || ""} ${model || ""} ${year ? `(${year})` : ""}
+Vehicle: ${brand || model ? `${brand || ""} ${model || ""} ${year ? `(${year})` : ""}`.trim() : (vrm ? `Reg: ${vrm}` : "N/A")}
 Engine Type: ${engineType || "N/A"}
 
 Our team is reviewing your requirements and will contact you shortly with the best options.

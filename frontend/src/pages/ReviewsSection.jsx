@@ -59,19 +59,24 @@ export default function ReviewsSection() {
   };
 
   return (
-    <Box bg="#F7F8FA" py={{ base: 12, md: 8 }} overflow="hidden">
+    <Box bg="#F7F8FA" py={{ base: 8, md: 6 }} overflow="hidden">
       <Container maxW="container.md">
         <VStack spacing={6} textAlign="center" mb={10}>
           <Text
             fontSize="13px"
             fontWeight="800"
-            color="#E10600"
-            letterSpacing="1px"
+            color="#D90404"
+            letterSpacing="1.5px"
             textTransform="uppercase"
           >
-            TESTIMONIALS
+            Testimonials
           </Text>
-          <Heading fontSize={{ base: "26px", md: "32px", lg: "36px" }} fontWeight="800" color="#111111">
+          <Heading
+            as="h2"
+            fontSize={{ base: "28px", md: "38px", lg: "42px" }}
+            fontWeight="800"
+            color="gray.900"
+          >
             What Our Customers Say
           </Heading>
         </VStack>
@@ -92,7 +97,7 @@ export default function ReviewsSection() {
             >
               {/* Quote Icon */}
               <Box position="absolute" top={{ base: 6, md: 10 }} left={{ base: 4, md: 10 }}>
-                <Icon as={FaQuoteLeft} color="#E10600" boxSize={{ base: 8, md: 10 }} />
+                <Icon as={FaQuoteLeft} color="#D90404" boxSize={{ base: 8, md: 10 }} />
               </Box>
 
               <VStack spacing={8} align="center" px={{ base: 4, md: 12 }}>
@@ -130,7 +135,7 @@ export default function ReviewsSection() {
                     aria-label="Previous Testimonial"
                     variant="ghost"
                     color="gray.600"
-                    _hover={{ color: "#E10600", bg: "transparent" }}
+                    _hover={{ color: "#D90404", bg: "transparent" }}
                     onClick={handlePrev}
                   />
 
@@ -140,7 +145,7 @@ export default function ReviewsSection() {
                       <Icon
                         key={idx}
                         as={FaStar}
-                        color={idx < testimonials[currentIndex].rating ? "#E10600" : "gray.300"}
+                        color={idx < testimonials[currentIndex].rating ? "#D90404" : "gray.300"}
                         boxSize={4}
                       />
                     ))}
@@ -152,7 +157,7 @@ export default function ReviewsSection() {
                     aria-label="Next Testimonial"
                     variant="ghost"
                     color="gray.600"
-                    _hover={{ color: "#E10600", bg: "transparent" }}
+                    _hover={{ color: "#D90404", bg: "transparent" }}
                     onClick={handleNext}
                   />
                 </Flex>

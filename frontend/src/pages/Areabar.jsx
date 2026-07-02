@@ -19,20 +19,26 @@ export default function ServiceAreasSection() {
 					{/* Header */}
 					<VStack spacing={3} textAlign="center" maxW="680px">
 						<Text
-							fontSize="14px"
-							fontWeight="700"
+							fontSize="13px"
+							fontWeight="800"
 							color={accentColor}
 							letterSpacing="1.5px"
 							textTransform="uppercase"
 						>
-							OUR COVERAGE
+							Our Coverage
 						</Text>
 
-						<Heading fontSize="28px" fontWeight="700" color="gray.800" lineHeight="1.2">
+						<Heading
+							as="h2"
+							fontSize={{ base: "28px", md: "38px", lg: "42px" }}
+							fontWeight="800"
+							color="gray.900"
+							lineHeight="1.2"
+						>
 							We Serve in Following Major Areas
 						</Heading>
 
-						<Text fontSize="16px" color="gray.600" maxW="520px">
+						<Text fontSize="15px" color="gray.600" maxW="520px">
 							We provide reliable engine delivery and fitting services across the United Kingdom
 						</Text>
 					</VStack>

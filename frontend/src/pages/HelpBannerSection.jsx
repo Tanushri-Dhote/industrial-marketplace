@@ -15,7 +15,7 @@ import { FaPhoneAlt } from "react-icons/fa";
 
 const HelpBannerSection = () => {
     return (
-        <Box bg="#F7F8FA" py={{ base: 8, md: 2 }}>
+        <Box bg="#F7F8FA" pt={{ base: 6, md: 4 }} pb={{ base: 8, md: 10 }}>
             <Container maxW="container.xl">
                 <Box
                     bg="white"
@@ -71,13 +71,13 @@ const HelpBannerSection = () => {
 
                             <HStack spacing={4} mt={2} flexWrap="wrap" justify={{ base: "center", md: "flex-start" }}>
                                 <Button
-                                    bg="#E10600"
+                                    bg="#D90404"
                                     color="white"
                                     size="lg"
                                     px={8}
                                     fontWeight="700"
                                     borderRadius="md"
-                                    _hover={{ bg: "#c40000" }}
+                                    _hover={{ bg: "#b50303" }}
                                     boxShadow="md"
                                     onClick={() => window.location.href = '/contact'}
                                 >
@@ -94,7 +94,7 @@ const HelpBannerSection = () => {
                                     border="1px solid"
                                     borderColor="gray.200"
                                     _hover={{ bg: "gray.50" }}
-                                    leftIcon={<Icon as={FaPhoneAlt} color="#E10600" boxSize={4} />}
+                                    leftIcon={<Icon as={FaPhoneAlt} color="#D90404" boxSize={4} />}
                                     boxShadow="sm"
                                 >
                                     +44 2071129397

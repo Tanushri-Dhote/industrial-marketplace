@@ -1,4 +1,4 @@
-﻿import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import {
 	Table,
 	Thead,
@@ -72,21 +72,21 @@ function saveStatuses(s) {
 
 const mapInquiryFromApi = (inquiry) => ({
 	id: inquiry._id,
-	registrationNumber: inquiry.registrationNumber || "ÔÇö",
+	registrationNumber: inquiry.registrationNumber || "—",
 	brand: inquiry.brand || "",
 	model: inquiry.model || "",
 	year: inquiry.year || "",
 	engineType: inquiry.engineType || "",
-	category: inquiry.category || "ÔÇö",
+	category: inquiry.category || "—",
 	engineOptions: inquiry.engineOptions || [],
 	fittingOptions: inquiry.fittingOptions || [],
-	postcode: inquiry.postcode || "ÔÇö",
+	postcode: inquiry.postcode || "—",
 	notes: inquiry.notes || "",
-	name: inquiry.name || "ÔÇö",
-	email: inquiry.email || "ÔÇö",
-	phone: inquiry.phone || "ÔÇö",
-	date: inquiry.createdAt ? new Date(inquiry.createdAt).toLocaleString() : "ÔÇö",
-	refNumber: inquiry._id?.slice(-6).toUpperCase() || "ÔÇöÔÇö",
+	name: inquiry.name || "—",
+	email: inquiry.email || "—",
+	phone: inquiry.phone || "—",
+	date: inquiry.createdAt ? new Date(inquiry.createdAt).toLocaleString() : "—",
+	refNumber: inquiry._id?.slice(-6).toUpperCase() || "——",
 });
 
 function UKPlate({ vrm }) {
@@ -107,7 +107,7 @@ function UKPlate({ vrm }) {
 					GB
 				</Text>
 				<Text color={PLATE_YELLOW} fontSize="7px">
-					Ôÿà
+					★
 				</Text>
 			</Flex>
 			<Text
@@ -118,7 +118,7 @@ function UKPlate({ vrm }) {
 				color={DARK}
 				fontFamily="'Arial Black', sans-serif"
 			>
-				{vrm || "ÔÇö"}
+				{vrm || "—"}
 			</Text>
 		</Flex>
 	);
@@ -724,7 +724,7 @@ function InquiryViewModal({
 									Inquiry Details
 								</Text>
 								<Text opacity={0.7} fontSize="13px">
-									{inquiry.registrationNumber !== "ÔÇö"
+									{inquiry.registrationNumber !== "—"
 										? `Reference: ${inquiry.refNumber}`
 										: `${inquiry.brand} ${inquiry.model} ${inquiry.year}`.trim() ||
 											"Manual Selection"}
@@ -732,7 +732,7 @@ function InquiryViewModal({
 							</VStack>
 						</HStack>
 
-						{inquiry.registrationNumber !== "ÔÇö" && (
+						{inquiry.registrationNumber !== "—" && (
 							<Flex
 								bg={PLATE_YELLOW}
 								border="2.5px solid #1a1a1a"
@@ -754,7 +754,7 @@ function InquiryViewModal({
 										GB
 									</Text>
 									<Text color={PLATE_YELLOW} fontSize="9px">
-										Ôÿà
+										★
 									</Text>
 								</Flex>
 								<Text

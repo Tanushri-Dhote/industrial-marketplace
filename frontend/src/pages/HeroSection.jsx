@@ -45,7 +45,7 @@ import { toast } from "sonner";
 
 const MotionBox = motion(Box);
 
-const RED = "#E10600";
+const RED = "#D90404";
 const DARK = "#111111";
 
 const getMercedesClass = (modelName) => {
@@ -385,7 +385,7 @@ export default function HeroSection() {
 
 
 	return (
-		<Box bg="#f7f7f7" pt={{ base: 8, md: 12 }} pb={{ base: 16, md: 24 }} overflow="visible">
+		<Box bgGradient="radial-gradient(circle at 80% 35%, rgba(217, 4, 4, 0.07) 0%, #f7f7f7 65%)" pt={{ base: 6, md: 8 }} pb={{ base: 8, md: 10 }} overflow="visible">
 			<Container maxW="container.xl">
 				{/* ── HERO ROW ── */}
 				<Flex
@@ -539,14 +539,27 @@ export default function HeroSection() {
 						transition={{ duration: 0.8 }}
 						display="flex"
 						justifyContent="flex-end"
+						mr={{ base: 0, lg: "-65px" }}
 					>
-						<Image
-							src="/engine-hero.png"
-							alt="Engine"
+						<MotionBox
+							animate={{ y: [0, -12, 0] }}
+							transition={{
+								duration: 4,
+								repeat: Infinity,
+								ease: "easeInOut",
+							}}
 							w="100%"
-							maxW={{ base: "360px", lg: "580px" }}
-							objectFit="contain"
-						/>
+							display="flex"
+							justifyContent="flex-end"
+						>
+							<Image
+								src="/engine-hero.png"
+								alt="Engine"
+								w="100%"
+								maxW={{ base: "360px", lg: "580px" }}
+								objectFit="contain"
+							/>
+						</MotionBox>
 					</MotionBox>
 				</Flex>
 
@@ -556,7 +569,7 @@ export default function HeroSection() {
 					px={{ base: 6, md: 10 }}
 					py={{ base: 8, md: 10 }}
 					borderRadius="3xl"
-					boxShadow="2xl"
+					boxShadow="0 30px 60px -15px rgba(15, 23, 42, 0.12)"
 					border="1px solid"
 					borderColor="gray.200"
 					maxW="960px"
@@ -814,7 +827,16 @@ export default function HeroSection() {
 							_hover={{ bg: "gray.100" }}
 						/>
 						<ModalBody p={0} bg="#F8FAFC">
-							<CallSellerPage isModal={true} onCloseModal={onClose} />
+							<CallSellerPage 
+								isModal={true} 
+								onCloseModal={onClose} 
+								vrm={regNumber}
+								brand={selectedBrand}
+								model={selectedModel}
+								year={selectedYear}
+								engineType={selectedEngineSize}
+								category={category}
+							/>
 						</ModalBody>
 					</ModalContent>
 				</Modal>

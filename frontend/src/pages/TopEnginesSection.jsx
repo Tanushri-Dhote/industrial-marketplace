@@ -10,11 +10,38 @@ import {
 	Text,
 	VStack,
 	IconButton,
+	HStack,
 } from "@chakra-ui/react";
 import { motion } from "framer-motion";
+import { keyframes } from "@emotion/react";
 import { useQuery } from "@tanstack/react-query";
 import { Link as RouterLink } from "react-router-dom";
 import API from "../services/api";
+
+const pulse = keyframes`
+  0% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba(72, 187, 120, 0.7);
+  }
+  70% {
+    transform: scale(1);
+    box-shadow: 0 0 0 6px rgba(72, 187, 120, 0);
+  }
+  100% {
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba(72, 187, 120, 0);
+  }
+`;
+
+const PulsingDot = () => (
+	<Box
+		w="6px"
+		h="6px"
+		borderRadius="full"
+		bg="green.500"
+		animation={`${pulse} 2s infinite`}
+	/>
+);
 
 // Swiper imports - CORRECTED
 import { Swiper, SwiperSlide } from "swiper/react";
@@ -105,7 +132,7 @@ export default function TopEnginesSection({ category }) {
 	};
 
 	return (
-		<Box bg="#F7F8FA" py={{ base: 14, md: 8 }}>
+		<Box bg="#F7F8FA" pt={{ base: 8, md: 10 }} pb={{ base: 4, md: 4 }}>
 			<Container maxW="container.xl">
 				<VStack spacing={10}>
 					{/* Header */}
@@ -117,11 +144,12 @@ export default function TopEnginesSection({ category }) {
 							textTransform="uppercase"
 							letterSpacing="1.5px"
 						>
-							OUR ENGINES
+							Our Engines
 						</Text>
 
 						<Heading
-							fontSize={{ base: "28px", md: "40px" }}
+							as="h2"
+							fontSize={{ base: "28px", md: "38px", lg: "42px" }}
 							fontWeight="800"
 							color="gray.900"
 						>
@@ -129,7 +157,7 @@ export default function TopEnginesSection({ category }) {
 						</Heading>
 
 						<Text
-							fontSize={{ base: "14px", md: "16px" }}
+							fontSize="15px"
 							color="gray.600"
 							maxW="600px"
 						>
@@ -173,15 +201,15 @@ export default function TopEnginesSection({ category }) {
 											bg="white"
 											borderRadius="xl"
 											p={4}
-											boxShadow="sm"
+											boxShadow="0 4px 10px rgba(0, 0, 0, 0.02)"
 											border="1px solid"
 											borderColor="gray.100"
-											textAlign="center"
 											cursor="pointer"
-											transition="all 0.3s ease"
+											transition="all 0.3s cubic-bezier(.25,.8,.25,1)"
 											_hover={{
 												transform: "translateY(-6px)",
-												boxShadow: "lg",
+												borderColor: "rgba(217, 4, 4, 0.3)",
+												boxShadow: "0 15px 30px rgba(217, 4, 4, 0.08)",
 												textDecoration: "none",
 											}}
 											display="block"
@@ -208,22 +236,26 @@ export default function TopEnginesSection({ category }) {
 											{/* Name */}
 											<Text
 												fontWeight="800"
-												fontSize="15px"
+												fontSize="14px"
 												color="gray.900"
 												noOfLines={1}
+												textAlign="left"
 											>
 												{engine.name}
 											</Text>
 
-											{/* Model */}
-											<Text
-												fontSize="12px"
-												color="gray.500"
-												mt={1}
-												noOfLines={1}
-											>
-												{engine.model || "Universal Fit"}
-											</Text>
+											{/* Fits & In Stock Row */}
+											<HStack spacing={1.5} fontSize="11px" color="gray.600" mt={1.5} w="full" justify="space-between">
+												<Text noOfLines={1} fontWeight="600">
+													Fits: {engine.model || "Universal"}
+												</Text>
+												<HStack spacing={1} align="center">
+													<PulsingDot />
+													<Text color="green.600" fontWeight="700">
+														Stock
+													</Text>
+												</HStack>
+											</HStack>
 
 											{/* Button */}
 											<Button

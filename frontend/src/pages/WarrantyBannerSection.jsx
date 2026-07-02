@@ -24,7 +24,8 @@ const WarrantyBannerSection = () => {
                 <VStack spacing={6} w="full" align="stretch">
                     {/* Top Red Banner */}
                     <Box
-                        bg="#E10600"
+                        bgGradient="linear-gradient(135deg, #0F172A 0%, #1E293B 100%)"
+                        borderLeft="5px solid #D90404"
                         borderRadius="2xl"
                         px={{ base: 6, md: 8 }}
                         py={{ base: 5, md: 4 }}
@@ -37,7 +38,7 @@ const WarrantyBannerSection = () => {
                             gap={{ base: 4, md: 8 }}
                         >
                             <Box flexShrink={0}>
-                                <Icon as={FaShieldAlt} boxSize={{ base: "42px", md: "40px" }} />
+                                <Icon as={FaShieldAlt} color="#D90404" boxSize={{ base: "42px", md: "40px" }} />
                             </Box>
 
                             <VStack align="start" spacing={2} flex={1}>
@@ -46,6 +47,7 @@ const WarrantyBannerSection = () => {
                                     fontWeight="700"
                                     textTransform="uppercase"
                                     letterSpacing="0.05em"
+                                    color="#D90404"
                                 >
                                     06 MONTHS WARRANTY
                                 </Text>
@@ -59,6 +61,7 @@ const WarrantyBannerSection = () => {
                                     fontSize={{ base: "13px", md: "14px" }}
                                     lineHeight="1.6"
                                     mt={0}
+                                    color="gray.300"
                                 >
                                     All our engines come with a 06 months warranty for your peace of mind.
                                 </Text>
@@ -107,7 +110,7 @@ const FeatureItem = ({ icon, title }) => {
             py={{ base: 4, md: 0 }}
             textAlign="center"
         >
-            <Icon as={icon} boxSize={{ base: 5, md: 8 }} color="#E10600" />
+            <Icon as={icon} boxSize={{ base: 5, md: 8 }} color="#D90404" />
             <Text fontWeight="800" fontSize={{ base: "13px", md: "15px" }} color="#111111" lineHeight="1.3">
                 <Box display={{ base: "block", md: "block" }}>
                     {title}
