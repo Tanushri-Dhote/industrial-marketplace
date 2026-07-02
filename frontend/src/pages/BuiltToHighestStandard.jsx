@@ -94,9 +94,9 @@ const BuiltToHighestStandard = () => {
 
                 {/* ── FEATURE CARDS ── */}
                 <Grid
-                    templateColumns={{ base: "1fr", sm: "repeat(2, 1fr)", lg: "repeat(4, 1fr)" }}
-                    gap={{ base: 4, md: 6 }}
-                    mb={10}
+                    templateColumns={{ base: "1fr", md: "repeat(2, 1fr)", lg: "repeat(4, 1fr)" }}
+                    gap={4}
+                    mb={8}
                 >
                     {features.map((feature, index) => (
                         <Box
@@ -114,7 +114,7 @@ const BuiltToHighestStandard = () => {
                                 boxShadow: "0 8px 16px rgba(217, 4, 4, 0.06)" 
                             }}
                         >
-                            <Flex direction={{ base: "column", lg: "row" }} align="flex-start" gap={4}>
+                            <Flex direction="row" align="center" gap={4}>
                                 <Box
                                     p={3}
                                     borderRadius="xl"
@@ -123,11 +123,10 @@ const BuiltToHighestStandard = () => {
                                     alignItems="center"
                                     justifyContent="center"
                                     flexShrink={0}
-                                    mb={{ base: 2, lg: 0 }}
                                 >
                                     <Icon as={feature.icon} boxSize={5} color={RED} />
                                 </Box>
-                                <VStack align="start" spacing={1}>
+                                <VStack align="start" spacing={0.5}>
                                     <Text fontWeight="800" fontSize="15px" color="gray.900" lineHeight="1.2">
                                         {feature.title}
                                     </Text>
