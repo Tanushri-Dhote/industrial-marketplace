@@ -24,6 +24,7 @@ import {
     useDisclosure,
     Skeleton,
     Badge,
+    Select,
 } from "@chakra-ui/react";
 import { motion } from "framer-motion";
 import { useQuery } from "@tanstack/react-query";
@@ -98,25 +99,64 @@ export default function AllEnginesPage({ category }) {
     const [selectedConditions, setSelectedConditions] = useState([]);
     const [page, setPage] = useState(1);
 
+    const [selectedBrand, setSelectedBrand] = useState(brand);
+    const [selectedModel, setSelectedModel] = useState(model);
+    const [selectedCategory, setSelectedCategory] = useState(category || "");
+
+    useEffect(() => {
+        setSelectedBrand(brand);
+        setSelectedModel(model);
+    }, [brand, model]);
+
+    useEffect(() => {
+        setSelectedCategory(category || "");
+    }, [category]);
+
+    // Load active brands
+    const { data: brandsRes } = useQuery({
+        queryKey: ["brands-list"],
+        queryFn: async () => {
+            const res = await API.get("/brands");
+            return res.data.data || res.data || [];
+        },
+        staleTime: 1000 * 60 * 10,
+    });
+    const brandsList = brandsRes || [];
+
+    // Load models for selected brand
+    const { data: modelsRes } = useQuery({
+        queryKey: ["models-list", selectedBrand],
+        queryFn: async () => {
+            if (!selectedBrand) return [];
+            const currentBrandObj = brandsList.find(b => b.slug === selectedBrand || b.name === selectedBrand);
+            if (!currentBrandObj) return [];
+            const res = await API.get(`/models/${currentBrandObj._id}`);
+            return res.data || [];
+        },
+        enabled: !!selectedBrand && brandsList.length > 0,
+        staleTime: 1000 * 60 * 10,
+    });
+    const modelsList = modelsRes || [];
+
     const { isOpen: isMobileFiltersOpen, onOpen: onMobileFiltersOpen, onClose: onMobileFiltersClose } = useDisclosure();
 
     // Reset to page 1 when filters or URL query params change
     useEffect(() => {
         setPage(1);
-    }, [search, brand, model, priceMin, priceMax, mileageMax, selectedConditions]);
+    }, [search, selectedBrand, selectedModel, selectedCategory, priceMin, priceMax, mileageMax, selectedConditions]);
 
     const { data, isLoading: loading, isFetching } = useQuery({
         queryKey: [
             "all-products",
-            { category, search, brand, model, priceMin, priceMax, mileageMax, selectedConditions, page },
+            { category: selectedCategory, search, brand: selectedBrand, model: selectedModel, priceMin, priceMax, mileageMax, selectedConditions, page },
         ],
         queryFn: async () => {
             const res = await API.get("/products", {
                 params: {
-                    category,
+                    category: selectedCategory || undefined,
                     search,
-                    brand,
-                    model,
+                    brand: selectedBrand || undefined,
+                    model: selectedModel || undefined,
                     priceMin,
                     priceMax,
                     mileageMax,
@@ -139,6 +179,9 @@ export default function AllEnginesPage({ category }) {
         priceMax ? 1 : 0,
         mileageMax ? 1 : 0,
         selectedConditions.length,
+        selectedBrand ? 1 : 0,
+        selectedModel ? 1 : 0,
+        selectedCategory ? 1 : 0,
     ].reduce((a, b) => a + b, 0);
 
     const handlePageChange = (newPage) => {
@@ -222,12 +265,93 @@ export default function AllEnginesPage({ category }) {
                             setPriceMax("");
                             setMileageMax("");
                             setSelectedConditions([]);
+                            setSelectedBrand("");
+                            setSelectedModel("");
+                            setSelectedCategory("");
                         }}
                     >
                         Reset
                     </Button>
                 )}
             </Flex>
+
+            {/* Category Filter */}
+            <VStack align="stretch" spacing={3}>
+                <Text fontWeight="800" fontSize="13px" color="gray.700" textTransform="uppercase" letterSpacing="0.5px">
+                    Category
+                </Text>
+                <Select
+                    placeholder="All Categories"
+                    size="md"
+                    borderRadius="xl"
+                    value={selectedCategory}
+                    onChange={(e) => {
+                        setSelectedCategory(e.target.value);
+                    }}
+                    bg="gray.50"
+                    border="1px solid"
+                    borderColor="gray.200"
+                    _focus={{ borderColor: "brand.500", bg: "white" }}
+                >
+                    <option value="Car Engines">Car Engines</option>
+                    <option value="Used Engines">Used Engines</option>
+                    <option value="Reconditioned Engines">Reconditioned Engines</option>
+                    <option value="Gearboxes">Gearboxes</option>
+                </Select>
+            </VStack>
+
+            {/* Brand Filter */}
+            <VStack align="stretch" spacing={3}>
+                <Text fontWeight="800" fontSize="13px" color="gray.700" textTransform="uppercase" letterSpacing="0.5px">
+                    Brand
+                </Text>
+                <Select
+                    placeholder="All Brands"
+                    size="md"
+                    borderRadius="xl"
+                    value={selectedBrand}
+                    onChange={(e) => {
+                        setSelectedBrand(e.target.value);
+                        setSelectedModel(""); // Reset model when brand changes
+                    }}
+                    bg="gray.50"
+                    border="1px solid"
+                    borderColor="gray.200"
+                    _focus={{ borderColor: "brand.500", bg: "white" }}
+                >
+                    {brandsList.map((b) => (
+                        <option key={b._id} value={b.slug}>
+                            {b.name}
+                        </option>
+                    ))}
+                </Select>
+            </VStack>
+
+            {/* Model Filter */}
+            {selectedBrand && (
+                <VStack align="stretch" spacing={3}>
+                    <Text fontWeight="800" fontSize="13px" color="gray.700" textTransform="uppercase" letterSpacing="0.5px">
+                        Model
+                    </Text>
+                    <Select
+                        placeholder="All Models"
+                        size="md"
+                        borderRadius="xl"
+                        value={selectedModel}
+                        onChange={(e) => setSelectedModel(e.target.value)}
+                        bg="gray.50"
+                        border="1px solid"
+                        borderColor="gray.200"
+                        _focus={{ borderColor: "brand.500", bg: "white" }}
+                    >
+                        {modelsList.map((m) => (
+                            <option key={m._id} value={m.name}>
+                                {m.name}
+                            </option>
+                        ))}
+                    </Select>
+                </VStack>
+            )}
 
             {/* Condition Filter */}
             <VStack align="stretch" spacing={3}>
@@ -353,6 +477,9 @@ export default function AllEnginesPage({ category }) {
                             setPriceMax("");
                             setMileageMax("");
                             setSelectedConditions([]);
+                            setSelectedBrand("");
+                            setSelectedModel("");
+                            setSelectedCategory("");
                         }}
                         fontWeight="700"
                     >
