@@ -80,8 +80,13 @@ async function migrate() {
   console.log(`🗄️  Database Name: ${sourceDbName}`);
   console.log("--------------------------------------------------");
 
-  const sourceClient = new MongoClient(sourceUri);
-  const targetClient = new MongoClient(targetUri);
+  const clientOptions = {
+    compressors: ["zstd", "snappy", "zlib"],
+    connectTimeoutMS: 30000,
+    socketTimeoutMS: 30000,
+  };
+  const sourceClient = new MongoClient(sourceUri, clientOptions);
+  const targetClient = new MongoClient(targetUri, clientOptions);
 
   try {
     console.log("Connecting to source database...");
@@ -136,7 +141,7 @@ async function migrate() {
       let insertedCount = 0;
       const startTime = Date.now();
 
-      const CHUNK_SIZE = 100;
+      const CHUNK_SIZE = 20;
       let skip = 0;
       const totalChunks = Math.ceil(count / CHUNK_SIZE);
       let chunkNum = 1;
