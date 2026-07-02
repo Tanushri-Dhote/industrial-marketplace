@@ -515,50 +515,105 @@ export default function ProductsPage() {
 										{currentBrand?.name} {currentModel?.name || ""} Specifications
 									</Heading>
 								</VStack>
-								<TableContainer 
-									bg="white" 
-									borderRadius="2xl" 
-									border="1px solid" 
-									borderColor="gray.200" 
-									boxShadow="sm"
-									overflow="hidden"
-								>
-									<Table variant="simple">
-										<Thead bg="gray.50">
-											<Tr>
-												<Th color="gray.600">Engine Details</Th>
-												<Th color="gray.600">Condition</Th>
-												<Th color="gray.600">Model Fit</Th>
-												<Th color="gray.600"></Th>
-											</Tr>
-										</Thead>
-										<Tbody>
-											{products.map((engine) => (
-												<Tr key={`table-${engine._id}`} _hover={{ bg: "gray.50" }}>
-													<Td fontWeight="700">{engine.name}</Td>
-													<Td>
-														<Badge colorScheme={engine.condition?.toLowerCase() === 'reconditioned' ? 'green' : 'blue'} variant="subtle">
+								{/* Desktop Table View */}
+								<Box display={{ base: "none", md: "block" }}>
+									<TableContainer 
+										bg="white" 
+										borderRadius="2xl" 
+										border="1px solid" 
+										borderColor="gray.200" 
+										boxShadow="sm"
+										overflow="hidden"
+									>
+										<Table variant="simple">
+											<Thead bg="gray.50">
+												<Tr>
+													<Th color="gray.600">Engine Details</Th>
+													<Th color="gray.600">Condition</Th>
+													<Th color="gray.600">Model Fit</Th>
+													<Th color="gray.600"></Th>
+												</Tr>
+											</Thead>
+											<Tbody>
+												{products.map((engine) => (
+													<Tr key={`table-dsktp-${engine._id}`} _hover={{ bg: "gray.50" }}>
+														<Td fontWeight="700">{engine.name}</Td>
+														<Td>
+															<Badge colorScheme={engine.condition?.toLowerCase() === 'reconditioned' ? 'green' : 'blue'} variant="subtle">
+																{engine.condition || "Used"}
+															</Badge>
+														</Td>
+														<Td fontSize="sm">{engine.model}</Td>
+														<Td isNumeric>
+															<Button 
+																as={RouterLink} 
+																to={`/products/${engine._id}`} 
+																size="sm" 
+																bg={darkColor}
+																color="white"
+																_hover={{ bg: accentColor }}
+															>
+																Get Quote
+															</Button>
+														</Td>
+													</Tr>
+												))}
+											</Tbody>
+										</Table>
+									</TableContainer>
+								</Box>
+
+								{/* Mobile List Card View */}
+								<Box display={{ base: "block", md: "none" }}>
+									<VStack spacing={4} align="stretch">
+										{products.map((engine) => (
+											<Box
+												key={`table-mob-${engine._id}`}
+												bg="white"
+												p={4}
+												borderRadius="xl"
+												border="1px solid"
+												borderColor="gray.200"
+												boxShadow="sm"
+											>
+												<VStack align="start" spacing={3}>
+													<Text fontWeight="800" color="gray.850" fontSize="15px" lineHeight="1.4">
+														{engine.name}
+													</Text>
+													
+													<HStack spacing={3} wrap="wrap">
+														<Badge colorScheme={engine.condition?.toLowerCase() === 'reconditioned' ? 'green' : 'blue'} variant="subtle" fontSize="10px">
 															{engine.condition || "Used"}
 														</Badge>
-													</Td>
-													<Td fontSize="sm">{engine.model}</Td>
-													<Td isNumeric>
-														<Button 
-															as={RouterLink} 
-															to={`/products/${engine._id}`} 
-															size="sm" 
+														{engine.model && (
+															<Text fontSize="12px" color="gray.600" fontWeight="600">
+																Fit: {engine.model}
+															</Text>
+														)}
+													</HStack>
+													
+													<Flex w="full" justify="space-between" align="center" pt={2} borderTop="1px dashed" borderColor="gray.100">
+														<Text fontSize="12px" color="gray.500" fontWeight="500">
+															Instant Quote Available
+														</Text>
+														<Button
+															as={RouterLink}
+															to={`/products/${engine._id}`}
+															size="sm"
 															bg={darkColor}
 															color="white"
 															_hover={{ bg: accentColor }}
+															h="32px"
+															px={4}
 														>
 															Get Quote
 														</Button>
-													</Td>
-												</Tr>
-											))}
-										</Tbody>
-									</Table>
-								</TableContainer>
+													</Flex>
+												</VStack>
+											</Box>
+										))}
+									</VStack>
+								</Box>
 							</MotionBox>
 						</VStack>
 					) : (

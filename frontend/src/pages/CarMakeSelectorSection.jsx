@@ -469,49 +469,97 @@ export default function CarMakeSelectorSection() {
 									</Box>
 								</Flex>
 
-								<TableContainer
-									bg="white"
-									border="1px solid"
-									borderColor="gray.200"
-									borderRadius="2xl"
-									overflow="hidden"
-								>
-									<Table variant="simple">
-										<Thead bg="gray.50">
-											<Tr>
-												<Th>Engine</Th>
-												<Th>Fuel</Th>
-												<Th>Model</Th>
-												<Th>Year</Th>
-												<Th isNumeric>Price</Th>
-												<Th>Quote</Th>
-											</Tr>
-										</Thead>
-										<Tbody>
-											{brandProducts.map((engine) => (
-												<Tr key={`price-${engine._id}`}>
-													<Td fontWeight="700">{engine.name}</Td>
-													<Td>{engine.engineType}</Td>
-													<Td>{engine.model}</Td>
-													<Td>{engine.year}</Td>
-													<Td isNumeric fontWeight="800">
-														£{Number(engine.price || 0).toLocaleString("en-GB")}
-													</Td>
-													<Td>
+								{/* Desktop Table View */}
+								<Box display={{ base: "none", md: "block" }}>
+									<TableContainer
+										bg="white"
+										border="1px solid"
+										borderColor="gray.200"
+										borderRadius="2xl"
+										overflow="hidden"
+									>
+										<Table variant="simple">
+											<Thead bg="gray.50">
+												<Tr>
+													<Th>Engine</Th>
+													<Th>Fuel</Th>
+													<Th>Model</Th>
+													<Th>Year</Th>
+													<Th isNumeric>Price</Th>
+													<Th>Quote</Th>
+												</Tr>
+											</Thead>
+											<Tbody>
+												{brandProducts.map((engine) => (
+													<Tr key={`price-dsktp-${engine._id}`}>
+														<Td fontWeight="700">{engine.name}</Td>
+														<Td>{engine.engineType}</Td>
+														<Td>{engine.model}</Td>
+														<Td>{engine.year}</Td>
+														<Td isNumeric fontWeight="800">
+															£{Number(engine.price || 0).toLocaleString("en-GB")}
+														</Td>
+														<Td>
+															<Button
+																as={RouterLink}
+																to={`/products/${engine._id}`}
+																size="sm"
+																colorScheme="green"
+															>
+																Get Quote
+															</Button>
+														</Td>
+													</Tr>
+												))}
+											</Tbody>
+										</Table>
+									</TableContainer>
+								</Box>
+
+								{/* Mobile List Card View */}
+								<Box display={{ base: "block", md: "none" }}>
+									<VStack spacing={4} align="stretch">
+										{brandProducts.map((engine) => (
+											<Box
+												key={`price-mob-${engine._id}`}
+												bg="white"
+												p={4}
+												borderRadius="xl"
+												border="1px solid"
+												borderColor="gray.200"
+												boxShadow="sm"
+											>
+												<VStack align="start" spacing={3}>
+													<Text fontWeight="800" color="gray.850" fontSize="15px" lineHeight="1.4">
+														{engine.name}
+													</Text>
+													
+													<HStack spacing={3} wrap="wrap" fontSize="12px" color="gray.600" fontWeight="600">
+														{engine.engineType && <Badge colorScheme="blue" variant="subtle">{engine.engineType}</Badge>}
+														{engine.model && <Text>Fit: {engine.model}</Text>}
+														{engine.year && <Text>Year: {engine.year}</Text>}
+													</HStack>
+													
+													<Flex w="full" justify="space-between" align="center" pt={2} borderTop="1px dashed" borderColor="gray.100">
+														<Text fontSize="16px" fontWeight="950" color="gray.900">
+															£{Number(engine.price || 0).toLocaleString("en-GB")}
+														</Text>
 														<Button
 															as={RouterLink}
 															to={`/products/${engine._id}`}
 															size="sm"
 															colorScheme="green"
+															h="32px"
+															px={4}
 														>
 															Get Quote
 														</Button>
-													</Td>
-												</Tr>
-											))}
-										</Tbody>
-									</Table>
-								</TableContainer>
+													</Flex>
+												</VStack>
+											</Box>
+										))}
+									</VStack>
+								</Box>
 							</Box>
 						</VStack>
 					)}
