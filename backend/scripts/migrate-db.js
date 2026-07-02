@@ -81,7 +81,7 @@ async function migrate() {
   console.log("--------------------------------------------------");
 
   const clientOptions = {
-    compressors: ["zstd", "snappy", "zlib"],
+    compressors: ["zlib"],
     connectTimeoutMS: 30000,
     socketTimeoutMS: 30000,
   };
