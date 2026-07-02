@@ -130,7 +130,7 @@ async function migrate() {
         await targetDb.collection(colName).createIndex(key, { name, ...options });
       }
 
-      // 3. Copy documents
+      // 3. Copy documents using _id keyset pagination (O(1) per page, no skip scans)
       const count = await sourceDb.collection(colName).countDocuments();
       if (count === 0) {
         console.log(`  - Collection "${colName}" is empty. Skipped copying documents.`);
@@ -141,39 +141,62 @@ async function migrate() {
       let insertedCount = 0;
       const startTime = Date.now();
 
-      const CHUNK_SIZE = 20;
-      let skip = 0;
-      const totalChunks = Math.ceil(count / CHUNK_SIZE);
+      const CHUNK_SIZE = 50;
+      const MAX_RETRIES = 5;
+
+      // Helper: fetch with retry + exponential backoff
+      async function fetchWithRetry(query, chunkNum) {
+        for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
+          try {
+            const fetchStart = Date.now();
+            console.log(`    - [DEBUG] Fetching chunk ${chunkNum} (attempt ${attempt}/${MAX_RETRIES})...`);
+            const docs = await sourceDb.collection(colName)
+              .find(query)
+              .sort({ _id: 1 })
+              .limit(CHUNK_SIZE)
+              .maxTimeMS(20000)
+              .toArray();
+            console.log(`      * Fetched ${docs.length} documents in ${Date.now() - fetchStart}ms.`);
+            return docs;
+          } catch (err) {
+            const wait = Math.min(1000 * Math.pow(2, attempt - 1), 10000); // 1s, 2s, 4s, 8s, 10s
+            console.error(`      ⚠️  Fetch attempt ${attempt} failed: ${err.message}. Retrying in ${wait}ms...`);
+            if (attempt === MAX_RETRIES) throw err;
+            await new Promise(r => setTimeout(r, wait));
+          }
+        }
+      }
+
+      let lastId = null;
       let chunkNum = 1;
 
-      // Use stateless page-by-page queries to prevent long-lived open cursor sockets and getMore hangs
-      while (insertedCount < count) {
-        console.log(`    - [DEBUG] Fetching chunk ${chunkNum}/${totalChunks} (skip: ${skip}, limit: ${CHUNK_SIZE}) from source...`);
-        const fetchStart = Date.now();
-        const docs = await sourceDb.collection(colName).find({}).skip(skip).limit(CHUNK_SIZE).toArray();
-        console.log(`    - [DEBUG] Fetched ${docs.length} documents in ${Date.now() - fetchStart}ms.`);
-        
-        if (docs.length === 0) {
-          console.log(`    - [DEBUG] No more documents found. Finishing loop.`);
+      while (true) {
+        const query = lastId ? { _id: { $gt: lastId } } : {};
+        const docs = await fetchWithRetry(query, chunkNum);
+
+        if (!docs || docs.length === 0) {
+          console.log(`    - [DEBUG] No more documents. Finished.`);
           break;
         }
 
-        console.log(`    - [DEBUG] Writing chunk ${chunkNum}/${totalChunks} to target (size: ${docs.length})...`);
+        console.log(`    - [DEBUG] Writing chunk ${chunkNum} (size: ${docs.length}) to target...`);
         const writeStart = Date.now();
         try {
           const res = await targetDb.collection(colName).insertMany(docs, { ordered: false });
           insertedCount += res.insertedCount;
-          console.log(`      * [DEBUG] Chunk ${chunkNum}/${totalChunks} written successfully in ${Date.now() - writeStart}ms. Total copied: ${insertedCount}/${count}`);
+          console.log(`      * Chunk ${chunkNum} written in ${Date.now() - writeStart}ms. Total: ${insertedCount}/${count}`);
         } catch (insertErr) {
-          console.error(`      ❌ [DEBUG] Chunk ${chunkNum}/${totalChunks} write failed after ${Date.now() - writeStart}ms. Error:`, insertErr.message);
+          console.error(`      ❌ Chunk ${chunkNum} write failed: ${insertErr.message}`);
           if (insertErr.result && insertErr.result.nInserted) {
             insertedCount += insertErr.result.nInserted;
           }
           throw insertErr;
         }
 
-        skip += CHUNK_SIZE;
+        lastId = docs[docs.length - 1]._id;
         chunkNum++;
+
+        if (docs.length < CHUNK_SIZE) break; // last page
       }
 
       console.log(`✅ Collection "${colName}" migrated successfully (${insertedCount} documents, ${indexes.length} indexes, took ${Date.now() - startTime}ms).`);
