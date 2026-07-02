@@ -129,7 +129,7 @@ export default function ProductDetailPage() {
 	}
 
 	return (
-		<Box bg="#f7f7f7" minH="100vh" pb={12}>
+		<Box bg="#f7f7f7" pb={8}>
 			<Container maxW="container.xl" py={4}>
 
 				{/* Top Bar / Breadcrumb Row */}
