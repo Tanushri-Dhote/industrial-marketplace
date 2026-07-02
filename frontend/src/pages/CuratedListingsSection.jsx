@@ -172,14 +172,14 @@ export default function CuratedListingsSection({ category }) {
 					{engine.name}
 				</Text>
 
-				<HStack spacing={1} fontSize="11px" color="gray.600" align="center" w="full">
-					<Text fontWeight="700">Fits:</Text>
-					<Text noOfLines={1}>{engine.model || "Universal Fit"}</Text>
-					<Box w="3px" h="3px" borderRadius="full" bg="gray.400" />
-					<HStack spacing={1} align="center">
+				<HStack spacing={1} fontSize="11px" color="gray.600" align="center" w="full" overflow="hidden">
+					<Text fontWeight="700" flexShrink={0} whiteSpace="nowrap">Fits:</Text>
+					<Text noOfLines={1} flexGrow={1}>{engine.model || "Universal Fit"}</Text>
+					<Box w="3px" h="3px" borderRadius="full" bg="gray.400" flexShrink={0} />
+					<HStack spacing={1} align="center" flexShrink={0} whiteSpace="nowrap">
 						<PulsingDot />
 						<Text color="green.700" fontWeight="700" noOfLines={1}>
-							In Stock
+							Stock
 						</Text>
 					</HStack>
 				</HStack>

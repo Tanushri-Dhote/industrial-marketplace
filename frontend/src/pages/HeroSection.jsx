@@ -458,7 +458,7 @@ export default function HeroSection({ category = "Engines" }) {
 						>
 							<HStack spacing={2} align="flex-start">
 								<Icon as={FaShieldAlt} color={RED} boxSize={5} mt="2px" />
-								<VStack align="start" spacing={0}>
+								<VStack align="start" spacing={0} textAlign="left">
 									<Text fontWeight="700" fontSize="xs">
 										Quality Tested
 									</Text>
@@ -470,7 +470,7 @@ export default function HeroSection({ category = "Engines" }) {
 
 							<HStack spacing={2} align="flex-start">
 								<Icon as={FaTools} color={RED} boxSize={5} mt="2px" />
-								<VStack align="start" spacing={0}>
+								<VStack align="start" spacing={0} textAlign="left">
 									<Text fontWeight="700" fontSize="xs">
 										06 Months Warranty
 									</Text>
@@ -482,7 +482,7 @@ export default function HeroSection({ category = "Engines" }) {
 
 							<HStack spacing={2} align="flex-start">
 								<Icon as={FaTruck} color={RED} boxSize={5} mt="2px" />
-								<VStack align="start" spacing={0}>
+								<VStack align="start" spacing={0} textAlign="left">
 									<Text fontWeight="700" fontSize="xs">
 										Nationwide collection and delivery available.
 									</Text>
