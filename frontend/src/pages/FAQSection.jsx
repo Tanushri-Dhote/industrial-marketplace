@@ -147,7 +147,7 @@ export default function FAQSection() {
 
               <Heading
                 as="h2"
-                fontSize={{ base: "20px", sm: "24px", md: "38px", lg: "42px" }}
+                fontSize={{ base: "17px", sm: "22px", md: "38px", lg: "42px" }}
                 fontWeight="800"
                 color="gray.900"
                 lineHeight="1.2"
