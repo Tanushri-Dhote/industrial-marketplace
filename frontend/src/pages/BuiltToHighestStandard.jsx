@@ -102,37 +102,39 @@ const BuiltToHighestStandard = () => {
                         <Box
                             key={index}
                             bg="white"
-                            p={{ base: 4, md: 6 }}
+                            p={4}
                             borderRadius="16px"
                             border="1px solid"
                             borderColor="gray.100"
                             boxShadow="0 2px 8px rgba(0,0,0,0.02)"
                             transition="all 0.3s ease"
                             _hover={{ 
-                                transform: "translateY(-4px)", 
+                                transform: "translateY(-2px)", 
                                 borderColor: "rgba(217, 4, 4, 0.3)",
-                                boxShadow: "0 12px 24px rgba(217, 4, 4, 0.08)" 
+                                boxShadow: "0 8px 16px rgba(217, 4, 4, 0.06)" 
                             }}
                         >
-                            <VStack spacing={4} align="flex-start">
+                            <HStack spacing={4} align="flex-start">
                                 <Box
                                     p={3}
-                                    borderRadius="full"
+                                    borderRadius="xl"
                                     bgGradient="linear-gradient(135deg, rgba(217, 4, 4, 0.08) 0%, rgba(217, 4, 4, 0.01) 100%)"
                                     display="flex"
                                     alignItems="center"
                                     justifyContent="center"
-                                    mb={1}
+                                    flexShrink={0}
                                 >
                                     <Icon as={feature.icon} boxSize={5} color={RED} />
                                 </Box>
-                                <Text fontWeight="700" fontSize="16px" color="gray.900" lineHeight="1.3">
-                                    {feature.title}
-                                </Text>
-                                <Text fontSize="13px" color="gray.600" lineHeight="1.5">
-                                    {feature.text}
-                                </Text>
-                            </VStack>
+                                <VStack align="start" spacing={1}>
+                                    <Text fontWeight="800" fontSize="15px" color="gray.900" lineHeight="1.2">
+                                        {feature.title}
+                                    </Text>
+                                    <Text fontSize="12.5px" color="gray.500" lineHeight="1.4">
+                                        {feature.text}
+                                    </Text>
+                                </VStack>
+                            </HStack>
                         </Box>
                     ))}
                 </Grid>
