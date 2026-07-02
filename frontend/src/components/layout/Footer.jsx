@@ -46,7 +46,7 @@ export default function Footer() {
 
         {/* Top Footer */}
         <SimpleGrid
-          columns={{ base: 1, sm: 2, md: 2, lg: 4 }}
+          columns={{ base: 1, md: 2, lg: 4 }}
           spacing={10}
           mb={10}
         >
