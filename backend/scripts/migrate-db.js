@@ -134,68 +134,56 @@ async function migrate() {
 
       console.log(`  - Copying ${count} documents...`);
       let insertedCount = 0;
+      const startTime = Date.now();
 
-      // For small to medium collections, copy all documents in a single read roundtrip,
-      // but write in chunks of 100 to prevent large payload network timeouts.
-      if (count <= 10000) {
-        console.log(`    - [DEBUG] Fetching all ${count} documents from source database...`);
-        const startTime = Date.now();
-        const docs = await sourceDb.collection(colName).find({}).toArray();
-        console.log(`    - [DEBUG] Fetched ${docs.length} documents in ${Date.now() - startTime}ms. Starting target writes...`);
-        
-        const WRITE_CHUNK_SIZE = 100;
-        const totalChunks = Math.ceil(docs.length / WRITE_CHUNK_SIZE);
-        
-        for (let i = 0; i < docs.length; i += WRITE_CHUNK_SIZE) {
-          const chunk = docs.slice(i, i + WRITE_CHUNK_SIZE);
-          const chunkNum = Math.floor(i / WRITE_CHUNK_SIZE) + 1;
-          console.log(`    - [DEBUG] Writing chunk ${chunkNum}/${totalChunks} (size: ${chunk.length} documents)...`);
-          
+      // Use a cursor stream for all collections to prevent socket/memory buffering hangs (no toArray())
+      let batch = [];
+      const WRITE_CHUNK_SIZE = 100;
+      const totalChunks = Math.ceil(count / WRITE_CHUNK_SIZE);
+      const cursor = sourceDb.collection(colName).find({}).batchSize(WRITE_CHUNK_SIZE);
+
+      console.log(`    - [DEBUG] Opened cursor stream from source database...`);
+
+      for await (const doc of cursor) {
+        batch.push(doc);
+        if (batch.length >= WRITE_CHUNK_SIZE) {
+          const chunkNum = Math.floor(insertedCount / WRITE_CHUNK_SIZE) + 1;
+          console.log(`    - [DEBUG] Writing chunk ${chunkNum}/${totalChunks} (size: ${batch.length} documents)...`);
           const chunkStart = Date.now();
           try {
-            const res = await targetDb.collection(colName).insertMany(chunk, { ordered: false });
+            const res = await targetDb.collection(colName).insertMany(batch, { ordered: false });
             insertedCount += res.insertedCount;
-            console.log(`      * [DEBUG] Chunk ${chunkNum} written successfully in ${Date.now() - chunkStart}ms. Total copied: ${insertedCount}/${count}`);
+            console.log(`      * [DEBUG] Chunk ${chunkNum}/${totalChunks} written successfully in ${Date.now() - chunkStart}ms. Total copied: ${insertedCount}/${count}`);
+            batch = [];
           } catch (insertErr) {
-            console.error(`      ❌ [DEBUG] Chunk ${chunkNum} failed after ${Date.now() - chunkStart}ms. Error:`, insertErr.message);
+            console.error(`      ❌ [DEBUG] Chunk ${chunkNum}/${totalChunks} write failed after ${Date.now() - chunkStart}ms. Error:`, insertErr.message);
             if (insertErr.result && insertErr.result.nInserted) {
               insertedCount += insertErr.result.nInserted;
             }
             throw insertErr;
           }
         }
-      } else {
-        // For very large collections, use optimized batching with for-await loop and batchSize
-        console.log(`    - [DEBUG] Starting large collection cursor stream...`);
-        let batch = [];
-        const BATCH_SIZE = 1000;
-        const cursor = sourceDb.collection(colName).find({}).batchSize(BATCH_SIZE);
+      }
 
-        for await (const doc of cursor) {
-          batch.push(doc);
-          if (batch.length >= BATCH_SIZE) {
-            console.log(`    - [DEBUG] Writing cursor batch of ${batch.length} documents...`);
-            const batchStart = Date.now();
-            try {
-              const res = await targetDb.collection(colName).insertMany(batch, { ordered: false });
-              insertedCount += res.insertedCount;
-              batch = [];
-              console.log(`      * [DEBUG] Batch written in ${Date.now() - batchStart}ms. Total copied: ${insertedCount}/${count}`);
-            } catch (insertErr) {
-              console.error(`      ❌ [DEBUG] Batch write failed. Error:`, insertErr.message);
-              throw insertErr;
-            }
-          }
-        }
-
-        if (batch.length > 0) {
-          console.log(`    - [DEBUG] Writing final cursor batch of ${batch.length} documents...`);
+      // Write any remaining documents in the final chunk
+      if (batch.length > 0) {
+        const chunkNum = Math.floor(insertedCount / WRITE_CHUNK_SIZE) + 1;
+        console.log(`    - [DEBUG] Writing final chunk ${chunkNum}/${totalChunks} (size: ${batch.length} documents)...`);
+        const chunkStart = Date.now();
+        try {
           const res = await targetDb.collection(colName).insertMany(batch, { ordered: false });
           insertedCount += res.insertedCount;
+          console.log(`      * [DEBUG] Final chunk ${chunkNum}/${totalChunks} written successfully in ${Date.now() - chunkStart}ms. Total copied: ${insertedCount}/${count}`);
+        } catch (insertErr) {
+          console.error(`      ❌ [DEBUG] Final chunk ${chunkNum}/${totalChunks} write failed after ${Date.now() - chunkStart}ms. Error:`, insertErr.message);
+          if (insertErr.result && insertErr.result.nInserted) {
+            insertedCount += insertErr.result.nInserted;
+          }
+          throw insertErr;
         }
       }
 
-      console.log(`✅ Collection "${colName}" migrated successfully (${insertedCount} documents, ${indexes.length} indexes).`);
+      console.log(`✅ Collection "${colName}" migrated successfully (${insertedCount} documents, ${indexes.length} indexes, took ${Date.now() - startTime}ms).`);
     }
 
     console.log("\n--------------------------------------------------");
