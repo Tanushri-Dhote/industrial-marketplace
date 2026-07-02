@@ -386,7 +386,7 @@ export default function HeroSection({ category = "Engines" }) {
 
 	return (
 		<Box bgGradient="radial-gradient(circle at 80% 35%, rgba(217, 4, 4, 0.07) 0%, #f7f7f7 65%)" pt={{ base: 6, md: 8 }} pb={{ base: 8, md: 10 }} overflow="visible">
-			<Container maxW="container.xl">
+			<Container maxW="container.xl" px={{ base: 4, md: 6 }}>
 				{/* ── HERO ROW ── */}
 				<Flex
 					direction={{ base: "column", lg: "row" }}
