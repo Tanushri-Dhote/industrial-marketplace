@@ -129,168 +129,135 @@ export default function ProductDetailPage() {
 	}
 
 	return (
-		<Box bg="#f7f7f7" minH="100vh" pb={16}>
-			<Container maxW="container.xl" py={8}>
+		<Box bg="#f7f7f7" minH="100vh" pb={12}>
+			<Container maxW="container.xl" py={4}>
 
-				{/* Top Bar */}
-				<Flex justify="space-between" align="center" mb={8}>
-					<Button as={Link} to="/" variant="ghost" leftIcon={<span>←</span>} color={DARK}>
+				{/* Top Bar / Breadcrumb Row */}
+				<Flex justify="space-between" align="center" mb={4}>
+					<Button 
+						as={Link} 
+						to="/" 
+						variant="ghost" 
+						leftIcon={<span>←</span>} 
+						color={DARK}
+						size="sm"
+						fontSize="13px"
+						_hover={{ bg: "gray.100" }}
+					>
 						Back to Home
 					</Button>
 
-					<HStack spacing={4}>
-						<Button
-							leftIcon={<FaShareAlt />}
-							variant="ghost"
-							color={DARK}
-							onClick={handleShare}
-							_hover={{ bg: "gray.100" }}
-						>
-							Share
-						</Button>
-
-
-					</HStack>
+					<Button
+						leftIcon={<FaShareAlt />}
+						variant="ghost"
+						color={DARK}
+						size="sm"
+						fontSize="13px"
+						onClick={handleShare}
+						_hover={{ bg: "gray.100" }}
+					>
+						Share
+					</Button>
 				</Flex>
 
-				<Flex direction={{ base: "column", lg: "row" }} gap={8}>
+				{/* Single Unified 2-Column Responsive Layout */}
+				<Flex direction={{ base: "column", lg: "row" }} gap={6} align="start">
 
-					{/* LEFT - Image Gallery */}
-					<Box flex="1">
-						<Box bg="white" borderRadius="2xl" p={6} boxShadow="sm">
-							{/* Thumbnails */}
-							{product.images?.length > 1 && (
-								<HStack spacing={3} mb={6} overflowX="auto" pb={2}>
-									{product.images.map((img, idx) => (
-										<Box
-											key={idx}
-											cursor="pointer"
-											border={selectedImage === idx ? `3px solid ${RED}` : "3px solid transparent"}
-											borderRadius="lg"
-											overflow="hidden"
-											onClick={() => setSelectedImage(idx)}
-										>
-											<Image src={img} boxSize="85px" objectFit="cover" />
-										</Box>
-									))}
-								</HStack>
-							)}
-
+					{/* LEFT COLUMN - Media & Descriptive Content (58% width on desktop) */}
+					<VStack flex={{ base: "1", lg: "1.3" }} align="stretch" spacing={6} w="full">
+						
+						{/* Image Gallery Card */}
+						<Box bg="white" borderRadius="2xl" p={5} boxShadow="sm" border="1px solid" borderColor="gray.100">
 							{/* Main Image */}
 							<Image
 								src={product.images?.[selectedImage]}
 								borderRadius="xl"
 								w="full"
-								h={{ base: "320px", md: "480px" }}
+								h={{ base: "260px", md: "400px" }}
 								objectFit="contain"
 								bg="#fafafa"
+								mb={product.images?.length > 1 ? 4 : 0}
 							/>
+
+							{/* Thumbnails */}
+							{product.images?.length > 1 && (
+								<HStack spacing={3} overflowX="auto" pb={1}>
+									{product.images.map((img, idx) => (
+										<Box
+											key={idx}
+											cursor="pointer"
+											border={selectedImage === idx ? `2px solid ${RED}` : "2px solid transparent"}
+											borderRadius="lg"
+											overflow="hidden"
+											transition="all 0.2s"
+											_hover={{ opacity: 0.8 }}
+											onClick={() => setSelectedImage(idx)}
+											flexShrink={0}
+										>
+											<Image src={img} boxSize="70px" objectFit="cover" />
+										</Box>
+									))}
+								</HStack>
+							)}
 						</Box>
-					</Box>
 
-					{/* RIGHT - Product Details */}
-					<Box flex="1">
-						<Wrap mb={5}>
-							<Badge bg="#E1060010" color={RED} fontSize="14px" px={5} py={1} borderRadius="full">
-								CAR ENGINES
-							</Badge>
-							<Badge bg="green.100" color="green.700" fontSize="14px" px={5} py={1} borderRadius="full">
-								IN STOCK
-							</Badge>
-						</Wrap>
-
-						<Heading size="xl" mb={6} color={DARK} lineHeight="1.2">
-							{product.name}
-						</Heading>
-
-						<SimpleGrid columns={{ base: 2, md: 4 }} gap={6} mb={8}>
-							{[
-								{ icon: FaTachometerAlt, label: "Make & Model", value: [product.make, product.model].filter(Boolean).join(" ") },
-								{ icon: FaCalendarAlt, label: "Year", value: product.year },
-								{ icon: FaGasPump, label: "Engine", value: product.engineType },
-								{ icon: FaCog, label: "Condition", value: product.condition },
-							]
-								.filter((item) => item.value && String(item.value).trim() !== "")
-								.map((item, i) => (
-									<Box key={i} bg="white" p={5} borderRadius="xl" boxShadow="sm">
-										<Icon as={item.icon} color={RED} mb={3} boxSize={6} />
-										<Text fontSize="13px" color="gray.500">{item.label}</Text>
-										<Text fontWeight="700" fontSize="16px" color={DARK}>{item.value}</Text>
-									</Box>
-								))}
-						</SimpleGrid>
-
-						<Button
-							leftIcon={<FaPhoneAlt />}
-							bg={RED}
-							color="white"
-							w="full"
-							h="64px"
-							fontSize="17px"
-							fontWeight="700"
-							_hover={{ bg: "#c40000" }}
-							onClick={() => navigate("/call-seller", { state: product })}
-						>
-							Request Quote
-						</Button>
-					</Box>
-				</Flex>
-
-				{/* Two-Column Details Layout */}
-				<Flex direction={{ base: "column", lg: "row" }} gap={8} mt={6} align="start">
-					{/* Left Column — 65% on large screens */}
-					<VStack flex="3" align="stretch" spacing={8} w="full">
-						{/* Product Overview */}
+						{/* Product Overview Card */}
 						{product.description && (
-							<Box bg="white" p={8} borderRadius="2xl" boxShadow="sm" border="1px solid" borderColor="gray.100">
-								<Heading size="md" mb={4} color={DARK}>Product Overview</Heading>
+							<Box bg="white" p={6} borderRadius="2xl" boxShadow="sm" border="1px solid" borderColor="gray.100">
+								<Heading size="sm" mb={4} color={DARK} fontWeight="800" textTransform="uppercase" letterSpacing="0.5px" fontSize="14px">
+									Product Overview
+								</Heading>
 								<Box 
-									fontSize="15px" 
-									lineHeight="1.8" 
+									fontSize="14px" 
+									lineHeight="1.7" 
 									color="gray.600"
 									dangerouslySetInnerHTML={{ __html: product.description }}
 									sx={{
-										"ul, ol": { paddingLeft: "20px", marginY: "10px" },
-										"li": { marginY: "5px" },
-										"p": { marginY: "10px" },
-										"h3": { fontSize: "17px", fontWeight: "bold", marginY: "12px", color: DARK }
+										"ul, ol": { paddingLeft: "20px", marginY: "8px" },
+										"li": { marginY: "4px" },
+										"p": { marginY: "8px" },
+										"h3": { fontSize: "15px", fontWeight: "bold", marginY: "10px", color: DARK }
 									}}
 								/>
 							</Box>
 						)}
 
-						{/* Additional Details */}
+						{/* Additional Details Card */}
 						{product.additionalDetails && (
-							<Box bg="white" p={8} borderRadius="2xl" boxShadow="sm" border="1px solid" borderColor="gray.100">
-								<Heading size="md" mb={4} color={DARK}>Additional Details</Heading>
+							<Box bg="white" p={6} borderRadius="2xl" boxShadow="sm" border="1px solid" borderColor="gray.100">
+								<Heading size="sm" mb={4} color={DARK} fontWeight="800" textTransform="uppercase" letterSpacing="0.5px" fontSize="14px">
+									Additional Details
+								</Heading>
 								<Box 
-									fontSize="15px" 
-									lineHeight="1.8" 
+									fontSize="14px" 
+									lineHeight="1.7" 
 									color="gray.600"
 									dangerouslySetInnerHTML={{ __html: product.additionalDetails }}
 									sx={{
-										"ul, ol": { paddingLeft: "20px", marginY: "10px" },
-										"li": { marginY: "5px" },
-										"p": { marginY: "10px" },
-										"h3": { fontSize: "17px", fontWeight: "bold", marginY: "12px", color: DARK }
+										"ul, ol": { paddingLeft: "20px", marginY: "8px" },
+										"li": { marginY: "4px" },
+										"p": { marginY: "8px" },
+										"h3": { fontSize: "15px", fontWeight: "bold", marginY: "10px", color: DARK }
 									}}
 								/>
 							</Box>
 						)}
 
-						{/* Compatible Vehicles */}
+						{/* Compatibility Card */}
 						{product.compatibility && product.compatibility.length > 0 && (
-							<Box bg="white" p={8} borderRadius="2xl" boxShadow="sm" border="1px solid" borderColor="gray.100">
-								<Heading size="md" mb={6} color={DARK}>Compatible Vehicles</Heading>
-								<Flex wrap="wrap" gap={3}>
+							<Box bg="white" p={6} borderRadius="2xl" boxShadow="sm" border="1px solid" borderColor="gray.100">
+								<Heading size="sm" mb={4} color={DARK} fontWeight="800" textTransform="uppercase" letterSpacing="0.5px" fontSize="14px">
+									Compatible Vehicles
+								</Heading>
+								<Flex wrap="wrap" gap={2}>
 									{product.compatibility.map((c, i) => (
 										<Badge
 											key={i}
 											colorScheme="red"
-											px={4}
-											py={2}
-											borderRadius="lg"
-											fontSize="13px"
+											px={3}
+											py={1.5}
+											borderRadius="md"
+											fontSize="12px"
 											fontWeight="bold"
 											variant="subtle"
 										>
@@ -302,9 +269,51 @@ export default function ProductDetailPage() {
 						)}
 					</VStack>
 
-					{/* Right Column — 35% on large screens (Sticky Sidebar) */}
-					<VStack flex="2" align="stretch" spacing={8} w="full" position={{ lg: "sticky" }} top="100px">
-						{/* Technical Specifications */}
+					{/* RIGHT COLUMN - Sticky Sidebar (42% width on desktop) */}
+					<VStack 
+						flex="1" 
+						align="stretch" 
+						spacing={6} 
+						w="full" 
+						position={{ lg: "sticky" }} 
+						top="80px"
+					>
+						{/* Main Title & Action Card */}
+						<Box bg="white" p={6} borderRadius="2xl" boxShadow="sm" border="1px solid" borderColor="gray.100">
+							<HStack spacing={2} mb={3}>
+								<Badge bg="#E1060010" color={RED} fontSize="11px" px={3} py={0.5} borderRadius="full" fontWeight="700">
+									CAR ENGINES
+								</Badge>
+								<Badge bg="green.50" color="green.700" fontSize="11px" px={3} py={0.5} borderRadius="full" fontWeight="700">
+									IN STOCK
+								</Badge>
+							</HStack>
+
+							<Heading size="lg" mb={4} color={DARK} lineHeight="1.3" fontWeight="800">
+								{product.name}
+							</Heading>
+
+							{/* Call to Action Button */}
+							<Button
+								leftIcon={<FaPhoneAlt />}
+								bg={RED}
+								color="white"
+								w="full"
+								h="54px"
+								fontSize="16px"
+								fontWeight="700"
+								borderRadius="xl"
+								boxShadow="md"
+								_hover={{ bg: "#c40000", transform: "translateY(-1px)", boxShadow: "lg" }}
+								transition="all 0.2s"
+								onClick={() => navigate("/call-seller", { state: product })}
+								mb={1}
+							>
+								Request Quote
+							</Button>
+						</Box>
+
+						{/* Technical Specifications Table */}
 						{(() => {
 							const specs = [
 								{ label: "Make", value: product.make },
@@ -318,34 +327,38 @@ export default function ProductDetailPage() {
 
 							return (
 								<Box bg="white" p={6} borderRadius="2xl" boxShadow="sm" border="1px solid" borderColor="gray.100">
-									<Heading size="md" mb={6} color={DARK}>Technical Specifications</Heading>
-									<VStack align="stretch" spacing={4}>
+									<Heading size="sm" mb={4} color={DARK} fontWeight="800" textTransform="uppercase" letterSpacing="0.5px" fontSize="13px">
+										Technical Specifications
+									</Heading>
+									<VStack align="stretch" spacing={3}>
 										{specs.map((item, i) => (
-											<HStack key={i} justify="space-between" pb={3} borderBottom={i < specs.length - 1 ? "1px solid" : "none"} borderColor="gray.100">
-												<Text color="gray.500" fontSize="14px">{item.label}</Text>
-												<Text fontWeight="600" color={DARK} fontSize="14px">{item.value}</Text>
-											</HStack>
+											<Flex key={i} justify="space-between" pb={2.5} borderBottom={i < specs.length - 1 ? "1px solid" : "none"} borderColor="gray.50">
+												<Text color="gray.500" fontSize="13px" fontWeight="600">{item.label}</Text>
+												<Text fontWeight="700" color={DARK} fontSize="13px">{item.value}</Text>
+											</Flex>
 										))}
 									</VStack>
 								</Box>
 							);
 						})()}
 
-						{/* Why Buy From Us Card */}
+						{/* Why Buy From Us Trust Points */}
 						<Box bg="white" p={6} borderRadius="2xl" boxShadow="sm" border="1px solid" borderColor="gray.100">
-							<Heading size="md" mb={6} color={DARK}>Why Buy From Us?</Heading>
-							<VStack align="stretch" spacing={5}>
+							<Heading size="sm" mb={4} color={DARK} fontWeight="800" textTransform="uppercase" letterSpacing="0.5px" fontSize="13px">
+								Why Buy From Us?
+							</Heading>
+							<VStack align="stretch" spacing={4}>
 								{[
 									{ icon: FaCertificate, text: "Quality Tested & Certified", desc: "Every unit is thoroughly inspected." },
 									{ icon: FaTruck, text: "Nationwide collection & delivery", desc: "Fast shipping options available." },
 									{ icon: FaShieldAlt, text: "06 Months Warranty", desc: "Comes with premium warranty coverage." },
 									{ icon: FaCheckCircle, text: "Satisfaction Guaranteed", desc: "We ensure total product quality." },
 								].map((item, i) => (
-									<HStack key={i} spacing={4} align="start">
-										<Icon as={item.icon} color={RED} boxSize={5} mt={0.5} />
+									<HStack key={i} spacing={3} align="start">
+										<Icon as={item.icon} color={RED} boxSize={4.5} mt={0.5} />
 										<VStack align="flex-start" spacing={0}>
-											<Text fontWeight="600" fontSize="14px" color={DARK}>{item.text}</Text>
-											<Text fontSize="12px" color="gray.500">{item.desc}</Text>
+											<Text fontWeight="700" fontSize="13px" color={DARK} lineHeight="1.2">{item.text}</Text>
+											<Text fontSize="11px" color="gray.500">{item.desc}</Text>
 										</VStack>
 									</HStack>
 								))}
@@ -356,9 +369,11 @@ export default function ProductDetailPage() {
 
 				{/* Similar Products */}
 				{product.similarProducts?.length > 0 && (
-					<Box mt={16}>
-						<Heading size="lg" mb={8} color={DARK}>You May Also Like</Heading>
-						<SimpleGrid columns={{ base: 2, md: 3, lg: 5 }} gap={6}>
+					<Box mt={10}>
+						<Heading size="md" mb={6} color={DARK} fontWeight="800">
+							You May Also Like
+						</Heading>
+						<SimpleGrid columns={{ base: 2, md: 3, lg: 5 }} gap={4}>
 							{product.similarProducts.slice(0, 5).map((p, i) => (
 								<ProductCard key={i} product={p} />
 							))}
