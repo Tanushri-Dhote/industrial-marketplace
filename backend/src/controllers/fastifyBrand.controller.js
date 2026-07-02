@@ -1,15 +1,25 @@
 const Brand = require("../models/Brand");
 const Product = require("../models/Product");
 
+let cachedBrands = null;
+let cacheTimestamp = 0;
+const CACHE_TTL = 60 * 1000; // 1 minute cache TTL
+
 // Public endpoints
 exports.getBrands = async (request, reply) => {
 	try {
-		const brands = await Brand.find({ isActive: true }).sort({ name: 1 }).lean();
-
 		const { all } = request.query || {};
 		if (all === "true" || all === true) {
+			const brands = await Brand.find({ isActive: true }).sort({ name: 1 }).lean();
 			return reply.code(200).send({ success: true, data: brands });
 		}
+
+		const now = Date.now();
+		if (cachedBrands && (now - cacheTimestamp < CACHE_TTL)) {
+			return reply.code(200).send({ success: true, data: cachedBrands });
+		}
+
+		const brands = await Brand.find({ isActive: true }).sort({ name: 1 }).lean();
 
 		// Find all models and group their names by brandId
 		const Model = require("../models/Model");
@@ -47,6 +57,9 @@ exports.getBrands = async (request, reply) => {
 				return makeMatches && modelMatches;
 			});
 		});
+
+		cachedBrands = filteredBrands;
+		cacheTimestamp = now;
 
 		return reply.code(200).send({ success: true, data: filteredBrands });
 	} catch (error) {

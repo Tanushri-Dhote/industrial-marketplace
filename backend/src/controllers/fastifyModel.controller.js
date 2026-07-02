@@ -2,13 +2,43 @@ const Model = require("../models/Model");
 const Brand = require("../models/Brand");
 const Product = require("../models/Product");
 
+const modelsCache = {};
+const modelsCacheTimestamps = {};
+const MODELS_CACHE_TTL = 60 * 1000; // 1 minute cache TTL
+
 // Public endpoint
 exports.getModelsByBrand = async (request, reply) => {
 	try {
 		const { brandId } = request.params;
+		const { all } = request.query || {};
+
+		if (all === "true" || all === true) {
+			const brand = await Brand.findById(brandId);
+			if (!brand) {
+				return reply.send({
+					success: true,
+					data: [],
+				});
+			}
+			const models = await Model.find({
+				brandId: brand._id,
+			}).sort({ name: 1 }).lean();
+			return reply.send({
+				success: true,
+				data: models,
+			});
+		}
+
+		const now = Date.now();
+		const cacheKey = String(brandId);
+		if (modelsCache[cacheKey] && (now - modelsCacheTimestamps[cacheKey] < MODELS_CACHE_TTL)) {
+			return reply.send({
+				success: true,
+				data: modelsCache[cacheKey],
+			});
+		}
 
 		const brand = await Brand.findById(brandId);
-
 		if (!brand) {
 			return reply.send({
 				success: true,
@@ -19,14 +49,6 @@ exports.getModelsByBrand = async (request, reply) => {
 		const models = await Model.find({
 			brandId: brand._id,
 		}).sort({ name: 1 }).lean();
-
-		const { all } = request.query || {};
-		if (all === "true" || all === true) {
-			return reply.send({
-				success: true,
-				data: models,
-			});
-		}
 
 		// Find distinct model names for this brand's make
 		const distinctModels = await Product.distinct("model", {
@@ -39,6 +61,10 @@ exports.getModelsByBrand = async (request, reply) => {
 			const ms = (m.slug || "").toLowerCase();
 			return distinctModelsLower.includes(mn) || distinctModelsLower.includes(ms);
 		});
+
+		// Save to cache
+		modelsCache[cacheKey] = filteredModels;
+		modelsCacheTimestamps[cacheKey] = now;
 
 		return reply.send({
 			success: true,

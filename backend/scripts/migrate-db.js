@@ -18,7 +18,7 @@ try {
 } catch (e) {}
 
 // Default target URI if not provided as argument
-const DEFAULT_TARGET_URI = "mongodb://mongo:iwoeikbfpaaprhxu@82.165.5.194:27018/?authSource=admin&directConnection=true";
+const DEFAULT_TARGET_URI = "mongodb://mongo:iwoeikbfpaaprhxu@engine4you-database-4h4nby:27017/?authSource=admin&directConnection=true";
 
 function getDbName(uri) {
   try {
