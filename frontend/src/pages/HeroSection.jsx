@@ -107,7 +107,7 @@ const getMercedesClass = (modelName) => {
 	return "Other";
 };
 
-export default function HeroSection() {
+export default function HeroSection({ category = "Engines" }) {
 	const [regNumber, setRegNumber] = useState("");
 	const [selectedBrand, setSelectedBrand] = useState("");
 	const [brands, setBrands] = useState([]);
