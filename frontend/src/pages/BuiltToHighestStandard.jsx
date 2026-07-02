@@ -114,7 +114,7 @@ const BuiltToHighestStandard = () => {
                                 boxShadow: "0 8px 16px rgba(217, 4, 4, 0.06)" 
                             }}
                         >
-                            <HStack spacing={4} align="flex-start">
+                            <Flex direction={{ base: "column", lg: "row" }} align="flex-start" gap={4}>
                                 <Box
                                     p={3}
                                     borderRadius="xl"
@@ -123,6 +123,7 @@ const BuiltToHighestStandard = () => {
                                     alignItems="center"
                                     justifyContent="center"
                                     flexShrink={0}
+                                    mb={{ base: 2, lg: 0 }}
                                 >
                                     <Icon as={feature.icon} boxSize={5} color={RED} />
                                 </Box>
@@ -134,7 +135,7 @@ const BuiltToHighestStandard = () => {
                                         {feature.text}
                                     </Text>
                                 </VStack>
-                            </HStack>
+                            </Flex>
                         </Box>
                     ))}
                 </Grid>
