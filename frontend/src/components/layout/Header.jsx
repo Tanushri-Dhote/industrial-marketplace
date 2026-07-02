@@ -1,52 +1,37 @@
-import React, { useState, useEffect } from 'react';
+import { CloseIcon, HamburgerIcon } from '@chakra-ui/icons';
 import {
   Box,
-  Flex,
-  Text,
   Button,
-  HStack,
-  VStack,
-  IconButton,
-  Collapse,
-  useDisclosure,
-  Container,
-  Avatar,
-  Menu,
-  MenuButton,
-  MenuList,
-  MenuItem,
-  MenuDivider,
-  Stack,
-  Modal,
-  ModalOverlay,
-  ModalContent,
-  ModalCloseButton,
-  ModalBody,
   Link as ChakraLink,
+  Collapse,
+  Container,
   Divider,
+  Flex,
+  HStack,
+  IconButton,
+  Modal,
+  ModalBody,
+  ModalCloseButton,
+  ModalContent,
+  ModalOverlay,
+  Text,
+  useDisclosure,
+  useToast,
+  VStack
 } from '@chakra-ui/react';
-import { HamburgerIcon, CloseIcon } from '@chakra-ui/icons';
+import { useEffect, useState } from 'react';
 import {
-  FaUserAlt,
-  FaFacebookF,
-  FaTwitter,
-  FaLinkedin,
-  FaInstagram,
-  FaYoutube,
-  FaBuilding,
-  FaPhone,
-  FaEnvelope,
+  FaCar,
+  FaFileContract,
   FaHome,
   FaInfoCircle,
-  FaFileContract,
-  FaShieldAlt,
-  FaCar,
   FaPhoneAlt,
+  FaShieldAlt,
+  FaUserAlt
 } from 'react-icons/fa';
-import { Link, useNavigate, useLocation } from 'react-router-dom';
-import AdminHeader from './AdminHeader';
-import { useToast } from "@chakra-ui/react";
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import CallSellerPage from '../../pages/CallSellerPage';
+import AdminHeader from './AdminHeader';
 
 export default function Header() {
   const { isOpen, onToggle } = useDisclosure();
@@ -209,20 +194,16 @@ export default function Header() {
               <HStack spacing={2}>
                 <Box
                   h={{ base: scrolled ? "45px" : "55px", md: scrolled ? "55px" : "70px" }}
-                  w={{ base: scrolled ? "120px" : "140px", md: scrolled ? "150px" : "180px" }}
                   transition="all 0.3s ease"
-                  // bg="#001F3F"
-                  borderRadius="2xl"
                   display="flex"
                   alignItems="center"
-                  justifyContent="center"
                 >
                   <img
                     src="/logo.png"
                     alt="Re-Conditioned Engine Logo"
                     style={{
-                      width: "90%",
-                      height: "90%",
+                      height: "100%",
+                      width: "auto",
                       objectFit: "contain",
                       display: "block",
                     }}
