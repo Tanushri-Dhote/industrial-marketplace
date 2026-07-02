@@ -142,11 +142,11 @@ export default function Header() {
             gap={{ base: 1, sm: 0 }}
           >
             <HStack spacing={{ base: 2, sm: 4 }} wrap="wrap" justify="center">
-              <HStack spacing={1.5}>
+              <HStack spacing={1.5} as="a" href="tel:02071129397" _hover={{ color: "brand.100" }} cursor="pointer">
                 <FaPhone size="10px" />
-                <Text>+44 2071129397</Text>
+                <Text>02071129397</Text>
               </HStack>
-              <HStack spacing={1.5}>
+              <HStack spacing={1.5} as="a" href="mailto:info@reconditionedengine.co.uk" _hover={{ color: "brand.100" }} cursor="pointer">
                 <FaEnvelope size="10px" />
                 <Text>info@reconditionedengine.co.uk</Text>
               </HStack>
@@ -254,12 +254,17 @@ export default function Header() {
             <HStack spacing={3} display={{ base: 'none', md: 'flex' }}>
               {/* Register Here Button */}
               <Box
+                as="a"
+                href="tel:02071129397"
+                cursor="pointer"
                 bg="gray.100"
                 px={4}
                 py={2}
                 borderRadius="md"
                 border="1px solid"
                 borderColor="gray.200"
+                _hover={{ bg: "gray.200", borderColor: "gray.300", textDecoration: "none" }}
+                transition="all 0.2s"
               >
                 <HStack spacing={3} align="center">
                   <Box
@@ -275,7 +280,7 @@ export default function Header() {
                   </Box>
 
                   <Text fontWeight="700" fontSize="14px" color="gray.800">
-                    +44 2071129397
+                    02071129397
                   </Text>
                 </HStack>
               </Box>
@@ -342,12 +347,17 @@ export default function Header() {
               <Divider my={2} />
 
               <Box
+                as="a"
+                href="tel:02071129397"
+                cursor="pointer"
                 bg="gray.100"
                 px={4}
                 py={2}
                 borderRadius="md"
                 border="1px solid"
                 borderColor="gray.200"
+                _hover={{ bg: "gray.200", borderColor: "gray.300", textDecoration: "none" }}
+                transition="all 0.2s"
               >
                 <HStack spacing={3} align="center">
                   <Box
@@ -363,7 +373,7 @@ export default function Header() {
                   </Box>
 
                   <Text fontWeight="700" fontSize="14px" color="gray.800">
-                    +44 2071129397
+                    02071129397
                   </Text>
                 </HStack>
               </Box>

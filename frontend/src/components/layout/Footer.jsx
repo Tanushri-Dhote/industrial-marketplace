@@ -123,23 +123,43 @@ export default function Footer() {
               Contact Info
             </Heading>
 
-            <HStack align="start">
+            <HStack 
+              as="a" 
+              href="https://maps.google.com/?q=44+Fowler+Road,+Hainault+Business+Park,+Ilford+London,+IG6+3UT" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              align="start"
+              _hover={{ color: "brand.500", textDecoration: "none" }}
+              cursor="pointer"
+            >
               <Icon as={MdLocationOn} color="gray.400" mt={1} />
-              <Text fontSize="14px" color="gray.400">
+              <Text fontSize="14px" color="gray.400" _hover={{ color: "white" }}>
                 44 Fowler Road, Hainault Business Park, Ilford London, IG6 3UT
               </Text>
             </HStack>
 
-            <HStack>
+            <HStack 
+              as="a" 
+              href="tel:02071129397"
+              align="center"
+              _hover={{ color: "brand.500", textDecoration: "none" }}
+              cursor="pointer"
+            >
               <Icon as={MdPhone} color="gray.400" />
-              <Text fontSize="14px" color="gray.400">
-                +44 2071129397
+              <Text fontSize="14px" color="gray.400" _hover={{ color: "white" }}>
+                02071129397
               </Text>
             </HStack>
 
-            <HStack>
+            <HStack 
+              as="a" 
+              href="mailto:info@reconditionedengine.co.uk"
+              align="center"
+              _hover={{ color: "brand.500", textDecoration: "none" }}
+              cursor="pointer"
+            >
               <Icon as={MdEmail} color="gray.400" />
-              <Text fontSize="14px" color="gray.400">
+              <Text fontSize="14px" color="gray.400" _hover={{ color: "white" }}>
                 info@reconditionedengine.co.uk
               </Text>
             </HStack>

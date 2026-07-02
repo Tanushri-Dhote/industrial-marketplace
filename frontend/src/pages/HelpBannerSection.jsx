@@ -85,6 +85,8 @@ const HelpBannerSection = () => {
                                 </Button>
 
                                 <Button
+                                    as="a"
+                                    href="tel:02071129397"
                                     bg="white"
                                     color="#111111"
                                     size="lg"
@@ -93,11 +95,11 @@ const HelpBannerSection = () => {
                                     borderRadius="md"
                                     border="1px solid"
                                     borderColor="gray.200"
-                                    _hover={{ bg: "gray.50" }}
+                                    _hover={{ bg: "gray.50", textDecoration: "none" }}
                                     leftIcon={<Icon as={FaPhoneAlt} color="#D90404" boxSize={4} />}
                                     boxShadow="sm"
                                 >
-                                    +44 2071129397
+                                    02071129397
                                 </Button>
                             </HStack>
                         </VStack>
