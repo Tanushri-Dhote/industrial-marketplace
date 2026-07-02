@@ -72,7 +72,7 @@ const sections = [
       "Company registration number: 12345678 (Registered in England and Wales)",
       "Registered address: 44 Fowler Road, Hainault Business Park, Ilford London, IG6 3UT",
       "Contact email: info@reconditionedengine.co.uk",
-      "Contact phone: +44 2071129397"
+      "Contact phone: 02071129397"
     ]
   },
   {
@@ -196,7 +196,7 @@ const sections = [
       "To exercise any of your privacy rights, please contact us:",
       "",
       "Email: privacy@reconditionedengine.co.uk",
-      "Phone: +44 2071129397",
+      "Phone: 02071129397",
       "Post: Data Protection Officer, 44 Fowler Road, Hainault Business Park, Ilford London, IG6 3UT",
       "",
       "We will respond to all requests within 30 days. For complex requests, we may extend this period by an additional 60 days and will notify you accordingly.",
@@ -511,7 +511,7 @@ export default function PrivacyPage() {
 
                   <Button
                     as="a"
-                    href="tel:+442081334040"
+                    href="tel:02071129397"
                     variant="outline"
                     color="white"
                     size="lg"

@@ -152,7 +152,7 @@ export default function ContactPage() {
 						{
 							icon: FaPhoneAlt,
 							title: "PHONE",
-							content: "+44 2071129397\nMon - Sat: 8:00 AM - 6:00 PM",
+							content: "02071129397\nMon - Sat: 8:00 AM - 6:00 PM",
 						},
 						{
 							icon: MdEmail,
@@ -294,7 +294,7 @@ export default function ContactPage() {
 													setFormData({ ...formData, phone: value });
 												}
 											}}
-											placeholder="+44 2071129397"
+											placeholder="02071129397"
 											size="lg"
 											h="54px"
 											type="tel"
@@ -419,7 +419,7 @@ export default function ContactPage() {
 
 						<Button
 							as="a"
-							href="tel:+442081334040"
+							href="tel:02071129397"
 							size="lg"
 							bg="white"
 							color={RED}
@@ -435,7 +435,7 @@ export default function ContactPage() {
 							transition="all 0.3s ease"
 							boxShadow="lg"
 						>
-							+44 2071129397
+							02071129397
 						</Button>
 					</Flex>
 				</Box>
