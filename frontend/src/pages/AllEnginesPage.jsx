@@ -131,7 +131,7 @@ export default function AllEnginesPage({ category }) {
             const currentBrandObj = brandsList.find(b => b.slug === selectedBrand || b.name === selectedBrand);
             if (!currentBrandObj) return [];
             const res = await API.get(`/models/${currentBrandObj._id}`);
-            return res.data || [];
+            return res.data?.data || res.data || [];
         },
         enabled: !!selectedBrand && brandsList.length > 0,
         staleTime: 1000 * 60 * 10,
