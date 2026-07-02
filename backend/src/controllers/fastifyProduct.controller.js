@@ -4,56 +4,163 @@ const Product = require("../models/Product");
 exports.getProducts = async (request, reply) => {
 	try {
 		const filter = {};
-		const { make, model, limit, page, search } = request.query || {};
-
-		if (make) {
-			filter.make = make;
-		}
-
-		if (model) {
-			filter.model = model;
-		}
-
-		if (search) {
-			filter.$or = [
-				{ name: { $regex: search, $options: "i" } },
-				{ make: { $regex: search, $options: "i" } },
-				{ model: { $regex: search, $options: "i" } },
-			];
-		}
+		const {
+			make,
+			model,
+			limit,
+			page,
+			search,
+			brand,
+			category,
+			priceMin,
+			priceMax,
+			mileageMax,
+			conditions
+		} = request.query || {};
 
 		if (request.tenantId) {
 			filter.website_id = request.tenantId;
 		}
 
-		let query = Product.find(filter).populate("category").sort({ price: 1, createdAt: -1 });
+		// Load active brands for slug mapping
+		const Brand = require("../models/Brand");
+		const brands = await Brand.find({ isActive: true }).lean();
 
+		// Fetch products matching basic website_id tenant filter
+		let query = Product.find(filter).populate("category").sort({ price: 1, createdAt: -1 });
+		let products = await query;
+
+		let filtered = [...products];
+
+		// 1. Search filter: model / make / name / engineCode / registrationNumber
+		if (search) {
+			const queryStr = search.toLowerCase();
+			filtered = filtered.filter((p) => {
+				return (
+					p.name?.toLowerCase().includes(queryStr) ||
+					p.make?.toLowerCase().includes(queryStr) ||
+					p.model?.toLowerCase().includes(queryStr) ||
+					p.engineCode?.toLowerCase().includes(queryStr) ||
+					p.registrationNumber?.toLowerCase().includes(queryStr)
+				);
+			});
+		}
+
+		// 2. Brand filter (mapping slug to makes)
+		if (brand) {
+			const brandObj = brands.find((b) => b.slug === brand);
+			const possibleMakes = [
+				brand.toLowerCase(),
+				brandObj?.name?.toLowerCase(),
+				brandObj?.productMake?.toLowerCase(),
+			].filter(Boolean);
+
+			filtered = filtered.filter((p) => {
+				if (!p.make) return false;
+				const pm = p.make.toLowerCase();
+				return (
+					p.brand?.slug === brand ||
+					p.brand === brand ||
+					possibleMakes.some(
+						(makeName) =>
+							pm === makeName ||
+							pm.includes(makeName) ||
+							makeName.includes(pm) ||
+							(pm === "vw" && makeName === "volkswagen") ||
+							(pm === "volkswagen" && makeName === "vw") ||
+							(pm === "mercedes" && makeName === "mercedes-benz") ||
+							(pm === "mercedes-benz" && makeName === "mercedes")
+					)
+				);
+			});
+		}
+
+		// 3. Model filter
+		if (model) {
+			const targetModelSlug = model.toLowerCase().replace(/[\s_-]+/g, "-");
+			filtered = filtered.filter(
+				(p) =>
+					p.model?.toLowerCase().replace(/[\s_-]+/g, "-") === targetModelSlug ||
+					p.model?.toLowerCase() === model.toLowerCase()
+			);
+		}
+
+		// 4. Category filter
+		if (category && category !== "Engines") {
+			filtered = filtered.filter(
+				(p) =>
+					p.category?.name === category ||
+					(category === "Used Engines" &&
+						p.condition?.toLowerCase() === "used") ||
+					(category === "Reconditioned Engines" &&
+						p.condition?.toLowerCase() === "reconditioned")
+			);
+		}
+
+		// 5. Price Min Filter
+		if (priceMin) {
+			filtered = filtered.filter((p) => p.price && p.price >= Number(priceMin));
+		}
+
+		// 6. Price Max Filter
+		if (priceMax) {
+			filtered = filtered.filter((p) => p.price && p.price <= Number(priceMax));
+		}
+
+		// 7. Mileage Max Filter
+		if (mileageMax) {
+			filtered = filtered.filter((p) => {
+				if (!p.mileage) return false;
+				const miles = Number(p.mileage.replace(/[^\d]/g, ""));
+				return miles && miles <= Number(mileageMax);
+			});
+		}
+
+		// 8. Condition Filter
+		if (conditions) {
+			const condList = typeof conditions === "string" ? conditions.split(",") : conditions;
+			const cleanCondList = condList.filter(Boolean).map(c => c.toLowerCase());
+			if (cleanCondList.length > 0) {
+				filtered = filtered.filter(
+					(p) => p.condition && cleanCondList.includes(p.condition.toLowerCase())
+				);
+			}
+		}
+
+		// 9. Explicit Make filter (for backward compatibility)
+		if (make) {
+			const targetMake = make.toLowerCase();
+			filtered = filtered.filter((p) => p.make && p.make.toLowerCase() === targetMake);
+		}
+
+		// Pagination handling
 		const pageNum = Number(page);
 		const limitNum = Number(limit || 10);
 
 		if (!isNaN(pageNum) && pageNum > 0) {
+			const total = filtered.length;
+			const pages = Math.ceil(total / limitNum);
 			const skipNum = (pageNum - 1) * limitNum;
-			const total = await Product.countDocuments(filter);
-			query = query.skip(skipNum).limit(limitNum);
-			const products = await query;
+			const paginatedProducts = filtered.slice(skipNum, skipNum + limitNum);
+
 			return {
 				success: true,
-				data: products,
+				data: paginatedProducts,
 				pagination: {
 					total,
 					page: pageNum,
 					limit: limitNum,
-					pages: Math.ceil(total / limitNum),
+					pages,
 				},
 			};
 		}
 
+		// If page is not specified, maintain backward compatibility
 		if (limit) {
-			query = query.limit(Number(limit));
+			filtered = filtered.slice(0, Number(limit));
 		}
 
-		const products = await query;
-		return { success: true, data: products };
+		return { success: true, data: filtered };
 	} catch (error) {
 		reply.status(500).send({ message: error.message });
 	}
