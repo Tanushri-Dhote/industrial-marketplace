@@ -135,11 +135,19 @@ async function migrate() {
       console.log(`  - Copying ${count} documents...`);
       let insertedCount = 0;
 
-      // For small to medium collections, copy all documents in a single roundtrip
+      // For small to medium collections, copy all documents in a single read roundtrip,
+      // but write in chunks of 100 to prevent large payload network timeouts.
       if (count <= 10000) {
         const docs = await sourceDb.collection(colName).find({}).toArray();
-        const res = await targetDb.collection(colName).insertMany(docs, { ordered: false });
-        insertedCount = res.insertedCount;
+        const WRITE_CHUNK_SIZE = 100;
+        for (let i = 0; i < docs.length; i += WRITE_CHUNK_SIZE) {
+          const chunk = docs.slice(i, i + WRITE_CHUNK_SIZE);
+          const res = await targetDb.collection(colName).insertMany(chunk, { ordered: false });
+          insertedCount += res.insertedCount;
+          if (docs.length > WRITE_CHUNK_SIZE) {
+            console.log(`    - Copied ${insertedCount}/${count} documents...`);
+          }
+        }
       } else {
         // For very large collections, use optimized batching with for-await loop and batchSize
         let batch = [];
