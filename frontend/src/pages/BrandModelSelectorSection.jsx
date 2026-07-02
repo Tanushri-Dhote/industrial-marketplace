@@ -207,22 +207,22 @@ function EngineProductCard({ engine }) {
 					{engine.name}
 				</Text>
 
-				<HStack spacing={1} fontSize="11px" color="gray.600" align="center" w="full">
-					<Text fontWeight="700">Fits:</Text>
-					<Text noOfLines={1}>{engine.model || "Universal Fit"}</Text>
-					<Box w="3px" h="3px" borderRadius="full" bg="gray.400" />
-					<Text color="green.700" fontWeight="600" noOfLines={1}>
-						In Stock
+				<HStack spacing={1} fontSize="11px" color="gray.600" align="center" w="full" overflow="hidden">
+					<Text fontWeight="700" flexShrink={0} whiteSpace="nowrap">Fits:</Text>
+					<Text noOfLines={1} flexGrow={1}>{engine.model || "Universal Fit"}</Text>
+					<Box w="3px" h="3px" borderRadius="full" bg="gray.400" flexShrink={0} />
+					<Text color="green.700" fontWeight="600" noOfLines={1} flexShrink={0} whiteSpace="nowrap">
+						Stock
 					</Text>
 				</HStack>
 
 				<Box h="1px" w="full" bg="gray.100" />
 
-				<Flex w="full" justify="space-between" align="center" pt={1} mt="auto">
-					<Text fontSize="10px" color="gray.500" fontWeight="500">
+				<Flex w="full" justify="space-between" align="center" pt={1} mt="auto" overflow="hidden">
+					<Text fontSize="10px" color="gray.500" fontWeight="500" flexShrink={1} noOfLines={1} overflow="hidden">
 						Shipping available
 					</Text>
-					<HStack spacing={1} color={accentColor}>
+					<HStack spacing={1} color={accentColor} flexShrink={0} whiteSpace="nowrap">
 						<Text fontSize="12px" fontWeight="700">
 							Get Quote
 						</Text>
