@@ -235,11 +235,11 @@ export default function TopEnginesSection({ category }) {
 											</Text>
 
 											{/* Fits & In Stock Row */}
-											<HStack spacing={1.5} fontSize="11px" color="gray.600" mt={1.5} w="full" justify="space-between">
-												<Text noOfLines={1} fontWeight="600">
+											<HStack spacing={1.5} fontSize="11px" color="gray.600" mt={1.5} w="full" justify="space-between" overflow="hidden">
+												<Text noOfLines={1} fontWeight="600" flexShrink={1} overflow="hidden">
 													Fits: {engine.model || "Universal"}
 												</Text>
-												<HStack spacing={1} align="center">
+												<HStack spacing={1} align="center" flexShrink={0} whiteSpace="nowrap">
 													<PulsingDot />
 													<Text color="green.600" fontWeight="700">
 														Stock
