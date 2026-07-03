@@ -507,18 +507,18 @@ export default function HeroSection({ category = "Engines", initialBrand = "", i
 
 								{/* Feature Icons */}
 								<Flex
-									direction={{ base: "column", sm: "row" }}
-									align={{ base: "flex-start", sm: "center" }}
+									direction={{ base: "column", md: "row" }}
+									align="center"
 									justify={{ base: "center", lg: "flex-start" }}
-									gap={{ base: 4, sm: 6 }}
+									gap={{ base: 4, md: 6 }}
 									w="full"
 									py={2}
 								>
-									<HStack spacing={3} align="center">
+									<HStack spacing={3} align="center" justify={{ base: "center", md: "flex-start" }} w={{ base: "full", md: "auto" }}>
 										<Box color={RED}>
 											<ShieldCheckIcon boxSize="28px" />
 										</Box>
-										<VStack align="start" spacing={0} textAlign="left">
+										<VStack align={{ base: "center", md: "start" }} spacing={0} textAlign={{ base: "center", md: "left" }}>
 											<Text fontWeight="800" fontSize="13px" color="#0F172A" lineHeight="1.2">
 												Quality Tested
 											</Text>
@@ -528,13 +528,13 @@ export default function HeroSection({ category = "Engines", initialBrand = "", i
 										</VStack>
 									</HStack>
 
-									<Box display={{ base: "none", sm: "block" }} w="1px" h="30px" bg="gray.300" mx={1} />
+									<Box display={{ base: "none", md: "block" }} w="1px" h="30px" bg="gray.300" mx={1} />
 
-									<HStack spacing={3} align="center">
+									<HStack spacing={3} align="center" justify={{ base: "center", md: "flex-start" }} w={{ base: "full", md: "auto" }}>
 										<Box color={RED}>
 											<ShieldCheckIcon boxSize="28px" />
 										</Box>
-										<VStack align="start" spacing={0} textAlign="left">
+										<VStack align={{ base: "center", md: "start" }} spacing={0} textAlign={{ base: "center", md: "left" }}>
 											<Text fontWeight="800" fontSize="13px" color="#0F172A" lineHeight="1.2">
 												06 Months Warranty
 											</Text>
@@ -544,13 +544,13 @@ export default function HeroSection({ category = "Engines", initialBrand = "", i
 										</VStack>
 									</HStack>
 
-									<Box display={{ base: "none", sm: "block" }} w="1px" h="30px" bg="gray.300" mx={1} />
+									<Box display={{ base: "none", md: "block" }} w="1px" h="30px" bg="gray.300" mx={1} />
 
-									<HStack spacing={3} align="center">
+									<HStack spacing={3} align="center" justify={{ base: "center", md: "flex-start" }} w={{ base: "full", md: "auto" }}>
 										<Box color={RED}>
 											<Icon as={FaTruck} boxSize="26px" />
 										</Box>
-										<VStack align="start" spacing={0} textAlign="left">
+										<VStack align={{ base: "center", md: "start" }} spacing={0} textAlign={{ base: "center", md: "left" }}>
 											<Text fontWeight="800" fontSize="13px" color="#0F172A" lineHeight="1.2">
 												Nationwide Delivery
 											</Text>
@@ -579,8 +579,9 @@ export default function HeroSection({ category = "Engines", initialBrand = "", i
 								</Box>
 
 								{/* Buttons */}
-								<HStack
-									spacing={4}
+								<Flex
+									direction={{ base: "column", md: "row" }}
+									gap={4}
 									w="full"
 									justify={{ base: "center", lg: "flex-start" }}
 									pt={2}
@@ -592,6 +593,7 @@ export default function HeroSection({ category = "Engines", initialBrand = "", i
 										color="white"
 										leftIcon={<FaCogs />}
 										size="lg"
+										w={{ base: "full", md: "auto" }}
 										px={8}
 										_hover={{ bg: "#c40000", transform: "translateY(-1px)" }}
 										_active={{ transform: "translateY(0)" }}
@@ -607,6 +609,7 @@ export default function HeroSection({ category = "Engines", initialBrand = "", i
 										bg="white"
 										color={DARK}
 										size="lg"
+										w={{ base: "full", md: "auto" }}
 										px={8}
 										leftIcon={<MdLibraryBooks />}
 										border="1px solid"
@@ -621,7 +624,7 @@ export default function HeroSection({ category = "Engines", initialBrand = "", i
 									>
 										Get A Quote
 									</Button>
-								</HStack>
+								</Flex>
 							</VStack>
 						</MotionBox>
 
