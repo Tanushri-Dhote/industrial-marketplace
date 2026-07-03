@@ -167,7 +167,7 @@ export default function ModelEnginePage() {
 								model: `${matchedBrand.name} ${matchedModel.name} 2.0L Petrol`,
 								engineSize: "2.0 litre",
 								fuel: "Petrol",
-								engineCode: "SPEC-PET-01",
+								engineCode: "RSE-01",
 								years: "2010 - 2020",
 								price: "£1450 - £3500"
 							},
@@ -175,7 +175,7 @@ export default function ModelEnginePage() {
 								model: `${matchedBrand.name} ${matchedModel.name} 2.0L Diesel`,
 								engineSize: "2.0 litre",
 								fuel: "Diesel",
-								engineCode: "SPEC-DSL-02",
+								engineCode: "RSE-02",
 								years: "2012 - 2020",
 								price: "£1600 - £3800"
 							},
@@ -183,7 +183,7 @@ export default function ModelEnginePage() {
 								model: `${matchedBrand.name} ${matchedModel.name} 1.6L Petrol`,
 								engineSize: "1.6 litre",
 								fuel: "Petrol",
-								engineCode: "SPEC-PET-03",
+								engineCode: "RSE-03",
 								years: "2008 - 2018",
 								price: "£1100 - £2800"
 							}
