@@ -591,45 +591,7 @@ export default function AllEnginesPage({ category }) {
                             Browse our extensive inventory of high-performance new, reconditioned, and fully tested used engines.
                         </Text>
 
-                        {/* Interactive Search Bar */}
-                        <Box as="form" onSubmit={(e) => { e.preventDefault(); triggerSearch(); }} w="full" maxW="550px" mt={2}>
-                            <HStack
-                                bg="white"
-                                p={1.5}
-                                borderRadius="2xl"
-                                boxShadow="lg"
-                                border="1px solid"
-                                borderColor="gray.200"
-                                spacing={0}
-                            >
-                                <Input
-                                    placeholder="Search by make, model, engine code..."
-                                    value={searchInput}
-                                    onChange={(e) => setSearchInput(e.target.value)}
-                                    border="none"
-                                    color="gray.800"
-                                    _focus={{ boxShadow: "none" }}
-                                    fontSize="14px"
-                                    h="46px"
-                                    pl={4}
-                                />
-                                <Button
-                                    leftIcon={<Icon as={FaSearch} />}
-                                    onClick={triggerSearch}
-                                    bg="gray.950"
-                                    color="white"
-                                    px={6}
-                                    h="46px"
-                                    borderRadius="xl"
-                                    fontSize="13px"
-                                    fontWeight="800"
-                                    _hover={{ bg: "#D90404" }}
-                                    transition="all 0.2s"
-                                >
-                                    Search
-                                </Button>
-                            </HStack>
-                        </Box>
+
                     </VStack>
                 </Box>
 
