@@ -21,28 +21,10 @@ exports.getBrands = async (request, reply) => {
 
 		const brands = await Brand.find({ isActive: true }).sort({ name: 1 }).lean();
 
-		// Find distinct makes in products (fully covered by make index)
-		const distinctMakes = await Product.distinct("make");
-		const distinctMakesLower = distinctMakes.map((m) => (m || "").toLowerCase());
-
-		const filteredBrands = brands.filter((brand) => {
-			const pm = (brand.productMake || "").toLowerCase();
-			const bn = (brand.name || "").toLowerCase();
-
-			const checkMakes = [pm, bn].filter(Boolean);
-			// Check common aliases/abbreviations
-			if (checkMakes.includes("volkswagen") && !checkMakes.includes("vw")) checkMakes.push("vw");
-			if (checkMakes.includes("vw") && !checkMakes.includes("volkswagen")) checkMakes.push("volkswagen");
-			if (checkMakes.includes("mercedes-benz") && !checkMakes.includes("mercedes")) checkMakes.push("mercedes");
-			if (checkMakes.includes("mercedes") && !checkMakes.includes("mercedes-benz")) checkMakes.push("mercedes-benz");
-
-			return checkMakes.some((m) => distinctMakesLower.includes(m));
-		});
-
-		cachedBrands = filteredBrands;
+		cachedBrands = brands;
 		cacheTimestamp = now;
 
-		return reply.code(200).send({ success: true, data: filteredBrands });
+		return reply.code(200).send({ success: true, data: brands });
 	} catch (error) {
 		return reply.code(500).send({ message: error.message });
 	}

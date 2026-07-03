@@ -20,6 +20,15 @@ async function routes(fastify, options) {
 		handler: modelController.deleteModel,
 	});
 
+	// Admin specs CSV upload
+	fastify.post("/admin/specs/upload-csv", {
+		preHandler: [authHook, tenantHook, permissionHook("models", "create")],
+		handler: modelController.uploadModelEngineSpecCSV,
+	});
+
+	// Public specs lookup route
+	fastify.get("/specs/:brandSlug/:modelSlug", modelController.getModelEngineSpecData);
+
 	// Public route
 	fastify.get("/:brandId", modelController.getModelsByBrand);
 }

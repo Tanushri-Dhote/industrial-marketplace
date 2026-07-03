@@ -24,7 +24,7 @@ import {
 } from "@chakra-ui/react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useQuery } from "@tanstack/react-query";
-import { Link as RouterLink } from "react-router-dom";
+import { Link as RouterLink, useNavigate } from "react-router-dom";
 import { FaArrowLeft, FaArrowRight, FaTimes, FaTools, FaCarSide, FaCheckCircle } from "react-icons/fa";
 import API from "../services/api";
 
@@ -294,6 +294,7 @@ const getMercedesClass = (modelName) => {
 };
 
 export default function BrandModelSelectorSection() {
+	const navigate = useNavigate();
 	const [selectedBrand, setSelectedBrand] = useState(null);
 	const [selectedClass, setSelectedClass] = useState(null);
 	const [selectedModel, setSelectedModel] = useState(null);
@@ -354,7 +355,9 @@ export default function BrandModelSelectorSection() {
 	};
 
 	const handleModelSelect = (model) => {
-		setSelectedModel(model);
+		const brandSlug = selectedBrand?.slug || "";
+		const modelSlugPart = model.name.toLowerCase().replace(/\s+/g, "-");
+		navigate(`/${brandSlug}-${modelSlugPart}-engines`);
 	};
 
 	const handleBackToBrands = () => {

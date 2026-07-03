@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import {
 	Table,
 	Thead,
@@ -68,14 +68,30 @@ export default function ModelsModule() {
 		},
 	});
 
-	// Fetch all models
-	const { data: models = [], isLoading } = useQuery({
-		queryKey: ["models-admin"],
+	const [page, setPage] = useState(1);
+	const [limit, setLimit] = useState(20);
+
+	// Fetch all models with pagination and search
+	const { data, isLoading } = useQuery({
+		queryKey: ["models-admin", page, limit, searchTerm],
 		queryFn: async () => {
-			const res = await API.get("/models/admin/all");
-			return res.data?.data || [];
+			const skip = (page - 1) * limit;
+			const res = await API.get("/models/admin/all", {
+				params: { skip, limit, search: searchTerm }
+			});
+			return res.data || { data: [], total: 0 };
 		},
+		placeholderData: (prev) => prev
 	});
+
+	const models = data?.data || [];
+	const total = data?.total || 0;
+	const totalPages = Math.ceil(total / limit);
+
+	// Reset page to 1 when search term changes
+	useEffect(() => {
+		setPage(1);
+	}, [searchTerm]);
 
 	// Create/Update mutation
 	const saveMutation = useMutation({
@@ -167,12 +183,29 @@ export default function ModelsModule() {
 		}
 	};
 
-	const filteredModels = models.filter(
-		(m) =>
-			m.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-			m.slug.toLowerCase().includes(searchTerm.toLowerCase()) ||
-			(m.brandId?.name || "").toLowerCase().includes(searchTerm.toLowerCase()),
-	);
+	const handleCSVUpload = async (e) => {
+		const file = e.target.files?.[0];
+		if (!file) return;
+
+		const uploadFormData = new FormData();
+		uploadFormData.append("file", file);
+
+		try {
+			toast.loading("Importing CSV...");
+			const res = await API.post("/models/admin/specs/upload-csv", uploadFormData, {
+				headers: { "Content-Type": "multipart/form-data" },
+			});
+			toast.dismiss();
+			toast.success(res.data?.message || "CSV imported successfully!");
+			queryClient.invalidateQueries({ queryKey: ["models-admin"] });
+		} catch (err) {
+			toast.dismiss();
+			toast.error(err.response?.data?.message || "CSV import failed");
+		}
+		e.target.value = "";
+	};
+
+	const filteredModels = models;
 
 	return (
 		<ModuleFrame
@@ -196,23 +229,46 @@ export default function ModelsModule() {
 					/>
 				</InputGroup>
 
-				<Button
-					leftIcon={<AddIcon />}
-					bg={ACCENT}
-					color="white"
-					_hover={{ bg: "#c00404" }}
-					onClick={() => {
-						resetForm();
-						onOpen();
-					}}
-					fontSize="15px"
-					px={8}
-					h="45px"
-					borderRadius="xl"
-					boxShadow="md"
-				>
-					Add Model
-				</Button>
+				<HStack spacing={4}>
+					<input
+						type="file"
+						id="csv-file-input"
+						accept=".csv"
+						style={{ display: "none" }}
+						onChange={handleCSVUpload}
+					/>
+					<Button
+						variant="outline"
+						borderColor={ACCENT}
+						color={ACCENT}
+						_hover={{ bg: "red.50" }}
+						onClick={() => document.getElementById("csv-file-input")?.click()}
+						fontSize="15px"
+						px={6}
+						h="45px"
+						borderRadius="xl"
+						boxShadow="sm"
+					>
+						Import Specs CSV
+					</Button>
+					<Button
+						leftIcon={<AddIcon />}
+						bg={ACCENT}
+						color="white"
+						_hover={{ bg: "#c00404" }}
+						onClick={() => {
+							resetForm();
+							onOpen();
+						}}
+						fontSize="15px"
+						px={8}
+						h="45px"
+						borderRadius="xl"
+						boxShadow="md"
+					>
+						Add Model
+					</Button>
+				</HStack>
 			</HStack>
 
 			{isLoading ? (
@@ -365,6 +421,66 @@ export default function ModelsModule() {
 						</Tbody>
 					</Table>
 				</Box>
+			)}
+
+			{!isLoading && totalPages > 1 && (
+				<HStack justify="space-between" mt={6} px={2} align="center">
+					<Text fontSize="13px" color="gray.500" fontWeight="600">
+						Showing {models.length > 0 ? (page - 1) * limit + 1 : 0} to{" "}
+						{Math.min(page * limit, total)} of {total} models
+					</Text>
+					<HStack spacing={2}>
+						<Button
+							size="sm"
+							variant="outline"
+							onClick={() => setPage((p) => Math.max(1, p - 1))}
+							isDisabled={page === 1}
+							fontSize="13px"
+							borderRadius="lg"
+						>
+							Previous
+						</Button>
+						
+						{/* Page Buttons */}
+						{[...Array(totalPages)].map((_, idx) => {
+							const pNum = idx + 1;
+							// Only show page numbers around current page
+							if (pNum === 1 || pNum === totalPages || Math.abs(pNum - page) <= 1) {
+								return (
+									<Button
+										key={pNum}
+										size="sm"
+										variant={pNum === page ? "solid" : "outline"}
+										bg={pNum === page ? ACCENT : "transparent"}
+										color={pNum === page ? "white" : "gray.600"}
+										_hover={pNum === page ? { bg: "#c00404" } : { bg: "gray.50" }}
+										onClick={() => setPage(pNum)}
+										fontSize="13px"
+										borderRadius="lg"
+										minW="32px"
+									>
+										{pNum}
+									</Button>
+								);
+							}
+							if (pNum === 2 || pNum === totalPages - 1) {
+								return <Text key={pNum} color="gray.400" fontSize="13px">...</Text>;
+							}
+							return null;
+						})}
+
+						<Button
+							size="sm"
+							variant="outline"
+							onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+							isDisabled={page === totalPages || totalPages === 0}
+							fontSize="13px"
+							borderRadius="lg"
+						>
+							Next
+						</Button>
+					</HStack>
+				</HStack>
 			)}
 
 			{/* Modal */}

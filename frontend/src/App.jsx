@@ -29,6 +29,7 @@ import ProductsPage from "./pages/ProductsPage";
 import RefreshPopUp from "./components/common/RefreshPopUp";
 import ScrollToTop from "./components/layout/ScrollToTop";
 import AllEnginesPage from "./pages/AllEnginesPage";
+import ModelEnginePage from "./pages/ModelEnginePage";
 
 function App() {
 	const { pathname } = useLocation();
@@ -132,6 +133,7 @@ function App() {
 						<Route path="/checkout" element={<CheckoutPage />} />
 						<Route path="/thank-you" element={<ThankYouPage />} />
 						<Route path="/call-seller" element={<CallSellerPage />} />
+						<Route path="/:landingPageSlug" element={<ModelEnginePage />} />
 					</Routes>
 				</Box>
 

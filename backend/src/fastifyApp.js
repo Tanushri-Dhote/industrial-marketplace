@@ -46,6 +46,7 @@ require("./models/ContactSubmission");
 require("./models/Inquiry");
 require("./models/Model");
 require("./models/Quote");
+require("./models/ModelEngineSpec");
 
 // Log all requests for debugging CORS/Network issues
 fastify.addHook("onRequest", async (request, reply) => {

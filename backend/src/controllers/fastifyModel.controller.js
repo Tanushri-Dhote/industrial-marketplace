@@ -1,6 +1,7 @@
 const Model = require("../models/Model");
 const Brand = require("../models/Brand");
 const Product = require("../models/Product");
+const ModelEngineSpec = require("../models/ModelEngineSpec");
 
 const modelsCache = {};
 const modelsCacheTimestamps = {};
@@ -50,25 +51,13 @@ exports.getModelsByBrand = async (request, reply) => {
 			brandId: brand._id,
 		}).sort({ name: 1 }).lean();
 
-		// Find distinct model names for this brand's make
-		const distinctModels = await Product.distinct("model", {
-			make: { $in: [brand.productMake, brand.name] }
-		});
-		const distinctModelsLower = distinctModels.map((m) => (m || "").toLowerCase());
-
-		const filteredModels = models.filter((m) => {
-			const mn = (m.name || "").toLowerCase();
-			const ms = (m.slug || "").toLowerCase();
-			return distinctModelsLower.includes(mn) || distinctModelsLower.includes(ms);
-		});
-
 		// Save to cache
-		modelsCache[cacheKey] = filteredModels;
+		modelsCache[cacheKey] = models;
 		modelsCacheTimestamps[cacheKey] = now;
 
 		return reply.send({
 			success: true,
-			data: filteredModels,
+			data: models,
 		});
 	} catch (error) {
 		return reply.code(500).send({
@@ -81,11 +70,38 @@ exports.getModelsByBrand = async (request, reply) => {
 // Admin endpoints
 exports.getAllModels = async (request, reply) => {
 	try {
-		const models = await Model.find().populate("brandId", "name slug").sort({ name: 1 });
+		const { skip = 0, limit = 20, search = "" } = request.query || {};
+
+		const parsedSkip = parseInt(skip) || 0;
+		const parsedLimit = parseInt(limit) || 20;
+
+		const query = {};
+		if (search) {
+			query.$or = [
+				{ name: new RegExp(search, "i") },
+				{ slug: new RegExp(search, "i") }
+			];
+			const matchingBrands = await Brand.find({ name: new RegExp(search, "i") }).select("_id");
+			if (matchingBrands.length > 0) {
+				const brandIds = matchingBrands.map(b => b._id);
+				query.$or.push({ brandId: { $in: brandIds } });
+			}
+		}
+
+		const total = await Model.countDocuments(query);
+		const models = await Model.find(query)
+			.populate("brandId", "name slug")
+			.sort({ name: 1 })
+			.skip(parsedSkip)
+			.limit(parsedLimit)
+			.lean();
 
 		return reply.send({
 			success: true,
 			data: models,
+			total,
+			skip: parsedSkip,
+			limit: parsedLimit
 		});
 	} catch (error) {
 		return reply.code(500).send({
@@ -201,6 +217,241 @@ exports.deleteModel = async (request, reply) => {
 		return reply.code(500).send({
 			success: false,
 			message: error.message,
+		});
+	}
+};
+
+// Public Engine Specs Endpoint
+exports.getModelEngineSpecData = async (request, reply) => {
+	try {
+		const { brandSlug, modelSlug } = request.params;
+		const spec = await ModelEngineSpec.findOne({
+			brandSlug: brandSlug.toLowerCase(),
+			modelSlug: modelSlug.toLowerCase(),
+			isActive: true
+		}).lean();
+
+		if (!spec) {
+			return reply.code(404).send({
+				success: false,
+				message: "Engine specifications not found for this brand and model"
+			});
+		}
+
+		return reply.send({
+			success: true,
+			data: spec
+		});
+	} catch (error) {
+		return reply.code(500).send({
+			success: false,
+			message: error.message
+		});
+	}
+};
+
+// Admin CSV Bulk Upload
+exports.uploadModelEngineSpecCSV = async (request, reply) => {
+	try {
+		const fileData = await request.file();
+		if (!fileData) {
+			return reply.code(400).send({
+				success: false,
+				message: "No file uploaded",
+			});
+		}
+
+		const buffer = await fileData.toBuffer();
+		const csvText = buffer.toString("utf8");
+
+		const lines = csvText.split(/\r?\n/);
+		if (lines.length < 2) {
+			return reply.code(400).send({
+				success: false,
+				message: "CSV is empty or invalid",
+			});
+		}
+
+		const parseCSVLine = (line) => {
+			const result = [];
+			let current = "";
+			let inQuotes = false;
+			for (let i = 0; i < line.length; i++) {
+				const char = line[i];
+				if (char === '"' || char === "'") {
+					inQuotes = !inQuotes;
+				} else if (char === "," && !inQuotes) {
+					result.push(current);
+					current = "";
+				} else {
+					current += char;
+				}
+			}
+			result.push(current);
+			return result.map((val) => val.replace(/^["']|["']$/g, "").trim());
+		};
+
+		const headers = parseCSVLine(lines[0]);
+		const rows = [];
+
+		for (let i = 1; i < lines.length; i++) {
+			const line = lines[i].trim();
+			if (!line) continue;
+			const values = parseCSVLine(line);
+			const row = {};
+			headers.forEach((header, idx) => {
+				row[header] = values[idx] || "";
+			});
+			rows.push(row);
+		}
+
+		const groups = {};
+		const allBrands = await Brand.find({ isActive: true }).lean();
+
+		const getVal = (row, possibleKeys) => {
+			for (const key of Object.keys(row)) {
+				const cleanKey = key.trim().toLowerCase();
+				if (possibleKeys.some(pk => cleanKey.startsWith(pk.toLowerCase()) || pk.toLowerCase().startsWith(cleanKey))) {
+					return row[key];
+				}
+			}
+			return "";
+		};
+
+		for (const row of rows) {
+			const modelCell = (getVal(row, ["models", "model"]) || "").trim();
+			const engineSizeCell = (getVal(row, ["engine siz", "engine size"]) || "").trim();
+			const fuelCell = (getVal(row, ["fuel"]) || "").trim();
+			const engineCodeCell = (getVal(row, ["engine co", "engine code"]) || "").trim();
+			const yearsCell = (getVal(row, ["years", "year"]) || "").trim();
+
+			if (!modelCell) continue;
+
+			// Match brand
+			let foundBrand = null;
+			for (const brand of allBrands) {
+				const namesToCheck = [brand.name, brand.productMake].filter(Boolean);
+				if (brand.slug === "mercedes-benz") namesToCheck.push("mercedes");
+				if (brand.slug === "volkswagen") namesToCheck.push("vw");
+				
+				for (const name of namesToCheck) {
+					const regex = new RegExp(`^${name}\\b`, "i");
+					if (regex.test(modelCell)) {
+						foundBrand = brand;
+						break;
+					}
+				}
+				if (foundBrand) break;
+			}
+
+			if (!foundBrand) {
+				return reply.code(400).send({
+					success: false,
+					message: `Could not identify brand from row model: "${modelCell}". Please make sure the brand is registered first.`
+				});
+			}
+
+			// Match model
+			const brandModels = await Model.find({ brandId: foundBrand._id }).lean();
+			brandModels.sort((a, b) => b.name.length - a.name.length);
+
+			const escapedBrandName = foundBrand.name.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
+			const cellWithoutBrand = modelCell.replace(new RegExp(`^${escapedBrandName}\\b`, "i"), "").trim();
+
+			let foundModel = null;
+			for (const m of brandModels) {
+				const regex = new RegExp(`^${m.name}\\b`, "i");
+				if (regex.test(cellWithoutBrand)) {
+					foundModel = m;
+					break;
+				}
+			}
+
+			if (!foundModel) {
+				return reply.code(400).send({
+					success: false,
+					message: `Could not identify car model from row model: "${modelCell}" under brand ${foundBrand.name}. Please make sure the model is registered first.`
+				});
+			}
+
+			const modelKey = foundModel.slug;
+			if (!groups[modelKey]) {
+				groups[modelKey] = {
+					brandSlug: foundBrand.slug,
+					brandName: foundBrand.name,
+					modelName: foundModel.name,
+					modelSlug: foundModel.slug,
+					costTable: []
+				};
+			}
+
+			if (modelCell && engineSizeCell) {
+				groups[modelKey].costTable.push({
+					model: modelCell,
+					engineSize: engineSizeCell,
+					fuel: fuelCell,
+					engineCode: engineCodeCell,
+					years: yearsCell,
+					price: ""
+				});
+			}
+		}
+
+		let count = 0;
+		for (const modelKey of Object.keys(groups)) {
+			const group = groups[modelKey];
+
+			// Dynamically extract popular submodels from cost table rows
+			const dieselSet = new Set();
+			const petrolSet = new Set();
+
+			const escapedBrand = group.brandName.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
+			const escapedModel = group.modelName.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
+
+			for (const item of group.costTable) {
+				const fuelLower = (item.fuel || "").toLowerCase();
+				let subModel = item.model
+					.replace(new RegExp(escapedBrand, "gi"), "")
+					.replace(new RegExp(escapedModel, "gi"), "")
+					.trim();
+
+				if (subModel) {
+					subModel = subModel.toUpperCase();
+					if (fuelLower.includes("diesel")) {
+						dieselSet.add(subModel);
+					} else {
+						petrolSet.add(subModel);
+					}
+				}
+			}
+
+			const popularDiesel = Array.from(dieselSet);
+			const popularPetrol = Array.from(petrolSet);
+
+			await ModelEngineSpec.findOneAndUpdate(
+				{ brandSlug: group.brandSlug, modelSlug: group.modelSlug },
+				{
+					brandName: group.brandName,
+					modelName: group.modelName,
+					popularDiesel,
+					popularPetrol,
+					costTable: group.costTable,
+					isActive: true
+				},
+				{ upsert: true, new: true }
+			);
+			count++;
+		}
+
+		return reply.send({
+			success: true,
+			message: `Successfully processed ${rows.length} rows and imported/updated ${count} engine specs landing pages.`,
+			importedCount: count
+		});
+	} catch (error) {
+		return reply.code(500).send({
+			success: false,
+			message: error.message
 		});
 	}
 };
