@@ -42,6 +42,7 @@ const productSchema = new mongoose.Schema(
 		},
 		condition: {
 			type: String,
+			index: true,
 		},
 		make: {
 			type: String,
@@ -103,6 +104,7 @@ const productSchema = new mongoose.Schema(
 			type: mongoose.Schema.Types.ObjectId,
 			ref: "Website",
 			required: true,
+			index: true,
 		},
 
 		createdBy: {
@@ -112,5 +114,7 @@ const productSchema = new mongoose.Schema(
 	},
 	{ timestamps: true },
 );
+
+productSchema.index({ price: 1, createdAt: -1 });
 
 module.exports = mongoose.model("Product", productSchema);

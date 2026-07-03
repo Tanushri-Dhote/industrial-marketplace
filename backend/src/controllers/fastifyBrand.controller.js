@@ -3,8 +3,8 @@ const Product = require("../models/Product");
 
 let cachedBrands = null;
 let cacheTimestamp = 0;
-const CACHE_TTL = 60 * 1000; // 1 minute cache TTL
-
+const CACHE_TTL = 5 * 60 * 1000; // 5 minutes cache TTL
+ 
 // Public endpoints
 exports.getBrands = async (request, reply) => {
 	try {
@@ -21,41 +21,22 @@ exports.getBrands = async (request, reply) => {
 
 		const brands = await Brand.find({ isActive: true }).sort({ name: 1 }).lean();
 
-		// Find all models and group their names by brandId
-		const Model = require("../models/Model");
-		const models = await Model.find({ isActive: { $ne: false } }).lean();
-		const brandModelsMap = {};
-		models.forEach((model) => {
-			const bId = String(model.brandId);
-			if (!brandModelsMap[bId]) {
-				brandModelsMap[bId] = [];
-			}
-			brandModelsMap[bId].push((model.name || "").toLowerCase());
-			brandModelsMap[bId].push((model.slug || "").toLowerCase());
-		});
-
-		// Find distinct products grouped by make and model
-		const distinctProductPairs = await Product.aggregate([
-			{ $group: { _id: { make: "$make", model: "$model" } } },
-		]);
+		// Find distinct makes in products (fully covered by make index)
+		const distinctMakes = await Product.distinct("make");
+		const distinctMakesLower = distinctMakes.map((m) => (m || "").toLowerCase());
 
 		const filteredBrands = brands.filter((brand) => {
 			const pm = (brand.productMake || "").toLowerCase();
 			const bn = (brand.name || "").toLowerCase();
-			const bId = String(brand._id);
 
-			// Find if there is any product matching this brand's make AND matching at least one of its models
-			const allowedModels = brandModelsMap[bId] || [];
+			const checkMakes = [pm, bn].filter(Boolean);
+			// Check common aliases/abbreviations
+			if (checkMakes.includes("volkswagen") && !checkMakes.includes("vw")) checkMakes.push("vw");
+			if (checkMakes.includes("vw") && !checkMakes.includes("volkswagen")) checkMakes.push("volkswagen");
+			if (checkMakes.includes("mercedes-benz") && !checkMakes.includes("mercedes")) checkMakes.push("mercedes");
+			if (checkMakes.includes("mercedes") && !checkMakes.includes("mercedes-benz")) checkMakes.push("mercedes-benz");
 
-			return distinctProductPairs.some((pair) => {
-				const pairMake = (pair._id.make || "").toLowerCase();
-				const pairModel = (pair._id.model || "").toLowerCase();
-
-				const makeMatches = pairMake === pm || pairMake === bn;
-				const modelMatches = allowedModels.includes(pairModel);
-
-				return makeMatches && modelMatches;
-			});
+			return checkMakes.some((m) => distinctMakesLower.includes(m));
 		});
 
 		cachedBrands = filteredBrands;

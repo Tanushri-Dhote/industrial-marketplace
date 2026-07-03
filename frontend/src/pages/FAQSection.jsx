@@ -112,7 +112,7 @@ export default function FAQSection() {
           {/* Header Section with Icon */}
           <MotionBox 
             textAlign="center" 
-            maxW="700px"
+            maxW="850px"
             initial={{ opacity: 0, scale: 0.95 }}
             whileInView={{ opacity: 1, scale: 1 }}
             viewport={{ once: true }}
@@ -129,7 +129,7 @@ export default function FAQSection() {
               >
                 <Icon as={FaQuestionCircle} w={5} h={5} color={accentColor} />
               </Flex>
-
+ 
               <Text
                 fontSize="13px"
                 fontWeight="800"
@@ -144,13 +144,14 @@ export default function FAQSection() {
               >
                 FAQ
               </Text>
-
+ 
               <Heading
                 as="h2"
                 fontSize={{ base: "28px", md: "38px", lg: "42px" }}
                 fontWeight="800"
                 color="gray.900"
                 lineHeight="1.2"
+                whiteSpace={{ base: "normal", md: "nowrap" }}
               >
                 Got Questions?
                 <Box as="br" display={{ base: "block", md: "none" }} />

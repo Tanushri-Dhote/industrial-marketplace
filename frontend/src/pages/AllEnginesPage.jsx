@@ -10,7 +10,6 @@ import {
     Spinner,
     Text,
     VStack,
-    Checkbox,
     Flex,
     HStack,
     Input,
@@ -28,9 +27,8 @@ import {
 } from "@chakra-ui/react";
 import { motion } from "framer-motion";
 import { useQuery } from "@tanstack/react-query";
-import { Link as RouterLink } from "react-router-dom";
-import { useLocation } from "react-router-dom";
-import { FaFilter, FaCar, FaCogs, FaCalendarAlt, FaTachometerAlt, FaUndo } from "react-icons/fa";
+import { Link as RouterLink, useLocation, useNavigate, useSearchParams } from "react-router-dom";
+import { FaFilter, FaCar, FaCogs, FaCalendarAlt, FaTachometerAlt, FaUndo, FaSearch } from "react-icons/fa";
 import API from "../services/api";
 
 const MotionBox = motion(Box);
@@ -71,23 +69,19 @@ const getConditionBadgeStyles = (condition) => {
 };
 
 const SkeletonCard = () => (
-    <Box bg="white" borderRadius="2xl" p={4} border="1px solid" borderColor="gray.100" boxShadow="sm">
-        <Skeleton h="120px" borderRadius="xl" mb={4} />
-        <Skeleton h="16px" w="75%" mb={2} />
-        <Skeleton h="12px" w="45%" mb={4} />
-        <SimpleGrid columns={2} spacing={2.5} mb={4}>
-            <Skeleton h="10px" />
-            <Skeleton h="10px" />
-            <Skeleton h="10px" />
-            <Skeleton h="10px" />
-        </SimpleGrid>
-        <Skeleton h="35px" w="full" borderRadius="xl" />
+    <Box bg="white" borderRadius="24px" p={4} border="1px solid" borderColor="gray.100" boxShadow="sm">
+        <Skeleton h="130px" borderRadius="20px" mb={4} />
+        <Skeleton h="18px" w="75%" mb={2} borderRadius="md" />
+        <Skeleton h="12px" w="45%" mb={4} borderRadius="md" />
+        <Skeleton h="18px" w="30%" mx="auto" mb={3} mt={4} borderRadius="md" />
+        <Skeleton h="36px" w="full" borderRadius="xl" />
     </Box>
 );
 
 export default function AllEnginesPage({ category }) {
     const location = useLocation();
-    const searchParams = new URLSearchParams(location.search);
+    const navigate = useNavigate();
+    const [searchParams, setSearchParams] = useSearchParams();
 
     const search = searchParams.get("search") || "";
     const brand = searchParams.get("brand") || "";
@@ -103,6 +97,9 @@ export default function AllEnginesPage({ category }) {
     const [selectedModel, setSelectedModel] = useState(model);
     const [selectedCategory, setSelectedCategory] = useState(category || "");
 
+    const [searchInput, setSearchInput] = useState(search);
+    const [searchVal, setSearchVal] = useState(search);
+
     useEffect(() => {
         setSelectedBrand(brand);
         setSelectedModel(model);
@@ -112,11 +109,16 @@ export default function AllEnginesPage({ category }) {
         setSelectedCategory(category || "");
     }, [category]);
 
-    // Load active brands
+    useEffect(() => {
+        setSearchInput(search);
+        setSearchVal(search);
+    }, [search]);
+
+    // Load active brands using optimized parameter all=true
     const { data: brandsRes } = useQuery({
         queryKey: ["brands-list"],
         queryFn: async () => {
-            const res = await API.get("/brands");
+            const res = await API.get("/brands", { params: { all: true } });
             return res.data.data || res.data || [];
         },
         staleTime: 1000 * 60 * 10,
@@ -140,21 +142,21 @@ export default function AllEnginesPage({ category }) {
 
     const { isOpen: isMobileFiltersOpen, onOpen: onMobileFiltersOpen, onClose: onMobileFiltersClose } = useDisclosure();
 
-    // Reset to page 1 when filters or URL query params change
+    // Reset page on search or filter updates
     useEffect(() => {
         setPage(1);
-    }, [search, selectedBrand, selectedModel, selectedCategory, priceMin, priceMax, mileageMax, selectedConditions]);
+    }, [searchVal, selectedBrand, selectedModel, selectedCategory, priceMin, priceMax, mileageMax, selectedConditions]);
 
     const { data, isLoading: loading, isFetching } = useQuery({
         queryKey: [
             "all-products",
-            { category: selectedCategory, search, brand: selectedBrand, model: selectedModel, priceMin, priceMax, mileageMax, selectedConditions, page },
+            { category: selectedCategory, search: searchVal, brand: selectedBrand, model: selectedModel, priceMin, priceMax, mileageMax, selectedConditions, page },
         ],
         queryFn: async () => {
             const res = await API.get("/products", {
                 params: {
                     category: selectedCategory || undefined,
-                    search,
+                    search: searchVal || undefined,
                     brand: selectedBrand || undefined,
                     model: selectedModel || undefined,
                     priceMin,
@@ -162,7 +164,7 @@ export default function AllEnginesPage({ category }) {
                     mileageMax,
                     conditions: selectedConditions.join(","),
                     page,
-                    limit: 10,
+                    limit: 12, // Grid layout fits 12 items perfectly (3x4 or 4x3)
                 },
             });
             return res.data;
@@ -192,6 +194,19 @@ export default function AllEnginesPage({ category }) {
         } else {
             window.scrollTo({ top: 0, behavior: "smooth" });
         }
+    };
+
+    const triggerSearch = () => {
+        setSearchVal(searchInput);
+        setPage(1);
+        const newParams = new URLSearchParams(location.search);
+        if (searchInput) {
+            newParams.set("search", searchInput);
+        } else {
+            newParams.delete("search");
+        }
+        newParams.set("page", "1");
+        setSearchParams(newParams);
     };
 
     const renderPageButtons = () => {
@@ -237,10 +252,13 @@ export default function AllEnginesPage({ category }) {
                     key={p}
                     size="sm"
                     onClick={() => handlePageChange(p)}
-                    colorScheme={isCurrent ? "brand" : "gray"}
-                    variant={isCurrent ? "solid" : "outline"}
+                    bg={isCurrent ? "#D90404" : "gray.50"}
+                    color={isCurrent ? "white" : "gray.700"}
+                    border="1px solid"
+                    borderColor={isCurrent ? "#D90404" : "gray.250"}
+                    _hover={{ bg: isCurrent ? "#D90404" : "gray.100" }}
                     borderRadius="xl"
-                    fontWeight="700"
+                    fontWeight="800"
                 >
                     {p}
                 </Button>
@@ -251,14 +269,14 @@ export default function AllEnginesPage({ category }) {
     const FilterContent = ({ isMobile }) => (
         <VStack align="stretch" spacing={6}>
             <Flex justify="space-between" align="center" display={isMobile ? "none" : "flex"}>
-                <Heading size="xs" textTransform="uppercase" letterSpacing="wider" color="gray.500">
+                <Heading fontSize="14px" fontWeight="900" textTransform="uppercase" letterSpacing="wider" color="gray.800">
                     Filters
                 </Heading>
                 {activeFilterCount > 0 && (
                     <Button
                         size="xs"
                         variant="ghost"
-                        colorScheme="brand"
+                        colorScheme="red"
                         leftIcon={<Icon as={FaUndo} />}
                         onClick={() => {
                             setPriceMin("");
@@ -268,16 +286,19 @@ export default function AllEnginesPage({ category }) {
                             setSelectedBrand("");
                             setSelectedModel("");
                             setSelectedCategory("");
+                            setSearchInput("");
+                            setSearchVal("");
+                            navigate("/all-engines");
                         }}
                     >
-                        Reset
+                        Reset All
                     </Button>
                 )}
             </Flex>
 
             {/* Category Filter */}
-            <VStack align="stretch" spacing={3}>
-                <Text fontWeight="800" fontSize="13px" color="gray.700" textTransform="uppercase" letterSpacing="0.5px">
+            <VStack align="stretch" spacing={2.5}>
+                <Text fontWeight="800" fontSize="12px" color="gray.500" textTransform="uppercase" letterSpacing="0.5px">
                     Category
                 </Text>
                 <Select
@@ -291,7 +312,10 @@ export default function AllEnginesPage({ category }) {
                     bg="gray.50"
                     border="1px solid"
                     borderColor="gray.200"
-                    _focus={{ borderColor: "brand.500", bg: "white" }}
+                    _focus={{ borderColor: "#D90404", bg: "white" }}
+                    fontSize="14px"
+                    fontWeight="600"
+                    color="gray.700"
                 >
                     <option value="Car Engines">Car Engines</option>
                     <option value="Used Engines">Used Engines</option>
@@ -301,8 +325,8 @@ export default function AllEnginesPage({ category }) {
             </VStack>
 
             {/* Brand Filter */}
-            <VStack align="stretch" spacing={3}>
-                <Text fontWeight="800" fontSize="13px" color="gray.700" textTransform="uppercase" letterSpacing="0.5px">
+            <VStack align="stretch" spacing={2.5}>
+                <Text fontWeight="800" fontSize="12px" color="gray.500" textTransform="uppercase" letterSpacing="0.5px">
                     Brand
                 </Text>
                 <Select
@@ -312,12 +336,15 @@ export default function AllEnginesPage({ category }) {
                     value={selectedBrand}
                     onChange={(e) => {
                         setSelectedBrand(e.target.value);
-                        setSelectedModel(""); // Reset model when brand changes
+                        setSelectedModel("");
                     }}
                     bg="gray.50"
                     border="1px solid"
                     borderColor="gray.200"
-                    _focus={{ borderColor: "brand.500", bg: "white" }}
+                    _focus={{ borderColor: "#D90404", bg: "white" }}
+                    fontSize="14px"
+                    fontWeight="600"
+                    color="gray.700"
                 >
                     {brandsList.map((b) => (
                         <option key={b._id} value={b.slug}>
@@ -329,8 +356,8 @@ export default function AllEnginesPage({ category }) {
 
             {/* Model Filter */}
             {selectedBrand && (
-                <VStack align="stretch" spacing={3}>
-                    <Text fontWeight="800" fontSize="13px" color="gray.700" textTransform="uppercase" letterSpacing="0.5px">
+                <VStack align="stretch" spacing={2.5}>
+                    <Text fontWeight="800" fontSize="12px" color="gray.500" textTransform="uppercase" letterSpacing="0.5px">
                         Model
                     </Text>
                     <Select
@@ -342,7 +369,10 @@ export default function AllEnginesPage({ category }) {
                         bg="gray.50"
                         border="1px solid"
                         borderColor="gray.200"
-                        _focus={{ borderColor: "brand.500", bg: "white" }}
+                        _focus={{ borderColor: "#D90404", bg: "white" }}
+                        fontSize="14px"
+                        fontWeight="600"
+                        color="gray.700"
                     >
                         {modelsList.map((m) => (
                             <option key={m._id} value={m.name}>
@@ -354,25 +384,28 @@ export default function AllEnginesPage({ category }) {
             )}
 
             {/* Condition Filter */}
-            <VStack align="stretch" spacing={3}>
-                <Text fontWeight="800" fontSize="13px" color="gray.700" textTransform="uppercase" letterSpacing="0.5px">
+            <VStack align="stretch" spacing={2.5}>
+                <Text fontWeight="800" fontSize="12px" color="gray.500" textTransform="uppercase" letterSpacing="0.5px">
                     Condition
                 </Text>
-                <VStack align="stretch" spacing={2}>
+                <HStack spacing={2} flexWrap="wrap">
                     {["New", "Used", "Reconditioned"].map((cond) => {
                         const isChecked = selectedConditions.includes(cond);
                         return (
                             <Box
                                 key={cond}
                                 border="1px solid"
-                                borderColor={isChecked ? "brand.500" : "gray.100"}
-                                bg={isChecked ? "brand.50" : "gray.50"}
-                                borderRadius="xl"
-                                px={4}
-                                py={2.5}
+                                borderColor={isChecked ? "#D90404" : "gray.200"}
+                                bg={isChecked ? "rgba(217, 4, 4, 0.06)" : "white"}
+                                color={isChecked ? "#D90404" : "gray.600"}
+                                borderRadius="full"
+                                px={3.5}
+                                py={1.5}
                                 cursor="pointer"
                                 transition="all 0.2s"
-                                _hover={{ borderColor: "brand.300" }}
+                                fontSize="12px"
+                                fontWeight="750"
+                                _hover={{ borderColor: isChecked ? "#D90404" : "gray.300" }}
                                 onClick={() => {
                                     if (isChecked) {
                                         setSelectedConditions(selectedConditions.filter((c) => c !== cond));
@@ -381,29 +414,19 @@ export default function AllEnginesPage({ category }) {
                                     }
                                 }}
                             >
-                                <Checkbox
-                                    isChecked={isChecked}
-                                    colorScheme="brand"
-                                    size="md"
-                                    spacing={3}
-                                    pointerEvents="none"
-                                >
-                                    <Text fontSize="14px" fontWeight={isChecked ? "700" : "500"} color="gray.700">
-                                        {cond}
-                                    </Text>
-                                </Checkbox>
+                                {cond}
                             </Box>
                         );
                     })}
-                </VStack>
+                </HStack>
             </VStack>
 
             {/* Price Filter */}
-            <VStack align="stretch" spacing={3}>
-                <Text fontWeight="800" fontSize="13px" color="gray.700" textTransform="uppercase" letterSpacing="0.5px">
-                    Price (£)
+            <VStack align="stretch" spacing={2.5}>
+                <Text fontWeight="800" fontSize="12px" color="gray.500" textTransform="uppercase" letterSpacing="0.5px">
+                    Price Range (£)
                 </Text>
-                <HStack spacing={3}>
+                <HStack spacing={2}>
                     <Input
                         placeholder="Min"
                         type="number"
@@ -414,10 +437,12 @@ export default function AllEnginesPage({ category }) {
                         bg="gray.50"
                         border="1px solid"
                         borderColor="gray.200"
-                        _focus={{ borderColor: "brand.500", bg: "white" }}
+                        _focus={{ borderColor: "#D90404", bg: "white" }}
+                        fontSize="13px"
+                        flex={1}
                     />
-                    <Text fontSize="xs" color="gray.400" fontWeight="bold">
-                        to
+                    <Text fontSize="sm" color="gray.400" fontWeight="bold" flexShrink={0}>
+                        -
                     </Text>
                     <Input
                         placeholder="Max"
@@ -429,14 +454,16 @@ export default function AllEnginesPage({ category }) {
                         bg="gray.50"
                         border="1px solid"
                         borderColor="gray.200"
-                        _focus={{ borderColor: "brand.500", bg: "white" }}
+                        _focus={{ borderColor: "#D90404", bg: "white" }}
+                        fontSize="13px"
+                        flex={1}
                     />
                 </HStack>
             </VStack>
 
             {/* Mileage Filter */}
-            <VStack align="stretch" spacing={3}>
-                <Text fontWeight="800" fontSize="13px" color="gray.700" textTransform="uppercase" letterSpacing="0.5px">
+            <VStack align="stretch" spacing={2.5}>
+                <Text fontWeight="800" fontSize="12px" color="gray.500" textTransform="uppercase" letterSpacing="0.5px">
                     Max Mileage
                 </Text>
                 <Input
@@ -449,14 +476,17 @@ export default function AllEnginesPage({ category }) {
                     bg="gray.50"
                     border="1px solid"
                     borderColor="gray.200"
-                    _focus={{ borderColor: "brand.500", bg: "white" }}
+                    _focus={{ borderColor: "#D90404", bg: "white" }}
+                    fontSize="13px"
                 />
             </VStack>
 
             {isMobile ? (
                 <Button
                     size="md"
-                    colorScheme="brand"
+                    bg="#D90404"
+                    color="white"
+                    _hover={{ bg: "red.600" }}
                     borderRadius="xl"
                     onClick={onMobileFiltersClose}
                     fontWeight="700"
@@ -470,7 +500,7 @@ export default function AllEnginesPage({ category }) {
                     <Button
                         size="sm"
                         variant="outline"
-                        colorScheme="brand"
+                        colorScheme="red"
                         borderRadius="xl"
                         onClick={() => {
                             setPriceMin("");
@@ -480,6 +510,9 @@ export default function AllEnginesPage({ category }) {
                             setSelectedBrand("");
                             setSelectedModel("");
                             setSelectedCategory("");
+                            setSearchInput("");
+                            setSearchVal("");
+                            navigate("/all-engines");
                         }}
                         fontWeight="700"
                     >
@@ -491,64 +524,112 @@ export default function AllEnginesPage({ category }) {
     );
 
     return (
-        <Box bg="#F8FAFC" minH="100vh" py={{ base: 8, md: 16 }}>
+        <Box bg="#F8FAFC" minH="100vh" py={{ base: 8, md: 12 }}>
             <Container maxW="container.xl">
-                {/* Header Hero Banner */}
+                {/* Header Hero Banner Redesigned */}
                 <Box
-                    bgGradient="linear(to-r, #0A1927, #132A3E)"
+                    bgGradient="linear(to-br, #0B1520 0%, #162A45 100%)"
                     color="white"
-                    py={{ base: 10, md: 14 }}
-                    px={{ base: 6, md: 10 }}
-                    borderRadius="2xl"
-                    mb={8}
-                    boxShadow="md"
+                    py={{ base: 12, md: 16 }}
+                    px={{ base: 6, md: 12 }}
+                    borderRadius="3xl"
+                    mb={10}
+                    boxShadow="xl"
                     position="relative"
                     overflow="hidden"
+                    border="1px solid"
+                    borderColor="whiteAlpha.100"
                 >
+                    {/* Glowing Decorative Orbs */}
                     <Box
                         position="absolute"
-                        top="-50%"
-                        right="-20%"
-                        w="400px"
-                        h="400px"
+                        top="-20%"
+                        right="-10%"
+                        w="380px"
+                        h="380px"
                         borderRadius="full"
                         bg="#D90404"
-                        opacity="0.1"
+                        opacity="0.18"
                         filter="blur(80px)"
+                        pointerEvents="none"
                     />
-                    <VStack spacing={4} align="center" textAlign="center" position="relative" zIndex={1}>
+                    <Box
+                        position="absolute"
+                        bottom="-10%"
+                        left="-10%"
+                        w="250px"
+                        h="250px"
+                        borderRadius="full"
+                        bg="blue.500"
+                        opacity="0.1"
+                        filter="blur(75px)"
+                        pointerEvents="none"
+                    />
+
+                    <VStack spacing={6} align="center" textAlign="center" position="relative" zIndex={2}>
                         <HStack
-                            spacing={2}
-                            bg="rgba(219, 4, 4, 0.15)"
-                            px={3}
+                            spacing={2.5}
+                            bg="whiteAlpha.100"
+                            backdropFilter="blur(8px)"
+                            px={4}
                             py={1.5}
                             borderRadius="full"
                             border="1px solid"
-                            borderColor="rgba(219, 4, 4, 0.3)"
+                            borderColor="whiteAlpha.200"
                         >
                             <Box w={2} h={2} bg="#D90404" borderRadius="full" />
-                            <Text
-                                fontSize="11px"
-                                fontWeight="800"
-                                color="#ff4d4d"
-                                textTransform="uppercase"
-                                letterSpacing="2px"
-                            >
-                                OUR ENGINES
+                            <Text fontSize="11px" fontWeight="800" color="red.400" letterSpacing="2px" textTransform="uppercase">
+                                Verified Inventory
                             </Text>
                         </HStack>
 
-                        <Heading
-                            fontSize={{ base: "28px", md: "40px" }}
-                            fontWeight="900"
-                            letterSpacing="-0.5px"
-                        >
-                            All {category || "Engine Listings"}
+                        <Heading fontSize={{ base: "32px", md: "46px" }} fontWeight="900" letterSpacing="-1px" lineHeight="1.15">
+                            All {selectedCategory || "Engine Listings"}
                         </Heading>
 
-                        <Text fontSize={{ base: "14px", md: "16px" }} color="gray.300" maxW="600px">
-                            Browse high-quality new, used, and reconditioned engines for various vehicle makes and models.
+                        <Text fontSize={{ base: "14px", md: "16px" }} color="slate.300" maxW="600px" opacity={0.85}>
+                            Browse our extensive inventory of high-performance new, reconditioned, and fully tested used engines.
                         </Text>
+
+                        {/* Interactive Search Bar */}
+                        <Box as="form" onSubmit={(e) => { e.preventDefault(); triggerSearch(); }} w="full" maxW="550px" mt={2}>
+                            <HStack
+                                bg="white"
+                                p={1.5}
+                                borderRadius="2xl"
+                                boxShadow="lg"
+                                border="1px solid"
+                                borderColor="gray.200"
+                                spacing={0}
+                            >
+                                <Input
+                                    placeholder="Search by make, model, engine code..."
+                                    value={searchInput}
+                                    onChange={(e) => setSearchInput(e.target.value)}
+                                    border="none"
+                                    color="gray.800"
+                                    _focus={{ boxShadow: "none" }}
+                                    fontSize="14px"
+                                    h="46px"
+                                    pl={4}
+                                />
+                                <Button
+                                    leftIcon={<Icon as={FaSearch} />}
+                                    onClick={triggerSearch}
+                                    bg="gray.950"
+                                    color="white"
+                                    px={6}
+                                    h="46px"
+                                    borderRadius="xl"
+                                    fontSize="13px"
+                                    fontWeight="800"
+                                    _hover={{ bg: "#D90404" }}
+                                    transition="all 0.2s"
+                                >
+                                    Search
+                                </Button>
+                            </HStack>
+                        </Box>
                     </VStack>
                 </Box>
 
@@ -560,22 +641,24 @@ export default function AllEnginesPage({ category }) {
                     display={{ base: "flex", md: "none" }}
                     bg="white"
                     p={4}
-                    borderRadius="xl"
+                    borderRadius="2xl"
                     boxShadow="sm"
                     border="1px solid"
                     borderColor="gray.100"
                 >
-                    <Text fontSize="sm" fontWeight="700" color="gray.600">
+                    <Text fontSize="14px" fontWeight="800" color="gray.700">
                         {pagination?.total || 0} Engines Found
                     </Text>
                     <Button
                         leftIcon={<Icon as={FaFilter} />}
                         onClick={onMobileFiltersOpen}
-                        colorScheme="brand"
+                        bg="#D90404"
+                        color="white"
+                        _hover={{ bg: "red.600" }}
                         size="sm"
                         borderRadius="xl"
                         px={4}
-                        fontWeight="700"
+                        fontWeight="800"
                     >
                         Filters {activeFilterCount > 0 ? `(${activeFilterCount})` : ""}
                     </Button>
@@ -588,7 +671,7 @@ export default function AllEnginesPage({ category }) {
                         w={{ base: "100%", md: "280px" }}
                         bg="white"
                         p={6}
-                        borderRadius="2xl"
+                        borderRadius="24px"
                         boxShadow="sm"
                         border="1px solid"
                         borderColor="gray.100"
@@ -608,32 +691,35 @@ export default function AllEnginesPage({ category }) {
                             mb={6}
                             display={{ base: "none", md: "flex" }}
                         >
-                            <Text fontSize="md" fontWeight="800" color="gray.700">
-                                {pagination?.total || 0} Results Found
+                            <Text fontSize="16px" fontWeight="800" color="gray.800">
+                                {pagination?.total || 0} Engines Found
                                 {activeFilterCount > 0 && (
-                                    <Badge ml={2} colorScheme="brand" variant="subtle" px={2} py={0.5} borderRadius="full">
-                                        {activeFilterCount} filter{activeFilterCount > 1 ? "s" : ""} active
+                                    <Badge ml={2} colorScheme="red" variant="subtle" px={2.5} py={0.5} borderRadius="full">
+                                        {activeFilterCount} active filter{activeFilterCount > 1 ? "s" : ""}
                                     </Badge>
                                 )}
                             </Text>
                         </Flex>
 
-                        {loading || isFetching ? (
-                            <SimpleGrid columns={{ base: 2, md: 2, lg: 3, xl: 4 }} spacing={5} w="full">
+                        {/* Loading States & Grid */}
+                        {loading && !engines.length ? (
+                            <SimpleGrid columns={{ base: 1, sm: 2, md: 2, lg: 3, xl: 4 }} spacing={5} w="full">
                                 {Array.from({ length: 8 }).map((_, i) => (
                                     <SkeletonCard key={i} />
                                 ))}
                             </SimpleGrid>
                         ) : engines.length > 0 ? (
-                            <VStack spacing={8} w="full">
+                            <VStack spacing={10} w="full">
                                 <MotionGrid
-                                    columns={{ base: 2, md: 2, lg: 3, xl: 4 }}
+                                    columns={{ base: 1, sm: 2, md: 2, lg: 3, xl: 4 }}
                                     spacing={5}
                                     w="full"
                                     variants={containerVariants}
                                     initial="hidden"
                                     whileInView="visible"
                                     viewport={{ once: true }}
+                                    opacity={isFetching ? 0.7 : 1}
+                                    transition="opacity 0.2s ease"
                                 >
                                     {engines.map((engine) => {
                                         const badgeStyles = getConditionBadgeStyles(engine.condition);
@@ -644,135 +730,122 @@ export default function AllEnginesPage({ category }) {
                                                 to={`/products/${engine._id}`}
                                                 variants={cardVariants}
                                                 bg="white"
-                                                borderRadius="2xl"
+                                                borderRadius="24px"
                                                 p={4}
                                                 boxShadow="sm"
                                                 border="1px solid"
                                                 borderColor="gray.100"
                                                 cursor="pointer"
-                                                transition="all 0.3s cubic-bezier(0.4, 0, 0.2, 1)"
+                                                transition="all 0.4s cubic-bezier(0.16, 1, 0.3, 1)"
                                                 position="relative"
                                                 display="flex"
                                                 flexDirection="column"
                                                 justifyContent="space-between"
+                                                role="group"
                                                 _hover={{
-                                                    transform: "translateY(-6px)",
+                                                    transform: "translateY(-4px)",
                                                     boxShadow: "md",
-                                                    borderColor: "brand.300",
+                                                    borderColor: "gray.200",
                                                     textDecoration: "none",
                                                 }}
                                             >
-                                                {/* Condition Badge */}
-                                                <Badge
-                                                    position="absolute"
-                                                    top={3}
-                                                    right={3}
-                                                    bg={badgeStyles.bg}
-                                                    color={badgeStyles.color}
-                                                    border="1px solid"
-                                                    borderColor={badgeStyles.borderColor}
-                                                    borderRadius="full"
-                                                    px={2.5}
-                                                    py={0.5}
-                                                    fontSize="10px"
-                                                    fontWeight="bold"
-                                                    textTransform="uppercase"
-                                                >
-                                                    {engine.condition || "Used"}
-                                                </Badge>
-
-                                                {/* Image */}
-                                                <Box
-                                                    h="110px"
-                                                    display="flex"
-                                                    alignItems="center"
-                                                    justifyContent="center"
-                                                    mb={4}
-                                                    mt={3}
-                                                >
-                                                    <Image
-                                                        src={
-                                                            engine.images?.[0] ||
-                                                            "https://images.unsplash.com/photo-1486006920555-c77dcf18193c?auto=format&fit=crop&w=400&q=80"
-                                                        }
-                                                        alt={engine.name}
-                                                        maxH="100%"
-                                                        objectFit="contain"
-                                                        fallbackSrc="https://images.unsplash.com/photo-1486006920555-c77dcf18193c?auto=format&fit=crop&w=400&q=80"
-                                                    />
-                                                </Box>
-
-                                                {/* Specs and Info */}
-                                                <VStack align="stretch" spacing={2} flex="1">
-                                                    <Text
-                                                        fontWeight="800"
-                                                        fontSize="14px"
-                                                        color="gray.900"
-                                                        noOfLines={1}
-                                                        lineHeight="short"
-                                                        title={engine.name}
-                                                    >
-                                                        {engine.name}
-                                                    </Text>
-
-                                                    <Text fontSize="12px" color="gray.500" noOfLines={1}>
-                                                        {engine.model || "Universal Fit"}
-                                                    </Text>
-
-                                                    {/* Specs Grid */}
-                                                    <SimpleGrid
-                                                        columns={2}
-                                                        spacing={2}
+                                                <Box>
+                                                    {/* Condition Badge */}
+                                                    <Badge
+                                                        position="absolute"
+                                                        top={3.5}
+                                                        right={3.5}
+                                                        bg={badgeStyles.bg}
+                                                        color={badgeStyles.color}
+                                                        border="1px solid"
+                                                        borderColor={badgeStyles.borderColor}
+                                                        borderRadius="full"
+                                                        px={3}
+                                                        py={0.5}
                                                         fontSize="10px"
-                                                        color="gray.500"
+                                                        fontWeight="800"
+                                                        textTransform="uppercase"
+                                                        zIndex={1}
+                                                    >
+                                                        {engine.condition || "Used"}
+                                                    </Badge>
+                                                    {/* Image Container with zoom-on-hover */}
+                                                    <Box
+                                                        bg="gray.50"
+                                                        borderRadius="20px"
+                                                        h="140px"
+                                                        w="full"
+                                                        display="flex"
+                                                        alignItems="center"
+                                                        justifyContent="center"
+                                                        mb={4}
                                                         mt={2}
-                                                        py={2}
-                                                        borderTop="1px dashed"
-                                                        borderBottom="1px dashed"
+                                                        overflow="hidden"
+                                                        position="relative"
+                                                        border="1px solid"
                                                         borderColor="gray.100"
                                                     >
-                                                        <HStack spacing={1}>
-                                                            <Icon as={FaTachometerAlt} color="gray.400" />
-                                                            <Text noOfLines={1}>{engine.mileage || "Low Miles"}</Text>
-                                                        </HStack>
-                                                        <HStack spacing={1}>
-                                                            <Icon as={FaCar} color="gray.400" />
-                                                            <Text noOfLines={1}>{engine.make || "Engine"}</Text>
-                                                        </HStack>
-                                                        <HStack spacing={1}>
-                                                            <Icon as={FaCogs} color="gray.400" />
-                                                            <Text noOfLines={1}>{engine.engineType || "Gas/Diesel"}</Text>
-                                                        </HStack>
-                                                        <HStack spacing={1}>
-                                                            <Icon as={FaCalendarAlt} color="gray.400" />
-                                                            <Text noOfLines={1}>{engine.year || "N/A"}</Text>
-                                                        </HStack>
-                                                    </SimpleGrid>
-                                                </VStack>
+                                                        <Image
+                                                            src={
+                                                                engine.images?.[0] ||
+                                                                "https://images.unsplash.com/photo-1486006920555-c77dcf18193c?auto=format&fit=crop&w=400&q=80"
+                                                            }
+                                                            alt={engine.name}
+                                                            maxH="90%"
+                                                            maxW="90%"
+                                                            objectFit="contain"
+                                                            transition="transform 0.5s ease"
+                                                            _groupHover={{ transform: "scale(1.06)" }}
+                                                            fallbackSrc="https://images.unsplash.com/photo-1486006920555-c77dcf18193c?auto=format&fit=crop&w=400&q=80"
+                                                        />
+                                                    </Box>
 
-                                                {/* Price & Action */}
-                                                <VStack align="stretch" spacing={3} mt={4}>
-                                                    <Text fontSize="16px" fontWeight="900" color="brand.500" textAlign="center">
+                                                    {/* Info Section */}
+                                                    <VStack align="stretch" spacing={1.5}>
+                                                        <Text
+                                                            fontWeight="800"
+                                                            fontSize="14px"
+                                                            color="gray.900"
+                                                            noOfLines={1}
+                                                            lineHeight="shorter"
+                                                            title={engine.name}
+                                                        >
+                                                            {engine.name}
+                                                        </Text>
+
+                                                        <Text fontSize="11px" fontWeight="700" color="gray.400" noOfLines={1}>
+                                                            {engine.model || "Universal Fit"}
+                                                        </Text>
+                                                     </VStack> 
+                                                </Box>
+
+                                                {/* Price & Action CTA */}
+                                                <VStack align="stretch" spacing={2.5} mt={4}>
+                                                    <Text fontSize="18px" fontWeight="900" color="#D90404" textAlign="center">
                                                         {engine.price ? `£${Number(engine.price).toLocaleString()}` : "Get Quote"}
                                                     </Text>
-                                                    <Button
-                                                        size="sm"
-                                                        w="full"
-                                                        bg="gray.50"
-                                                        color="gray.800"
+                                                    <Box
+                                                        py={2}
+                                                        px={4}
+                                                        bg="#D90404"
+                                                        color="white"
                                                         fontSize="11px"
                                                         fontWeight="800"
                                                         borderRadius="xl"
-                                                        border="1px solid"
-                                                        borderColor="gray.100"
+                                                        textAlign="center"
+                                                        h="36px"
+                                                        display="flex"
+                                                        alignItems="center"
+                                                        justifyContent="center"
                                                         _hover={{
-                                                            bg: "brand.500",
-                                                            color: "white",
-                                                            borderColor: "brand.500",
+                                                            bg: "#b30303",
+                                                            transform: "scale(1.03)",
+                                                            boxShadow: "0 4px 14px rgba(217,4,4,0.45)",
                                                         }}
+                                                        transition="all 0.18s ease"
                                                     >
                                                         View Details
-                                                    </Button>
+                                                    </Box>
                                                 </VStack>
                                             </MotionBox>
                                         );
@@ -787,9 +860,9 @@ export default function AllEnginesPage({ category }) {
                                             onClick={() => handlePageChange(page - 1)}
                                             isDisabled={page === 1}
                                             variant="outline"
-                                            colorScheme="brand"
+                                            colorScheme="gray"
                                             borderRadius="xl"
-                                            fontWeight="700"
+                                            fontWeight="800"
                                         >
                                             Prev
                                         </Button>
@@ -801,9 +874,9 @@ export default function AllEnginesPage({ category }) {
                                             onClick={() => handlePageChange(page + 1)}
                                             isDisabled={page === pagination.pages}
                                             variant="outline"
-                                            colorScheme="brand"
+                                            colorScheme="gray"
                                             borderRadius="xl"
-                                            fontWeight="700"
+                                            fontWeight="800"
                                         >
                                             Next
                                         </Button>
