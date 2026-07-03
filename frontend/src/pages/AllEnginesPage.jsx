@@ -320,7 +320,6 @@ export default function AllEnginesPage({ category }) {
                     <option value="Car Engines">Car Engines</option>
                     <option value="Used Engines">Used Engines</option>
                     <option value="Reconditioned Engines">Reconditioned Engines</option>
-                    <option value="Gearboxes">Gearboxes</option>
                 </Select>
             </VStack>
 
@@ -678,8 +677,7 @@ export default function AllEnginesPage({ category }) {
                                     w="full"
                                     variants={containerVariants}
                                     initial="hidden"
-                                    whileInView="visible"
-                                    viewport={{ once: true }}
+                                    animate="visible"
                                     opacity={isFetching ? 0.7 : 1}
                                     transition="opacity 0.2s ease"
                                 >
