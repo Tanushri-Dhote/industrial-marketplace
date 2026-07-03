@@ -368,10 +368,38 @@ exports.uploadModelEngineSpecCSV = async (request, reply) => {
 			}
 
 			if (!foundModel) {
-				return reply.code(400).send({
-					success: false,
-					message: `Could not identify car model from row model: "${modelCell}" under brand ${foundBrand.name}. Please make sure the model is registered first.`
-				});
+				// Clean model name extraction (e.g. "Cx-3 2.0 Skyactiv-G" -> "Cx-3")
+				const words = cellWithoutBrand.trim().split(/\s+/);
+				let newModelName = words[0] || "";
+				if (words[0] && words[0].match(/^\d+$/) && words[1] && words[1].toLowerCase() === "series") {
+					newModelName = `${words[0]} Series`;
+				} else if (words[0] && words[0].toLowerCase() === "range" && words[1] && words[1].toLowerCase() === "rover") {
+					if (words[2] && words[2].toLowerCase() === "sport") {
+						newModelName = "Range Rover Sport";
+					} else {
+						newModelName = "Range Rover";
+					}
+				}
+
+				if (!newModelName) {
+					return reply.code(400).send({
+						success: false,
+						message: `Could not identify car model from row model: "${modelCell}" under brand ${foundBrand.name}.`
+					});
+				}
+
+				// Find or create in DB (so next iterations find it too)
+				let dbModel = await Model.findOne({ brandId: foundBrand._id, name: new RegExp(`^${newModelName}$`, "i") });
+				if (!dbModel) {
+					const newSlug = `${foundBrand.slug}-${newModelName.toLowerCase().replace(/\s+/g, "-")}`;
+					dbModel = await Model.create({
+						brandId: foundBrand._id,
+						name: newModelName,
+						slug: newSlug,
+						isActive: true
+					});
+				}
+				foundModel = dbModel;
 			}
 
 			const modelKey = foundModel.slug;
