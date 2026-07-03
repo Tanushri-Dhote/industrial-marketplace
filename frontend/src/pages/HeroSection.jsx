@@ -419,14 +419,14 @@ export default function HeroSection({ category = "Engines", initialBrand = "", i
 		<Box backgroundColor="#F8FAFC" overflow="visible">
 			{/* ── HERO VISUAL BACKGROUND SECTION ── */}
 			<Box
-				bgImage={{ base: "none", lg: "url('/hero.png')" }}
+				bgImage="url('/hero.png')"
 				bgSize="cover"
 				bgPosition="center"
 				bgRepeat="no-repeat"
 				minH={{ base: "auto", lg: "75svh" }}
 				display={{ lg: "flex" }}
 				alignItems={{ lg: "center" }}
-				py={{ base: 8, lg: 0 }}
+				py={{ base: 12, lg: 0 }}
 				overflow="visible"
 			>
 				<Container maxW="container.xl" px={{ base: 4, md: 6 }}>
@@ -637,27 +637,6 @@ export default function HeroSection({ category = "Engines", initialBrand = "", i
 						>
 							{/* Desktop Spacer (since background image contains the engine) */}
 							<Box display={{ base: "none", lg: "block" }} w="100%" h="420px" />
-
-							{/* Mobile Engine Image rendering cropped view */}
-							<Box
-								display={{ base: "block", lg: "none" }}
-								w="100%"
-								maxW="500px"
-								borderRadius="2xl"
-								overflow="hidden"
-								boxShadow="lg"
-								border="1px solid"
-								borderColor="gray.200"
-							>
-								<Image
-									src="/hero.png"
-									alt="Reconditioned Engine"
-									objectFit="cover"
-									objectPosition="right center"
-									w="100%"
-									h="260px"
-								/>
-							</Box>
 						</Box>
 					</Flex>
 				</Container>
