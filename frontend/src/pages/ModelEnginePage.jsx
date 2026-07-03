@@ -1,5 +1,5 @@
-import {
 	Box,
+	Button,
 	Center,
 	Container,
 	Heading,
@@ -370,6 +370,7 @@ export default function ModelEnginePage() {
 										<Th fontWeight="800" color={DARK} fontSize="13px" whiteSpace="nowrap">Fuel</Th>
 										<Th fontWeight="800" color={DARK} fontSize="13px" whiteSpace="normal">Engine Code</Th>
 										<Th fontWeight="800" color={DARK} fontSize="13px" whiteSpace="nowrap">Years</Th>
+										<Th whiteSpace="nowrap"></Th>
 									</Tr>
 								</Thead>
 								<Tbody>
@@ -386,6 +387,21 @@ export default function ModelEnginePage() {
 											<Td whiteSpace="nowrap">{row.fuel}</Td>
 											<Td fontFamily="mono" fontSize="12px" color="blue.600" whiteSpace="normal">{row.engineCode}</Td>
 											<Td fontWeight="600" whiteSpace="nowrap">{row.years}</Td>
+											<Td whiteSpace="nowrap" textAlign="right">
+												<Button
+													size="sm"
+													bg={RED}
+													color="white"
+													_hover={{ bg: "#c40000" }}
+													fontSize="12px"
+													fontWeight="700"
+													borderRadius="md"
+													h="32px"
+													px={4}
+												>
+													Get Quote
+												</Button>
+											</Td>
 										</Tr>
 									))}
 								</Tbody>
