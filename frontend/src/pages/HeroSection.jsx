@@ -588,7 +588,7 @@ export default function HeroSection({ category = "Engines", initialBrand = "", i
 								>
 									<Button
 										as={RouterLink}
-										to="/all-engines"
+										to="/#brand-section"
 										bg={RED}
 										color="white"
 										leftIcon={<FaCogs />}
@@ -601,6 +601,13 @@ export default function HeroSection({ category = "Engines", initialBrand = "", i
 										fontSize="15px"
 										fontWeight="700"
 										boxShadow="md"
+										onClick={(e) => {
+											const element = document.getElementById("brand-section");
+											if (element) {
+												e.preventDefault();
+												element.scrollIntoView({ behavior: "smooth" });
+											}
+										}}
 									>
 										View Engines
 									</Button>

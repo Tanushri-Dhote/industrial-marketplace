@@ -385,7 +385,7 @@ export default function BrandModelSelectorSection() {
 	}
 
 	return (
-		<Box bg={surfaceColor} py={{ base: 8, md: 10 }}>
+		<Box id="brand-section" bg={surfaceColor} py={{ base: 8, md: 10 }}>
 			<Container maxW="7xl" px={{ base: 4, md: 6 }}>
 				<VStack spacing={12} align="stretch">
 					{/* Header */}

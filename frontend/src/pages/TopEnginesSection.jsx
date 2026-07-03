@@ -325,7 +325,7 @@ export default function TopEnginesSection({ category }) {
 					{/* View All Button */}
 					<Button
 						as={RouterLink}
-						to="/all-engines"
+						to="/#brand-section"
 						bg={accentColor}
 						color="white"
 						size="lg"
@@ -333,6 +333,13 @@ export default function TopEnginesSection({ category }) {
 						fontWeight="700"
 						_hover={{
 							bg: "#b50303",
+						}}
+						onClick={(e) => {
+							const element = document.getElementById("brand-section");
+							if (element) {
+								e.preventDefault();
+								element.scrollIntoView({ behavior: "smooth" });
+							}
 						}}
 					>
 						View All Engines
