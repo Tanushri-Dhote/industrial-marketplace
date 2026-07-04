@@ -253,20 +253,22 @@ export default function Header() {
             {/* Buttons - Desktop (Always visible) */}
             <HStack spacing={3} display={{ base: 'none', md: 'flex' }}>
               {/* Phone Button */}
-              <Box
+              <Button
                 as="a"
                 href="tel:02071129397"
                 cursor="pointer"
                 bg="gray.100"
+                color="gray.800"
                 px={4}
-                h="46px"
-                display="flex"
-                alignItems="center"
+                height="46px"
                 borderRadius="md"
                 border="1px solid"
                 borderColor="gray.200"
                 _hover={{ bg: "gray.200", borderColor: "gray.300", textDecoration: "none" }}
                 transition="all 0.2s"
+                display="inline-flex"
+                alignItems="center"
+                fontWeight="700"
               >
                 <HStack spacing={2} align="center">
                   <Box
@@ -281,11 +283,11 @@ export default function Header() {
                     <FaPhoneAlt size={10} />
                   </Box>
 
-                  <Text fontWeight="700" fontSize="14px" color="gray.800">
+                  <Text fontSize="14px" color="gray.800">
                     02071129397
                   </Text>
                 </HStack>
-              </Box>
+              </Button>
 
               <Button
                 onClick={onCallSellerOpen}
