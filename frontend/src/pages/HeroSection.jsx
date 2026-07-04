@@ -665,7 +665,7 @@ export default function HeroSection({ category = "Engines", initialBrand = "", i
 						boxShadow="0 10px 40px -10px rgba(15, 23, 42, 0.08)"
 						border="1px solid"
 						borderColor="gray.200"
-						maxW="1020px"
+						maxW="1180px"
 						mx="auto"
 						position="relative"
 						zIndex={5}
@@ -959,24 +959,31 @@ export default function HeroSection({ category = "Engines", initialBrand = "", i
 									isDisabled={!selectedBrand || !selectedModel || !selectedYear || (showEngineSizeSelect && !selectedEngineSize)}
 									_hover={{ bg: "#c40000", transform: "translateY(-1px)", boxShadow: "lg" }}
 									_active={{ transform: "translateY(0)" }}
+									_disabled={{
+										bg: "#D90404",
+										color: "white",
+										opacity: 1, // Keep it fully opaque so it matches the mockup red exactly
+										cursor: "not-allowed",
+										_hover: { bg: "#D90404", transform: "none", boxShadow: "none" }
+									}}
 									transition="all 0.15s ease"
-									rightIcon={
-										<Circle size="24px" bg="white" color="#D90404" display="inline-flex" alignItems="center" justifyContent="center" ml={2}>
-											<ChevronRightIcon size={18} />
-										</Circle>
-									}
 									onClick={handleGetQuotesSubmit}
 									boxShadow="md"
 									w={{ base: "full", sm: "400px" }}
 									position="relative"
 								>
-									{/* Horizontal speed lines on left side of button */}
-									<Box position="absolute" left="15px" top="50%" transform="translateY(-50%)" display="flex" flexDirection="column" gap="4px" opacity={0.6}>
-										<Box w="18px" h="2px" bg="white" borderRadius="full" />
-										<Box w="24px" h="2px" bg="white" borderRadius="full" />
-										<Box w="14px" h="2px" bg="white" borderRadius="full" />
-									</Box>
-									<Text ml={4}>Get Free Quotes</Text>
+									<HStack spacing={2} align="center" w="full" justify="center" position="relative">
+										{/* Horizontal speed lines on left side of button content */}
+										<HStack spacing="3px" opacity={0.8} align="center" position="absolute" left="0">
+											<Box w="10px" h="2px" bg="white" borderRadius="full" />
+											<Box w="16px" h="2px" bg="white" borderRadius="full" />
+											<Box w="8px" h="2px" bg="white" borderRadius="full" />
+										</HStack>
+										<Text>Get Free Quotes</Text>
+										<Circle size="24px" bg="white" color="#D90404" display="inline-flex" alignItems="center" justify="center" position="absolute" right="0">
+											<ChevronRightIcon size={18} />
+										</Circle>
+									</HStack>
 								</Button>
 							</Box>
 
@@ -984,7 +991,7 @@ export default function HeroSection({ category = "Engines", initialBrand = "", i
 
 							{/* Bottom Row - Features & Slanted Badge */}
 							<Flex
-								direction={{ base: "column", md: "row" }}
+								direction={{ base: "column", lg: "row" }}
 								justify="space-between"
 								align="center"
 								w="full"
@@ -992,26 +999,26 @@ export default function HeroSection({ category = "Engines", initialBrand = "", i
 								position="relative"
 							>
 								{/* Bottom Row Features */}
-								<Flex direction={{ base: "column", sm: "row" }} gap={{ base: 4, md: 8 }} wrap="wrap" justify={{ base: "center", md: "start" }} py={2}>
+								<Flex direction={{ base: "column", md: "row" }} gap={{ base: 4, md: 8 }} wrap="nowrap" justify={{ base: "center", md: "start" }} py={2}>
 									<HStack spacing={3}>
 										<Circle size="38px" border="1.5px solid" borderColor="gray.200" bg="white" boxShadow="sm" flexShrink={0}>
 											<Icon as={FaTools} color="#D90404" boxSize={4} />
 										</Circle>
-										<Text fontSize="14px" fontWeight="700" color="#1E293B">Supply and Fitting Offered</Text>
+										<Text fontSize="14px" fontWeight="700" color="#1E293B" whiteSpace="nowrap">Supply and Fitting Offered</Text>
 									</HStack>
 
 									<HStack spacing={3}>
 										<Circle size="38px" border="1.5px solid" borderColor="gray.200" bg="white" boxShadow="sm" flexShrink={0}>
 											<Icon as={FaShieldAlt} color="#D90404" boxSize={4} />
 										</Circle>
-										<Text fontSize="14px" fontWeight="700" color="#1E293B">Unlimited Mileage Warranty*</Text>
+										<Text fontSize="14px" fontWeight="700" color="#1E293B" whiteSpace="nowrap">Unlimited Mileage Warranty*</Text>
 									</HStack>
 
 									<HStack spacing={3}>
 										<Circle size="38px" border="1.5px solid" borderColor="gray.200" bg="white" boxShadow="sm" flexShrink={0}>
 											<Icon as={FaClock} color="#D90404" boxSize={4} />
 										</Circle>
-										<Text fontSize="14px" fontWeight="700" color="#1E293B">It Only Takes a Minute</Text>
+										<Text fontSize="14px" fontWeight="700" color="#1E293B" whiteSpace="nowrap">It Only Takes a Minute</Text>
 									</HStack>
 								</Flex>
 
