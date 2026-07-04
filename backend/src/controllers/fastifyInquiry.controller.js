@@ -190,12 +190,14 @@ const lookupVRM = async (req, reply) => {
     }
 
     const apiKey = process.env.DVLA_API_KEY || "F4vP4DPNLSadsgBwUN3y43c7g7c8GsiI9NsKqS3q";
+    const baseUrl = process.env.DVLA_API_URL || "https://driver-vehicle-licensing.api.gov.uk/vehicle-enquiry";
 
-    const response = await fetch("https://driver-vehicle-licensing.api.gov.uk/vehicle-enquiry/v1/vehicles", {
+    const response = await fetch(`${baseUrl}/v1/vehicles`, {
       method: "POST",
       headers: {
         "x-api-key": apiKey,
         "Content-Type": "application/json",
+        "Accept": "application/json",
       },
       body: JSON.stringify({ registrationNumber: cleanedVrm }),
     });
@@ -206,7 +208,7 @@ const lookupVRM = async (req, reply) => {
 
     if (!response.ok) {
       const errText = await response.text();
-      console.error("DVLA API error response:", errText);
+      console.error(`DVLA API Error (Status ${response.status}):`, errText);
       return reply.status(response.status).send({ success: false, message: "Error querying DVLA database" });
     }
 
