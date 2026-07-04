@@ -33,6 +33,9 @@ import {
 	FaPlus,
 	FaCar,
 	FaCogs,
+	FaCalendarAlt,
+	FaClock,
+	FaStar,
 } from "react-icons/fa";
 import { MdLibraryBooks } from "react-icons/md";
 import { Link as RouterLink } from "react-router-dom";
@@ -651,267 +654,394 @@ export default function HeroSection({ category = "Engines", initialBrand = "", i
 			</Box>
 
 			{/* ── VEHICLE SELECTOR SECTION (Separate block below background visual) ── */}
-			<Box py={{ base: 8, lg: 12 }} bg="#F8FAFC">
+			<Box py={{ base: 10, lg: 14 }} bg="#F8FAFC">
 				<Container maxW="container.xl" px={{ base: 4, md: 6 }}>
 					{/* ── REDESIGNED VEHICLE SELECTOR CARD ── */}
 					<Box
 						bg="white"
-						px={{ base: 5, md: 8 }}
-						py={{ base: 6, md: 8 }}
-						borderRadius="2xl"
-						boxShadow="0 10px 30px -10px rgba(15, 23, 42, 0.08)"
+						px={{ base: 6, md: 10 }}
+						py={{ base: 8, md: 10 }}
+						borderRadius="3xl"
+						boxShadow="0 10px 40px -10px rgba(15, 23, 42, 0.08)"
 						border="1px solid"
-						borderColor="gray.100"
-						maxW="980px"
+						borderColor="gray.200"
+						maxW="1020px"
 						mx="auto"
 						position="relative"
 						zIndex={5}
 					>
-						<VStack spacing={6} align="stretch">
+						<VStack spacing={8} align="stretch">
 							{/* Header Row */}
-							<Flex justify="space-between" align="center" direction={{ base: "column", md: "row" }} gap={4}>
-								<HStack spacing={3} align="center">
-									<Circle size="42px" bg="red.50" border="1px solid" borderColor="red.100" flexShrink={0}>
-										<Icon as={Car} color={RED} boxSize={5} />
+							<Flex justify="space-between" align="center" direction={{ base: "column", md: "row" }} gap={6} w="full">
+								<HStack spacing={4} align="center">
+									<Circle size="70px" border="1.5px solid" borderColor="gray.100" bg="white" boxShadow="sm" flexShrink={0}>
+										<Icon as={FaCar} color="#D90404" boxSize="30px" />
 									</Circle>
-									<VStack align="start" spacing={0.5}>
-										<Heading as="h2" fontSize={{ base: "lg", md: "xl" }} color="gray.955" fontWeight="800">
+									<VStack align="start" spacing={1}>
+										<Heading as="h2" fontSize={{ base: "20px", md: "26px" }} color="#0F172A" fontWeight="800">
 											Select Your Vehicle Manually
 										</Heading>
-										<Text fontSize="xs" color="gray.500" fontWeight="500">
+										<Text fontSize="sm" color="gray.500" fontWeight="500">
 											Quickly find matching engines and get premium quotes in a minute
 										</Text>
 									</VStack>
 								</HStack>
 
-								<HStack spacing={2} bg="green.50" px={3} py={1.5} borderRadius="full" border="1px solid" borderColor="green.100" display={{ base: "none", md: "flex" }}>
-									<Icon as={ShieldCheck} color="green.600" boxSize={4} />
-									<Text fontSize="10px" fontWeight="700" color="green.700" letterSpacing="0.3px">
-										TRUSTED BY THOUSANDS OF CUSTOMERS
-									</Text>
-								</HStack>
+								<Box border="1.5px solid" borderColor="gray.200" borderRadius="xl" px={4} py={3} maxW="190px" bg="white" display={{ base: "none", md: "block" }}>
+									<HStack spacing={2} align="center">
+										<Icon as={FaShieldAlt} color="#0F172A" boxSize="22px" />
+										<VStack align="start" spacing={0}>
+											<Text fontSize="9px" fontWeight="800" color="gray.400" lineHeight="1">
+												TRUSTED BY
+											</Text>
+											<Text fontSize="11px" fontWeight="900" color="#0F172A" lineHeight="1.1" whiteSpace="nowrap">
+												THOUSANDS OF
+											</Text>
+											<Text fontSize="10px" fontWeight="800" color="gray.500" lineHeight="1">
+												CUSTOMERS
+											</Text>
+										</VStack>
+									</HStack>
+								</Box>
 							</Flex>
 
+							<Box w="full" h="1px" bg="gray.100" />
+
 							{/* Dropdowns Grid */}
-							<SimpleGrid columns={{ base: 1, sm: 2, md: 3, lg: showEngineSizeSelect ? 4 : 3 }} spacing={4} w="full" mt={2}>
+							<SimpleGrid columns={{ base: 1, sm: 2, md: 3, lg: (selectedBrand === "mercedes-benz" && showEngineSizeSelect) ? 5 : (selectedBrand === "mercedes-benz" || showEngineSizeSelect) ? 4 : 3 }} spacing={4} w="full">
 								{/* Brand Select */}
-								<VStack align="start" spacing={1.5} w="full">
-									<Text fontSize="xs" fontWeight="700" color="gray.500" textTransform="uppercase" letterSpacing="0.5px">
+								<VStack align="start" spacing={2} w="full">
+									<Text fontSize="14px" fontWeight="700" color="#1E293B">
 										Select Brand
 									</Text>
-									<Select
-										placeholder="Choose Brand"
-										value={selectedBrand}
-										onChange={(e) => {
-											setSelectedBrand(e.target.value);
-											setSelectedModel("");
-											setSelectedClass("");
-										}}
-										size="md"
-										h="46px"
-										bg="white"
+									<Flex
+										border="1.5px solid"
 										borderColor="gray.200"
-										borderRadius="lg"
+										borderRadius="xl"
+										overflow="hidden"
+										h="52px"
+										w="full"
+										bg="white"
+										align="center"
 										_hover={{ borderColor: "gray.300" }}
-										_focus={{ borderColor: RED, boxShadow: `0 0 0 2px rgba(225,6,0,0.1)` }}
-										fontWeight="500"
-										fontSize="sm"
+										_focusWithin={{ borderColor: RED, boxShadow: "0 0 0 1px rgba(217, 4, 4, 0.1)" }}
 									>
-										{brands.map((brand) => (
-											<option key={brand._id} value={brand.slug}>
-												{brand.name}
-											</option>
-										))}
-									</Select>
+										<Flex bg="#FEF2F2" w="50px" h="full" align="center" justify="center" borderRight="1.5px solid" borderColor="gray.200" flexShrink={0}>
+											<Icon as={FaCar} color="#D90404" boxSize={5} />
+										</Flex>
+										<Select
+											variant="unstyled"
+											placeholder="Choose Brand"
+											value={selectedBrand}
+											onChange={(e) => {
+												setSelectedBrand(e.target.value);
+												setSelectedModel("");
+												setSelectedClass("");
+											}}
+											h="full"
+											w="full"
+											px={3}
+											fontWeight="600"
+											fontSize="14px"
+											color="gray.700"
+											cursor="pointer"
+										>
+											{brands.map((brand) => (
+												<option key={brand._id} value={brand.slug}>
+													{brand.name}
+												</option>
+											))}
+										</Select>
+									</Flex>
 								</VStack>
 
 								{/* Class Select (Mercedes-Benz only) */}
 								{selectedBrand === "mercedes-benz" && (
-									<VStack align="start" spacing={1.5} w="full">
-										<Text fontSize="xs" fontWeight="700" color="gray.500" textTransform="uppercase" letterSpacing="0.5px">
+									<VStack align="start" spacing={2} w="full">
+										<Text fontSize="14px" fontWeight="700" color="#1E293B">
 											Select Class
 										</Text>
-										<Select
-											placeholder="Choose Class"
-											value={selectedClass}
-											onChange={(e) => {
-												setSelectedClass(e.target.value);
-												setSelectedModel("");
-											}}
-											size="md"
-											h="46px"
-											bg="white"
+										<Flex
+											border="1.5px solid"
 											borderColor="gray.200"
-											borderRadius="lg"
+											borderRadius="xl"
+											overflow="hidden"
+											h="52px"
+											w="full"
+											bg="white"
+											align="center"
 											_hover={{ borderColor: "gray.300" }}
-											_focus={{ borderColor: RED, boxShadow: `0 0 0 2px rgba(225,6,0,0.1)` }}
-											fontWeight="500"
-											fontSize="sm"
+											_focusWithin={{ borderColor: RED, boxShadow: "0 0 0 1px rgba(217, 4, 4, 0.1)" }}
 										>
-											{[...new Set(models.map((m) => getMercedesClass(m.name)))].sort().map((cls) => (
-												<option key={cls} value={cls}>
-													{cls}
-												</option>
-											))}
-										</Select>
+											<Flex bg="#FEF2F2" w="50px" h="full" align="center" justify="center" borderRight="1.5px solid" borderColor="gray.200" flexShrink={0}>
+												<Icon as={FaCar} color="#D90404" boxSize={5} />
+											</Flex>
+											<Select
+												variant="unstyled"
+												placeholder="Choose Class"
+												value={selectedClass}
+												onChange={(e) => {
+													setSelectedClass(e.target.value);
+													setSelectedModel("");
+												}}
+												h="full"
+												w="full"
+												px={3}
+												fontWeight="600"
+												fontSize="14px"
+												color="gray.700"
+												cursor="pointer"
+											>
+												{[...new Set(models.map((m) => getMercedesClass(m.name)))].sort().map((cls) => (
+													<option key={cls} value={cls}>
+														{cls}
+													</option>
+												))}
+											</Select>
+										</Flex>
 									</VStack>
 								)}
 
 								{/* Model Select */}
-								<VStack align="start" spacing={1.5} w="full">
-									<Text fontSize="xs" fontWeight="700" color="gray.500" textTransform="uppercase" letterSpacing="0.5px">
+								<VStack align="start" spacing={2} w="full">
+									<Text fontSize="14px" fontWeight="700" color="#1E293B">
 										Select Model
 									</Text>
-									<Select
-										placeholder={loadingModels ? "Loading Models..." : "Choose Model"}
-										value={selectedModel}
-										onChange={(e) => setSelectedModel(e.target.value)}
-										isDisabled={!selectedBrand || loadingModels || (selectedBrand === "mercedes-benz" && !selectedClass)}
-										size="md"
-										h="46px"
-										bg="white"
+									<Flex
+										border="1.5px solid"
 										borderColor="gray.200"
-										borderRadius="lg"
+										borderRadius="xl"
+										overflow="hidden"
+										h="52px"
+										w="full"
+										bg="white"
+										align="center"
 										_hover={{ borderColor: "gray.300" }}
-										_focus={{ borderColor: RED, boxShadow: `0 0 0 2px rgba(225,6,0,0.1)` }}
-										fontWeight="500"
-										fontSize="sm"
+										_focusWithin={{ borderColor: RED, boxShadow: "0 0 0 1px rgba(217, 4, 4, 0.1)" }}
 									>
-										{filteredModels.some(m => m.year || m.type) ? (
-											[...new Set(filteredModels.map(m => m.name))]
-												.sort((a, b) => a.localeCompare(b, undefined, { numeric: true }))
-												.map((name) => (
-													<option key={name} value={name}>
-														{name}
+										<Flex bg="#FEF2F2" w="50px" h="full" align="center" justify="center" borderRight="1.5px solid" borderColor="gray.200" flexShrink={0}>
+											<Icon as={FaCar} color="#D90404" boxSize={5} />
+										</Flex>
+										<Select
+											variant="unstyled"
+											placeholder={loadingModels ? "Loading Models..." : "Choose Model"}
+											value={selectedModel}
+											onChange={(e) => setSelectedModel(e.target.value)}
+											isDisabled={!selectedBrand || loadingModels || (selectedBrand === "mercedes-benz" && !selectedClass)}
+											h="full"
+											w="full"
+											px={3}
+											fontWeight="600"
+											fontSize="14px"
+											color="gray.700"
+											cursor="pointer"
+										>
+											{filteredModels.some(m => m.year || m.type) ? (
+												[...new Set(filteredModels.map(m => m.name))]
+													.sort((a, b) => a.localeCompare(b, undefined, { numeric: true }))
+													.map((name) => (
+														<option key={name} value={name}>
+															{name}
+														</option>
+													))
+											) : (
+												filteredModels.map((model) => (
+													<option key={model._id} value={model.slug}>
+														{model.name}
 													</option>
 												))
-										) : (
-											filteredModels.map((model) => (
-												<option key={model._id} value={model.slug}>
-													{model.name}
-												</option>
-											))
-										)}
-									</Select>
+											)}
+										</Select>
+									</Flex>
 								</VStack>
 
 								{/* Year Select */}
-								<VStack align="start" spacing={1.5} w="full">
-									<Text fontSize="xs" fontWeight="700" color="gray.500" textTransform="uppercase" letterSpacing="0.5px">
+								<VStack align="start" spacing={2} w="full">
+									<Text fontSize="14px" fontWeight="700" color="#1E293B">
 										Select Year
 									</Text>
-									<Select
-										placeholder={loadingProducts ? "Loading Years..." : "Choose Year"}
-										value={selectedYear}
-										onChange={(e) => setSelectedYear(e.target.value)}
-										isDisabled={!selectedModel || loadingProducts}
-										size="md"
-										h="46px"
-										bg="white"
+									<Flex
+										border="1.5px solid"
 										borderColor="gray.200"
-										borderRadius="lg"
+										borderRadius="xl"
+										overflow="hidden"
+										h="52px"
+										w="full"
+										bg="white"
+										align="center"
 										_hover={{ borderColor: "gray.300" }}
-										_focus={{ borderColor: RED, boxShadow: `0 0 0 2px rgba(225,6,0,0.1)` }}
-										fontWeight="500"
-										fontSize="sm"
+										_focusWithin={{ borderColor: RED, boxShadow: "0 0 0 1px rgba(217, 4, 4, 0.1)" }}
 									>
-										{dynamicYears.map((y) => (
-											<option key={y} value={y}>
-												{y}
-											</option>
-										))}
-									</Select>
+										<Flex bg="#FEF2F2" w="50px" h="full" align="center" justify="center" borderRight="1.5px solid" borderColor="gray.200" flexShrink={0}>
+											<Icon as={FaCalendarAlt} color="#D90404" boxSize={5} />
+										</Flex>
+										<Select
+											variant="unstyled"
+											placeholder={loadingProducts ? "Loading Years..." : "Choose Year"}
+											value={selectedYear}
+											onChange={(e) => setSelectedYear(e.target.value)}
+											isDisabled={!selectedModel || loadingProducts}
+											h="full"
+											w="full"
+											px={3}
+											fontWeight="600"
+											fontSize="14px"
+											color="gray.700"
+											cursor="pointer"
+										>
+											{dynamicYears.map((y) => (
+												<option key={y} value={y}>
+													{y}
+												</option>
+											))}
+										</Select>
+									</Flex>
 								</VStack>
 
 								{/* Engine Size Select */}
 								{showEngineSizeSelect && (
-									<VStack align="start" spacing={1.5} w="full">
-										<Text fontSize="xs" fontWeight="700" color="gray.500" textTransform="uppercase" letterSpacing="0.5px">
+									<VStack align="start" spacing={2} w="full">
+										<Text fontSize="14px" fontWeight="700" color="#1E293B">
 											Engine Size / Type
 										</Text>
-										<Select
-											placeholder={loadingProducts ? "Loading Engines..." : "Select Engine Size/Type"}
-											value={selectedEngineSize}
-											onChange={(e) => setSelectedEngineSize(e.target.value)}
-											isDisabled={!selectedYear || loadingProducts}
-											size="md"
-											h="46px"
-											bg="white"
+										<Flex
+											border="1.5px solid"
 											borderColor="gray.200"
-											borderRadius="lg"
+											borderRadius="xl"
+											overflow="hidden"
+											h="52px"
+											w="full"
+											bg="white"
+											align="center"
 											_hover={{ borderColor: "gray.300" }}
-											_focus={{ borderColor: RED, boxShadow: `0 0 0 2px rgba(225,6,0,0.1)` }}
-											fontWeight="500"
-											fontSize="sm"
+											_focusWithin={{ borderColor: RED, boxShadow: "0 0 0 1px rgba(217, 4, 4, 0.1)" }}
 										>
-											{dynamicEngines.map((size) => (
-												<option key={size} value={size}>
-													{size}
-												</option>
-											))}
-										</Select>
+											<Flex bg="#FEF2F2" w="50px" h="full" align="center" justify="center" borderRight="1.5px solid" borderColor="gray.200" flexShrink={0}>
+												<Icon as={FaCogs} color="#D90404" boxSize={5} />
+											</Flex>
+											<Select
+												variant="unstyled"
+												placeholder={loadingProducts ? "Loading Engines..." : "Select Engine Size/Type"}
+												value={selectedEngineSize}
+												onChange={(e) => setSelectedEngineSize(e.target.value)}
+												isDisabled={!selectedYear || loadingProducts}
+												h="full"
+												w="full"
+												px={3}
+												fontWeight="600"
+												fontSize="14px"
+												color="gray.700"
+												cursor="pointer"
+											>
+												{dynamicEngines.map((size) => (
+													<option key={size} value={size}>
+														{size}
+													</option>
+												))}
+											</Select>
+										</Flex>
 									</VStack>
 								)}
 							</SimpleGrid>
 
-							{/* Get Free Quotes Button aligned below */}
-							<Box w="full" display="flex" justifyContent="center" mt={2}>
+							{/* Center Button Row */}
+							<Box w="full" display="flex" justifyContent="center" mt={4} position="relative">
+								{/* Button styled with gradient fade-in speed lines layout */}
 								<Button
-									bg={RED}
+									bg="#D90404"
+									bgGradient="linear(to-r, rgba(217,4,4,0) 0%, rgba(217,4,4,0.4) 15%, #D90404 35%)"
 									color="white"
-									borderRadius="lg"
-									h="50px"
-									px={12}
-									fontSize="md"
+									borderRadius="xl"
+									h="54px"
+									px={16}
+									fontSize="18px"
 									fontWeight="800"
 									isDisabled={!selectedBrand || !selectedModel || !selectedYear || (showEngineSizeSelect && !selectedEngineSize)}
 									_hover={{ bg: "#c40000", transform: "translateY(-1px)", boxShadow: "lg" }}
 									_active={{ transform: "translateY(0)" }}
 									transition="all 0.15s ease"
 									rightIcon={
-										<Circle size="20px" bg="white" color={RED} display="inline-flex" alignItems="center" justifyContent="center">
-											<ChevronRightIcon size={14} />
+										<Circle size="24px" bg="white" color="#D90404" display="inline-flex" alignItems="center" justifyContent="center" ml={2}>
+											<ChevronRightIcon size={18} />
 										</Circle>
 									}
 									onClick={handleGetQuotesSubmit}
-									boxShadow="sm"
-									w={{ base: "full", sm: "auto" }}
+									boxShadow="md"
+									w={{ base: "full", sm: "400px" }}
+									position="relative"
 								>
-									Get Free Quotes
+									{/* Horizontal speed lines on left side of button */}
+									<Box position="absolute" left="15px" top="50%" transform="translateY(-50%)" display="flex" flexDirection="column" gap="4px" opacity={0.6}>
+										<Box w="18px" h="2px" bg="white" borderRadius="full" />
+										<Box w="24px" h="2px" bg="white" borderRadius="full" />
+										<Box w="14px" h="2px" bg="white" borderRadius="full" />
+									</Box>
+									<Text ml={4}>Get Free Quotes</Text>
 								</Button>
 							</Box>
 
-							{/* Bottom Row - Features & Badge */}
+							<Box w="full" h="1px" bg="gray.100" />
+
+							{/* Bottom Row - Features & Slanted Badge */}
 							<Flex
 								direction={{ base: "column", md: "row" }}
 								justify="space-between"
 								align="center"
 								w="full"
-								pt={4}
-								borderTop="1px solid"
-								borderColor="gray.100"
 								gap={4}
-								mt={2}
+								position="relative"
 							>
-								<HStack spacing={{ base: 4, md: 8 }} wrap="wrap" justify={{ base: "center", md: "start" }} w="full">
-									<HStack spacing={2}>
-										<Icon as={Wrench} color="green.500" boxSize={4} />
-										<Text fontSize="xs" fontWeight="700" color="gray.600">Supply and Fitting Offered</Text>
+								{/* Bottom Row Features */}
+								<Flex direction={{ base: "column", sm: "row" }} gap={{ base: 4, md: 8 }} wrap="wrap" justify={{ base: "center", md: "start" }} py={2}>
+									<HStack spacing={3}>
+										<Circle size="38px" border="1.5px solid" borderColor="gray.200" bg="white" boxShadow="sm" flexShrink={0}>
+											<Icon as={FaTools} color="#D90404" boxSize={4} />
+										</Circle>
+										<Text fontSize="14px" fontWeight="700" color="#1E293B">Supply and Fitting Offered</Text>
 									</HStack>
-									<HStack spacing={2}>
-										<Icon as={ShieldCheck} color="green.500" boxSize={4} />
-										<Text fontSize="xs" fontWeight="700" color="gray.600">Unlimited Mileage Warranty*</Text>
-									</HStack>
-									<HStack spacing={2}>
-										<Icon as={Clock} color="green.500" boxSize={4} />
-										<Text fontSize="xs" fontWeight="700" color="gray.600">It Only Takes a Minute</Text>
-									</HStack>
-								</HStack>
 
-								<HStack spacing={2} bg="red.50" px={3} py={1.5} borderRadius="full" border="1px solid" borderColor="red.100" flexShrink={0}>
-									<Icon as={BadgePercent} color={RED} boxSize={4} />
-									<Text fontSize="xs" fontWeight="900" color={RED} letterSpacing="0.5px">GUARANTEED LOWEST PRICES</Text>
-								</HStack>
+									<HStack spacing={3}>
+										<Circle size="38px" border="1.5px solid" borderColor="gray.200" bg="white" boxShadow="sm" flexShrink={0}>
+											<Icon as={FaShieldAlt} color="#D90404" boxSize={4} />
+										</Circle>
+										<Text fontSize="14px" fontWeight="700" color="#1E293B">Unlimited Mileage Warranty*</Text>
+									</HStack>
+
+									<HStack spacing={3}>
+										<Circle size="38px" border="1.5px solid" borderColor="gray.200" bg="white" boxShadow="sm" flexShrink={0}>
+											<Icon as={FaClock} color="#D90404" boxSize={4} />
+										</Circle>
+										<Text fontSize="14px" fontWeight="700" color="#1E293B">It Only Takes a Minute</Text>
+									</HStack>
+								</Flex>
+
+								{/* Slanted Black Badge */}
+								<Box
+									bg="#111827"
+									h="78px"
+									w="270px"
+									position="relative"
+									clipPath={{ base: "none", md: "polygon(18px 0, 100% 0, 100% 100%, 0 100%)" }}
+									borderRadius={{ base: "xl", md: "0 xl xl 0" }}
+									flexShrink={0}
+								>
+									<HStack spacing={3} pl={{ base: 4, md: 8 }} pr={4} h="full" align="center">
+										<Circle size="36px" border="1.5px solid rgba(255, 255, 255, 0.4)" bg="transparent" flexShrink={0}>
+											<Icon as={FaStar} color="white" boxSize={4} />
+										</Circle>
+										<VStack align="start" spacing={0} justify="center">
+											<Text fontSize="10px" fontWeight="700" color="white" letterSpacing="0.5px" lineHeight="1">
+												GUARANTEED
+											</Text>
+											<Text fontSize="18px" fontWeight="950" color="#D90404" my={0.5} lineHeight="1" letterSpacing="-0.2px">
+												LOWEST
+											</Text>
+											<Text fontSize="12px" fontWeight="800" color="white" letterSpacing="0.5px" lineHeight="1">
+												PRICES
+											</Text>
+										</VStack>
+									</HStack>
+								</Box>
 							</Flex>
 						</VStack>
 					</Box>
