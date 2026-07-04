@@ -423,7 +423,7 @@ export default function HeroSection({ category = "Engines", initialBrand = "", i
 		<Box backgroundColor="#F8FAFC" overflow="visible">
 			{/* ── HERO VISUAL BACKGROUND SECTION ── */}
 			<Box
-				bgImage="url('/hero.png')"
+				bgImage={{ base: "url('/hero-mobile.png')", lg: "url('/hero.png')" }}
 				bgSize="cover"
 				bgPosition="center"
 				bgRepeat="no-repeat"
