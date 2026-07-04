@@ -25,7 +25,7 @@ import {
 	EmailIcon,
 	PhoneIcon,
 } from "@chakra-ui/icons";
-import { MapPin, Settings, Package, User, MessageSquare, Truck, ShieldCheck } from "lucide-react";
+import { MapPin, Settings, Package, User, MessageSquare, Truck, ShieldCheck, AlertTriangle } from "lucide-react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { toast } from "sonner";
@@ -99,17 +99,19 @@ export default function CallSellerPage({
 	const [dvlaData, setDvlaData] = useState(null);
 	const [isLoadingVehicle, setIsLoadingVehicle] = useState(false);
 	const [debouncedVrm, setDebouncedVrm] = useState("");
-
+	const [lookupError, setLookupError] = useState("");
+ 
 	useEffect(() => {
 		const handler = setTimeout(() => {
 			setDebouncedVrm(manualVrm);
 		}, 500);
 		return () => clearTimeout(handler);
 	}, [manualVrm]);
-
+ 
 	const fetchVehicleDetails = async (vrmToLookup) => {
 		if (!vrmToLookup) return;
 		setIsLoadingVehicle(true);
+		setLookupError("");
 		try {
 			const API_URL = import.meta.env.VITE_API_URL;
 			const res = await fetch(`${API_URL}/lookup-vrm`, {
@@ -129,12 +131,18 @@ export default function CallSellerPage({
 				const fuel = vehicle.fuelType ? vehicle.fuelType.toUpperCase() : "";
 				const engineSpec = [capacityL, fuel].filter(Boolean).join(" ");
 				setDvlaEngineType(engineSpec);
+				setLookupError("");
 			} else {
 				setDvlaData(null);
 				setDvlaBrand("");
 				setDvlaModel("");
 				setDvlaYear("");
 				setDvlaEngineType("");
+				if (res.status === 404) {
+					setLookupError("Vehicle details not found for this registration.");
+				} else {
+					setLookupError("Unable to verify vehicle details automatically. Please enter manually.");
+				}
 			}
 		} catch (err) {
 			console.error("DVLA lookup error:", err);
@@ -143,11 +151,12 @@ export default function CallSellerPage({
 			setDvlaModel("");
 			setDvlaYear("");
 			setDvlaEngineType("");
+			setLookupError("Unable to verify vehicle details automatically. Please enter manually.");
 		} finally {
 			setIsLoadingVehicle(false);
 		}
 	};
-
+ 
 	useEffect(() => {
 		const targetVrm = (debouncedVrm || "").trim() || safeVrm || "";
 		if (!targetVrm) {
@@ -156,9 +165,10 @@ export default function CallSellerPage({
 			setDvlaModel("");
 			setDvlaYear("");
 			setDvlaEngineType("");
+			setLookupError("");
 			return;
 		}
-
+ 
 		const cleaned = targetVrm.replace(/\s+/g, "").toUpperCase();
 		const ukVrmRegex = /^[A-Z]{2}[0-9]{2}[A-Z]{3}$|^[A-Z]{1,2}[0-9]{1,4}[A-Z]{1,3}$/;
 		if (ukVrmRegex.test(cleaned)) {
@@ -169,6 +179,11 @@ export default function CallSellerPage({
 			setDvlaModel("");
 			setDvlaYear("");
 			setDvlaEngineType("");
+			if (cleaned.length >= 4) {
+				setLookupError("Invalid UK registration format (e.g. AB12CDE).");
+			} else {
+				setLookupError("");
+			}
 		}
 	}, [debouncedVrm, safeVrm]);
 
@@ -418,6 +433,24 @@ export default function CallSellerPage({
 														</Text>
 														<Text fontSize="10px" color="green.600" textAlign="left">
 															Engine: {dvlaData.engineCapacity ? `${(dvlaData.engineCapacity/1000).toFixed(1)}L` : "N/A"} | Fuel: {dvlaData.fuelType || "N/A"}
+														</Text>
+													</VStack>
+												</HStack>
+											</Box>
+										)}
+
+										{!isLoadingVehicle && lookupError && (
+											<Box mt={3} p={3} bg="orange.50" border="1px solid" borderColor="orange.200" borderRadius="lg">
+												<HStack spacing={2.5} align="start">
+													<Box color="orange.600" mt="2px">
+														<AlertTriangle size={16} />
+													</Box>
+													<VStack align="start" spacing={0.5}>
+														<Text fontSize="xs" fontWeight="bold" color="orange.800" textAlign="left">
+															{lookupError}
+														</Text>
+														<Text fontSize="10px" color="orange.600" textAlign="left">
+															You can still continue and enter details manually below.
 														</Text>
 													</VStack>
 												</HStack>
