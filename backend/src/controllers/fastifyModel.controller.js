@@ -361,7 +361,13 @@ exports.uploadModelEngineSpecCSV = async (request, reply) => {
 
 			let foundModel = null;
 			for (const m of brandModels) {
-				const regex = new RegExp(`^${m.name}\\b`, "i");
+				let escapedName = m.name.replace(/[-\/\\^$*+?.()|[\]{}]/g, (match) => {
+					if (match === '-' || match === ' ') return match;
+					return '\\' + match;
+				});
+				escapedName = escapedName.replace(/[\s-]+/g, "[\\s-]*");
+				const regex = new RegExp(`^${escapedName}\\b`, "i");
+
 				if (regex.test(cellWithoutBrand)) {
 					foundModel = m;
 					break;
