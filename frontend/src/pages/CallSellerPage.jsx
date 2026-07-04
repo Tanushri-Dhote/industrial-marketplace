@@ -131,6 +131,7 @@ export default function CallSellerPage({
 				const fuel = vehicle.fuelType ? vehicle.fuelType.toUpperCase() : "";
 				const engineSpec = [capacityL, fuel].filter(Boolean).join(" ");
 				setDvlaEngineType(engineSpec);
+				setVrmEngineType(engineSpec);
 				setLookupError("");
 			} else {
 				setDvlaData(null);
@@ -165,6 +166,7 @@ export default function CallSellerPage({
 			setDvlaModel("");
 			setDvlaYear("");
 			setDvlaEngineType("");
+			setVrmEngineType(toText(actualType));
 			setLookupError("");
 			return;
 		}
