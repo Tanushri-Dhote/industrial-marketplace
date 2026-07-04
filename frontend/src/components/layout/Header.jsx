@@ -102,11 +102,38 @@ export default function Header() {
   // Navigation items configuration
   const navItems = [
     { path: "/", label: "Home", icon: FaHome },
-    { path: "/all-engines", label: "All Engines", icon: FaCar },
+    { path: "/#brand-section", label: "All Engines", icon: FaCar },
     { path: "/about", label: "About Us", icon: FaInfoCircle },
     { path: "/terms-and-conditions", label: "Terms & Conditions", icon: FaFileContract },
     { path: "/privacy-policy", label: "Privacy Policy", icon: FaShieldAlt },
   ];
+
+  const isItemActive = (item) => {
+    if (item.path.includes('#')) {
+      const [path, hash] = item.path.split('#');
+      const targetPath = path || "/";
+      return location.pathname === targetPath && location.hash === `#${hash}`;
+    }
+    if (item.path === "/") {
+      return location.pathname === "/" && !location.hash;
+    }
+    return location.pathname === item.path;
+  };
+
+  const handleNavItemClick = (e, item) => {
+    if (item.path.includes('#')) {
+      const [path, hash] = item.path.split('#');
+      const targetPath = path || "/";
+      if (location.pathname === targetPath) {
+        const element = document.getElementById(hash);
+        if (element) {
+          e.preventDefault();
+          element.scrollIntoView({ behavior: "smooth" });
+          navigate(item.path);
+        }
+      }
+    }
+  };
 
   if (isLoggedIn) {
     return <AdminHeader user={userData} onLogout={handleLogout} />;
@@ -221,7 +248,7 @@ export default function Header() {
               transition="all 0.25s ease"
             >
               {navItems.map((item) => {
-                const isActive = location.pathname === item.path;
+                const isActive = isItemActive(item);
                 return (
                   <ChakraLink
                     key={item.path}
@@ -232,6 +259,7 @@ export default function Header() {
                     _hover={{ color: accentColor, textDecoration: "none" }}
                     pb={1}
                     fontWeight={isActive ? "600" : "500"}
+                    onClick={(e) => handleNavItemClick(e, item)}
                   >
                     {item.label}
                     {isActive && (
@@ -326,6 +354,7 @@ export default function Header() {
             <VStack spacing={1} py={4} align="stretch">
               {navItems.map((item) => {
                 const Icon = item.icon;
+                const isActive = isItemActive(item);
                 return (
                   <Button
                     key={item.path}
@@ -333,11 +362,14 @@ export default function Header() {
                     justifyContent="flex-start"
                     as={Link}
                     to={item.path}
-                    onClick={onToggle}
+                    onClick={(e) => {
+                      onToggle();
+                      handleNavItemClick(e, item);
+                    }}
                     fontSize="14px"
-                    fontWeight={location.pathname === item.path ? "600" : "500"}
-                    color={location.pathname === item.path ? accentColor : "gray.700"}
-                    bg={location.pathname === item.path ? `${accentColor}10` : "transparent"}
+                    fontWeight={isActive ? "600" : "500"}
+                    color={isActive ? accentColor : "gray.700"}
+                    bg={isActive ? `${accentColor}10` : "transparent"}
                     leftIcon={<Icon />}
                     _hover={{ bg: `${accentColor}10`, color: accentColor }}
                   >

@@ -88,7 +88,7 @@ export default function Footer() {
             </Heading>
 
             <FooterLink to="/">Home</FooterLink>
-            <FooterLink to="/all-engines">All Engines</FooterLink>
+            <FooterLink to="/#brand-section">All Engines</FooterLink>
             <FooterLink to="/about">About Us</FooterLink>
             <FooterLink to="/contact">Contact</FooterLink>
           </Stack>
