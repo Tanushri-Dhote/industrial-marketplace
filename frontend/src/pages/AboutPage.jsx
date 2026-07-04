@@ -370,7 +370,7 @@ const AboutPage = () => {
               >
                 <Button
                   as={RouterLink}
-                  to="/all-engines"
+                  to="/#brand-section"
                   bg={RED}
                   color="white"
                   size="lg"

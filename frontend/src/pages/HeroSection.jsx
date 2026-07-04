@@ -376,7 +376,7 @@ export default function HeroSection({ category = "Engines", initialBrand = "", i
 		if (selectedBrand) query.append("brand", selectedBrand);
 		if (selectedModel) query.append("model", selectedModel);
 
-		navigate(`/all-engines?${query.toString()}`);
+		navigate(`/#brand-section?${query.toString()}`);
 	};
 
 	const handleGetQuotesSubmit = () => {

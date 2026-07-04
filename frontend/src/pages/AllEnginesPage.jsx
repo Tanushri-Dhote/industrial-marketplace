@@ -81,6 +81,11 @@ const SkeletonCard = () => (
 export default function AllEnginesPage({ category }) {
     const location = useLocation();
     const navigate = useNavigate();
+
+    useEffect(() => {
+        navigate("/#brand-section", { replace: true });
+    }, [navigate]);
+
     const [searchParams, setSearchParams] = useSearchParams();
 
     const search = searchParams.get("search") || "";
@@ -288,7 +293,7 @@ export default function AllEnginesPage({ category }) {
                             setSelectedCategory("");
                             setSearchInput("");
                             setSearchVal("");
-                            navigate("/all-engines");
+                            navigate("/#brand-section");
                         }}
                     >
                         Reset All
@@ -511,7 +516,7 @@ export default function AllEnginesPage({ category }) {
                             setSelectedCategory("");
                             setSearchInput("");
                             setSearchVal("");
-                            navigate("/all-engines");
+                            navigate("/#brand-section");
                         }}
                         fontWeight="700"
                     >

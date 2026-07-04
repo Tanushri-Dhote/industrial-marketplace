@@ -1,5 +1,5 @@
 import React from "react";
-import { Routes, Route, useLocation } from "react-router-dom";
+import { Routes, Route, useLocation, Navigate } from "react-router-dom";
 import { Box } from "@chakra-ui/react";
 import Header from "./components/layout/Header";
 import Footer from "./components/layout/Footer";
@@ -67,7 +67,7 @@ function App() {
 						<Route path="/blog/:slug" element={<BlogDetailPage />} />
 						<Route path="/products" element={<ProductsPage />} />
 						<Route path="/products/:id" element={<ProductDetailPage />} />
-						<Route path="/all-engines" element={<AllEnginesPage />} />
+						<Route path="/all-engines" element={<Navigate to="/#brand-section" replace />} />
 
 						<Route
 							path="/dashboard"
