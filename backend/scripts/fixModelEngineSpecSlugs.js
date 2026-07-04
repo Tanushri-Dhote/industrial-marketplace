@@ -51,8 +51,7 @@ async function run() {
 					console.log(`Current doc has more/equal rows (${currentCount} >= ${dupCount}). Deleting duplicate and renaming current...`);
 					await ModelEngineSpec.deleteOne({ _id: duplicate._id });
 					
-					spec.modelSlug = cleanModelSlug;
-					await spec.save();
+					await ModelEngineSpec.updateOne({ _id: spec._id }, { $set: { modelSlug: cleanModelSlug } });
 					updatedCount++;
 				} else {
 					console.log(`Duplicate doc has more rows (${dupCount} > ${currentCount}). Deleting current redundant doc...`);
@@ -61,8 +60,7 @@ async function run() {
 				}
 			} else {
 				// No duplicate, safe to update directly
-				spec.modelSlug = cleanModelSlug;
-				await spec.save();
+				await ModelEngineSpec.updateOne({ _id: spec._id }, { $set: { modelSlug: cleanModelSlug } });
 				updatedCount++;
 			}
 		}
