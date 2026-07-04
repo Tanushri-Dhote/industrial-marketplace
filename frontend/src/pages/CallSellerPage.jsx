@@ -16,6 +16,7 @@ import {
 	Icon,
 	Divider,
 	SimpleGrid,
+	Spinner,
 } from "@chakra-ui/react";
 import {
 	CheckCircleIcon,
@@ -90,6 +91,86 @@ export default function CallSellerPage({
 		email: "",
 		phone: "+44 ",
 	});
+
+	const [dvlaBrand, setDvlaBrand] = useState("");
+	const [dvlaModel, setDvlaModel] = useState("");
+	const [dvlaYear, setDvlaYear] = useState("");
+	const [dvlaEngineType, setDvlaEngineType] = useState("");
+	const [dvlaData, setDvlaData] = useState(null);
+	const [isLoadingVehicle, setIsLoadingVehicle] = useState(false);
+	const [debouncedVrm, setDebouncedVrm] = useState("");
+
+	useEffect(() => {
+		const handler = setTimeout(() => {
+			setDebouncedVrm(manualVrm);
+		}, 500);
+		return () => clearTimeout(handler);
+	}, [manualVrm]);
+
+	const fetchVehicleDetails = async (vrmToLookup) => {
+		if (!vrmToLookup) return;
+		setIsLoadingVehicle(true);
+		try {
+			const API_URL = import.meta.env.VITE_API_URL;
+			const res = await fetch(`${API_URL}/lookup-vrm`, {
+				method: "POST",
+				headers: { "Content-Type": "application/json" },
+				body: JSON.stringify({ vrm: vrmToLookup }),
+			});
+			const result = await res.json();
+			if (res.ok && result.success && result.data) {
+				const vehicle = result.data;
+				setDvlaData(vehicle);
+				setDvlaBrand(vehicle.make || "");
+				setDvlaModel(vehicle.model || "");
+				setDvlaYear(vehicle.year ? String(vehicle.year) : "");
+				
+				const capacityL = vehicle.engineCapacity ? (vehicle.engineCapacity / 1000).toFixed(1) + "L" : "";
+				const fuel = vehicle.fuelType ? vehicle.fuelType.toUpperCase() : "";
+				const engineSpec = [capacityL, fuel].filter(Boolean).join(" ");
+				setDvlaEngineType(engineSpec);
+			} else {
+				setDvlaData(null);
+				setDvlaBrand("");
+				setDvlaModel("");
+				setDvlaYear("");
+				setDvlaEngineType("");
+			}
+		} catch (err) {
+			console.error("DVLA lookup error:", err);
+			setDvlaData(null);
+			setDvlaBrand("");
+			setDvlaModel("");
+			setDvlaYear("");
+			setDvlaEngineType("");
+		} finally {
+			setIsLoadingVehicle(false);
+		}
+	};
+
+	useEffect(() => {
+		const targetVrm = (debouncedVrm || "").trim() || safeVrm || "";
+		if (!targetVrm) {
+			setDvlaData(null);
+			setDvlaBrand("");
+			setDvlaModel("");
+			setDvlaYear("");
+			setDvlaEngineType("");
+			return;
+		}
+
+		const cleaned = targetVrm.replace(/\s+/g, "").toUpperCase();
+		const ukVrmRegex = /^[A-Z]{2}[0-9]{2}[A-Z]{3}$|^[A-Z]{1,2}[0-9]{1,4}[A-Z]{1,3}$/;
+		if (ukVrmRegex.test(cleaned)) {
+			fetchVehicleDetails(cleaned);
+		} else {
+			setDvlaData(null);
+			setDvlaBrand("");
+			setDvlaModel("");
+			setDvlaYear("");
+			setDvlaEngineType("");
+		}
+	}, [debouncedVrm, safeVrm]);
 
 	const handlePhoneChange = (val) => {
 		// Allow only numbers, +, and space
@@ -178,10 +259,10 @@ export default function CallSellerPage({
 				headers: { "Content-Type": "application/json" },
 				body: JSON.stringify({
 					vrm: finalVehicleVrm,
-					brand,
-					model,
-					year,
-					engineType: brand ? actualType : vrmEngineType,
+					brand: dvlaBrand || brand,
+					model: dvlaModel || model,
+					year: dvlaYear || year,
+					engineType: dvlaEngineType || (brand ? actualType : vrmEngineType),
 					category,
 					engineOptions,
 					fittingOptions,
@@ -202,12 +283,12 @@ export default function CallSellerPage({
 	};
 
 	const ProgressBar = () => (
-		<HStack w="full" spacing={4} mb={10}>
+		<HStack w="full" spacing={3} mb={5}>
 			{[1, 2, 3].map((i) => (
 				<Box
 					key={i}
 					flex={1}
-					h="8px"
+					h="4px"
 					bg={step >= i ? RED : "#E5E7EB"}
 					borderRadius="full"
 				/>
@@ -216,8 +297,8 @@ export default function CallSellerPage({
 	);
 
 	return (
-		<Box bg="#f7f7f7" minH={isModal ? "auto" : "100vh"} py={{ base: 8, md: 16 }}>
-			<Container maxW="container.md">
+		<Box bg={isModal ? "transparent" : "#f7f7f7"} minH={isModal ? "auto" : "100vh"} py={isModal ? 4 : { base: 8, md: 16 }}>
+			<Container maxW={isModal ? "full" : "container.md"} px={isModal ? 5 : undefined}>
 				<ProgressBar />
 
 				<AnimatePresence mode="wait">
@@ -229,317 +310,356 @@ export default function CallSellerPage({
 							animate={{ opacity: 1, y: 0 }}
 							exit={{ opacity: 0, y: -40 }}
 						>
-							{/* Vehicle Info */}
-							<Box bg="white" borderRadius="3xl" p={8} mb={10} boxShadow="lg">
-								<HStack spacing={5}>
-									<Box bg={RED} color="white" p={5} borderRadius="2xl">
-										<Settings size={32} />
-									</Box>
-									<VStack align="start" spacing={1}>
-										<Text fontSize="sm" fontWeight="700" color="gray.500" textTransform="uppercase" letterSpacing="1px">
-											YOUR VEHICLE
-										</Text>
-										<Heading size="lg" color={DARK}>
-											{hasVehicle ? (safeVrm || `${safeBrand} ${safeModel} ${safeYear}`) : "Enter Registration"}
-										</Heading>
-									</VStack>
-								</HStack>
-
-								{!safeVrm && (
-									<Box
-										position="relative"
-										bg="#FFD300"
-										border="3px solid #111111"
-										borderRadius="xl"
-										h="76px"
-										w="full"
-										overflow="hidden"
-										boxShadow="md"
-										display="flex"
-										alignItems="center"
-										mt={6}
-									>
-										{/* Blue UK Band */}
-										<VStack
-											bg="#003399"
-											w="50px"
-											h="full"
-											justify="center"
-											spacing={1.5}
-											px={2}
-											flexShrink={0}
-											borderRight="1px solid #111111"
-										>
-											{/* SVG Union Jack */}
-											<Box w="28px" h="16px" borderRadius="xs" overflow="hidden">
-												<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 30" width="100%" height="100%">
-													<clipPath id="s">
-														<path d="M0,0 L60,0 L60,30 L0,30 Z"/>
-													</clipPath>
-													<clipPath id="t">
-														<path d="M30,15 L0,0 L0,30 Z"/>
-													</clipPath>
-													<path d="M0,0 L60,30 M60,0 L0,30" stroke="#fff" strokeWidth="6"/>
-													<path d="M0,0 L60,30 M60,0 L0,30" stroke="#c8102e" strokeWidth="4"/>
-													<path d="M30,0 L30,30 M0,15 L60,15" stroke="#fff" strokeWidth="10"/>
-													<path d="M30,0 L30,30 M0,15 L60,15" stroke="#c8102e" strokeWidth="6"/>
-												</svg>
-											</Box>
-											<Text color="#FFD300" fontSize="11px" fontWeight="900" lineHeight="1" letterSpacing="0.5px">
-												UK
-											</Text>
-										</VStack>
-
-										{/* Input Field */}
-										<Input
-											value={manualVrm}
-											onChange={(e) => setManualVrm(e.target.value.toUpperCase().replace(/\s+/g, ""))}
-											placeholder="ENTER YOUR REG"
-											border="none"
-											bg="transparent"
-											h="full"
-											flex="1"
-											color="#111111"
-											fontSize="28px"
-											fontWeight="bold"
-											fontFamily="'Impact', 'Arial Black', sans-serif"
-											letterSpacing="4px"
-											textAlign="center"
-											_focus={{ boxShadow: "none" }}
-											_placeholder={{ color: "rgba(17, 17, 17, 0.35)", letterSpacing: "2px" }}
-											textTransform="uppercase"
-										/>
-									</Box>
-								)}
+							<Box mb={5}>
+								<Heading size="lg" mb={1} color={DARK}>Tell Us What You Need</Heading>
+								<Text fontSize="sm" color="gray.600">Select your preferences to get accurate quotes</Text>
 							</Box>
 
-							<VStack spacing={10} align="stretch">
-								<Box>
-									<Heading size="xl" mb={2} color={DARK}>Tell Us What You Need</Heading>
-									<Text color="gray.600">Select your preferences to get accurate quotes</Text>
-								</Box>
+							<SimpleGrid columns={{ base: 1, md: 2 }} spacing={6} alignItems="start">
+								{/* Left Column */}
+								<VStack spacing={4} align="stretch">
+									{/* Vehicle Info */}
+									<Box bg="white" borderRadius="xl" p={4} border="1px solid" borderColor="gray.100" boxShadow="sm">
+										<HStack spacing={3}>
+											<Box bg={RED} color="white" p={2.5} borderRadius="lg">
+												<Settings size={20} />
+											</Box>
+											<VStack align="start" spacing={0}>
+												<Text fontSize="xs" fontWeight="700" color="gray.500" textTransform="uppercase" letterSpacing="0.5px">
+													YOUR VEHICLE
+												</Text>
+												<Heading size="xs" fontSize="15px" color={DARK}>
+													{hasVehicle ? (safeVrm || `${safeBrand} ${safeModel} ${safeYear}`) : "Enter Registration"}
+												</Heading>
+											</VStack>
+										</HStack>
 
-								{/* Condition Selection */}
-								<Box>
-									<Text fontWeight="700" mb={5} color="gray.700">
-										Preferred Condition
-									</Text>
-
-									<SimpleGrid
-										columns={{ base: 1, md: 2 }}
-										gap={5}
-									>
-										{[
-											{
-												title: "Reconditioned/Rebuild",
-												desc: "Premium quality",
-												icon: ShieldCheck,
-											},
-											{
-												title: "Used (low mileage)",
-												desc: "Best value",
-												icon: Package,
-											},
-											{
-												title: "New",
-												desc: "Factory standard",
-												icon: CheckCircleIcon,
-											},
-											{
-												title: "Will consider all",
-												desc: "Flexible",
-												icon: MessageSquare,
-											},
-										].map((item) => {
-											const isSelected = engineOptions.includes(item.title);
-
-											return (
-												<Box
-													key={item.title}
-													p={6}
-													bg="white"
-													borderRadius="2xl"
-													border="2px solid"
-													borderColor={isSelected ? RED : "gray.100"}
-													cursor="pointer"
-													onClick={() => handleEngineSelect(item.title)}
-													transition="all 0.2s ease"
-													_hover={{
-														borderColor: RED,
-														transform: "translateY(-4px)",
-													}}
+										{!safeVrm && (
+											<Box
+												position="relative"
+												bg="#FFD300"
+												border="2px solid #111111"
+												borderRadius="lg"
+												h="54px"
+												w="full"
+												overflow="hidden"
+												boxShadow="sm"
+												display="flex"
+												alignItems="center"
+												mt={3}
+											>
+												{/* Blue UK Band */}
+												<VStack
+													bg="#003399"
+													w="40px"
+													h="full"
+													justify="center"
+													spacing={1}
+													px={1.5}
+													flexShrink={0}
+													borderRight="1px solid #111111"
 												>
-													<HStack spacing={4}>
+													{/* SVG Union Jack */}
+													<Box w="20px" h="12px" borderRadius="xs" overflow="hidden">
+														<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 30" width="100%" height="100%">
+															<clipPath id="s">
+																<path d="M0,0 L60,0 L60,30 L0,30 Z"/>
+															</clipPath>
+															<clipPath id="t">
+																<path d="M30,15 L0,0 L0,30 Z"/>
+															</clipPath>
+															<path d="M0,0 L60,30 M60,0 L0,30" stroke="#fff" strokeWidth="6"/>
+															<path d="M0,0 L60,30 M60,0 L0,30" stroke="#c8102e" strokeWidth="4"/>
+															<path d="M30,0 L30,30 M0,15 L60,15" stroke="#fff" strokeWidth="10"/>
+															<path d="M30,0 L30,30 M0,15 L60,15" stroke="#c8102e" strokeWidth="6"/>
+														</svg>
+													</Box>
+													<Text color="#FFD300" fontSize="9px" fontWeight="900" lineHeight="1" letterSpacing="0.5px">
+														UK
+													</Text>
+												</VStack>
+
+												{/* Input Field */}
+												<Input
+													value={manualVrm}
+													onChange={(e) => setManualVrm(e.target.value.toUpperCase().replace(/\s+/g, ""))}
+													placeholder="ENTER YOUR REG"
+													border="none"
+													bg="transparent"
+													h="full"
+													flex="1"
+													color="#111111"
+													fontSize="20px"
+													fontWeight="bold"
+													fontFamily="'Impact', 'Arial Black', sans-serif"
+													letterSpacing="3px"
+													textAlign="center"
+													_focus={{ boxShadow: "none" }}
+													_placeholder={{ color: "rgba(17, 17, 17, 0.35)", letterSpacing: "2px" }}
+													textTransform="uppercase"
+												/>
+											</Box>
+										)}
+
+										{isLoadingVehicle && (
+											<HStack mt={3} justify="center" spacing={2}>
+												<Spinner size="xs" color={RED} />
+												<Text fontSize="xs" color="gray.500">Searching vehicle details...</Text>
+											</HStack>
+										)}
+
+										{!isLoadingVehicle && dvlaData && (
+											<Box mt={3} p={3} bg="green.50" border="1px solid" borderColor="green.200" borderRadius="lg">
+												<HStack spacing={2.5} align="center">
+													<Icon as={CheckCircleIcon} color="green.500" boxSize={4} />
+													<VStack align="start" spacing={0.5}>
+														<Text fontSize="xs" fontWeight="bold" color="green.800" textAlign="left">
+															Vehicle Verified: {dvlaData.colour} {dvlaData.make} {dvlaData.year ? `(${dvlaData.year})` : ""}
+														</Text>
+														<Text fontSize="10px" color="green.600" textAlign="left">
+															Engine: {dvlaData.engineCapacity ? `${(dvlaData.engineCapacity/1000).toFixed(1)}L` : "N/A"} | Fuel: {dvlaData.fuelType || "N/A"}
+														</Text>
+													</VStack>
+												</HStack>
+											</Box>
+										)}
+									</Box>
+
+									{/* Postcode, Engine Type & Notes */}
+									<Box bg="white" p={4} borderRadius="xl" border="1px solid" borderColor="gray.100" boxShadow="sm">
+										<Text fontWeight="700" fontSize="sm" color="gray.700" mb={3}>
+											Delivery & Details
+										</Text>
+										<VStack spacing={3}>
+											<InputGroup size="md">
+												<InputLeftElement h="40px" pointerEvents="none">
+													<MapPin color="#E10600" size={18} />
+												</InputLeftElement>
+												<Input
+													placeholder="Your Postcode"
+													borderRadius="lg"
+													value={form.postcode}
+													onChange={(e) => setForm({ ...form, postcode: e.target.value.toUpperCase() })}
+												/>
+											</InputGroup>
+
+											{!brand && (
+												<InputGroup size="md">
+													<InputLeftElement h="40px" pointerEvents="none">
+														<Settings color="#E10600" size={18} />
+													</InputLeftElement>
+													<Input
+														placeholder="Engine Type / Code (Optional, e.g. 2.0L Diesel)"
+														borderRadius="lg"
+														value={vrmEngineType}
+														onChange={(e) => setVrmEngineType(e.target.value)}
+													/>
+												</InputGroup>
+											)}
+
+											<Textarea
+												placeholder="Additional requirements or notes..."
+												rows={2}
+												borderRadius="lg"
+												fontSize="sm"
+												value={form.notes}
+												onChange={(e) => setForm({ ...form, notes: e.target.value })}
+											/>
+										</VStack>
+									</Box>
+								</VStack>
+
+								{/* Right Column */}
+								<VStack spacing={4} align="stretch">
+									{/* Condition Selection */}
+									<Box bg="white" p={4} borderRadius="xl" border="1px solid" borderColor="gray.100" boxShadow="sm">
+										<Text fontWeight="700" fontSize="sm" color="gray.700" mb={3}>
+											Preferred Condition
+										</Text>
+
+										<SimpleGrid columns={2} gap={3}>
+											{[
+												{
+													title: "Reconditioned/Rebuild",
+													desc: "Premium quality",
+													icon: ShieldCheck,
+												},
+												{
+													title: "Used (low mileage)",
+													desc: "Best value",
+													icon: Package,
+												},
+												{
+													title: "New",
+													desc: "Factory standard",
+													icon: CheckCircleIcon,
+												},
+												{
+													title: "Will consider all",
+													desc: "Flexible",
+													icon: MessageSquare,
+												},
+											].map((item) => {
+												const isSelected = engineOptions.includes(item.title);
+
+												return (
+													<Box
+														key={item.title}
+														p={3}
+														bg="white"
+														borderRadius="xl"
+														border="2px solid"
+														borderColor={isSelected ? RED : "gray.100"}
+														cursor="pointer"
+														onClick={() => handleEngineSelect(item.title)}
+														transition="all 0.2s ease"
+														_hover={{
+															borderColor: RED,
+															transform: "translateY(-2px)",
+														}}
+														display="flex"
+														alignItems="center"
+													>
+														<HStack spacing={2.5} align="center">
+															<Icon
+																as={item.icon}
+																color={isSelected ? RED : "gray.400"}
+																boxSize={5}
+																flexShrink={0}
+															/>
+
+															<VStack align="start" spacing={0}>
+																<Text fontWeight="700" fontSize="12px" lineHeight="1.2">
+																	{item.title}
+																</Text>
+
+																<Text fontSize="10px" color="gray.500" mt={0.5}>
+																	{item.desc}
+																</Text>
+															</VStack>
+														</HStack>
+													</Box>
+												);
+											})}
+										</SimpleGrid>
+									</Box>
+
+									{/* Fitting Options */}
+									<Box bg="white" p={4} borderRadius="xl" border="1px solid" borderColor="gray.100" boxShadow="sm">
+										<Text fontWeight="700" fontSize="sm" color="gray.700" mb={3}>
+											Supply & Fitting
+										</Text>
+
+										<SimpleGrid columns={3} gap={2}>
+											{[
+												{ title: "Supplied & Fitted", icon: Settings },
+												{ title: "Supplied Only", icon: Truck },
+												{ title: "Will consider both", icon: Package },
+											].map((item) => {
+												const isSelected = fittingOptions.includes(item.title);
+
+												return (
+													<Box
+														key={item.title}
+														p={2.5}
+														bg="white"
+														borderRadius="xl"
+														border="2px solid"
+														borderColor={isSelected ? RED : "gray.100"}
+														textAlign="center"
+														cursor="pointer"
+														onClick={() => handleFittingSelect(item.title)}
+														transition="0.2s ease"
+														_hover={{
+															borderColor: RED,
+															transform: "translateY(-2px)",
+														}}
+														display="flex"
+														flexDirection="column"
+														alignItems="center"
+														justifyContent="center"
+														minH="72px"
+													>
 														<Icon
 															as={item.icon}
 															color={isSelected ? RED : "gray.400"}
-															boxSize={7}
+															boxSize={5}
+															mb={1.5}
 														/>
 
-														<VStack align="start" spacing={0.5}>
-															<Text fontWeight="700" fontSize="15px">
-																{item.title}
-															</Text>
+														<Text fontWeight="700" fontSize="11px" lineHeight="1.2">
+															{item.title}
+														</Text>
+													</Box>
+												);
+											})}
+										</SimpleGrid>
+									</Box>
+								</VStack>
+							</SimpleGrid>
 
-															<Text fontSize="sm" color="gray.500">
-																{item.desc}
-															</Text>
-														</VStack>
-													</HStack>
-												</Box>
-											);
-										})}
-									</SimpleGrid>
-								</Box>
-
-								{/* Fitting Options */}
-								<Box>
-									<Text fontWeight="700" mb={5} color="gray.700">
-										Supply & Fitting
-									</Text>
-
-									<SimpleGrid
-										columns={{ base: 1, md: 3 }}
-										gap={5}
-									>
-										{[
-											{ title: "Supplied & Fitted", icon: Settings },
-											{ title: "Supplied Only", icon: Truck },
-											{ title: "Will consider both", icon: Package },
-										].map((item) => {
-											const isSelected = fittingOptions.includes(item.title);
-
-											return (
-												<Box
-													key={item.title}
-													p={6}
-													bg="white"
-													borderRadius="2xl"
-													border="2px solid"
-													borderColor={isSelected ? RED : "gray.100"}
-													textAlign="center"
-													cursor="pointer"
-													onClick={() => handleFittingSelect(item.title)}
-													transition="0.3s ease"
-													_hover={{
-														borderColor: RED,
-														transform: "translateY(-4px)",
-													}}
-												>
-													<Icon
-														as={item.icon}
-														color={isSelected ? RED : "gray.400"}
-														boxSize={8}
-														mb={3}
-													/>
-
-													<Text fontWeight="700" fontSize="14px">
-														{item.title}
-													</Text>
-												</Box>
-											);
-										})}
-									</SimpleGrid>
-								</Box>
-
-								{/* Postcode, Engine Type & Notes */}
-								<Box bg="white" p={8} borderRadius="3xl" boxShadow="sm">
-									<VStack spacing={6}>
-										<InputGroup>
-											<InputLeftElement h="52px" pointerEvents="none">
-												<MapPin color="#E10600" />
-											</InputLeftElement>
-											<Input
-												size="lg"
-												placeholder="Your Postcode"
-												borderRadius="xl"
-												value={form.postcode}
-												onChange={(e) => setForm({ ...form, postcode: e.target.value.toUpperCase() })}
-											/>
-										</InputGroup>
-
-										{!brand && (
-											<InputGroup>
-												<InputLeftElement h="52px" pointerEvents="none">
-													<Settings color="#E10600" />
-												</InputLeftElement>
-												<Input
-													size="lg"
-													placeholder="Engine Type / Code (Optional, e.g. 2.0L Diesel)"
-													borderRadius="xl"
-													value={vrmEngineType}
-													onChange={(e) => setVrmEngineType(e.target.value)}
-												/>
-											</InputGroup>
-										)}
-
-										<Textarea
-											placeholder="Additional requirements or notes..."
-											rows={4}
-											borderRadius="xl"
-											value={form.notes}
-											onChange={(e) => setForm({ ...form, notes: e.target.value })}
-										/>
-									</VStack>
-								</Box>
-
-								<Button
-									size="lg"
-									bg={RED}
-									color="white"
-									h="66px"
-									fontSize="18px"
-									fontWeight="700"
-									borderRadius="2xl"
-									rightIcon={<ChevronRightIcon />}
-									onClick={handleNext}
-								>
-									Continue to Contact Details
-								</Button>
-							</VStack>
+							<Button
+								size="md"
+								bg={RED}
+								color="white"
+								h="52px"
+								fontSize="16px"
+								fontWeight="700"
+								borderRadius="xl"
+								rightIcon={<ChevronRightIcon />}
+								onClick={handleNext}
+								mt={6}
+								w="full"
+								_hover={{ bg: "#C10500" }}
+							>
+								Continue to Contact Details
+							</Button>
 						</MotionBox>
 					)}
 
 					{/* STEP 2 */}
 					{step === 2 && (
 						<MotionBox key="step2" initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }}>
-							<Button leftIcon={<ChevronLeftIcon />} variant="ghost" mb={6} onClick={handleBack}>
+							<Button leftIcon={<ChevronLeftIcon />} variant="ghost" size="sm" mb={4} onClick={handleBack}>
 								Back
 							</Button>
 
-							<Heading size="xl" mb={3} color={DARK}>Contact Information</Heading>
-							<Text color="gray.600" mb={8}>We'll use this to connect you with suppliers</Text>
+							<Box mb={4}>
+								<Heading size="md" mb={1} color={DARK}>Contact Information</Heading>
+								<Text fontSize="sm" color="gray.600">We'll use this to connect you with suppliers</Text>
+							</Box>
 
-							<Box bg="white" p={10} borderRadius="3xl" boxShadow="lg">
-								<VStack spacing={6}>
-									<InputGroup>
-										<InputLeftElement h="52px"><User color="#E10600" /></InputLeftElement>
-										<Input size="lg" placeholder="Full Name" borderRadius="xl" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
+							<Box bg="white" p={6} borderRadius="xl" border="1px solid" borderColor="gray.100" boxShadow="sm" maxW="md" mx="auto">
+								<VStack spacing={4}>
+									<InputGroup size="md">
+										<InputLeftElement h="40px"><User color="#E10600" size={18} /></InputLeftElement>
+										<Input placeholder="Full Name" borderRadius="lg" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
 									</InputGroup>
 
-									<InputGroup>
-										<InputLeftElement h="52px"><EmailIcon color="#E10600" /></InputLeftElement>
-										<Input size="lg" type="email" placeholder="Email Address" borderRadius="xl" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} />
+									<InputGroup size="md">
+										<InputLeftElement h="40px"><EmailIcon color="#E10600" /></InputLeftElement>
+										<Input type="email" placeholder="Email Address" borderRadius="lg" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} />
 									</InputGroup>
 
-									<InputGroup>
-										<InputLeftElement h="52px"><PhoneIcon color="#E10600" /></InputLeftElement>
-										<Input size="lg" type="tel" placeholder="+44 7700 900000" borderRadius="xl" value={form.phone} onChange={(e) => handlePhoneChange(e.target.value)} />
+									<InputGroup size="md">
+										<InputLeftElement h="40px"><PhoneIcon color="#E10600" /></InputLeftElement>
+										<Input type="tel" placeholder="+44 7700 900000" borderRadius="lg" value={form.phone} onChange={(e) => handlePhoneChange(e.target.value)} />
 									</InputGroup>
 
 									<Button
 										w="full"
-										size="lg"
+										size="md"
 										bg={RED}
 										color="white"
-										h="66px"
-										fontSize="18px"
+										h="52px"
+										fontSize="16px"
 										fontWeight="700"
-										borderRadius="2xl"
+										borderRadius="xl"
 										onClick={handleGetQuote}
 										isDisabled={!form.name || !form.email || !form.phone}
 										isLoading={submitting}
 										loadingText="Submitting Request..."
+										_hover={{ bg: "#C10500" }}
 									>
 										Submit Request
 									</Button>
@@ -550,34 +670,36 @@ export default function CallSellerPage({
 
 					{/* STEP 3 - Success */}
 					{step === 3 && (
-						<MotionBox key="step3" initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} textAlign="center" py={12}>
-							<Box mx="auto" w="120px" h="120px" bg="green.100" borderRadius="full" display="flex" alignItems="center" justifyContent="center" mb={8}>
-								<CheckCircleIcon boxSize={16} color="green.500" />
+						<MotionBox key="step3" initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} textAlign="center" py={4}>
+							<Box mx="auto" w="80px" h="80px" bg="green.100" borderRadius="full" display="flex" alignItems="center" justifyContent="center" mb={4}>
+								<CheckCircleIcon boxSize={9} color="green.500" />
 							</Box>
 
-							<Heading size="2xl" mb={4} color={DARK}>Request Sent Successfully!</Heading>
-							<Text fontSize="lg" color="gray.600" maxW="500px" mx="auto" mb={12}>
+							<Heading size="lg" mb={2} color={DARK}>Request Sent Successfully!</Heading>
+							<Text fontSize="sm" color="gray.600" maxW="450px" mx="auto" mb={6}>
 								Our network of specialists has received your request. You should hear back shortly.
 							</Text>
 
-							<SimpleGrid columns={{ base: 1, md: 3 }} gap={6} mb={12}>
+							<SimpleGrid columns={{ base: 1, md: 3 }} gap={4} mb={6}>
 								{[
 									{ icon: "📞", title: "Contact", desc: "Suppliers will reach out soon" },
 									{ icon: "💰", title: "Quotes", desc: "Get competitive offers directly" },
 									{ icon: "✅", title: "Save", desc: "Get the best deal" },
 								].map((item, i) => (
-									<Box key={i} bg="white" p={8} borderRadius="2xl" boxShadow="md">
-										<Text fontSize="42px" mb={4}>{item.icon}</Text>
-										<Text fontWeight="700" mb={2}>{item.title}</Text>
-										<Text color="gray.500">{item.desc}</Text>
+									<Box key={i} bg="white" p={4} borderRadius="xl" border="1px solid" borderColor="gray.100" boxShadow="sm">
+										<Text fontSize="28px" mb={2}>{item.icon}</Text>
+										<Text fontWeight="700" fontSize="sm" mb={1}>{item.title}</Text>
+										<Text fontSize="xs" color="gray.500">{item.desc}</Text>
 									</Box>
 								))}
 							</SimpleGrid>
 
 							<Button
-								size="lg"
+								size="md"
 								onClick={() => isModal && onCloseModal ? onCloseModal() : navigate("/")}
 								colorScheme="gray"
+								h="40px"
+								borderRadius="lg"
 							>
 								{isModal ? "Close" : "Back to Homepage"}
 							</Button>

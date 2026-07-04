@@ -4,6 +4,7 @@ const { authHook, tenantHook, permissionHook } = require("../../middlewares/fast
 module.exports = async function (fastify, opts) {
   // Public route (maintained at original path)
   fastify.post("/validate-vrm", inquiryController.validateVRM);
+  fastify.post("/lookup-vrm", inquiryController.lookupVRM);
 
   // Admin routes
   fastify.get("/inquiries", {

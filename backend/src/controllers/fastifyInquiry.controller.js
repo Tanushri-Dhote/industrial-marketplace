@@ -176,8 +176,64 @@ const deleteInquiry = async (req, reply) => {
   }
 };
 
+const lookupVRM = async (req, reply) => {
+  try {
+    let { vrm } = req.body;
+
+    if (!vrm) {
+      return reply.status(400).send({ success: false, message: "VRM is required" });
+    }
+
+    const cleanedVrm = vrm.replace(/[^A-Z0-9]/gi, "").toUpperCase();
+    if (cleanedVrm.length < 2 || cleanedVrm.length > 8) {
+      return reply.status(400).send({ success: false, message: "Invalid VRM format" });
+    }
+
+    const apiKey = process.env.DVLA_API_KEY || "F4vP4DPNLSadsgBwUN3y43c7g7c8GsiI9NsKqS3q";
+
+    const response = await fetch("https://driver-vehicle-licensing.api.gov.uk/vehicle-enquiry/v1/vehicles", {
+      method: "POST",
+      headers: {
+        "x-api-key": apiKey,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ registrationNumber: cleanedVrm }),
+    });
+
+    if (response.status === 404) {
+      return reply.status(404).send({ success: false, message: "Vehicle not found in DVLA database" });
+    }
+
+    if (!response.ok) {
+      const errText = await response.text();
+      console.error("DVLA API error response:", errText);
+      return reply.status(response.status).send({ success: false, message: "Error querying DVLA database" });
+    }
+
+    const data = await response.json();
+
+    return reply.send({
+      success: true,
+      data: {
+        registrationNumber: data.registrationNumber,
+        make: data.make,
+        year: data.yearOfManufacture,
+        engineCapacity: data.engineCapacity,
+        fuelType: data.fuelType,
+        colour: data.colour,
+        taxDueDate: data.taxDueDate,
+        motExpiryDate: data.motExpiryDate,
+      },
+    });
+  } catch (error) {
+    console.error("DVLA lookup exception:", error);
+    return reply.status(500).send({ success: false, message: "Internal server error" });
+  }
+};
+
 module.exports = {
   validateVRM,
   getInquiries,
   deleteInquiry,
+  lookupVRM,
 };
