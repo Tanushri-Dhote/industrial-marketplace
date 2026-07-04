@@ -369,7 +369,7 @@ export default function ModelEnginePage() {
 										<Th fontWeight="800" color={DARK} fontSize="13px" py={5} whiteSpace="nowrap">Models</Th>
 										<Th fontWeight="800" color={DARK} fontSize="13px" whiteSpace="nowrap">Engine Size</Th>
 										<Th fontWeight="800" color={DARK} fontSize="13px" whiteSpace="nowrap">Fuel</Th>
-										<Th fontWeight="800" color={DARK} fontSize="13px" whiteSpace="normal">Engine Code</Th>
+										<Th fontWeight="800" color={DARK} fontSize="13px" whiteSpace="nowrap" minW="160px">Engine Code</Th>
 										<Th fontWeight="800" color={DARK} fontSize="13px" whiteSpace="nowrap">Years</Th>
 										<Th whiteSpace="nowrap"></Th>
 									</Tr>
@@ -386,7 +386,7 @@ export default function ModelEnginePage() {
 											<Td fontWeight="700" color={DARK} whiteSpace="nowrap">{row.model}</Td>
 											<Td whiteSpace="nowrap">{row.engineSize}</Td>
 											<Td whiteSpace="nowrap">{row.fuel}</Td>
-											<Td fontFamily="mono" fontSize="12px" color="blue.600" whiteSpace="normal">{row.engineCode}</Td>
+											<Td fontFamily="mono" fontSize="12px" color="blue.600" whiteSpace="normal" minW="160px">{row.engineCode}</Td>
 											<Td fontWeight="600" whiteSpace="nowrap">{row.years}</Td>
 											<Td whiteSpace="nowrap" textAlign="right">
 												<Button
