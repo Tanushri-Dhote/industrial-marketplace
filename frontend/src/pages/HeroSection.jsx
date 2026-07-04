@@ -659,10 +659,10 @@ export default function HeroSection({ category = "Engines", initialBrand = "", i
 					{/* ── REDESIGNED VEHICLE SELECTOR CARD ── */}
 					<Box
 						bg="white"
-						px={{ base: 6, md: 10 }}
-						py={{ base: 8, md: 10 }}
-						borderRadius="3xl"
-						boxShadow="0 10px 40px -10px rgba(15, 23, 42, 0.08)"
+						px={{ base: 5, md: 8 }}
+						py={{ base: 6, md: 7 }}
+						borderRadius="2xl"
+						boxShadow="0 8px 30px -8px rgba(15, 23, 42, 0.06)"
 						border="1px solid"
 						borderColor="gray.200"
 						maxW="1180px"
@@ -670,34 +670,34 @@ export default function HeroSection({ category = "Engines", initialBrand = "", i
 						position="relative"
 						zIndex={5}
 					>
-						<VStack spacing={8} align="stretch">
+						<VStack spacing={5} align="stretch">
 							{/* Header Row */}
-							<Flex justify="space-between" align="center" direction={{ base: "column", md: "row" }} gap={6} w="full">
-								<HStack spacing={4} align="center">
-									<Circle size="70px" border="1.5px solid" borderColor="gray.100" bg="white" boxShadow="sm" flexShrink={0}>
-										<Icon as={FaCar} color="#D90404" boxSize="30px" />
+							<Flex justify="space-between" align="center" direction={{ base: "column", md: "row" }} gap={4} w="full">
+								<HStack spacing={3} align="center">
+									<Circle size="54px" border="1.5px solid" borderColor="gray.100" bg="white" boxShadow="sm" flexShrink={0}>
+										<Icon as={FaCar} color="#D90404" boxSize="22px" />
 									</Circle>
-									<VStack align="start" spacing={1}>
-										<Heading as="h2" fontSize={{ base: "20px", md: "26px" }} color="#0F172A" fontWeight="800">
+									<VStack align="start" spacing={0.5}>
+										<Heading as="h2" fontSize={{ base: "18px", md: "22px" }} color="#0F172A" fontWeight="800">
 											Select Your Vehicle Manually
 										</Heading>
-										<Text fontSize="sm" color="gray.500" fontWeight="500">
+										<Text fontSize="xs" color="gray.500" fontWeight="500">
 											Quickly find matching engines and get premium quotes in a minute
 										</Text>
 									</VStack>
 								</HStack>
 
-								<Box border="1.5px solid" borderColor="gray.200" borderRadius="xl" px={4} py={3} maxW="190px" bg="white" display={{ base: "none", md: "block" }}>
+								<Box border="1.5px solid" borderColor="gray.200" borderRadius="lg" px={3} py={2} maxW="170px" bg="white" display={{ base: "none", md: "block" }}>
 									<HStack spacing={2} align="center">
-										<Icon as={FaShieldAlt} color="#0F172A" boxSize="22px" />
+										<Icon as={FaShieldAlt} color="#0F172A" boxSize="18px" />
 										<VStack align="start" spacing={0}>
-											<Text fontSize="9px" fontWeight="800" color="gray.400" lineHeight="1">
+											<Text fontSize="8px" fontWeight="800" color="gray.400" lineHeight="1">
 												TRUSTED BY
 											</Text>
-											<Text fontSize="11px" fontWeight="900" color="#0F172A" lineHeight="1.1" whiteSpace="nowrap">
+											<Text fontSize="10px" fontWeight="900" color="#0F172A" lineHeight="1.1" whiteSpace="nowrap">
 												THOUSANDS OF
 											</Text>
-											<Text fontSize="10px" fontWeight="800" color="gray.500" lineHeight="1">
+											<Text fontSize="9px" fontWeight="800" color="gray.500" lineHeight="1">
 												CUSTOMERS
 											</Text>
 										</VStack>
@@ -710,24 +710,24 @@ export default function HeroSection({ category = "Engines", initialBrand = "", i
 							{/* Dropdowns Grid */}
 							<SimpleGrid columns={{ base: 1, sm: 2, md: 3, lg: (selectedBrand === "mercedes-benz" && showEngineSizeSelect) ? 5 : (selectedBrand === "mercedes-benz" || showEngineSizeSelect) ? 4 : 3 }} spacing={4} w="full">
 								{/* Brand Select */}
-								<VStack align="start" spacing={2} w="full">
-									<Text fontSize="14px" fontWeight="700" color="#1E293B">
+								<VStack align="start" spacing={1} w="full">
+									<Text fontSize="12px" fontWeight="700" color="#1E293B">
 										Select Brand
 									</Text>
 									<Flex
 										border="1.5px solid"
 										borderColor="gray.200"
-										borderRadius="xl"
+										borderRadius="lg"
 										overflow="hidden"
-										h="52px"
+										h="46px"
 										w="full"
 										bg="white"
 										align="center"
 										_hover={{ borderColor: "gray.300" }}
 										_focusWithin={{ borderColor: RED, boxShadow: "0 0 0 1px rgba(217, 4, 4, 0.1)" }}
 									>
-										<Flex bg="#FEF2F2" w="50px" h="full" align="center" justify="center" borderRight="1.5px solid" borderColor="gray.200" flexShrink={0}>
-											<Icon as={FaCar} color="#D90404" boxSize={5} />
+										<Flex bg="#FEF2F2" w="42px" h="full" align="center" justify="center" borderRight="1.5px solid" borderColor="gray.200" flexShrink={0}>
+											<Icon as={FaCar} color="#D90404" boxSize={4} />
 										</Flex>
 										<Select
 											variant="unstyled"
@@ -742,7 +742,7 @@ export default function HeroSection({ category = "Engines", initialBrand = "", i
 											w="full"
 											px={3}
 											fontWeight="600"
-											fontSize="14px"
+											fontSize="13px"
 											color="gray.700"
 											cursor="pointer"
 										>
@@ -757,24 +757,24 @@ export default function HeroSection({ category = "Engines", initialBrand = "", i
 
 								{/* Class Select (Mercedes-Benz only) */}
 								{selectedBrand === "mercedes-benz" && (
-									<VStack align="start" spacing={2} w="full">
-										<Text fontSize="14px" fontWeight="700" color="#1E293B">
+									<VStack align="start" spacing={1} w="full">
+										<Text fontSize="12px" fontWeight="700" color="#1E293B">
 											Select Class
 										</Text>
 										<Flex
 											border="1.5px solid"
 											borderColor="gray.200"
-											borderRadius="xl"
+											borderRadius="lg"
 											overflow="hidden"
-											h="52px"
+											h="46px"
 											w="full"
 											bg="white"
 											align="center"
 											_hover={{ borderColor: "gray.300" }}
 											_focusWithin={{ borderColor: RED, boxShadow: "0 0 0 1px rgba(217, 4, 4, 0.1)" }}
 										>
-											<Flex bg="#FEF2F2" w="50px" h="full" align="center" justify="center" borderRight="1.5px solid" borderColor="gray.200" flexShrink={0}>
-												<Icon as={FaCar} color="#D90404" boxSize={5} />
+											<Flex bg="#FEF2F2" w="42px" h="full" align="center" justify="center" borderRight="1.5px solid" borderColor="gray.200" flexShrink={0}>
+												<Icon as={FaCar} color="#D90404" boxSize={4} />
 											</Flex>
 											<Select
 												variant="unstyled"
@@ -788,7 +788,7 @@ export default function HeroSection({ category = "Engines", initialBrand = "", i
 												w="full"
 												px={3}
 												fontWeight="600"
-												fontSize="14px"
+												fontSize="13px"
 												color="gray.700"
 												cursor="pointer"
 											>
@@ -803,24 +803,24 @@ export default function HeroSection({ category = "Engines", initialBrand = "", i
 								)}
 
 								{/* Model Select */}
-								<VStack align="start" spacing={2} w="full">
-									<Text fontSize="14px" fontWeight="700" color="#1E293B">
+								<VStack align="start" spacing={1} w="full">
+									<Text fontSize="12px" fontWeight="700" color="#1E293B">
 										Select Model
 									</Text>
 									<Flex
 										border="1.5px solid"
 										borderColor="gray.200"
-										borderRadius="xl"
+										borderRadius="lg"
 										overflow="hidden"
-										h="52px"
+										h="46px"
 										w="full"
 										bg="white"
 										align="center"
 										_hover={{ borderColor: "gray.300" }}
 										_focusWithin={{ borderColor: RED, boxShadow: "0 0 0 1px rgba(217, 4, 4, 0.1)" }}
 									>
-										<Flex bg="#FEF2F2" w="50px" h="full" align="center" justify="center" borderRight="1.5px solid" borderColor="gray.200" flexShrink={0}>
-											<Icon as={FaCar} color="#D90404" boxSize={5} />
+										<Flex bg="#FEF2F2" w="42px" h="full" align="center" justify="center" borderRight="1.5px solid" borderColor="gray.200" flexShrink={0}>
+											<Icon as={FaCar} color="#D90404" boxSize={4} />
 										</Flex>
 										<Select
 											variant="unstyled"
@@ -832,7 +832,7 @@ export default function HeroSection({ category = "Engines", initialBrand = "", i
 											w="full"
 											px={3}
 											fontWeight="600"
-											fontSize="14px"
+											fontSize="13px"
 											color="gray.700"
 											cursor="pointer"
 										>
@@ -856,24 +856,24 @@ export default function HeroSection({ category = "Engines", initialBrand = "", i
 								</VStack>
 
 								{/* Year Select */}
-								<VStack align="start" spacing={2} w="full">
-									<Text fontSize="14px" fontWeight="700" color="#1E293B">
+								<VStack align="start" spacing={1} w="full">
+									<Text fontSize="12px" fontWeight="700" color="#1E293B">
 										Select Year
 									</Text>
 									<Flex
 										border="1.5px solid"
 										borderColor="gray.200"
-										borderRadius="xl"
+										borderRadius="lg"
 										overflow="hidden"
-										h="52px"
+										h="46px"
 										w="full"
 										bg="white"
 										align="center"
 										_hover={{ borderColor: "gray.300" }}
 										_focusWithin={{ borderColor: RED, boxShadow: "0 0 0 1px rgba(217, 4, 4, 0.1)" }}
 									>
-										<Flex bg="#FEF2F2" w="50px" h="full" align="center" justify="center" borderRight="1.5px solid" borderColor="gray.200" flexShrink={0}>
-											<Icon as={FaCalendarAlt} color="#D90404" boxSize={5} />
+										<Flex bg="#FEF2F2" w="42px" h="full" align="center" justify="center" borderRight="1.5px solid" borderColor="gray.200" flexShrink={0}>
+											<Icon as={FaCalendarAlt} color="#D90404" boxSize={4} />
 										</Flex>
 										<Select
 											variant="unstyled"
@@ -885,7 +885,7 @@ export default function HeroSection({ category = "Engines", initialBrand = "", i
 											w="full"
 											px={3}
 											fontWeight="600"
-											fontSize="14px"
+											fontSize="13px"
 											color="gray.700"
 											cursor="pointer"
 										>
@@ -900,24 +900,24 @@ export default function HeroSection({ category = "Engines", initialBrand = "", i
 
 								{/* Engine Size Select */}
 								{showEngineSizeSelect && (
-									<VStack align="start" spacing={2} w="full">
-										<Text fontSize="14px" fontWeight="700" color="#1E293B">
+									<VStack align="start" spacing={1} w="full">
+										<Text fontSize="12px" fontWeight="700" color="#1E293B">
 											Engine Size / Type
 										</Text>
 										<Flex
 											border="1.5px solid"
 											borderColor="gray.200"
-											borderRadius="xl"
+											borderRadius="lg"
 											overflow="hidden"
-											h="52px"
+											h="46px"
 											w="full"
 											bg="white"
 											align="center"
 											_hover={{ borderColor: "gray.300" }}
 											_focusWithin={{ borderColor: RED, boxShadow: "0 0 0 1px rgba(217, 4, 4, 0.1)" }}
 										>
-											<Flex bg="#FEF2F2" w="50px" h="full" align="center" justify="center" borderRight="1.5px solid" borderColor="gray.200" flexShrink={0}>
-												<Icon as={FaCogs} color="#D90404" boxSize={5} />
+											<Flex bg="#FEF2F2" w="42px" h="full" align="center" justify="center" borderRight="1.5px solid" borderColor="gray.200" flexShrink={0}>
+												<Icon as={FaCogs} color="#D90404" boxSize={4} />
 											</Flex>
 											<Select
 												variant="unstyled"
@@ -929,7 +929,7 @@ export default function HeroSection({ category = "Engines", initialBrand = "", i
 												w="full"
 												px={3}
 												fontWeight="600"
-												fontSize="14px"
+												fontSize="13px"
 												color="gray.700"
 												cursor="pointer"
 											>
@@ -945,43 +945,43 @@ export default function HeroSection({ category = "Engines", initialBrand = "", i
 							</SimpleGrid>
 
 							{/* Center Button Row */}
-							<Box w="full" display="flex" justifyContent="center" mt={4} position="relative">
+							<Box w="full" display="flex" justifyContent="center" mt={2} position="relative">
 								{/* Button styled with gradient fade-in speed lines layout */}
 								<Button
 									bg="#D90404"
 									bgGradient="linear(to-r, rgba(217,4,4,0) 0%, rgba(217,4,4,0.4) 15%, #D90404 35%)"
 									color="white"
-									borderRadius="xl"
-									h="54px"
-									px={16}
-									fontSize="18px"
+									borderRadius="lg"
+									h="46px"
+									px={12}
+									fontSize="16px"
 									fontWeight="800"
 									isDisabled={!selectedBrand || !selectedModel || !selectedYear || (showEngineSizeSelect && !selectedEngineSize)}
-									_hover={{ bg: "#c40000", transform: "translateY(-1px)", boxShadow: "lg" }}
+									_hover={{ bg: "#c40000", transform: "translateY(-1px)", boxShadow: "md" }}
 									_active={{ transform: "translateY(0)" }}
 									_disabled={{
 										bg: "#D90404",
 										color: "white",
-										opacity: 1, // Keep it fully opaque so it matches the mockup red exactly
+										opacity: 1,
 										cursor: "not-allowed",
 										_hover: { bg: "#D90404", transform: "none", boxShadow: "none" }
 									}}
 									transition="all 0.15s ease"
 									onClick={handleGetQuotesSubmit}
-									boxShadow="md"
-									w={{ base: "full", sm: "400px" }}
+									boxShadow="sm"
+									w={{ base: "full", sm: "360px" }}
 									position="relative"
 								>
 									<HStack spacing={2} align="center" w="full" justify="center" position="relative">
 										{/* Horizontal speed lines on left side of button content */}
 										<HStack spacing="3px" opacity={0.8} align="center" position="absolute" left="0">
-											<Box w="10px" h="2px" bg="white" borderRadius="full" />
-											<Box w="16px" h="2px" bg="white" borderRadius="full" />
 											<Box w="8px" h="2px" bg="white" borderRadius="full" />
+											<Box w="12px" h="2px" bg="white" borderRadius="full" />
+											<Box w="6px" h="2px" bg="white" borderRadius="full" />
 										</HStack>
 										<Text>Get Free Quotes</Text>
-										<Circle size="24px" bg="white" color="#D90404" display="inline-flex" alignItems="center" justify="center" position="absolute" right="0">
-											<ChevronRightIcon size={18} />
+										<Circle size="20px" bg="white" color="#D90404" display="inline-flex" alignItems="center" justify="center" position="absolute" right="0">
+											<ChevronRightIcon size={14} />
 										</Circle>
 									</HStack>
 								</Button>
@@ -995,55 +995,55 @@ export default function HeroSection({ category = "Engines", initialBrand = "", i
 								justify="space-between"
 								align="center"
 								w="full"
-								gap={4}
+								gap={2}
 								position="relative"
 							>
 								{/* Bottom Row Features */}
-								<Flex direction={{ base: "column", md: "row" }} gap={{ base: 4, md: 8 }} wrap="nowrap" justify={{ base: "center", md: "start" }} py={2}>
-									<HStack spacing={3}>
-										<Circle size="38px" border="1.5px solid" borderColor="gray.200" bg="white" boxShadow="sm" flexShrink={0}>
-											<Icon as={FaTools} color="#D90404" boxSize={4} />
+								<Flex direction={{ base: "column", md: "row" }} gap={{ base: 3, md: 6 }} wrap="nowrap" justify={{ base: "center", md: "start" }} py={1}>
+									<HStack spacing={2.5}>
+										<Circle size="32px" border="1.5px solid" borderColor="gray.200" bg="white" boxShadow="sm" flexShrink={0}>
+											<Icon as={FaTools} color="#D90404" boxSize="14px" />
 										</Circle>
-										<Text fontSize="14px" fontWeight="700" color="#1E293B" whiteSpace="nowrap">Supply and Fitting Offered</Text>
+										<Text fontSize="13px" fontWeight="700" color="#1E293B" whiteSpace="nowrap">Supply and Fitting Offered</Text>
 									</HStack>
 
-									<HStack spacing={3}>
-										<Circle size="38px" border="1.5px solid" borderColor="gray.200" bg="white" boxShadow="sm" flexShrink={0}>
-											<Icon as={FaShieldAlt} color="#D90404" boxSize={4} />
+									<HStack spacing={2.5}>
+										<Circle size="32px" border="1.5px solid" borderColor="gray.200" bg="white" boxShadow="sm" flexShrink={0}>
+											<Icon as={FaShieldAlt} color="#D90404" boxSize="14px" />
 										</Circle>
-										<Text fontSize="14px" fontWeight="700" color="#1E293B" whiteSpace="nowrap">Unlimited Mileage Warranty*</Text>
+										<Text fontSize="13px" fontWeight="700" color="#1E293B" whiteSpace="nowrap">Unlimited Mileage Warranty*</Text>
 									</HStack>
 
-									<HStack spacing={3}>
-										<Circle size="38px" border="1.5px solid" borderColor="gray.200" bg="white" boxShadow="sm" flexShrink={0}>
-											<Icon as={FaClock} color="#D90404" boxSize={4} />
+									<HStack spacing={2.5}>
+										<Circle size="32px" border="1.5px solid" borderColor="gray.200" bg="white" boxShadow="sm" flexShrink={0}>
+											<Icon as={FaClock} color="#D90404" boxSize="14px" />
 										</Circle>
-										<Text fontSize="14px" fontWeight="700" color="#1E293B" whiteSpace="nowrap">It Only Takes a Minute</Text>
+										<Text fontSize="13px" fontWeight="700" color="#1E293B" whiteSpace="nowrap">It Only Takes a Minute</Text>
 									</HStack>
 								</Flex>
 
 								{/* Slanted Black Badge */}
 								<Box
 									bg="#111827"
-									h="78px"
-									w="270px"
+									h="64px"
+									w="240px"
 									position="relative"
-									clipPath={{ base: "none", md: "polygon(18px 0, 100% 0, 100% 100%, 0 100%)" }}
+									clipPath={{ base: "none", md: "polygon(14px 0, 100% 0, 100% 100%, 0 100%)" }}
 									borderRadius={{ base: "xl", md: "0 xl xl 0" }}
 									flexShrink={0}
 								>
-									<HStack spacing={3} pl={{ base: 4, md: 8 }} pr={4} h="full" align="center">
-										<Circle size="36px" border="1.5px solid rgba(255, 255, 255, 0.4)" bg="transparent" flexShrink={0}>
-											<Icon as={FaStar} color="white" boxSize={4} />
+									<HStack spacing={2.5} pl={{ base: 4, md: 6 }} pr={4} h="full" align="center">
+										<Circle size="30px" border="1.5px solid rgba(255, 255, 255, 0.4)" bg="transparent" flexShrink={0}>
+											<Icon as={FaStar} color="white" boxSize="12px" />
 										</Circle>
 										<VStack align="start" spacing={0} justify="center">
-											<Text fontSize="10px" fontWeight="700" color="white" letterSpacing="0.5px" lineHeight="1">
+											<Text fontSize="8px" fontWeight="700" color="white" letterSpacing="0.5px" lineHeight="1">
 												GUARANTEED
 											</Text>
-											<Text fontSize="18px" fontWeight="950" color="#D90404" my={0.5} lineHeight="1" letterSpacing="-0.2px">
+											<Text fontSize="15px" fontWeight="950" color="#D90404" my={0.2} lineHeight="1" letterSpacing="-0.2px">
 												LOWEST
 											</Text>
-											<Text fontSize="12px" fontWeight="800" color="white" letterSpacing="0.5px" lineHeight="1">
+											<Text fontSize="10px" fontWeight="800" color="white" letterSpacing="0.5px" lineHeight="1">
 												PRICES
 											</Text>
 										</VStack>
