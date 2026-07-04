@@ -184,7 +184,9 @@ const lookupVRM = async (req, reply) => {
       return reply.status(400).send({ success: false, message: "VRM is required" });
     }
 
+    console.log("Original VRM received by backend:", JSON.stringify(vrm));
     const cleanedVrm = vrm.replace(/[^A-Z0-9]/gi, "").toUpperCase();
+    console.log("Cleaned VRM sent to DVLA:", JSON.stringify(cleanedVrm));
     if (cleanedVrm.length < 2 || cleanedVrm.length > 8) {
       return reply.status(400).send({ success: false, message: "Invalid VRM format" });
     }
