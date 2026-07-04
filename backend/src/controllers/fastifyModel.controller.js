@@ -324,6 +324,7 @@ exports.uploadModelEngineSpecCSV = async (request, reply) => {
 			const fuelCell = (getVal(row, ["fuel"]) || "").trim();
 			const engineCodeCell = (getVal(row, ["engine co", "engine code"]) || "").trim();
 			const yearsCell = (getVal(row, ["years", "year"]) || "").trim();
+			const priceCell = (getVal(row, ["price", "quote", "average price"]) || "").trim();
 
 			if (!modelCell) continue;
 
@@ -408,7 +409,7 @@ exports.uploadModelEngineSpecCSV = async (request, reply) => {
 					brandSlug: foundBrand.slug,
 					brandName: foundBrand.name,
 					modelName: foundModel.name,
-					modelSlug: foundModel.slug,
+					modelSlug: foundModel.name.trim().replace(/\s+/g, "-").toLowerCase(),
 					costTable: []
 				};
 			}
@@ -420,7 +421,7 @@ exports.uploadModelEngineSpecCSV = async (request, reply) => {
 					fuel: fuelCell,
 					engineCode: engineCodeCell,
 					years: yearsCell,
-					price: ""
+					price: priceCell
 				});
 			}
 		}
