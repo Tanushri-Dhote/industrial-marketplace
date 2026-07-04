@@ -39,6 +39,7 @@ import { Link as RouterLink } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { ChevronRightIcon, CheckCircleIcon } from "@chakra-ui/icons";
+import { ShieldCheck, Wrench, Clock, BadgePercent, Car } from "lucide-react";
 import CallSellerPage from "./CallSellerPage";
 import API from "../services/api";
 import { toast } from "sonner";
@@ -650,248 +651,267 @@ export default function HeroSection({ category = "Engines", initialBrand = "", i
 			</Box>
 
 			{/* ── VEHICLE SELECTOR SECTION (Separate block below background visual) ── */}
-			<Box py={{ base: 10, lg: 14 }} bg="#F8FAFC">
+			<Box py={{ base: 8, lg: 12 }} bg="#F8FAFC">
 				<Container maxW="container.xl" px={{ base: 4, md: 6 }}>
 					{/* ── REDESIGNED VEHICLE SELECTOR CARD ── */}
 					<Box
 						bg="white"
-						px={{ base: 6, md: 10 }}
-						py={{ base: 8, md: 10 }}
-						borderRadius="3xl"
-						boxShadow="0 30px 60px -15px rgba(15, 23, 42, 0.12)"
+						px={{ base: 5, md: 8 }}
+						py={{ base: 6, md: 8 }}
+						borderRadius="2xl"
+						boxShadow="0 10px 30px -10px rgba(15, 23, 42, 0.08)"
 						border="1px solid"
-						borderColor="gray.200"
-						maxW="960px"
+						borderColor="gray.100"
+						maxW="980px"
 						mx="auto"
 						position="relative"
 						zIndex={5}
 					>
-						<VStack spacing={8} align="center">
-							<VStack spacing={2} textAlign="center">
-								<Heading as="h2" fontSize={{ base: "24px", md: "32px" }} color="gray.900" fontWeight="900" letterSpacing="-0.5px">
-									Select Your Vehicle Manually
-								</Heading>
-								<Text fontSize="md" color="gray.500" fontWeight="500">
-									Quickly find matching engines and get premium quotes in a minute
-								</Text>
-							</VStack>
+						<VStack spacing={6} align="stretch">
+							{/* Header Row */}
+							<Flex justify="space-between" align="center" direction={{ base: "column", md: "row" }} gap={4}>
+								<HStack spacing={3} align="center">
+									<Circle size="42px" bg="red.50" border="1px solid" borderColor="red.100" flexShrink={0}>
+										<Icon as={Car} color={RED} boxSize={5} />
+									</Circle>
+									<VStack align="start" spacing={0.5}>
+										<Heading as="h2" fontSize={{ base: "lg", md: "xl" }} color="gray.955" fontWeight="800">
+											Select Your Vehicle Manually
+										</Heading>
+										<Text fontSize="xs" color="gray.500" fontWeight="500">
+											Quickly find matching engines and get premium quotes in a minute
+										</Text>
+									</VStack>
+								</HStack>
 
-							<SimpleGrid columns={{ base: 1, md: 3 }} spacing={5} w="full">
+								<HStack spacing={2} bg="green.50" px={3} py={1.5} borderRadius="full" border="1px solid" borderColor="green.100" display={{ base: "none", md: "flex" }}>
+									<Icon as={ShieldCheck} color="green.600" boxSize={4} />
+									<Text fontSize="10px" fontWeight="700" color="green.700" letterSpacing="0.3px">
+										TRUSTED BY THOUSANDS OF CUSTOMERS
+									</Text>
+								</HStack>
+							</Flex>
+
+							{/* Dropdowns Grid */}
+							<SimpleGrid columns={{ base: 1, sm: 2, md: 3, lg: showEngineSizeSelect ? 4 : 3 }} spacing={4} w="full" mt={2}>
 								{/* Brand Select */}
-								<Select
-									placeholder="Select Brand"
-									value={selectedBrand}
-									onChange={(e) => {
-										setSelectedBrand(e.target.value);
-										setSelectedModel("");
-										setSelectedClass("");
-									}}
-									size="lg"
-									h="54px"
-									bg="gray.50"
-									borderColor="gray.200"
-									borderRadius="xl"
-									_hover={{ borderColor: "gray.300", bg: "white" }}
-									_focus={{ borderColor: RED, bg: "white", boxShadow: `0 0 0 3px rgba(225,6,0,0.1)` }}
-									fontWeight="600"
-									fontSize="15px"
-								>
-									{brands.map((brand) => (
-										<option key={brand._id} value={brand.slug}>
-											{brand.name}
-										</option>
-									))}
-								</Select>
+								<VStack align="start" spacing={1.5} w="full">
+									<Text fontSize="xs" fontWeight="700" color="gray.500" textTransform="uppercase" letterSpacing="0.5px">
+										Select Brand
+									</Text>
+									<Select
+										placeholder="Choose Brand"
+										value={selectedBrand}
+										onChange={(e) => {
+											setSelectedBrand(e.target.value);
+											setSelectedModel("");
+											setSelectedClass("");
+										}}
+										size="md"
+										h="46px"
+										bg="white"
+										borderColor="gray.200"
+										borderRadius="lg"
+										_hover={{ borderColor: "gray.300" }}
+										_focus={{ borderColor: RED, boxShadow: `0 0 0 2px rgba(225,6,0,0.1)` }}
+										fontWeight="500"
+										fontSize="sm"
+									>
+										{brands.map((brand) => (
+											<option key={brand._id} value={brand.slug}>
+												{brand.name}
+											</option>
+										))}
+									</Select>
+								</VStack>
 
 								{/* Class Select (Mercedes-Benz only) */}
 								{selectedBrand === "mercedes-benz" && (
-									<Select
-										placeholder="Select Class"
-										value={selectedClass}
-										onChange={(e) => {
-											setSelectedClass(e.target.value);
-											setSelectedModel("");
-										}}
-										size="lg"
-										h="54px"
-										bg="gray.50"
-										borderColor="gray.200"
-										borderRadius="xl"
-										_hover={{ borderColor: "gray.300", bg: "white" }}
-										_focus={{ borderColor: RED, bg: "white", boxShadow: `0 0 0 3px rgba(225,6,0,0.1)` }}
-										fontWeight="600"
-										fontSize="15px"
-									>
-										{[...new Set(models.map((m) => getMercedesClass(m.name)))].sort().map((cls) => (
-											<option key={cls} value={cls}>
-												{cls}
-											</option>
-										))}
-									</Select>
+									<VStack align="start" spacing={1.5} w="full">
+										<Text fontSize="xs" fontWeight="700" color="gray.500" textTransform="uppercase" letterSpacing="0.5px">
+											Select Class
+										</Text>
+										<Select
+											placeholder="Choose Class"
+											value={selectedClass}
+											onChange={(e) => {
+												setSelectedClass(e.target.value);
+												setSelectedModel("");
+											}}
+											size="md"
+											h="46px"
+											bg="white"
+											borderColor="gray.200"
+											borderRadius="lg"
+											_hover={{ borderColor: "gray.300" }}
+											_focus={{ borderColor: RED, boxShadow: `0 0 0 2px rgba(225,6,0,0.1)` }}
+											fontWeight="500"
+											fontSize="sm"
+										>
+											{[...new Set(models.map((m) => getMercedesClass(m.name)))].sort().map((cls) => (
+												<option key={cls} value={cls}>
+													{cls}
+												</option>
+											))}
+										</Select>
+									</VStack>
 								)}
 
 								{/* Model Select */}
-								<Select
-									placeholder={loadingModels ? "Loading Models..." : "Select Model"}
-									value={selectedModel}
-									onChange={(e) => setSelectedModel(e.target.value)}
-									isDisabled={!selectedBrand || loadingModels || (selectedBrand === "mercedes-benz" && !selectedClass)}
-									size="lg"
-									h="54px"
-									bg="gray.50"
-									borderColor="gray.200"
-									borderRadius="xl"
-									_hover={{ borderColor: "gray.300", bg: "white" }}
-									_focus={{ borderColor: RED, bg: "white", boxShadow: `0 0 0 3px rgba(225,6,0,0.1)` }}
-									fontWeight="600"
-									fontSize="15px"
-								>
-									{filteredModels.some(m => m.year || m.type) ? (
-										[...new Set(filteredModels.map(m => m.name))]
-											.sort((a, b) => a.localeCompare(b, undefined, { numeric: true }))
-											.map((name) => (
-												<option key={name} value={name}>
-													{name}
+								<VStack align="start" spacing={1.5} w="full">
+									<Text fontSize="xs" fontWeight="700" color="gray.500" textTransform="uppercase" letterSpacing="0.5px">
+										Select Model
+									</Text>
+									<Select
+										placeholder={loadingModels ? "Loading Models..." : "Choose Model"}
+										value={selectedModel}
+										onChange={(e) => setSelectedModel(e.target.value)}
+										isDisabled={!selectedBrand || loadingModels || (selectedBrand === "mercedes-benz" && !selectedClass)}
+										size="md"
+										h="46px"
+										bg="white"
+										borderColor="gray.200"
+										borderRadius="lg"
+										_hover={{ borderColor: "gray.300" }}
+										_focus={{ borderColor: RED, boxShadow: `0 0 0 2px rgba(225,6,0,0.1)` }}
+										fontWeight="500"
+										fontSize="sm"
+									>
+										{filteredModels.some(m => m.year || m.type) ? (
+											[...new Set(filteredModels.map(m => m.name))]
+												.sort((a, b) => a.localeCompare(b, undefined, { numeric: true }))
+												.map((name) => (
+													<option key={name} value={name}>
+														{name}
+													</option>
+												))
+										) : (
+											filteredModels.map((model) => (
+												<option key={model._id} value={model.slug}>
+													{model.name}
 												</option>
 											))
-									) : (
-										filteredModels.map((model) => (
-											<option key={model._id} value={model.slug}>
-												{model.name}
-											</option>
-										))
-									)}
-								</Select>
+										)}
+									</Select>
+								</VStack>
 
 								{/* Year Select */}
-								<Select
-									placeholder={loadingProducts ? "Loading Years..." : "Select Year"}
-									value={selectedYear}
-									onChange={(e) => setSelectedYear(e.target.value)}
-									isDisabled={!selectedModel || loadingProducts}
-									size="lg"
-									h="54px"
-									bg="gray.50"
-									borderColor="gray.200"
-									borderRadius="xl"
-									_hover={{ borderColor: "gray.300", bg: "white" }}
-									_focus={{ borderColor: RED, bg: "white", boxShadow: `0 0 0 3px rgba(225,6,0,0.1)` }}
-									fontWeight="600"
-									fontSize="15px"
-								>
-									{dynamicYears.map((y) => (
-										<option key={y} value={y}>
-											{y}
-										</option>
-									))}
-								</Select>
-
-								{/* Engine Size Select */}
-								{showEngineSizeSelect && (
+								<VStack align="start" spacing={1.5} w="full">
+									<Text fontSize="xs" fontWeight="700" color="gray.500" textTransform="uppercase" letterSpacing="0.5px">
+										Select Year
+									</Text>
 									<Select
-										placeholder={loadingProducts ? "Loading Engines..." : "Select Engine Size/Type"}
-										value={selectedEngineSize}
-										onChange={(e) => setSelectedEngineSize(e.target.value)}
-										isDisabled={!selectedYear || loadingProducts}
-										size="lg"
-										h="54px"
-										bg="gray.50"
+										placeholder={loadingProducts ? "Loading Years..." : "Choose Year"}
+										value={selectedYear}
+										onChange={(e) => setSelectedYear(e.target.value)}
+										isDisabled={!selectedModel || loadingProducts}
+										size="md"
+										h="46px"
+										bg="white"
 										borderColor="gray.200"
-										borderRadius="xl"
-										_hover={{ borderColor: "gray.300", bg: "white" }}
-										_focus={{ borderColor: RED, bg: "white", boxShadow: `0 0 0 3px rgba(225,6,0,0.1)` }}
-										fontWeight="600"
-										fontSize="15px"
+										borderRadius="lg"
+										_hover={{ borderColor: "gray.300" }}
+										_focus={{ borderColor: RED, boxShadow: `0 0 0 2px rgba(225,6,0,0.1)` }}
+										fontWeight="500"
+										fontSize="sm"
 									>
-										{dynamicEngines.map((size) => (
-											<option key={size} value={size}>
-												{size}
+										{dynamicYears.map((y) => (
+											<option key={y} value={y}>
+												{y}
 											</option>
 										))}
 									</Select>
-								)}
+								</VStack>
 
-								{/* Get Free Quotes Button aligned in Grid */}
-								<GridItem colSpan={{ base: 1, md: 3 - ((3 + (showClassSelect ? 1 : 0) + (showEngineSizeSelect ? 1 : 0)) % 3) }}>
-									<Button
-										bg={RED}
-										color="white"
-										borderRadius="xl"
-										h="54px"
-										w="full"
-										fontSize="md"
-										fontWeight="800"
-										isDisabled={!selectedBrand || !selectedModel || !selectedYear || (showEngineSizeSelect && !selectedEngineSize)}
-										_hover={{ bg: "#c40000", transform: "translateY(-1px)", boxShadow: "lg" }}
-										_active={{ transform: "translateY(0)" }}
-										transition="all 0.15s ease"
-										rightIcon={
-											<Circle size="24px" bg="white" color={RED} display="inline-flex" alignItems="center" justifyContent="center">
-												<ChevronRightIcon size={18} />
-											</Circle>
-										}
-										onClick={handleGetQuotesSubmit}
-										boxShadow="md"
-									>
-										Get Free Quotes
-									</Button>
-								</GridItem>
+								{/* Engine Size Select */}
+								{showEngineSizeSelect && (
+									<VStack align="start" spacing={1.5} w="full">
+										<Text fontSize="xs" fontWeight="700" color="gray.500" textTransform="uppercase" letterSpacing="0.5px">
+											Engine Size / Type
+										</Text>
+										<Select
+											placeholder={loadingProducts ? "Loading Engines..." : "Select Engine Size/Type"}
+											value={selectedEngineSize}
+											onChange={(e) => setSelectedEngineSize(e.target.value)}
+											isDisabled={!selectedYear || loadingProducts}
+											size="md"
+											h="46px"
+											bg="white"
+											borderColor="gray.200"
+											borderRadius="lg"
+											_hover={{ borderColor: "gray.300" }}
+											_focus={{ borderColor: RED, boxShadow: `0 0 0 2px rgba(225,6,0,0.1)` }}
+											fontWeight="500"
+											fontSize="sm"
+										>
+											{dynamicEngines.map((size) => (
+												<option key={size} value={size}>
+													{size}
+												</option>
+											))}
+										</Select>
+									</VStack>
+								)}
 							</SimpleGrid>
 
-							{/* Bullet points & badge */}
+							{/* Get Free Quotes Button aligned below */}
+							<Box w="full" display="flex" justifyContent="center" mt={2}>
+								<Button
+									bg={RED}
+									color="white"
+									borderRadius="lg"
+									h="50px"
+									px={12}
+									fontSize="md"
+									fontWeight="800"
+									isDisabled={!selectedBrand || !selectedModel || !selectedYear || (showEngineSizeSelect && !selectedEngineSize)}
+									_hover={{ bg: "#c40000", transform: "translateY(-1px)", boxShadow: "lg" }}
+									_active={{ transform: "translateY(0)" }}
+									transition="all 0.15s ease"
+									rightIcon={
+										<Circle size="20px" bg="white" color={RED} display="inline-flex" alignItems="center" justifyContent="center">
+											<ChevronRightIcon size={14} />
+										</Circle>
+									}
+									onClick={handleGetQuotesSubmit}
+									boxShadow="sm"
+									w={{ base: "full", sm: "auto" }}
+								>
+									Get Free Quotes
+								</Button>
+							</Box>
+
+							{/* Bottom Row - Features & Badge */}
 							<Flex
-								direction={{ base: "column", sm: "row" }}
+								direction={{ base: "column", md: "row" }}
 								justify="space-between"
 								align="center"
 								w="full"
-								pt={6}
+								pt={4}
 								borderTop="1px solid"
 								borderColor="gray.100"
-								gap={6}
+								gap={4}
+								mt={2}
 							>
-								<VStack align="flex-start" spacing={3} fontSize="15px" fontWeight="700" color="gray.700">
-									<HStack spacing={3}>
-										<Text color="#10B981" fontSize="18px">✓</Text>
-										<Text>Supply and Fitting Offered</Text>
+								<HStack spacing={{ base: 4, md: 8 }} wrap="wrap" justify={{ base: "center", md: "start" }} w="full">
+									<HStack spacing={2}>
+										<Icon as={Wrench} color="green.500" boxSize={4} />
+										<Text fontSize="xs" fontWeight="700" color="gray.600">Supply and Fitting Offered</Text>
 									</HStack>
-									<HStack spacing={3}>
-										<Text color="#10B981" fontSize="18px">✓</Text>
-										<Text>Unlimited Mileage Warranty*</Text>
+									<HStack spacing={2}>
+										<Icon as={ShieldCheck} color="green.500" boxSize={4} />
+										<Text fontSize="xs" fontWeight="700" color="gray.600">Unlimited Mileage Warranty*</Text>
 									</HStack>
-									<HStack spacing={3}>
-										<Text color="#10B981" fontSize="18px">✓</Text>
-										<Text>It Only Takes a Minute</Text>
+									<HStack spacing={2}>
+										<Icon as={Clock} color="green.500" boxSize={4} />
+										<Text fontSize="xs" fontWeight="700" color="gray.600">It Only Takes a Minute</Text>
 									</HStack>
-								</VStack>
+								</HStack>
 
-								<Box
-									border="3px double #10B981"
-									color="#10B981"
-									borderRadius="full"
-									px={2}
-									py={2}
-									fontWeight="900"
-									fontSize="11px"
-									textTransform="uppercase"
-									transform="rotate(-8deg)"
-									letterSpacing="0.8px"
-									textAlign="center"
-									lineHeight="1.2"
-									w="115px"
-									h="115px"
-									display="flex"
-									flexDirection="column"
-									alignItems="center"
-									justifyContent="center"
-									boxShadow="0 0 0 4px white, 0 0 0 7px #10B981"
-									mr={{ sm: 6 }}
-									bg="white"
-									flexShrink={0}
-								>
-									<Text fontSize="9px" whiteSpace="nowrap" color="#10B981">GUARANTEED</Text>
-									<Text fontSize="15px" fontWeight="950" my={0.5} whiteSpace="nowrap" color="#10B981">LOWEST</Text>
-									<Text fontSize="10px" whiteSpace="nowrap" color="#10B981">PRICES</Text>
-								</Box>
+								<HStack spacing={2} bg="red.50" px={3} py={1.5} borderRadius="full" border="1px solid" borderColor="red.100" flexShrink={0}>
+									<Icon as={BadgePercent} color={RED} boxSize={4} />
+									<Text fontSize="xs" fontWeight="900" color={RED} letterSpacing="0.5px">GUARANTEED LOWEST PRICES</Text>
+								</HStack>
 							</Flex>
 						</VStack>
 					</Box>
