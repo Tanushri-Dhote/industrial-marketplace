@@ -252,31 +252,33 @@ export default function Header() {
 
             {/* Buttons - Desktop (Always visible) */}
             <HStack spacing={3} display={{ base: 'none', md: 'flex' }}>
-              {/* Register Here Button */}
+              {/* Phone Button */}
               <Box
                 as="a"
                 href="tel:02071129397"
                 cursor="pointer"
                 bg="gray.100"
                 px={4}
-                py={2}
+                h="46px"
+                display="flex"
+                alignItems="center"
                 borderRadius="md"
                 border="1px solid"
                 borderColor="gray.200"
                 _hover={{ bg: "gray.200", borderColor: "gray.300", textDecoration: "none" }}
                 transition="all 0.2s"
               >
-                <HStack spacing={3} align="center">
+                <HStack spacing={2} align="center">
                   <Box
                     bg="#c40000"
                     color="white"
-                    boxSize="34px"
+                    boxSize="26px"
                     borderRadius="full"
                     display="flex"
                     alignItems="center"
                     justifyContent="center"
                   >
-                    <FaPhoneAlt size={14} />
+                    <FaPhoneAlt size={10} />
                   </Box>
 
                   <Text fontWeight="700" fontSize="14px" color="gray.800">
@@ -293,7 +295,7 @@ export default function Header() {
                 _active={{ transform: "translateY(0)" }}
                 fontWeight="700"
                 size="md"
-                height="42px"
+                height="46px"
                 px={6}
                 fontSize="14px"
                 borderRadius="md"
