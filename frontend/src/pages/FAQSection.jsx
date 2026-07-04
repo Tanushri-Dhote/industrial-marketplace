@@ -119,17 +119,7 @@ export default function FAQSection() {
             transition={{ duration: 0.5 }}
           >
             <VStack spacing={2}>
-              <Flex
-                w="48px"
-                h="48px"
-                bg={`${accentColor}10`}
-                borderRadius="full"
-                align="center"
-                justify="center"
-              >
-                <Icon as={FaQuestionCircle} w={5} h={5} color={accentColor} />
-              </Flex>
- 
+           
               <Text
                 fontSize="13px"
                 fontWeight="800"
