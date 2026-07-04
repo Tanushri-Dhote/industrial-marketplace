@@ -286,21 +286,19 @@ export default function Header() {
               </Box>
 
               <Button
-                as={Link}
-                to="/login"
-                variant="outline"
-                borderColor={accentColor}
-                color={accentColor}
-                _hover={{ bg: accentColor, color: "white", transform: "translateY(-1px)" }}
+                onClick={onCallSellerOpen}
+                bg={accentColor}
+                color="white"
+                _hover={{ bg: "#c40000", transform: "translateY(-1px)" }}
                 _active={{ transform: "translateY(0)" }}
-                fontWeight="600"
+                fontWeight="700"
                 size="md"
                 height="42px"
                 px={6}
                 fontSize="14px"
                 borderRadius="md"
               >
-                Login
+                Get Quote
               </Button>
             </HStack>
 
@@ -379,16 +377,19 @@ export default function Header() {
               </Box>
 
               <Button
-                as={Link}
-                to="/login"
+                onClick={() => {
+                  onToggle();
+                  onCallSellerOpen();
+                }}
                 justifyContent="flex-start"
-                leftIcon={<FaUserAlt />}
+                leftIcon={<FaFileContract />}
                 variant="ghost"
-                onClick={onToggle}
                 fontSize="14px"
                 fontWeight="500"
+                color={accentColor}
+                _hover={{ bg: `${accentColor}10` }}
               >
-                Login
+                Get Quote
               </Button>
             </VStack>
           </Container>

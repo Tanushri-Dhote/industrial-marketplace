@@ -109,6 +109,7 @@ export default function Footer() {
             <FooterLink to="/terms-and-conditions">
               Terms & Conditions
             </FooterLink>
+            <FooterLink to="/login">Login</FooterLink>
           </Stack>
 
           {/* Contact */}
