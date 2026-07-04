@@ -425,13 +425,13 @@ export default function HeroSection({ category = "Engines", initialBrand = "", i
 			<Box
 				bgImage={{ base: "url('/hero-mobile.png')", lg: "url('/hero.png')" }}
 				bgSize="cover"
-				bgPosition={{ base: "top center", lg: "center" }}
+				bgPosition={{ base: "bottom center", lg: "center" }}
 				bgRepeat="no-repeat"
 				minH={{ base: "auto", lg: "75svh" }}
 				display={{ lg: "flex" }}
 				alignItems={{ lg: "center" }}
-				pt={{ base: 10, lg: 0 }}
-				pb={{ base: "320px", lg: 0 }}
+				pt={{ base: 12, lg: 0 }}
+				pb={{ base: 12, md: "240px", lg: 0 }}
 				overflow="visible"
 			>
 				<Container maxW="container.xl" px={{ base: 4, md: 6 }}>
@@ -455,6 +455,13 @@ export default function HeroSection({ category = "Engines", initialBrand = "", i
 							initial={{ opacity: 0, y: 30 }}
 							animate={{ opacity: 1, y: 0 }}
 							transition={{ duration: 0.8 }}
+							bg={{ base: "rgba(255, 255, 255, 0.85)", lg: "transparent" }}
+							backdropFilter={{ base: "blur(12px)", lg: "none" }}
+							p={{ base: 6, md: 8, lg: 0 }}
+							borderRadius={{ base: "2xl", lg: "none" }}
+							boxShadow={{ base: "0 8px 32px 0 rgba(0, 0, 0, 0.08)", lg: "none" }}
+							border={{ base: "1px solid rgba(255, 255, 255, 0.5)", lg: "none" }}
+							w="full"
 						>
 							<VStack
 								align={{ base: "center", lg: "flex-start" }}
