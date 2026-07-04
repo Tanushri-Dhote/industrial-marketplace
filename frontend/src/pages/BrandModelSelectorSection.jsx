@@ -675,6 +675,20 @@ export default function BrandModelSelectorSection() {
 											</Center>
 										) : models.length > 0 ? (
 											(() => {
+												const fallbackModel = models.find((m) => m.spriteSheetUrl || m.imageUrl);
+
+												const getDisplayModel = (model) => {
+													const hasImage = model.spriteSheetUrl || model.imageUrl;
+													if (hasImage || !fallbackModel) return model;
+													return {
+														...model,
+														spriteSheetUrl: fallbackModel.spriteSheetUrl || null,
+														spritePosition: fallbackModel.spritePosition || null,
+														spriteSize: fallbackModel.spriteSize || null,
+														imageUrl: fallbackModel.imageUrl || null,
+													};
+												};
+
 												if (selectedBrand.slug === "mercedes-benz") {
 													if (!selectedClass) {
 														// Group models by class
@@ -690,7 +704,7 @@ export default function BrandModelSelectorSection() {
 														const sortedClassNames = Object.keys(classMap).sort();
 														const classesToRender = sortedClassNames.map((className) => {
 															const classModels = classMap[className];
-															const repModel = classModels.find((m) => m.spriteSheetUrl || m.imageUrl);
+															const repModel = classModels.find((m) => m.spriteSheetUrl || m.imageUrl) || fallbackModel;
 															return {
 																_id: `class-${className}`,
 																name: className,
@@ -718,7 +732,7 @@ export default function BrandModelSelectorSection() {
 															}
 														}
 														return uniqueModels.map((model) => (
-															<ModelCard key={model._id} model={model} onSelect={handleModelSelect} />
+															<ModelCard key={model._id} model={getDisplayModel(model)} onSelect={handleModelSelect} />
 														));
 													}
 												} else {
@@ -733,7 +747,7 @@ export default function BrandModelSelectorSection() {
 													return uniqueModels.map((model) => (
 														<ModelCard 
 															key={model._id} 
-															model={model} 
+															model={getDisplayModel(model)} 
 															onSelect={handleModelSelect} 
 															brandName={selectedBrand?.name}
 														/>
