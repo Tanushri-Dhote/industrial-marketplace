@@ -425,12 +425,13 @@ export default function HeroSection({ category = "Engines", initialBrand = "", i
 			<Box
 				bgImage={{ base: "url('/hero-mobile.png')", lg: "url('/hero.png')" }}
 				bgSize="cover"
-				bgPosition="center"
+				bgPosition={{ base: "top center", lg: "center" }}
 				bgRepeat="no-repeat"
 				minH={{ base: "auto", lg: "75svh" }}
 				display={{ lg: "flex" }}
 				alignItems={{ lg: "center" }}
-				py={{ base: 12, lg: 0 }}
+				pt={{ base: 10, lg: 0 }}
+				pb={{ base: "320px", lg: 0 }}
 				overflow="visible"
 			>
 				<Container maxW="container.xl" px={{ base: 4, md: 6 }}>
@@ -439,7 +440,7 @@ export default function HeroSection({ category = "Engines", initialBrand = "", i
 						direction={{ base: "column", lg: "row" }}
 						align="center"
 						justify="space-between"
-						gap={{ base: 10, lg: 8 }}
+						gap={{ base: 8, lg: 8 }}
 						position="relative"
 						zIndex={2}
 					>
@@ -457,7 +458,7 @@ export default function HeroSection({ category = "Engines", initialBrand = "", i
 						>
 							<VStack
 								align={{ base: "center", lg: "flex-start" }}
-								spacing={6}
+								spacing={{ base: 4, lg: 6 }}
 								w="full"
 							>
 								{/* Badge */}
@@ -484,7 +485,7 @@ export default function HeroSection({ category = "Engines", initialBrand = "", i
 
 								{/* Heading */}
 								<Heading
-									fontSize={{ base: "36px", md: "52px", lg: "58px" }}
+									fontSize={{ base: "30px", md: "48px", lg: "58px" }}
 									lineHeight="1.1"
 									fontWeight="900"
 									color="#0F172A"
@@ -499,7 +500,7 @@ export default function HeroSection({ category = "Engines", initialBrand = "", i
 
 								{/* Subtitle */}
 								<Text
-									fontSize={{ base: "14px", md: "16px" }}
+									fontSize={{ base: "13px", md: "16px" }}
 									color="gray.600"
 									lineHeight="1.6"
 									maxW="480px"
@@ -514,7 +515,7 @@ export default function HeroSection({ category = "Engines", initialBrand = "", i
 									direction={{ base: "column", md: "row" }}
 									align="center"
 									justify={{ base: "center", lg: "flex-start" }}
-									gap={{ base: 4, md: 6 }}
+									gap={{ base: 3, md: 6 }}
 									w="full"
 									py={2}
 								>
@@ -569,15 +570,15 @@ export default function HeroSection({ category = "Engines", initialBrand = "", i
 								<Box
 									bg="#0A1128"
 									color="white"
-									py="10px"
-									px={5}
+									py="8px"
+									px={4}
 									borderRadius="md"
 									display="inline-flex"
 									alignItems="center"
 									boxShadow="md"
 								>
 									<Box w="3px" h="14px" bg={RED} mr={3} borderRadius="full" />
-									<Text fontSize="13px" fontWeight="600" letterSpacing="0.5px">
+									<Text fontSize="12px" fontWeight="600" letterSpacing="0.5px">
 										Built to <Text as="span" fontWeight="800" color="white">Perform</Text>. Built to <Text as="span" fontWeight="800" color="white">Last</Text>.
 									</Text>
 								</Box>
@@ -585,10 +586,10 @@ export default function HeroSection({ category = "Engines", initialBrand = "", i
 								{/* Buttons */}
 								<Flex
 									direction={{ base: "column", md: "row" }}
-									gap={4}
+									gap={3}
 									w="full"
 									justify={{ base: "center", lg: "flex-start" }}
-									pt={2}
+									pt={{ base: 1, lg: 2 }}
 								>
 									<Button
 										as={RouterLink}
@@ -597,6 +598,7 @@ export default function HeroSection({ category = "Engines", initialBrand = "", i
 										color="white"
 										leftIcon={<FaCogs />}
 										size="lg"
+										h={{ base: "48px", lg: "54px" }}
 										w={{ base: "full", md: "auto" }}
 										px={8}
 										_hover={{ bg: "#c40000", transform: "translateY(-1px)" }}
@@ -620,6 +622,7 @@ export default function HeroSection({ category = "Engines", initialBrand = "", i
 										bg="white"
 										color={DARK}
 										size="lg"
+										h={{ base: "48px", lg: "54px" }}
 										w={{ base: "full", md: "auto" }}
 										px={8}
 										leftIcon={<MdLibraryBooks />}
