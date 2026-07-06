@@ -1039,7 +1039,15 @@ export default function HeroSection({ category = "Engines", initialBrand = "", i
 								position="relative"
 							>
 								{/* Bottom Row Features */}
-								<Flex direction={{ base: "column", md: "row" }} gap={{ base: 3, md: 6 }} wrap="nowrap" justify={{ base: "center", md: "start" }} py={1}>
+								<Flex
+									direction={{ base: "column", md: "row" }}
+									gap={{ base: 3, md: 6 }}
+									wrap="wrap"
+									justify={{ base: "center", md: "start" }}
+									align={{ base: "center", md: "start" }}
+									w={{ base: "full", lg: "auto" }}
+									py={1}
+								>
 									<HStack spacing={2.5}>
 										<Circle size="32px" border="1.5px solid" borderColor="gray.200" bg="white" boxShadow="sm" flexShrink={0}>
 											<Icon as={FaTools} color="#D90404" boxSize="14px" />
@@ -1071,6 +1079,8 @@ export default function HeroSection({ category = "Engines", initialBrand = "", i
 									clipPath={{ base: "none", md: "polygon(14px 0, 100% 0, 100% 100%, 0 100%)" }}
 									borderRadius={{ base: "xl", md: "0 xl xl 0" }}
 									flexShrink={0}
+									mx={{ base: "auto", lg: "0" }}
+									mt={{ base: 4, lg: 0 }}
 								>
 									<HStack spacing={2.5} pl={{ base: 4, md: 6 }} pr={4} h="full" align="center">
 										<Circle size="30px" border="1.5px solid rgba(255, 255, 255, 0.4)" bg="transparent" flexShrink={0}>
