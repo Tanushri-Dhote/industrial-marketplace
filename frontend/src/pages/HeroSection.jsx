@@ -1073,29 +1073,34 @@ export default function HeroSection({ category = "Engines", initialBrand = "", i
 								{/* Slanted Black Badge */}
 								<Box
 									bg="#111827"
-									h="64px"
-									w="240px"
+									h="56px"
+									w="260px"
 									position="relative"
 									clipPath={{ base: "none", md: "polygon(14px 0, 100% 0, 100% 100%, 0 100%)" }}
-									borderRadius={{ base: "xl", md: "0 xl xl 0" }}
+									borderRadius={{ base: "full", md: "0 xl xl 0" }}
 									flexShrink={0}
 									mx={{ base: "auto", lg: "0" }}
-									mt={{ base: 2, lg: 0 }}
+									mt={{ base: 3, lg: 0 }}
+									boxShadow="sm"
+									border="1px solid"
+									borderColor="gray.800"
 								>
-									<HStack spacing={2.5} pl={{ base: 4, md: 6 }} pr={4} h="full" align="center">
-										<Circle size="30px" border="1.5px solid rgba(255, 255, 255, 0.4)" bg="transparent" flexShrink={0}>
-											<Icon as={FaStar} color="white" boxSize="12px" />
+									<HStack spacing={3} pl={{ base: 5, md: 6 }} pr={5} h="full" align="center" justify={{ base: "center", md: "start" }}>
+										<Circle size="28px" border="1.5px solid" borderColor="#D90404" bg="rgba(217, 4, 4, 0.15)" flexShrink={0}>
+											<Icon as={FaStar} color="#D90404" boxSize="11px" />
 										</Circle>
 										<VStack align="start" spacing={0} justify="center">
-											<Text fontSize="8px" fontWeight="700" color="white" letterSpacing="0.5px" lineHeight="1">
+											<Text fontSize="8px" fontWeight="800" color="gray.400" letterSpacing="1px" lineHeight="1">
 												GUARANTEED
 											</Text>
-											<Text fontSize="15px" fontWeight="950" color="#D90404" my={0.2} lineHeight="1" letterSpacing="-0.2px">
-												LOWEST
-											</Text>
-											<Text fontSize="10px" fontWeight="800" color="white" letterSpacing="0.5px" lineHeight="1">
-												PRICES
-											</Text>
+											<HStack spacing={1.5} align="baseline" mt={0.5}>
+												<Text fontSize="16px" fontWeight="950" color="#D90404" lineHeight="1" letterSpacing="-0.3px">
+													LOWEST
+												</Text>
+												<Text fontSize="12px" fontWeight="800" color="white" letterSpacing="0.5px" lineHeight="1">
+													PRICES
+												</Text>
+											</HStack>
 										</VStack>
 									</HStack>
 								</Box>
