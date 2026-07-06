@@ -447,11 +447,11 @@ export default function HeroSection({ category = "Engines", initialBrand = "", i
 						{/* LEFT CONTENT */}
 						<MotionBox
 							flex={{ base: "1", lg: "1.2" }}
-							alignItems={{ base: "center", lg: "flex-start" }}
+							alignItems="flex-start"
 							display="flex"
 							flexDirection="column"
 							justifyContent="center"
-							textAlign={{ base: "center", lg: "left" }}
+							textAlign="left"
 							initial={{ opacity: 0, y: 30 }}
 							animate={{ opacity: 1, y: 0 }}
 							transition={{ duration: 0.8 }}
@@ -464,12 +464,12 @@ export default function HeroSection({ category = "Engines", initialBrand = "", i
 							w="full"
 						>
 							<VStack
-								align={{ base: "center", lg: "flex-start" }}
+								align="flex-start"
 								spacing={{ base: 4, lg: 6 }}
 								w="full"
 							>
 								{/* Badge */}
-								<Flex align="center" gap={3} justify={{ base: "center", lg: "flex-start" }}>
+								<Flex align="center" gap={3} justify="flex-start">
 									<Box
 										bg={RED}
 										color="white"
@@ -520,17 +520,17 @@ export default function HeroSection({ category = "Engines", initialBrand = "", i
 								{/* Feature Icons */}
 								<Flex
 									direction={{ base: "column", md: "row" }}
-									align="center"
-									justify={{ base: "center", lg: "flex-start" }}
+									align="flex-start"
+									justify="flex-start"
 									gap={{ base: 3, md: 6 }}
 									w="full"
 									py={2}
 								>
-									<HStack spacing={3} align="center" justify={{ base: "center", md: "flex-start" }} w={{ base: "full", md: "auto" }}>
+									<HStack spacing={3} align="center" justify="flex-start" w={{ base: "full", md: "auto" }}>
 										<Box color={RED}>
 											<ShieldCheckIcon boxSize="28px" />
 										</Box>
-										<VStack align={{ base: "center", md: "start" }} spacing={0} textAlign={{ base: "center", md: "left" }}>
+										<VStack align="start" spacing={0} textAlign="left">
 											<Text fontWeight="800" fontSize="13px" color="#0F172A" lineHeight="1.2">
 												Quality Tested
 											</Text>
@@ -542,11 +542,11 @@ export default function HeroSection({ category = "Engines", initialBrand = "", i
 
 									<Box display={{ base: "none", md: "block" }} w="1px" h="30px" bg="gray.300" mx={1} />
 
-									<HStack spacing={3} align="center" justify={{ base: "center", md: "flex-start" }} w={{ base: "full", md: "auto" }}>
+									<HStack spacing={3} align="center" justify="flex-start" w={{ base: "full", md: "auto" }}>
 										<Box color={RED}>
 											<ShieldCheckIcon boxSize="28px" />
 										</Box>
-										<VStack align={{ base: "center", md: "start" }} spacing={0} textAlign={{ base: "center", md: "left" }}>
+										<VStack align="start" spacing={0} textAlign="left">
 											<Text fontWeight="800" fontSize="13px" color="#0F172A" lineHeight="1.2">
 												06 Months Warranty
 											</Text>
@@ -558,16 +558,16 @@ export default function HeroSection({ category = "Engines", initialBrand = "", i
 
 									<Box display={{ base: "none", md: "block" }} w="1px" h="30px" bg="gray.300" mx={1} />
 
-									<HStack spacing={3} align="center" justify={{ base: "center", md: "flex-start" }} w={{ base: "full", md: "auto" }}>
+									<HStack spacing={3} align="center" justify="flex-start" w={{ base: "full", md: "auto" }}>
 										<Box color={RED}>
 											<Icon as={FaTruck} boxSize="26px" />
 										</Box>
-										<VStack align={{ base: "center", md: "start" }} spacing={0} textAlign={{ base: "center", md: "left" }}>
+										<VStack align="start" spacing={0} textAlign="left">
 											<Text fontWeight="800" fontSize="13px" color="#0F172A" lineHeight="1.2">
-												Local Delivery
+												Engine Rebuilt
 											</Text>
 											<Text fontSize="11px" color="gray.500" fontWeight="500">
-												Local collection & delivery
+												Vehicle collection & fitting
 											</Text>
 										</VStack>
 									</HStack>
@@ -595,7 +595,7 @@ export default function HeroSection({ category = "Engines", initialBrand = "", i
 									direction={{ base: "column", md: "row" }}
 									gap={3}
 									w="full"
-									justify={{ base: "center", lg: "flex-start" }}
+									justify="flex-start"
 									pt={{ base: 1, lg: 2 }}
 								>
 									<Button
