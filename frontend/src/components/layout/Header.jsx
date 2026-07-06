@@ -403,13 +403,17 @@ export default function Header() {
                   onToggle();
                   onCallSellerOpen();
                 }}
-                justifyContent="flex-start"
-                leftIcon={<FaFileContract />}
-                variant="ghost"
-                fontSize="14px"
-                fontWeight="500"
-                color={accentColor}
-                _hover={{ bg: `${accentColor}10` }}
+                bg={accentColor}
+                color="white"
+                _hover={{ bg: "#c40000", transform: "translateY(-1px)" }}
+                _active={{ transform: "translateY(0)" }}
+                w="full"
+                h="48px"
+                fontWeight="700"
+                fontSize="15px"
+                borderRadius="md"
+                boxShadow="md"
+                mt={2}
               >
                 Get Quote
               </Button>
