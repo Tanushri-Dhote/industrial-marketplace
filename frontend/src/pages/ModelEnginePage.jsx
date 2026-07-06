@@ -19,7 +19,10 @@ import {
 	Thead,
 	Tr,
 	useDisclosure,
-	VStack
+	VStack,
+	Flex,
+	SimpleGrid,
+	HStack
 } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
@@ -353,42 +356,110 @@ export default function ModelEnginePage() {
 							</Text>
 						</VStack>
 
-						<TableContainer
-							bg="white"
-							borderRadius="2xl"
-							boxShadow="lg"
-							border="1px solid"
-							borderColor="gray.200"
-							maxW="100%"
-							mx="auto"
-							p={2}
-						>
-							<Table variant="striped" colorScheme="gray" size="md">
-								<Thead bg="gray.50">
-									<Tr>
-										<Th fontWeight="800" color={DARK} fontSize="13px" py={5} whiteSpace="nowrap">Models</Th>
-										<Th fontWeight="800" color={DARK} fontSize="13px" whiteSpace="nowrap">Engine Size</Th>
-										<Th fontWeight="800" color={DARK} fontSize="13px" whiteSpace="nowrap">Fuel</Th>
-										<Th fontWeight="800" color={DARK} fontSize="13px" whiteSpace="nowrap" minW="160px">Engine Code</Th>
-										<Th fontWeight="800" color={DARK} fontSize="13px" whiteSpace="nowrap">Years</Th>
-										<Th whiteSpace="nowrap"></Th>
-									</Tr>
-								</Thead>
-								<Tbody>
-									{specs.costTable.map((row, idx) => (
-										<Tr
-											key={idx}
-											cursor="pointer"
-											transition="all 0.15s"
-											_hover={{ bg: "red.50", transform: "scale(1.005)" }}
-											onClick={() => handleItemClick(`${row.model} (${row.engineSize} - ${row.engineCode})`)}
-										>
-											<Td fontWeight="700" color={DARK} whiteSpace="nowrap">{row.model}</Td>
-											<Td whiteSpace="nowrap">{row.engineSize}</Td>
-											<Td whiteSpace="nowrap">{row.fuel}</Td>
-											<Td fontFamily="mono" fontSize="12px" color="blue.600" whiteSpace="normal" minW="160px">{row.engineCode}</Td>
-											<Td fontWeight="600" whiteSpace="nowrap">{row.years}</Td>
-											<Td whiteSpace="nowrap" textAlign="right">
+						{/* Desktop Table View */}
+						<Box display={{ base: "none", md: "block" }}>
+							<TableContainer
+								bg="white"
+								borderRadius="2xl"
+								boxShadow="lg"
+								border="1px solid"
+								borderColor="gray.200"
+								maxW="100%"
+								mx="auto"
+								p={2}
+							>
+								<Table variant="striped" colorScheme="gray" size="md">
+									<Thead bg="gray.50">
+										<Tr>
+											<Th fontWeight="800" color={DARK} fontSize="13px" py={5} whiteSpace="nowrap">Models</Th>
+											<Th fontWeight="800" color={DARK} fontSize="13px" whiteSpace="nowrap">Engine Size</Th>
+											<Th fontWeight="800" color={DARK} fontSize="13px" whiteSpace="nowrap">Fuel</Th>
+											<Th fontWeight="800" color={DARK} fontSize="13px" whiteSpace="nowrap" minW="160px">Engine Code</Th>
+											<Th fontWeight="800" color={DARK} fontSize="13px" whiteSpace="nowrap">Years</Th>
+											<Th whiteSpace="nowrap"></Th>
+										</Tr>
+									</Thead>
+									<Tbody>
+										{specs.costTable.map((row, idx) => (
+											<Tr
+												key={idx}
+												cursor="pointer"
+												transition="all 0.15s"
+												_hover={{ bg: "red.50", transform: "scale(1.005)" }}
+												onClick={() => handleItemClick(`${row.model} (${row.engineSize} - ${row.engineCode})`)}
+											>
+												<Td fontWeight="700" color={DARK} whiteSpace="nowrap">{row.model}</Td>
+												<Td whiteSpace="nowrap">{row.engineSize}</Td>
+												<Td whiteSpace="nowrap">{row.fuel}</Td>
+												<Td fontFamily="mono" fontSize="12px" color="blue.600" whiteSpace="normal" minW="160px">{row.engineCode}</Td>
+												<Td fontWeight="600" whiteSpace="nowrap">{row.years}</Td>
+												<Td whiteSpace="nowrap" textAlign="right">
+													<Button
+														size="sm"
+														bg={RED}
+														color="white"
+														_hover={{ bg: "#c40000" }}
+														fontSize="12px"
+														fontWeight="700"
+														borderRadius="md"
+														h="32px"
+														px={4}
+													>
+														Get Quote
+													</Button>
+												</Td>
+											</Tr>
+										))}
+									</Tbody>
+								</Table>
+							</TableContainer>
+						</Box>
+
+						{/* Mobile Card View */}
+						<Box display={{ base: "block", md: "none" }}>
+							<VStack spacing={4} align="stretch">
+								{specs.costTable.map((row, idx) => (
+									<Box
+										key={idx}
+										bg="white"
+										p={5}
+										borderRadius="2xl"
+										border="1px solid"
+										borderColor="gray.200"
+										boxShadow="sm"
+										onClick={() => handleItemClick(`${row.model} (${row.engineSize} - ${row.engineCode})`)}
+										cursor="pointer"
+										transition="all 0.2s"
+										_hover={{ borderColor: RED, bg: "red.50" }}
+									>
+										<VStack align="start" spacing={3}>
+											<Text fontWeight="800" color={DARK} fontSize="16px" lineHeight="1.4">
+												{row.model}
+											</Text>
+											
+											<SimpleGrid columns={2} spacing={3} w="full" fontSize="13px" py={1}>
+												<Box>
+													<Text color="gray.400" fontWeight="600" fontSize="11px" textTransform="uppercase">Engine Size</Text>
+													<Text color="gray.800" fontWeight="700">{row.engineSize}</Text>
+												</Box>
+												<Box>
+													<Text color="gray.400" fontWeight="600" fontSize="11px" textTransform="uppercase">Fuel Type</Text>
+													<Text color="gray.800" fontWeight="700">{row.fuel}</Text>
+												</Box>
+												<Box>
+													<Text color="gray.400" fontWeight="600" fontSize="11px" textTransform="uppercase">Engine Code</Text>
+													<Text color="blue.600" fontFamily="mono" fontWeight="700">{row.engineCode}</Text>
+												</Box>
+												<Box>
+													<Text color="gray.400" fontWeight="600" fontSize="11px" textTransform="uppercase">Years</Text>
+													<Text color="gray.800" fontWeight="700">{row.years}</Text>
+												</Box>
+											</SimpleGrid>
+
+											<Flex w="full" justify="space-between" align="center" pt={3} borderTop="1px dashed" borderColor="gray.100">
+												<Text fontSize="13px" fontWeight="800" color="green.600">
+													Quote Request
+												</Text>
 												<Button
 													size="sm"
 													bg={RED}
@@ -398,16 +469,16 @@ export default function ModelEnginePage() {
 													fontWeight="700"
 													borderRadius="md"
 													h="32px"
-													px={4}
+													px={5}
 												>
 													Get Quote
 												</Button>
-											</Td>
-										</Tr>
-									))}
-								</Tbody>
-							</Table>
-						</TableContainer>
+											</Flex>
+										</VStack>
+									</Box>
+								))}
+							</VStack>
+						</Box>
 					</Container>
 				</Box>
 			)}
