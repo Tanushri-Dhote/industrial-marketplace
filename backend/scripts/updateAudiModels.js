@@ -112,12 +112,20 @@ async function update() {
 			});
 
 			if (match) {
-				spriteFields = {
-					spriteClass: `bg-${match.name}`,
-					spriteSheetUrl: "/images/car_sprites.png",
-					spritePosition: { x: match.x, y: match.y },
-					spriteSize: { width: 135, height: 76 }
-				};
+				if (match.x === -945 && match.y === -1672) {
+					spriteFields = {
+						imageUrl: "/brands/Audi.png",
+						spriteSheetUrl: "",
+						spritePosition: { x: 0, y: 0 }
+					};
+				} else {
+					spriteFields = {
+						spriteClass: `bg-${match.name}`,
+						spriteSheetUrl: "/images/car_sprites.png",
+						spritePosition: { x: match.x, y: match.y },
+						spriteSize: { width: 135, height: 76 }
+					};
+				}
 			}
 
 			return {
