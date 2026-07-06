@@ -25,6 +25,7 @@ import {
 	Badge,
 	Box,
 	VStack,
+	Flex,
 	SimpleGrid,
 	Text,
 	Icon,
@@ -108,8 +109,8 @@ export default function BlogsModule() {
 			title="Blog & Content Management"
 			description="Create and manage industrial-themed blog posts to drive traffic and engagement. Edit drafts or publish new articles directly."
 		>
-			<HStack justify="space-between" mb={8}>
-				<InputGroup maxW="350px">
+			<Flex direction={{ base: "column", sm: "row" }} justify="space-between" align={{ base: "stretch", sm: "center" }} gap={4} mb={8}>
+				<InputGroup maxW={{ base: "full", sm: "350px" }}>
 					<InputLeftElement pointerEvents="none">
 						<SearchIcon color="gray.300" />
 					</InputLeftElement>
@@ -139,11 +140,12 @@ export default function BlogsModule() {
 						h="45px"
 						borderRadius="xl"
 						boxShadow="md"
+						w={{ base: "full", sm: "auto" }}
 					>
 						Add Blog Post
 					</Button>
 				)}
-			</HStack>
+			</Flex>
 
 			{isLoading ? (
 				<Center py={20}>

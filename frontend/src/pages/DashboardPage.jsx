@@ -286,19 +286,19 @@ function NavItem({ module, isActive, onClick }) {
 }
 
 // ─── Sidebar ─────────────────────────────────────────────────────────────────
-function Sidebar({ modules, activeModule, onSelect, user, userRole, onLogout }) {
+function Sidebar({ modules, activeModule, onSelect, user, userRole, onLogout, isMobileSidebar }) {
 	const navigate = useNavigate();
 	return (
 		<Flex
 			direction="column"
-			bg={SIDEBAR_BG}
-			w={SIDEBAR_W}
-			h="100vh"
-			position="fixed"
+			bg={isMobileSidebar ? "transparent" : SIDEBAR_BG}
+			w={isMobileSidebar ? "full" : SIDEBAR_W}
+			h={isMobileSidebar ? "full" : "100vh"}
+			position={isMobileSidebar ? "relative" : "fixed"}
 			top={0}
 			left={0}
 			zIndex={100}
-			py={6}
+			py={isMobileSidebar ? 4 : 6}
 			px={4}
 			overflowY="auto"
 		>
@@ -528,9 +528,9 @@ export default function DashboardPage({ defaultModule }) {
 				<Drawer isOpen={isMobileOpen} placement="left" onClose={onMobileClose} size="xs">
 					<DrawerOverlay />
 					<DrawerContent bg={SIDEBAR_BG} p={0}>
-						<DrawerCloseButton color="white" />
-						<DrawerBody p={0} pt={10}>
-							<Sidebar {...sidebarProps} />
+						<DrawerCloseButton color="white" zIndex={200} />
+						<DrawerBody p={0} pt={14}>
+							<Sidebar {...sidebarProps} isMobileSidebar={true} />
 						</DrawerBody>
 					</DrawerContent>
 				</Drawer>

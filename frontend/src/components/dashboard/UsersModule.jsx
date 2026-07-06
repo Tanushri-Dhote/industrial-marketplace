@@ -36,6 +36,7 @@ import {
 	Tr,
 	useDisclosure,
 	VStack,
+	Flex,
 } from "@chakra-ui/react";
 import { Settings, ShieldCheck, Users } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -237,9 +238,9 @@ export default function UsersModule({ moduleId }) {
 					: "View and manage registered customers and marketplace members assigned to specific sites."
 			}
 		>
-			<HStack justify="space-between" mb={6} spacing={4}>
-				<HStack spacing={4} flex="1">
-					<InputGroup maxW="300px">
+			<Flex direction={{ base: "column", md: "row" }} justify="space-between" align={{ base: "stretch", md: "center" }} gap={4} mb={6}>
+				<Flex direction={{ base: "column", sm: "row" }} gap={4} flex="1">
+					<InputGroup maxW={{ base: "full", sm: "300px" }}>
 						<InputLeftElement pointerEvents="none">
 							<SearchIcon color="gray.300" />
 						</InputLeftElement>
@@ -253,7 +254,7 @@ export default function UsersModule({ moduleId }) {
 						/>
 					</InputGroup>
 					<Select
-						maxW="180px"
+						maxW={{ base: "full", sm: "180px" }}
 						h="42px"
 						borderRadius="lg"
 						fontSize="14px"
@@ -264,7 +265,7 @@ export default function UsersModule({ moduleId }) {
 						<option value="Active">Active</option>
 						<option value="Inactive">Inactive</option>
 					</Select>
-				</HStack>
+				</Flex>
 				{isSuperAdmin && (
 					<Button
 						leftIcon={<AddIcon />}
@@ -279,11 +280,12 @@ export default function UsersModule({ moduleId }) {
 						px={6}
 						h="42px"
 						borderRadius="lg"
+						w={{ base: "full", md: "auto" }}
 					>
 						{isAdminsMode ? "Invite Staff" : "Add User"}
 					</Button>
 				)}
-			</HStack>
+			</Flex>
 
 			<Box overflowX="auto" borderRadius="xl" border="1px solid" borderColor="gray.100">
 				<Table variant="simple" size="sm" layout="fixed" minW="1100px">

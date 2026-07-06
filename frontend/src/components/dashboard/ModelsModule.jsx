@@ -23,6 +23,7 @@ import {
 	Badge,
 	Box,
 	VStack,
+	Flex,
 	Text,
 	Spinner,
 	Center,
@@ -213,8 +214,8 @@ export default function ModelsModule() {
 			title="Model Management"
 			description="Manage car models for each brand. Add model images for the brand selector."
 		>
-			<HStack justify="space-between" mb={8}>
-				<InputGroup maxW="350px">
+			<Flex direction={{ base: "column", md: "row" }} justify="space-between" align={{ base: "stretch", md: "center" }} gap={4} mb={8}>
+				<InputGroup maxW={{ base: "full", md: "350px" }}>
 					<InputLeftElement pointerEvents="none">
 						<SearchIcon color="gray.300" />
 					</InputLeftElement>
@@ -229,7 +230,7 @@ export default function ModelsModule() {
 					/>
 				</InputGroup>
 
-				<HStack spacing={4}>
+				<Flex direction={{ base: "column", sm: "row" }} gap={4} w={{ base: "full", md: "auto" }}>
 					<input
 						type="file"
 						id="csv-file-input"
@@ -248,6 +249,7 @@ export default function ModelsModule() {
 						h="45px"
 						borderRadius="xl"
 						boxShadow="sm"
+						w={{ base: "full", sm: "auto" }}
 					>
 						Import Specs CSV
 					</Button>
@@ -265,11 +267,12 @@ export default function ModelsModule() {
 						h="45px"
 						borderRadius="xl"
 						boxShadow="md"
+						w={{ base: "full", sm: "auto" }}
 					>
 						Add Model
 					</Button>
-				</HStack>
-			</HStack>
+				</Flex>
+			</Flex>
 
 			{isLoading ? (
 				<Center py={20}>

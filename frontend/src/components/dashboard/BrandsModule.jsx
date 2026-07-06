@@ -23,6 +23,7 @@ import {
 	Badge,
 	Box,
 	VStack,
+	Flex,
 	Text,
 	Spinner,
 	Center,
@@ -181,8 +182,8 @@ export default function BrandsModule() {
 			title="Brand Management"
 			description="Manage car brands and their details. Add logos and descriptions for the brand selector."
 		>
-			<HStack justify="space-between" mb={8}>
-				<InputGroup maxW="350px">
+			<Flex direction={{ base: "column", sm: "row" }} justify="space-between" align={{ base: "stretch", sm: "center" }} gap={4} mb={8}>
+				<InputGroup maxW={{ base: "full", sm: "350px" }}>
 					<InputLeftElement pointerEvents="none">
 						<SearchIcon color="gray.300" />
 					</InputLeftElement>
@@ -214,7 +215,7 @@ export default function BrandsModule() {
 				>
 					Add Brand
 				</Button>
-			</HStack>
+			</Flex>
 
 			{isLoading ? (
 				<Center py={20}>

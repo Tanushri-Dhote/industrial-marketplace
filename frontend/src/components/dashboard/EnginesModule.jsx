@@ -24,6 +24,7 @@ import {
 	Box,
 	VStack,
 	SimpleGrid,
+	Flex,
 	Text,
 	Icon,
 	Select,
@@ -237,8 +238,8 @@ export default function EnginesModule() {
 			title="Engine Inventory"
 			description="Manage your industrial engine catalog. Track stock, specifications, and pricing across all your tenant sites."
 		>
-			<HStack justify="space-between" mb={8}>
-				<InputGroup maxW="350px">
+			<Flex direction={{ base: "column", md: "row" }} justify="space-between" align={{ base: "stretch", md: "center" }} gap={4} mb={8}>
+				<InputGroup maxW={{ base: "full", md: "350px" }}>
 					<InputLeftElement pointerEvents="none">
 						<SearchIcon color="gray.300" />
 					</InputLeftElement>
@@ -254,7 +255,7 @@ export default function EnginesModule() {
 				</InputGroup>
 
 				{!isViewer && (
-					<HStack spacing={3}>
+					<Flex direction={{ base: "column", sm: "row" }} gap={3} w={{ base: "full", md: "auto" }}>
 						<Button
 							variant="outline"
 							borderColor="gray.200"
@@ -266,6 +267,7 @@ export default function EnginesModule() {
 							h="45px"
 							borderRadius="xl"
 							boxShadow="sm"
+							w={{ base: "full", sm: "auto" }}
 						>
 							Import CSV
 						</Button>
@@ -276,27 +278,27 @@ export default function EnginesModule() {
 							style={{ display: "none" }}
 							onChange={handleCSVImport}
 						/>
-
 						<Button
 							leftIcon={<AddIcon />}
-							bg="#D90404"
+							bg={ACCENT}
 							color="white"
 							_hover={{ bg: "#c00404" }}
 							onClick={() => {
-								setEditingProduct(null);
+								resetForm();
 								onOpen();
 							}}
 							fontSize="14px"
-							px={6}
+							px={8}
 							h="45px"
 							borderRadius="xl"
 							boxShadow="md"
+							w={{ base: "full", sm: "auto" }}
 						>
 							Add Engine
 						</Button>
-					</HStack>
+					</Flex>
 				)}
-			</HStack>
+			</Flex>
 
 			{isLoading ? (
 				<Center py={20}>
