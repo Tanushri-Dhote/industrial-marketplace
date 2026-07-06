@@ -402,7 +402,8 @@ export default function InquiriesModule({ moduleId }) {
 					</VStack>
 				</Flex>
 			) : (
-				<Box overflowX="auto" borderRadius="xl" border="1px solid" borderColor="gray.100">
+				{/* Desktop Table View */}
+				<Box display={{ base: "none", lg: "block" }} overflowX="auto" borderRadius="xl" border="1px solid" borderColor="gray.100">
 					<Table variant="simple" size="sm">
 						<Thead>
 							<Tr bg={DARK}>
@@ -673,6 +674,195 @@ export default function InquiriesModule({ moduleId }) {
 							))}
 						</Tbody>
 					</Table>
+				</Box>
+
+				{/* Mobile Card View */}
+				<Box display={{ base: "block", lg: "none" }}>
+					<VStack spacing={4} align="stretch">
+						{visibleInquiries.map((inquiry, idx) => (
+							<Box
+								key={inquiry.id}
+								bg="white"
+								p={4}
+								borderRadius="xl"
+								border="1px solid"
+								borderColor="gray.200"
+								boxShadow="sm"
+								_hover={{ borderColor: "blue.300" }}
+								transition="all 0.15s"
+							>
+								<VStack align="stretch" spacing={3}>
+									<Flex justify="space-between" align="center">
+										<Text fontSize="12px" fontWeight="700" color="gray.500" fontFamily="mono">
+											Ref: #{inquiry.refNumber}
+										</Text>
+										<Text fontSize="11px" color="gray.400" fontWeight="600">
+											{inquiry.date}
+										</Text>
+									</Flex>
+
+									<Flex justify="space-between" align="start" gap={3}>
+										<VStack align="start" spacing={1} flex="1">
+											<Text fontSize="14px" fontWeight="800" color={DARK}>
+												{inquiry.name}
+											</Text>
+											<Text fontSize="11px" color="gray.500">
+												{inquiry.email}
+											</Text>
+											
+											<HStack spacing={2} mt={1} wrap="wrap">
+												<Badge colorScheme="blue" variant="subtle" fontSize="10px" px={2} borderRadius="full">
+													{inquiry.category}
+												</Badge>
+												<HStack spacing={1}>
+													<Icon as={MapPin} size={11} color="gray.400" />
+													<Text fontSize="11px" color="gray.500" fontWeight="600">
+														{inquiry.postcode}
+													</Text>
+												</HStack>
+											</HStack>
+										</VStack>
+
+										<Box shrink={0}>
+											<UKPlate vrm={inquiry.registrationNumber} />
+										</Box>
+									</Flex>
+
+									<Flex justify="space-between" align="center" pt={3} borderTop="1px dashed" borderColor="gray.100">
+										<Button
+											size="xs"
+											leftIcon={<ViewIcon />}
+											variant="ghost"
+											color="blue.600"
+											_hover={{ bg: "blue.50" }}
+											onClick={() => {
+												setViewingInquiry(inquiry);
+												onViewOpen();
+											}}
+											fontSize="11px"
+											fontWeight="700"
+										>
+											Details
+										</Button>
+
+										<HStack spacing={2}>
+											{activeTab === "enquiry" && !isViewer && (
+												<>
+													<Button
+														size="xs"
+														bg={RED}
+														color="white"
+														_hover={{ bg: "#c00404" }}
+														fontWeight="700"
+														fontSize="10px"
+														borderRadius="lg"
+														px={3}
+														onClick={() => handleCreateQuote(inquiry)}
+														leftIcon={<Icon as={FileText} size={10} />}
+													>
+														Quote
+													</Button>
+													<Button
+														size="xs"
+														bg={DARK}
+														color="white"
+														_hover={{ bg: "#1E293B" }}
+														fontWeight="700"
+														fontSize="10px"
+														borderRadius="lg"
+														px={3}
+														onClick={() => handleMarkJob(inquiry.id)}
+														leftIcon={<Icon as={Briefcase} size={10} />}
+													>
+														Job
+													</Button>
+													<IconButton
+														icon={<Icon as={EyeOff} size={14} />}
+														size="xs"
+														variant="ghost"
+														color="gray.400"
+														_hover={{ bg: "gray.100", color: "gray.700" }}
+														onClick={() => handleHide(inquiry.id)}
+														aria-label="Hide"
+													/>
+												</>
+											)}
+
+											{activeTab === "quoted" && !isViewer && (
+												<>
+													<Button
+														size="xs"
+														bg={DARK}
+														color="white"
+														_hover={{ bg: "#1E293B" }}
+														fontWeight="700"
+														fontSize="10px"
+														borderRadius="lg"
+														px={3}
+														onClick={() => handleMarkJob(inquiry.id)}
+														leftIcon={<Icon as={CheckCircle} size={10} />}
+													>
+														Accept Job
+													</Button>
+													<IconButton
+														icon={<Icon as={EyeOff} size={14} />}
+														size="xs"
+														variant="ghost"
+														color="gray.400"
+														_hover={{ bg: "gray.100" }}
+														onClick={() => handleHide(inquiry.id)}
+														aria-label="Hide"
+													/>
+												</>
+											)}
+
+											{activeTab === "job" && !isViewer && (
+												<IconButton
+													icon={<Icon as={EyeOff} size={14} />}
+													size="xs"
+													variant="ghost"
+													color="gray.400"
+													_hover={{ bg: "gray.100" }}
+													onClick={() => handleHide(inquiry.id)}
+													aria-label="Hide"
+												/>
+											)}
+
+											{activeTab === "hidden" && (
+												<>
+													<Button
+														size="xs"
+														variant="outline"
+														borderColor="gray.400"
+														color="gray.600"
+														_hover={{ bg: "gray.100" }}
+														fontWeight="700"
+														fontSize="10px"
+														borderRadius="lg"
+														px={3}
+														onClick={() => handleUnhide(inquiry.id)}
+														leftIcon={<Icon as={Eye} size={10} />}
+													>
+														Un-Hide
+													</Button>
+													{!isViewer && canModify() && (
+														<IconButton
+															icon={<DeleteIcon />}
+															size="xs"
+															variant="ghost"
+															colorScheme="red"
+															onClick={() => handleDelete(inquiry.id)}
+															aria-label="Delete"
+														/>
+													)}
+												</>
+											)}
+										</HStack>
+									</Flex>
+								</VStack>
+							</Box>
+						))}
+					</VStack>
 				</Box>
 			)}
 

@@ -30,6 +30,7 @@ import {
 	SimpleGrid,
 	Text,
 	Icon,
+	Flex,
 	useColorModeValue,
 	Spinner,
 	Center,
@@ -160,7 +161,8 @@ export default function QuotesModule() {
 					<Spinner size="xl" color="#D90404" />
 				</Center>
 			) : (
-				<Box overflowX="auto" borderRadius="xl" border="1px solid" borderColor="gray.100">
+				{/* Desktop Table View */}
+				<Box display={{ base: "none", lg: "block" }} overflowX="auto" borderRadius="xl" border="1px solid" borderColor="gray.100">
 					<Table variant="simple" layout="fixed" minW="1000px">
 						<Thead bg="gray.50">
 							<Tr>
@@ -275,6 +277,112 @@ export default function QuotesModule() {
 							})}
 						</Tbody>
 					</Table>
+				</Box>
+
+				{/* Mobile Card View */}
+				<Box display={{ base: "block", lg: "none" }}>
+					<VStack spacing={4} align="stretch">
+						{quotes.map((quote) => {
+							const productLabel =
+								quote.vehicle?.vehicleDesc ||
+								quote.vehicle?.engineCode ||
+								quote.vehicle?.vrm ||
+								"-";
+							const amount = quote.pricing?.total || 0;
+							return (
+								<Box
+									key={quote._id}
+									bg="white"
+									p={4}
+									borderRadius="xl"
+									border="1px solid"
+									borderColor="gray.200"
+									boxShadow="sm"
+									_hover={{ borderColor: "blue.300" }}
+									transition="all 0.15s"
+								>
+									<VStack align="stretch" spacing={3}>
+										<Flex justify="space-between" align="center">
+											<Text fontSize="12px" color="gray.400" fontWeight="600">
+												{new Date(quote.createdAt).toISOString().slice(0, 10)}
+											</Text>
+											<Badge variant="subtle" colorScheme="blue" fontSize="10px" px={2} borderRadius="full">
+												{quote.website_id?.name || "Main Site"}
+											</Badge>
+										</Flex>
+
+										<VStack align="start" spacing={1}>
+											<Text fontSize="14px" fontWeight="800" color="gray.850">
+												{quote.customer?.name || "-"}
+											</Text>
+											<Text fontSize="13px" color="gray.600">
+												Product: <Text as="span" fontWeight="600" color="gray.800">{productLabel}</Text>
+											</Text>
+											<Flex align="center" justify="space-between" w="full" pt={1}>
+												<Text fontSize="15px" fontWeight="800" color="green.600">
+													£{amount.toLocaleString()}
+												</Text>
+												<Select
+													value={quote.status || "Pending"}
+													size="xs"
+													width="100px"
+													fontSize="11px"
+													borderRadius="md"
+													onChange={(e) => handleStatusChange(quote._id, e.target.value)}
+													bg={inputBg}
+												>
+													<option value="Pending">Pending</option>
+													<option value="Sent">Sent</option>
+													<option value="Approved">Approved</option>
+													<option value="Rejected">Rejected</option>
+												</Select>
+											</Flex>
+										</VStack>
+
+										<Flex justify="space-between" align="center" pt={3} borderTop="1px dashed" borderColor="gray.100">
+											<Text fontSize="11px" color="gray.400" fontWeight="500">
+												By: {quote.createdBy?.name || "System"}
+											</Text>
+											<HStack spacing={1}>
+												<IconButton
+													icon={<ViewIcon />}
+													size="sm"
+													variant="ghost"
+													onClick={() => {
+														setViewingQuote(quote);
+														onViewOpen();
+													}}
+													aria-label="View Quote"
+												/>
+												{canModify() && (
+													<>
+														<IconButton
+															icon={<EditIcon />}
+															size="sm"
+															variant="ghost"
+															onClick={() => {
+																setEditingQuote(quote);
+																onOpen();
+															}}
+															aria-label="Edit Quote"
+														/>
+														<IconButton
+															icon={<DeleteIcon />}
+															size="sm"
+															variant="ghost"
+															colorScheme="red"
+															onClick={() => handleDelete(quote._id)}
+															aria-label="Delete Quote"
+														/>
+													</>
+												)}
+											</HStack>
+										</Flex>
+									</VStack>
+								</Box>
+							);
+						})}
+					</VStack>
 				</Box>
 			)}
 

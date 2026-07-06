@@ -264,110 +264,212 @@ export default function LeadsModule() {
 				</HStack>
 			</HStack>
 
-			<Box overflowX="auto" borderRadius="xl" border="1px solid" borderColor="gray.100">
-				<Table variant="simple">
-					<Thead bg="gray.50">
-						<Tr>
-							<Th fontSize="12px" fontWeight="800" textTransform="uppercase" letterSpacing="1px">
-								Lead
-							</Th>
-							<Th fontSize="12px" fontWeight="800" textTransform="uppercase" letterSpacing="1px">
-								Email
-							</Th>
-							<Th fontSize="12px" fontWeight="800" textTransform="uppercase" letterSpacing="1px">
-								Product
-							</Th>
-							<Th fontSize="12px" fontWeight="800" textTransform="uppercase" letterSpacing="1px">
-								Website
-							</Th>
-							<Th fontSize="12px" fontWeight="800" textTransform="uppercase" letterSpacing="1px">
-								Status
-							</Th>
-							<Th fontSize="12px" fontWeight="800" textTransform="uppercase" letterSpacing="1px">
-								Date
-							</Th>
-							<Th fontSize="12px" fontWeight="800" textTransform="uppercase" letterSpacing="1px">
-								Actions
-							</Th>
-						</Tr>
-					</Thead>
-					<Tbody>
-						{filteredLeads.map((lead) => (
-							<Tr key={lead.id}>
-								<Td fontSize="13px" fontWeight="600">
-									{lead.name}
-								</Td>
-								<Td fontSize="13px">{lead.email}</Td>
-								<Td fontSize="13px">{lead.product}</Td>
-								<Td fontSize="13px">{lead.websiteName}</Td>
-								<Td>
-									<Select
-										value={lead.status}
-										size="sm"
-										width="130px"
-										fontSize="12px"
-										borderRadius="md"
-										onChange={(e) => handleStatusChange(lead.id, e.target.value)}
-										isDisabled={isViewer}
-									>
-										{STATUS_OPTIONS.map((status) => (
-											<option key={status} value={status}>
-												{status}
-											</option>
-										))}
-									</Select>
-								</Td>
-								<Td fontSize="13px">{lead.date}</Td>
-								<Td>
-									<HStack spacing={1}>
-										<IconButton
-											icon={<ViewIcon />}
-											size="sm"
-											variant="ghost"
-											onClick={() => {
-												setViewingLead(lead);
-												onViewOpen();
-											}}
-											aria-label="View Lead"
-										/>
-										{canModify && (
-											<>
+			{filteredLeads.length === 0 ? (
+				<Flex justify="center" py={16} bg="white" borderRadius="xl" border="1px solid" borderColor="gray.100">
+					<VStack spacing={3} color="gray.500">
+						<Icon as={UserCheck} boxSize={10} />
+						<Text fontWeight="600">No leads found</Text>
+					</VStack>
+				</Flex>
+			) : (
+				<>
+					{/* Desktop Table View */}
+					<Box display={{ base: "none", lg: "block" }} overflowX="auto" borderRadius="xl" border="1px solid" borderColor="gray.100">
+						<Table variant="simple">
+							<Thead bg="gray.50">
+								<Tr>
+									<Th fontSize="12px" fontWeight="800" textTransform="uppercase" letterSpacing="1px">
+										Lead
+									</Th>
+									<Th fontSize="12px" fontWeight="800" textTransform="uppercase" letterSpacing="1px">
+										Email
+									</Th>
+									<Th fontSize="12px" fontWeight="800" textTransform="uppercase" letterSpacing="1px">
+										Product
+									</Th>
+									<Th fontSize="12px" fontWeight="800" textTransform="uppercase" letterSpacing="1px">
+										Website
+									</Th>
+									<Th fontSize="12px" fontWeight="800" textTransform="uppercase" letterSpacing="1px">
+										Status
+									</Th>
+									<Th fontSize="12px" fontWeight="800" textTransform="uppercase" letterSpacing="1px">
+										Date
+									</Th>
+									<Th fontSize="12px" fontWeight="800" textTransform="uppercase" letterSpacing="1px">
+										Actions
+									</Th>
+								</Tr>
+							</Thead>
+							<Tbody>
+								{filteredLeads.map((lead) => (
+									<Tr key={lead.id}>
+										<Td fontSize="13px" fontWeight="600">
+											{lead.name}
+										</Td>
+										<Td fontSize="13px">{lead.email}</Td>
+										<Td fontSize="13px">{lead.product}</Td>
+										<Td fontSize="13px">{lead.websiteName}</Td>
+										<Td>
+											<Select
+												value={lead.status}
+												size="sm"
+												width="130px"
+												fontSize="12px"
+												borderRadius="md"
+												onChange={(e) => handleStatusChange(lead.id, e.target.value)}
+												isDisabled={isViewer}
+											>
+												{STATUS_OPTIONS.map((status) => (
+													<option key={status} value={status}>
+														{status}
+													</option>
+												))}
+											</Select>
+										</Td>
+										<Td fontSize="13px">{lead.date}</Td>
+										<Td>
+											<HStack spacing={1}>
 												<IconButton
-													icon={<EditIcon />}
+													icon={<ViewIcon />}
 													size="sm"
 													variant="ghost"
 													onClick={() => {
-														setEditingLead(lead);
-														onOpen();
+														setViewingLead(lead);
+														onViewOpen();
 													}}
-													aria-label="Edit Lead"
+													aria-label="View Lead"
 												/>
+												{canModify && (
+													<>
+														<IconButton
+															icon={<EditIcon />}
+															size="sm"
+															variant="ghost"
+															onClick={() => {
+																setEditingLead(lead);
+																onOpen();
+															}}
+															aria-label="Edit Lead"
+														/>
+														<IconButton
+															icon={<DeleteIcon />}
+															size="sm"
+															variant="ghost"
+															colorScheme="red"
+															onClick={() => handleDelete(lead.id)}
+															aria-label="Delete Lead"
+														/>
+													</>
+												)}
+											</HStack>
+										</Td>
+									</Tr>
+								))}
+							</Tbody>
+						</Table>
+					</Box>
+
+					{/* Mobile Card View */}
+					<Box display={{ base: "block", lg: "none" }}>
+						<VStack spacing={4} align="stretch">
+							{filteredLeads.map((lead) => (
+								<Box
+									key={lead.id}
+									bg="white"
+									p={4}
+									borderRadius="xl"
+									border="1px solid"
+									borderColor="gray.200"
+									boxShadow="sm"
+									_hover={{ borderColor: "blue.300" }}
+									transition="all 0.15s"
+								>
+									<VStack align="stretch" spacing={3}>
+										<Flex justify="space-between" align="center">
+											<Text fontSize="12px" color="gray.400" fontWeight="600">
+												{lead.date}
+											</Text>
+											<Badge variant="subtle" colorScheme="blue" fontSize="10px" px={2} borderRadius="full">
+												{lead.websiteName}
+											</Badge>
+										</Flex>
+
+										<VStack align="start" spacing={1}>
+											<Text fontSize="14px" fontWeight="800" color="gray.850">
+												{lead.name}
+											</Text>
+											<Text fontSize="12px" color="gray.500">
+												{lead.email}
+											</Text>
+											<Text fontSize="13px" color="gray.600">
+												Product: <Text as="span" fontWeight="600" color="gray.800">{lead.product}</Text>
+											</Text>
+											<Flex align="center" justify="space-between" w="full" pt={1}>
+												<Text fontSize="12px" fontWeight="700" color="gray.400">
+													Status:
+												</Text>
+												<Select
+													value={lead.status}
+													size="xs"
+													width="120px"
+													fontSize="11px"
+													borderRadius="md"
+													onChange={(e) => handleStatusChange(lead.id, e.target.value)}
+													isDisabled={isViewer}
+												>
+													{STATUS_OPTIONS.map((status) => (
+														<option key={status} value={status}>
+															{status}
+														</option>
+													))}
+												</Select>
+											</Flex>
+										</VStack>
+
+										<Flex justify="flex-end" align="center" pt={3} borderTop="1px dashed" borderColor="gray.100">
+											<HStack spacing={1}>
 												<IconButton
-													icon={<DeleteIcon />}
+													icon={<ViewIcon />}
 													size="sm"
 													variant="ghost"
-													colorScheme="red"
-													onClick={() => handleDelete(lead.id)}
-													aria-label="Delete Lead"
+													onClick={() => {
+														setViewingLead(lead);
+														onViewOpen();
+													}}
+													aria-label="View Lead"
 												/>
-											</>
-										)}
-									</HStack>
-								</Td>
-							</Tr>
-						))}
-					</Tbody>
-				</Table>
-
-				{filteredLeads.length === 0 && (
-					<Flex justify="center" py={16}>
-						<VStack spacing={3} color="gray.500">
-							<Icon as={UserCheck} boxSize={10} />
-							<Text fontWeight="600">No leads found</Text>
+												{canModify && (
+													<>
+														<IconButton
+															icon={<EditIcon />}
+															size="sm"
+															variant="ghost"
+															onClick={() => {
+																setEditingLead(lead);
+																onOpen();
+															}}
+															aria-label="Edit Lead"
+														/>
+														<IconButton
+															icon={<DeleteIcon />}
+															size="sm"
+															variant="ghost"
+															colorScheme="red"
+															onClick={() => handleDelete(lead.id)}
+															aria-label="Delete Lead"
+														/>
+													</>
+												)}
+											</HStack>
+										</Flex>
+									</VStack>
+								</Box>
+							))}
 						</VStack>
-					</Flex>
-				)}
-			</Box>
+					</Box>
+				</>
+			)}
 
 			<LeadModal
 				isOpen={isOpen}
