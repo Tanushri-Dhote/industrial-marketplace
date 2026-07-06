@@ -1040,33 +1040,33 @@ export default function HeroSection({ category = "Engines", initialBrand = "", i
 							>
 								{/* Bottom Row Features */}
 								<Flex
-									direction={{ base: "column", md: "row" }}
+									direction="row"
 									gap={{ base: 3, md: 6 }}
 									wrap="wrap"
-									justify={{ base: "center", md: "start" }}
-									align={{ base: "center", md: "start" }}
+									justify={{ base: "center", lg: "start" }}
+									align="center"
 									w={{ base: "full", lg: "auto" }}
 									py={1}
 								>
-									<HStack spacing={2.5}>
-										<Circle size="32px" border="1.5px solid" borderColor="gray.200" bg="white" boxShadow="sm" flexShrink={0}>
-											<Icon as={FaTools} color="#D90404" boxSize="14px" />
+									<HStack spacing={2}>
+										<Circle size={{ base: "26px", md: "32px" }} border="1.5px solid" borderColor="gray.200" bg="white" boxShadow="sm" flexShrink={0}>
+											<Icon as={FaTools} color="#D90404" boxSize={{ base: "12px", md: "14px" }} />
 										</Circle>
-										<Text fontSize="13px" fontWeight="700" color="#1E293B" whiteSpace="nowrap">Supply and Fitting Offered</Text>
+										<Text fontSize={{ base: "11px", md: "13px" }} fontWeight="700" color="#1E293B" whiteSpace="nowrap">Supply and Fitting Offered</Text>
 									</HStack>
 
-									<HStack spacing={2.5}>
-										<Circle size="32px" border="1.5px solid" borderColor="gray.200" bg="white" boxShadow="sm" flexShrink={0}>
-											<Icon as={FaShieldAlt} color="#D90404" boxSize="14px" />
+									<HStack spacing={2}>
+										<Circle size={{ base: "26px", md: "32px" }} border="1.5px solid" borderColor="gray.200" bg="white" boxShadow="sm" flexShrink={0}>
+											<Icon as={FaShieldAlt} color="#D90404" boxSize={{ base: "12px", md: "14px" }} />
 										</Circle>
-										<Text fontSize="13px" fontWeight="700" color="#1E293B" whiteSpace="nowrap">6 Months Warranty*</Text>
+										<Text fontSize={{ base: "11px", md: "13px" }} fontWeight="700" color="#1E293B" whiteSpace="nowrap">6 Months Warranty*</Text>
 									</HStack>
 
-									<HStack spacing={2.5}>
-										<Circle size="32px" border="1.5px solid" borderColor="gray.200" bg="white" boxShadow="sm" flexShrink={0}>
-											<Icon as={FaClock} color="#D90404" boxSize="14px" />
+									<HStack spacing={2}>
+										<Circle size={{ base: "26px", md: "32px" }} border="1.5px solid" borderColor="gray.200" bg="white" boxShadow="sm" flexShrink={0}>
+											<Icon as={FaClock} color="#D90404" boxSize={{ base: "12px", md: "14px" }} />
 										</Circle>
-										<Text fontSize="13px" fontWeight="700" color="#1E293B" whiteSpace="nowrap">It Only Takes a Minute</Text>
+										<Text fontSize={{ base: "11px", md: "13px" }} fontWeight="700" color="#1E293B" whiteSpace="nowrap">It Only Takes a Minute</Text>
 									</HStack>
 								</Flex>
 
@@ -1080,7 +1080,7 @@ export default function HeroSection({ category = "Engines", initialBrand = "", i
 									borderRadius={{ base: "xl", md: "0 xl xl 0" }}
 									flexShrink={0}
 									mx={{ base: "auto", lg: "0" }}
-									mt={{ base: 4, lg: 0 }}
+									mt={{ base: 2, lg: 0 }}
 								>
 									<HStack spacing={2.5} pl={{ base: 4, md: 6 }} pr={4} h="full" align="center">
 										<Circle size="30px" border="1.5px solid rgba(255, 255, 255, 0.4)" bg="transparent" flexShrink={0}>
