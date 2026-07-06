@@ -718,10 +718,10 @@ export default function HeroSection({ category = "Engines", initialBrand = "", i
 							<Box w="full" h="1px" bg="gray.100" />
 
 							{/* Dropdowns Grid */}
-							<SimpleGrid columns={{ base: 1, sm: 2, md: 3, lg: (selectedBrand === "mercedes-benz" && showEngineSizeSelect) ? 5 : (selectedBrand === "mercedes-benz" || showEngineSizeSelect) ? 4 : 3 }} spacing={4} w="full">
+							<SimpleGrid columns={{ base: 1, md: (selectedBrand === "mercedes-benz" && showEngineSizeSelect) ? 5 : (selectedBrand === "mercedes-benz" || showEngineSizeSelect) ? 4 : 3 }} spacing={4} w="full">
 								{/* Brand Select */}
-								<Flex direction={{ base: "row", sm: "column" }} align={{ base: "center", sm: "start" }} gap={{ base: 3, sm: 1 }} w="full">
-									<Text fontSize="12px" fontWeight="700" color="#1E293B" minW={{ base: "90px", sm: "auto" }} textAlign="left">
+								<VStack align="start" spacing={1} w="full">
+									<Text fontSize="12px" fontWeight="700" color="#1E293B">
 										Select Brand
 									</Text>
 									<Flex
@@ -765,12 +765,12 @@ export default function HeroSection({ category = "Engines", initialBrand = "", i
 											))}
 										</Select>
 									</Flex>
-								</Flex>
+								</VStack>
 
 								{/* Class Select (Mercedes-Benz only) */}
 								{selectedBrand === "mercedes-benz" && (
-									<Flex direction={{ base: "row", sm: "column" }} align={{ base: "center", sm: "start" }} gap={{ base: 3, sm: 1 }} w="full">
-										<Text fontSize="12px" fontWeight="700" color="#1E293B" minW={{ base: "90px", sm: "auto" }} textAlign="left">
+									<VStack align="start" spacing={1} w="full">
+										<Text fontSize="12px" fontWeight="700" color="#1E293B">
 											Select Class
 										</Text>
 										<Flex
@@ -813,21 +813,20 @@ export default function HeroSection({ category = "Engines", initialBrand = "", i
 												))}
 											</Select>
 										</Flex>
-									</Flex>
+									</VStack>
 								)}
 
 								{/* Model Select */}
-								<Flex
+								<VStack
+									align="start"
+									spacing={1}
+									w="full"
 									display={{
 										base: (selectedBrand && (selectedBrand !== "mercedes-benz" || selectedClass)) ? "flex" : "none",
-										sm: "flex"
+										md: "flex"
 									}}
-									direction={{ base: "row", sm: "column" }}
-									align={{ base: "center", sm: "start" }}
-									gap={{ base: 3, sm: 1 }}
-									w="full"
 								>
-									<Text fontSize="12px" fontWeight="700" color="#1E293B" minW={{ base: "90px", sm: "auto" }} textAlign="left">
+									<Text fontSize="12px" fontWeight="700" color="#1E293B">
 										Select Model
 									</Text>
 									<Flex
@@ -837,7 +836,7 @@ export default function HeroSection({ category = "Engines", initialBrand = "", i
 										overflow="hidden"
 										h="46px"
 										w="full"
-										bg={(!selectedBrand || (selectedBrand === "mercedes-benz" && !selectedClass)) ? "gray.50" : "white"}
+										bg={{ base: "white", md: (!selectedBrand || (selectedBrand === "mercedes-benz" && !selectedClass)) ? "gray.50" : "white" }}
 										align="center"
 										_hover={{ borderColor: "gray.300" }}
 										_focusWithin={{ borderColor: RED, boxShadow: "0 0 0 1px rgba(217, 4, 4, 0.1)" }}
@@ -880,20 +879,19 @@ export default function HeroSection({ category = "Engines", initialBrand = "", i
 											)}
 										</Select>
 									</Flex>
-								</Flex>
+								</VStack>
 
 								{/* Year Select */}
-								<Flex
+								<VStack
+									align="start"
+									spacing={1}
+									w="full"
 									display={{
 										base: selectedModel ? "flex" : "none",
-										sm: "flex"
+										md: "flex"
 									}}
-									direction={{ base: "row", sm: "column" }}
-									align={{ base: "center", sm: "start" }}
-									gap={{ base: 3, sm: 1 }}
-									w="full"
 								>
-									<Text fontSize="12px" fontWeight="700" color="#1E293B" minW={{ base: "90px", sm: "auto" }} textAlign="left">
+									<Text fontSize="12px" fontWeight="700" color="#1E293B">
 										Select Year
 									</Text>
 									<Flex
@@ -903,7 +901,7 @@ export default function HeroSection({ category = "Engines", initialBrand = "", i
 										overflow="hidden"
 										h="46px"
 										w="full"
-										bg={!selectedModel ? "gray.50" : "white"}
+										bg={{ base: "white", md: !selectedModel ? "gray.50" : "white" }}
 										align="center"
 										_hover={{ borderColor: "gray.300" }}
 										_focusWithin={{ borderColor: RED, boxShadow: "0 0 0 1px rgba(217, 4, 4, 0.1)" }}
@@ -935,21 +933,20 @@ export default function HeroSection({ category = "Engines", initialBrand = "", i
 											))}
 										</Select>
 									</Flex>
-								</Flex>
+								</VStack>
 
 								{/* Engine Size Select */}
 								{showEngineSizeSelect && (
-									<Flex
+									<VStack
+										align="start"
+										spacing={1}
+										w="full"
 										display={{
 											base: selectedYear ? "flex" : "none",
-											sm: "flex"
+											md: "flex"
 										}}
-										direction={{ base: "row", sm: "column" }}
-										align={{ base: "center", sm: "start" }}
-										gap={{ base: 3, sm: 1 }}
-										w="full"
 									>
-										<Text fontSize="12px" fontWeight="700" color="#1E293B" minW={{ base: "90px", sm: "auto" }} textAlign="left">
+										<Text fontSize="12px" fontWeight="700" color="#1E293B">
 											Engine Size
 										</Text>
 										<Flex
@@ -959,7 +956,7 @@ export default function HeroSection({ category = "Engines", initialBrand = "", i
 											overflow="hidden"
 											h="46px"
 											w="full"
-											bg={!selectedYear ? "gray.50" : "white"}
+											bg={{ base: "white", md: !selectedYear ? "gray.50" : "white" }}
 											align="center"
 											_hover={{ borderColor: "gray.300" }}
 											_focusWithin={{ borderColor: RED, boxShadow: "0 0 0 1px rgba(217, 4, 4, 0.1)" }}
@@ -988,7 +985,7 @@ export default function HeroSection({ category = "Engines", initialBrand = "", i
 												))}
 											</Select>
 										</Flex>
-									</Flex>
+									</VStack>
 								)}
 							</SimpleGrid>
 
