@@ -15,24 +15,13 @@ async function check() {
 			console.log("❌ Audi brand not found.");
 			process.exit(1);
 		}
-		console.log(`Found Brand: ${brand.name} (ID: ${brand._id})`);
 
-		const totalModelsCount = await Model.countDocuments({ brandId: brand._id });
-		console.log(`Total Audi models in database: ${totalModelsCount}`);
-
-		// Get a sample of Audi models
-		const sampleModels = await Model.find({ brandId: brand._id }).limit(10);
-		console.log("Sample Audi models:");
-		sampleModels.forEach(m => {
-			console.log(`- Name: "${m.name}", Slug: "${m.slug}", spritePosition: ${JSON.stringify(m.spritePosition)}, imageUrl: "${m.imageUrl}", spriteSheetUrl: "${m.spriteSheetUrl}"`);
+		const models = await Model.find({ brandId: brand._id }).sort({ name: 1 });
+		console.log(`Found ${models.length} Audi models. Listing all:`);
+		
+		models.forEach((m, idx) => {
+			console.log(`${idx + 1}. Name: "${m.name}", Slug: "${m.slug}", spritePosition: ${JSON.stringify(m.spritePosition)}`);
 		});
-
-		// Count models with specific spritePosition fields
-		const withPosition = await Model.countDocuments({
-			brandId: brand._id,
-			spritePosition: { $exists: true }
-		});
-		console.log(`Models with spritePosition object defined: ${withPosition}`);
 
 		process.exit(0);
 	} catch (error) {
