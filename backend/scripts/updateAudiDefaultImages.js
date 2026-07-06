@@ -17,12 +17,14 @@ async function update() {
 		}
 		console.log(`🏷️ Found Brand: ${brand.name} (ID: ${brand._id})`);
 
-		// Update all Audi models where spritePosition is { x: -945, y: -1672 }
+		// Update all Audi models where spritePosition is { x: -945, y: -1672 } or { x: 0, y: 0 }
 		const result = await Model.updateMany(
 			{
 				brandId: brand._id,
-				"spritePosition.x": -945,
-				"spritePosition.y": -1672
+				$or: [
+					{ "spritePosition.x": -945, "spritePosition.y": -1672 },
+					{ "spritePosition.x": 0, "spritePosition.y": 0 }
+				]
 			},
 			{
 				$set: {
