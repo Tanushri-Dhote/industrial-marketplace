@@ -285,33 +285,24 @@ export default function Header() {
                 as="a"
                 href="tel:02071129397"
                 cursor="pointer"
-                bg="gray.100"
-                color="gray.800"
-                px={4}
+                bg="red.50"
+                color="#D90404"
+                px={5}
                 height="46px"
-                borderRadius="md"
-                border="1px solid"
-                borderColor="gray.200"
-                _hover={{ bg: "gray.200", borderColor: "gray.300", textDecoration: "none" }}
+                borderRadius="full"
+                border="2px solid"
+                borderColor="#D90404"
+                _hover={{ bg: "red.100", transform: "scale(1.03)", textDecoration: "none" }}
                 transition="all 0.2s"
                 display="inline-flex"
                 alignItems="center"
-                fontWeight="700"
+                boxShadow="sm"
               >
-                <HStack spacing={2} align="center">
-                  <Box
-                    bg="#c40000"
-                    color="white"
-                    boxSize="26px"
-                    borderRadius="full"
-                    display="flex"
-                    alignItems="center"
-                    justifyContent="center"
-                  >
-                    <FaPhoneAlt size={10} />
+                <HStack spacing={2.5} align="center">
+                  <Box color="#D90404" display="flex" alignItems="center">
+                    <FaPhoneAlt size={12} />
                   </Box>
-
-                  <Text fontSize="14px" color="gray.800">
+                  <Text fontSize="16px" fontWeight="800" color="#D90404" letterSpacing="0.5px">
                     02071129397
                   </Text>
                 </HStack>
@@ -380,37 +371,32 @@ export default function Header() {
 
               <Divider my={2} />
 
-              <Box
+              <Button
                 as="a"
                 href="tel:02071129397"
                 cursor="pointer"
-                bg="gray.100"
+                bg="red.50"
+                color="#D90404"
                 px={4}
-                py={2}
-                borderRadius="md"
-                border="1px solid"
-                borderColor="gray.200"
-                _hover={{ bg: "gray.200", borderColor: "gray.300", textDecoration: "none" }}
+                py={6}
+                borderRadius="full"
+                border="2px solid"
+                borderColor="#D90404"
+                _hover={{ bg: "red.100", textDecoration: "none" }}
                 transition="all 0.2s"
+                w="full"
+                justifyContent="center"
+                boxShadow="sm"
               >
                 <HStack spacing={3} align="center">
-                  <Box
-                    bg="#c40000"
-                    color="white"
-                    boxSize="34px"
-                    borderRadius="full"
-                    display="flex"
-                    alignItems="center"
-                    justifyContent="center"
-                  >
+                  <Box color="#D90404" display="flex" alignItems="center">
                     <FaPhoneAlt size={14} />
                   </Box>
-
-                  <Text fontWeight="700" fontSize="14px" color="gray.800">
+                  <Text fontWeight="800" fontSize="16px" color="#D90404" letterSpacing="0.5px">
                     02071129397
                   </Text>
                 </HStack>
-              </Box>
+              </Button>
 
               <Button
                 onClick={() => {
