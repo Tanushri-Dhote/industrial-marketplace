@@ -70,7 +70,7 @@ const HomeAbout = () => {
                             </HStack>
                             <HStack spacing={3}>
                                 <Icon as={FaCheckCircle} color="#D90404" boxSize={5} />
-                                <Text fontWeight="600" color="gray.700">Nationwide collection and delivery available.</Text>
+                                <Text fontWeight="600" color="gray.700">Local collection and delivery available.</Text>
                             </HStack>
                         </VStack>
 

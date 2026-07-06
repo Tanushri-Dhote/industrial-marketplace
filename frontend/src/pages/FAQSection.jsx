@@ -32,7 +32,7 @@ const faqs = [
   },
   {
     question: "How long does delivery take?",
-    answer: "Delivery usually takes 3-7 working days nationwide. Local pickup or fitting options are also available."
+    answer: "Delivery usually takes 3-7 working days. Local pickup or fitting options are also available."
   },
   {
     question: "Can I get the engine fitted locally?",
@@ -48,7 +48,7 @@ const faqs = [
   },
   {
     question: "Do you offer international shipping?",
-    answer: "Currently, we specialize in nationwide collection and delivery across the United Kingdom. Please contact our support team for custom international delivery inquiries."
+    answer: "Currently, we specialize in local collection and delivery. Please contact our support team for custom international delivery inquiries."
   },
 ];
 

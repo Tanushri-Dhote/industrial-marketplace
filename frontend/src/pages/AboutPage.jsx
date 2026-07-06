@@ -97,8 +97,8 @@ const features = [
   },
   {
     icon: FaTruck,
-    title: "Nationwide collection and delivery available.",
-    text: "We can arrange the collection of your vehicle from anywhere in the UK",
+    title: "Local collection and delivery available.",
+    text: "We can arrange the collection of your vehicle locally",
   },
   {
     icon: FaUsers,

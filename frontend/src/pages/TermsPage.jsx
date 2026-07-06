@@ -97,7 +97,7 @@ const sections = [
       "We provide professional engine reconditioning services with the highest quality standards.",
       "All engines are carefully rebuilt and tested by experienced technicians.",
       "We offer comprehensive warranty coverage on all our reconditioned engines.",
-      "Our service includes nationwide delivery across the UK.",
+      "Our service includes local delivery.",
       "We provide free quotes for all engine reconditioning services."
     ]
   },
@@ -169,7 +169,7 @@ const sections = [
     title: "Delivery Policy",
     icon: FaTruck,
     content: [
-      "We offer nationwide delivery across the UK mainland.",
+      "We offer local delivery.",
       "Delivery times are estimated and typically range from 2-5 business days.",
       "Shipping costs will be calculated and confirmed before dispatch.",
       "Customers are responsible for providing accurate delivery addresses.",

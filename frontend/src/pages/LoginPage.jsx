@@ -279,7 +279,7 @@ export default function LoginPage() {
 					{[
 						{ icon: FaShieldAlt, label: "Quality Tested", sub: "100% Inspected" },
 						{ icon: FaTools, label: "06 Months Warranty", sub: "For Peace of Mind" },
-						{ icon: FaTruck, label: "Nationwide collection and delivery available.", sub: "We can arrange the collection of your vehicle from anywhere in the UK" },
+						{ icon: FaTruck, label: "Local collection and delivery available.", sub: "We can arrange the collection of your vehicle locally" },
 					].map(({ icon, label, sub }) => (
 						<HStack key={label} spacing={4}>
 							<Box

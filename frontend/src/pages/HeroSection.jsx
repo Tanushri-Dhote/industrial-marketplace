@@ -564,10 +564,10 @@ export default function HeroSection({ category = "Engines", initialBrand = "", i
 										</Box>
 										<VStack align={{ base: "center", md: "start" }} spacing={0} textAlign={{ base: "center", md: "left" }}>
 											<Text fontWeight="800" fontSize="13px" color="#0F172A" lineHeight="1.2">
-												Nationwide Delivery
+												Local Delivery
 											</Text>
 											<Text fontSize="11px" color="gray.500" fontWeight="500">
-												Across the UK
+												Local collection & delivery
 											</Text>
 										</VStack>
 									</HStack>
@@ -720,8 +720,8 @@ export default function HeroSection({ category = "Engines", initialBrand = "", i
 							{/* Dropdowns Grid */}
 							<SimpleGrid columns={{ base: 1, sm: 2, md: 3, lg: (selectedBrand === "mercedes-benz" && showEngineSizeSelect) ? 5 : (selectedBrand === "mercedes-benz" || showEngineSizeSelect) ? 4 : 3 }} spacing={4} w="full">
 								{/* Brand Select */}
-								<VStack align="start" spacing={1} w="full">
-									<Text fontSize="12px" fontWeight="700" color="#1E293B">
+								<Flex direction={{ base: "row", sm: "column" }} align={{ base: "center", sm: "start" }} gap={{ base: 3, sm: 1 }} w="full">
+									<Text fontSize="12px" fontWeight="700" color="#1E293B" minW={{ base: "90px", sm: "auto" }} textAlign="left">
 										Select Brand
 									</Text>
 									<Flex
@@ -747,6 +747,8 @@ export default function HeroSection({ category = "Engines", initialBrand = "", i
 												setSelectedBrand(e.target.value);
 												setSelectedModel("");
 												setSelectedClass("");
+												setSelectedYear("");
+												setSelectedEngineSize("");
 											}}
 											h="full"
 											w="full"
@@ -763,12 +765,12 @@ export default function HeroSection({ category = "Engines", initialBrand = "", i
 											))}
 										</Select>
 									</Flex>
-								</VStack>
+								</Flex>
 
 								{/* Class Select (Mercedes-Benz only) */}
 								{selectedBrand === "mercedes-benz" && (
-									<VStack align="start" spacing={1} w="full">
-										<Text fontSize="12px" fontWeight="700" color="#1E293B">
+									<Flex direction={{ base: "row", sm: "column" }} align={{ base: "center", sm: "start" }} gap={{ base: 3, sm: 1 }} w="full">
+										<Text fontSize="12px" fontWeight="700" color="#1E293B" minW={{ base: "90px", sm: "auto" }} textAlign="left">
 											Select Class
 										</Text>
 										<Flex
@@ -793,6 +795,8 @@ export default function HeroSection({ category = "Engines", initialBrand = "", i
 												onChange={(e) => {
 													setSelectedClass(e.target.value);
 													setSelectedModel("");
+													setSelectedYear("");
+													setSelectedEngineSize("");
 												}}
 												h="full"
 												w="full"
@@ -809,110 +813,119 @@ export default function HeroSection({ category = "Engines", initialBrand = "", i
 												))}
 											</Select>
 										</Flex>
-									</VStack>
+									</Flex>
 								)}
 
 								{/* Model Select */}
-								<VStack align="start" spacing={1} w="full">
-									<Text fontSize="12px" fontWeight="700" color="#1E293B">
-										Select Model
-									</Text>
-									<Flex
-										border="1.5px solid"
-										borderColor="gray.200"
-										borderRadius="lg"
-										overflow="hidden"
-										h="46px"
-										w="full"
-										bg="white"
-										align="center"
-										_hover={{ borderColor: "gray.300" }}
-										_focusWithin={{ borderColor: RED, boxShadow: "0 0 0 1px rgba(217, 4, 4, 0.1)" }}
-									>
-										<Flex bg="#FEF2F2" w="42px" h="full" align="center" justify="center" borderRight="1.5px solid" borderColor="gray.200" flexShrink={0}>
-											<Icon as={FaCar} color="#D90404" boxSize={4} />
-										</Flex>
-										<Select
-											variant="unstyled"
-											placeholder={loadingModels ? "Loading Models..." : "Choose Model"}
-											value={selectedModel}
-											onChange={(e) => setSelectedModel(e.target.value)}
-											isDisabled={!selectedBrand || loadingModels || (selectedBrand === "mercedes-benz" && !selectedClass)}
-											h="full"
+								{selectedBrand && (selectedBrand !== "mercedes-benz" || selectedClass) && (
+									<Flex direction={{ base: "row", sm: "column" }} align={{ base: "center", sm: "start" }} gap={{ base: 3, sm: 1 }} w="full">
+										<Text fontSize="12px" fontWeight="700" color="#1E293B" minW={{ base: "90px", sm: "auto" }} textAlign="left">
+											Select Model
+										</Text>
+										<Flex
+											border="1.5px solid"
+											borderColor="gray.200"
+											borderRadius="lg"
+											overflow="hidden"
+											h="46px"
 											w="full"
-											px={3}
-											fontWeight="600"
-											fontSize="13px"
-											color="gray.700"
-											cursor="pointer"
+											bg="white"
+											align="center"
+											_hover={{ borderColor: "gray.300" }}
+											_focusWithin={{ borderColor: RED, boxShadow: "0 0 0 1px rgba(217, 4, 4, 0.1)" }}
 										>
-											{filteredModels.some(m => m.year || m.type) ? (
-												[...new Set(filteredModels.map(m => m.name))]
-													.sort((a, b) => a.localeCompare(b, undefined, { numeric: true }))
-													.map((name) => (
-														<option key={name} value={name}>
-															{name}
+											<Flex bg="#FEF2F2" w="42px" h="full" align="center" justify="center" borderRight="1.5px solid" borderColor="gray.200" flexShrink={0}>
+												<Icon as={FaCar} color="#D90404" boxSize={4} />
+											</Flex>
+											<Select
+												variant="unstyled"
+												placeholder={loadingModels ? "Loading Models..." : "Choose Model"}
+												value={selectedModel}
+												onChange={(e) => {
+													setSelectedModel(e.target.value);
+													setSelectedYear("");
+													setSelectedEngineSize("");
+												}}
+												h="full"
+												w="full"
+												px={3}
+												fontWeight="600"
+												fontSize="13px"
+												color="gray.700"
+												cursor="pointer"
+											>
+												{filteredModels.some(m => m.year || m.type) ? (
+													[...new Set(filteredModels.map(m => m.name))]
+														.sort((a, b) => a.localeCompare(b, undefined, { numeric: true }))
+														.map((name) => (
+															<option key={name} value={name}>
+																{name}
+															</option>
+														))
+												) : (
+													filteredModels.map((model) => (
+														<option key={model._id} value={model.slug}>
+															{model.name}
 														</option>
 													))
-											) : (
-												filteredModels.map((model) => (
-													<option key={model._id} value={model.slug}>
-														{model.name}
-													</option>
-												))
-											)}
-										</Select>
+												)}
+											</Select>
+										</Flex>
 									</Flex>
-								</VStack>
+								)}
 
 								{/* Year Select */}
-								<VStack align="start" spacing={1} w="full">
-									<Text fontSize="12px" fontWeight="700" color="#1E293B">
-										Select Year
-									</Text>
-									<Flex
-										border="1.5px solid"
-										borderColor="gray.200"
-										borderRadius="lg"
-										overflow="hidden"
-										h="46px"
-										w="full"
-										bg="white"
-										align="center"
-										_hover={{ borderColor: "gray.300" }}
-										_focusWithin={{ borderColor: RED, boxShadow: "0 0 0 1px rgba(217, 4, 4, 0.1)" }}
-									>
-										<Flex bg="#FEF2F2" w="42px" h="full" align="center" justify="center" borderRight="1.5px solid" borderColor="gray.200" flexShrink={0}>
-											<Icon as={FaCalendarAlt} color="#D90404" boxSize={4} />
-										</Flex>
-										<Select
-											variant="unstyled"
-											placeholder={loadingProducts ? "Loading Years..." : "Choose Year"}
-											value={selectedYear}
-											onChange={(e) => setSelectedYear(e.target.value)}
-											isDisabled={!selectedModel || loadingProducts}
-											h="full"
+								{selectedModel && (
+									<Flex direction={{ base: "row", sm: "column" }} align={{ base: "center", sm: "start" }} gap={{ base: 3, sm: 1 }} w="full">
+										<Text fontSize="12px" fontWeight="700" color="#1E293B" minW={{ base: "90px", sm: "auto" }} textAlign="left">
+											Select Year
+										</Text>
+										<Flex
+											border="1.5px solid"
+											borderColor="gray.200"
+											borderRadius="lg"
+											overflow="hidden"
+											h="46px"
 											w="full"
-											px={3}
-											fontWeight="600"
-											fontSize="13px"
-											color="gray.700"
-											cursor="pointer"
+											bg="white"
+											align="center"
+											_hover={{ borderColor: "gray.300" }}
+											_focusWithin={{ borderColor: RED, boxShadow: "0 0 0 1px rgba(217, 4, 4, 0.1)" }}
 										>
-											{dynamicYears.map((y) => (
-												<option key={y} value={y}>
-													{y}
-												</option>
-											))}
-										</Select>
+											<Flex bg="#FEF2F2" w="42px" h="full" align="center" justify="center" borderRight="1.5px solid" borderColor="gray.200" flexShrink={0}>
+												<Icon as={FaCalendarAlt} color="#D90404" boxSize={4} />
+											</Flex>
+											<Select
+												variant="unstyled"
+												placeholder={loadingProducts ? "Loading Years..." : "Choose Year"}
+												value={selectedYear}
+												onChange={(e) => {
+													setSelectedYear(e.target.value);
+													setSelectedEngineSize("");
+												}}
+												h="full"
+												w="full"
+												px={3}
+												fontWeight="600"
+												fontSize="13px"
+												color="gray.700"
+												cursor="pointer"
+											>
+												{dynamicYears.map((y) => (
+													<option key={y} value={y}>
+														{y}
+													</option>
+												))}
+											</Select>
+										</Flex>
 									</Flex>
-								</VStack>
+								)}
 
 								{/* Engine Size Select */}
-								{showEngineSizeSelect && (
-									<VStack align="start" spacing={1} w="full">
-										<Text fontSize="12px" fontWeight="700" color="#1E293B">
-											Engine Size / Type
+								{selectedYear && showEngineSizeSelect && (
+									<Flex direction={{ base: "row", sm: "column" }} align={{ base: "center", sm: "start" }} gap={{ base: 3, sm: 1 }} w="full">
+										<Text fontSize="12px" fontWeight="700" color="#1E293B" minW={{ base: "90px", sm: "auto" }} textAlign="left">
+											Engine Size
 										</Text>
 										<Flex
 											border="1.5px solid"
@@ -934,7 +947,6 @@ export default function HeroSection({ category = "Engines", initialBrand = "", i
 												placeholder={loadingProducts ? "Loading Engines..." : "Select Engine Size/Type"}
 												value={selectedEngineSize}
 												onChange={(e) => setSelectedEngineSize(e.target.value)}
-												isDisabled={!selectedYear || loadingProducts}
 												h="full"
 												w="full"
 												px={3}
@@ -950,7 +962,7 @@ export default function HeroSection({ category = "Engines", initialBrand = "", i
 												))}
 											</Select>
 										</Flex>
-									</VStack>
+									</Flex>
 								)}
 							</SimpleGrid>
 
@@ -1021,7 +1033,7 @@ export default function HeroSection({ category = "Engines", initialBrand = "", i
 										<Circle size="32px" border="1.5px solid" borderColor="gray.200" bg="white" boxShadow="sm" flexShrink={0}>
 											<Icon as={FaShieldAlt} color="#D90404" boxSize="14px" />
 										</Circle>
-										<Text fontSize="13px" fontWeight="700" color="#1E293B" whiteSpace="nowrap">Unlimited Mileage Warranty*</Text>
+										<Text fontSize="13px" fontWeight="700" color="#1E293B" whiteSpace="nowrap">6 Months Warranty*</Text>
 									</HStack>
 
 									<HStack spacing={2.5}>

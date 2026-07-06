@@ -142,7 +142,7 @@ export default function VehicleSelectorSection({ category }) {
 
             <ListItem display="flex" alignItems="center" gap={2} whiteSpace="nowrap">
               <ListIcon as={CheckCircleIcon} color={accentColor} boxSize={5} />
-              Unlimited Mileage Warranty*
+              6 Months Warranty*
             </ListItem>
 
             <ListItem display="flex" alignItems="center" gap={2} whiteSpace="nowrap">

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import {
 	Box,
 	Container,
@@ -89,8 +89,16 @@ export default function CallSellerPage({
 		notes: "",
 		name: "",
 		email: "",
-		phone: "+44 ",
+		phone: "",
 	});
+
+	const vrmRef = useRef(null);
+	const postcodeRef = useRef(null);
+	const engineTypeRef = useRef(null);
+	const notesRef = useRef(null);
+	const nameRef = useRef(null);
+	const emailRef = useRef(null);
+	const phoneRef = useRef(null);
 
 	const [dvlaBrand, setDvlaBrand] = useState("");
 	const [dvlaModel, setDvlaModel] = useState("");
@@ -398,8 +406,15 @@ export default function CallSellerPage({
 
 												{/* Input Field */}
 												<Input
+													ref={vrmRef}
 													value={manualVrm}
 													onChange={(e) => setManualVrm(e.target.value.toUpperCase().replace(/\s+/g, ""))}
+													onKeyDown={(e) => {
+														if (e.key === "Enter") {
+															e.preventDefault();
+															postcodeRef.current?.focus();
+														}
+													}}
 													placeholder="ENTER YOUR REG"
 													border="none"
 													bg="transparent"
@@ -471,10 +486,21 @@ export default function CallSellerPage({
 													<MapPin color="#E10600" size={18} />
 												</InputLeftElement>
 												<Input
+													ref={postcodeRef}
 													placeholder="Your Postcode"
 													borderRadius="lg"
 													value={form.postcode}
 													onChange={(e) => setForm({ ...form, postcode: e.target.value.toUpperCase() })}
+													onKeyDown={(e) => {
+														if (e.key === "Enter") {
+															e.preventDefault();
+															if (!brand && engineTypeRef.current) {
+																engineTypeRef.current.focus();
+															} else {
+																notesRef.current?.focus();
+															}
+														}
+													}}
 												/>
 											</InputGroup>
 
@@ -484,15 +510,23 @@ export default function CallSellerPage({
 														<Settings color="#E10600" size={18} />
 													</InputLeftElement>
 													<Input
+														ref={engineTypeRef}
 														placeholder="Engine Type / Code (Optional, e.g. 2.0L Diesel)"
 														borderRadius="lg"
 														value={vrmEngineType}
 														onChange={(e) => setVrmEngineType(e.target.value)}
+														onKeyDown={(e) => {
+															if (e.key === "Enter") {
+																e.preventDefault();
+																notesRef.current?.focus();
+															}
+														}}
 													/>
 												</InputGroup>
 											)}
 
 											<Textarea
+												ref={notesRef}
 												placeholder="Additional requirements or notes..."
 												rows={2}
 												borderRadius="lg"
@@ -668,17 +702,57 @@ export default function CallSellerPage({
 								<VStack spacing={4}>
 									<InputGroup size="md">
 										<InputLeftElement h="40px"><User color="#E10600" size={18} /></InputLeftElement>
-										<Input placeholder="Full Name" borderRadius="lg" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
+										<Input
+											ref={nameRef}
+											placeholder="Full Name"
+											borderRadius="lg"
+											value={form.name}
+											onChange={(e) => setForm({ ...form, name: e.target.value })}
+											onKeyDown={(e) => {
+												if (e.key === "Enter") {
+													e.preventDefault();
+													emailRef.current?.focus();
+												}
+											}}
+										/>
 									</InputGroup>
 
 									<InputGroup size="md">
 										<InputLeftElement h="40px"><EmailIcon color="#E10600" /></InputLeftElement>
-										<Input type="email" placeholder="Email Address" borderRadius="lg" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} />
+										<Input
+											ref={emailRef}
+											type="email"
+											placeholder="Email Address"
+											borderRadius="lg"
+											value={form.email}
+											onChange={(e) => setForm({ ...form, email: e.target.value })}
+											onKeyDown={(e) => {
+												if (e.key === "Enter") {
+													e.preventDefault();
+													phoneRef.current?.focus();
+												}
+											}}
+										/>
 									</InputGroup>
 
 									<InputGroup size="md">
 										<InputLeftElement h="40px"><PhoneIcon color="#E10600" /></InputLeftElement>
-										<Input type="tel" placeholder="+44 7700 900000" borderRadius="lg" value={form.phone} onChange={(e) => handlePhoneChange(e.target.value)} />
+										<Input
+											ref={phoneRef}
+											type="tel"
+											placeholder="+44 7700 900000"
+											borderRadius="lg"
+											value={form.phone}
+											onChange={(e) => handlePhoneChange(e.target.value)}
+											onKeyDown={(e) => {
+												if (e.key === "Enter") {
+													e.preventDefault();
+													if (form.name && form.email && form.phone) {
+														handleGetQuote();
+													}
+												}
+											}}
+										/>
 									</InputGroup>
 
 									<Button
