@@ -55,7 +55,7 @@ const ConfirmProdutModel = ({ isOpen, onClose }) => {
                     </Text>
 
                     <Text fontSize="sm" color="gray.600" mb={5}>
-                        This will confirm compatibility and allow 100s of suppliers to quote you.
+                        This will confirm compatibility and allow our team to quote you.
                     </Text>
 
                     {/* ✅ INPUT + BUTTON IN ONE LINE */}

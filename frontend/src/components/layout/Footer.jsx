@@ -63,8 +63,8 @@ export default function Footer() {
             </Link>
 
             <Text fontSize="14px" color="gray.400" lineHeight="1.8">
-              Your trusted UK marketplace for quality used and reconditioned
-              car engines with fast delivery and local fitting service.
+              Your trusted UK specialist for professional engine rebuilding,
+              local vehicle collection, and fitting services.
             </Text>
 
             <HStack spacing={2}>

@@ -31,24 +31,24 @@ const faqs = [
     answer: "Yes, all engines come with a 6-month warranty."
   },
   {
-    question: "How long does delivery take?",
-    answer: "Delivery usually takes 3-7 working days. Local pickup or fitting options are also available."
+    question: "How long does the engine rebuild take?",
+    answer: "The rebuild process usually takes 5-10 working days. Local vehicle collection and fitting is included."
   },
   {
     question: "Can I get the engine fitted locally?",
     answer: "Yes, we offer professional supply & fitting services. You can select this option while requesting your quote."
   },
   {
-    question: "What if I receive a wrong or defective engine?",
-    answer: "If you receive an incorrect or faulty engine, please contact our support team within 48 hours of delivery so the issue can be reviewed and resolved."
+    question: "What if there is an issue with the rebuilt engine?",
+    answer: "All our rebuilds come with a 6-month warranty. If you notice any issues with the rebuilt engine, contact our support team immediately."
   },
   {
     question: "How do I find the right engine for my vehicle?",
     answer: "Simply submit your vehicle or engine details and our team will help you find the matching engine option from our stock."
   },
   {
-    question: "Do you offer international shipping?",
-    answer: "Currently, we specialize in local collection and delivery. Please contact our support team for custom international delivery inquiries."
+    question: "Do you collect vehicles from outside the UK?",
+    answer: "Currently, we specialize in collection and engine rebuilding within the UK. Please contact our support team for extended inquiries."
   },
 ];
 

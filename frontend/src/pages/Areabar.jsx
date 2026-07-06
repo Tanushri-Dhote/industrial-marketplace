@@ -39,7 +39,7 @@ export default function ServiceAreasSection() {
 						</Heading>
 
 						<Text fontSize="15px" color="gray.600" maxW="520px">
-							We provide reliable engine delivery and fitting services across the United Kingdom
+							We provide reliable engine rebuilding and fitting services across the United Kingdom
 						</Text>
 					</VStack>
 

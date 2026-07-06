@@ -296,7 +296,7 @@ const RefreshPopUp = () => {
 								Enter your vehicle registration
 							</Heading>
 							<Text fontSize="sm" color="gray.500">
-								17 suppliers currently online
+								Our engineering team is online
 							</Text>
 						</Box>
 						<HStack justify="center" spacing={2} mb={2}>

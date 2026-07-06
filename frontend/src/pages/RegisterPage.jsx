@@ -191,7 +191,7 @@ export default function RegisterPage() {
 
         {/* Trust badges */}
         <HStack spacing={6} flexWrap="wrap">
-          {["Trusted Supplier", "Quality Guaranteed", "24/7 Support"].map((t) => (
+          {["Rebuilding Specialist", "Quality Guaranteed", "24/7 Support"].map((t) => (
             <Text key={t} fontSize="11px" color="whiteAlpha.500">✓ {t}</Text>
           ))}
         </HStack>

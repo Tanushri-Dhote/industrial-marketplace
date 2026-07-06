@@ -36,7 +36,7 @@ export default function ThankYouPage() {
                         <Text fontSize="md" color="gray.600" lineHeight="1.8">
                             Get the Exact Fit - Pay Only After Confirmation. We don't take
                             chances or payments upfront. Submit your VRM and contact info so
-                            our supplier can contact you and verify the best-fit engine for
+                            our team can contact you and verify the best-fit engine for
                             your car to quickly get your car back on the road.
                         </Text>
 

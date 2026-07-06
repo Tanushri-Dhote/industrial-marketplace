@@ -695,7 +695,7 @@ export default function CallSellerPage({
 
 							<Box mb={4}>
 								<Heading size="md" mb={1} color={DARK}>Contact Information</Heading>
-								<Text fontSize="sm" color="gray.600">We'll use this to connect you with suppliers</Text>
+								<Text fontSize="sm" color="gray.600">We'll use this to contact you regarding your engine rebuild request</Text>
 							</Box>
 
 							<Box bg="white" p={6} borderRadius="xl" border="1px solid" borderColor="gray.100" boxShadow="sm" maxW="md" mx="auto">
@@ -786,13 +786,13 @@ export default function CallSellerPage({
 
 							<Heading size="lg" mb={2} color={DARK}>Request Sent Successfully!</Heading>
 							<Text fontSize="sm" color="gray.600" maxW="450px" mx="auto" mb={6}>
-								Our network of specialists has received your request. You should hear back shortly.
+								Our engine rebuild specialists have received your request. You should hear back shortly.
 							</Text>
 
 							<SimpleGrid columns={{ base: 1, md: 3 }} gap={4} mb={6}>
 								{[
-									{ icon: "📞", title: "Contact", desc: "Suppliers will reach out soon" },
-									{ icon: "💰", title: "Quotes", desc: "Get competitive offers directly" },
+									{ icon: "📞", title: "Contact", desc: "Our team will reach out soon" },
+									{ icon: "💰", title: "Quotes", desc: "Get a comprehensive quote directly" },
 									{ icon: "✅", title: "Save", desc: "Get the best deal" },
 								].map((item, i) => (
 									<Box key={i} bg="white" p={4} borderRadius="xl" border="1px solid" borderColor="gray.100" boxShadow="sm">

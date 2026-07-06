@@ -624,7 +624,7 @@ export default function BrandModelSelectorSection() {
 										<Box textAlign="center" py={8}>
 											<Heading fontSize="22px" mb={4}>{selectedBrand?.name} Engine History</Heading>
 											<Text color="gray.600" lineHeight="1.8">
-												{selectedBrand?.description || `${selectedBrand?.name} is a renowned automotive manufacturer known for producing reliable and high-performance engines. Whether you are looking for reconditioned, remanufactured, or used engines, we help you find the best deals from verified suppliers across the UK.`}
+												{selectedBrand?.description || `${selectedBrand?.name} is a renowned automotive manufacturer known for producing reliable and high-performance engines. Whether you are looking for reconditioned, remanufactured, or used engines, we specialize in professional engine rebuilding and fitting services across the UK.`}
 											</Text>
 										</Box>
 									</>

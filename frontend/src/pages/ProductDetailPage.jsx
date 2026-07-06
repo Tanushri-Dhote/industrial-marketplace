@@ -350,7 +350,7 @@ export default function ProductDetailPage() {
 							<VStack align="stretch" spacing={4}>
 								{[
 									{ icon: FaCertificate, text: "Quality Tested & Certified", desc: "Every unit is thoroughly inspected." },
-									{icon: FaTruck, text: "Local collection & delivery", desc: "Fast shipping options available."},
+									{icon: FaTruck, text: "We Rebuild Your Engine", desc: "Local vehicle collection and fitting available."},
 									{ icon: FaShieldAlt, text: "06 Months Warranty", desc: "Comes with premium warranty coverage." },
 									{ icon: FaCheckCircle, text: "Satisfaction Guaranteed", desc: "We ensure total product quality." },
 								].map((item, i) => (

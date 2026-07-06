@@ -97,8 +97,8 @@ const features = [
   },
   {
     icon: FaTruck,
-    title: "Local collection and delivery available.",
-    text: "We can arrange the collection of your vehicle locally",
+    title: "We Rebuild Your Engine",
+    text: "We collect your vehicle, rebuild its engine, and fit it back locally.",
   },
   {
     icon: FaUsers,

@@ -84,7 +84,7 @@ const WarrantyBannerSection = () => {
                             align="stretch"
                             gap={{ base: 0, md: 2 }}
                         >
-                            <FeatureItem icon={FaTruck} title="Local Collection & Delivery" />
+                            <FeatureItem icon={FaTruck} title="We Rebuild Your Engine" />
                             <Divider />
                             <FeatureItem icon={FaBoxOpen} title="Secure Packaging" />
                             <Divider />

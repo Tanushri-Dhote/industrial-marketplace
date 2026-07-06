@@ -995,12 +995,7 @@ export default function HeroSection({ category = "Engines", initialBrand = "", i
 									position="relative"
 								>
 									<HStack spacing={2} align="center" w="full" justify="center" position="relative">
-										{/* Horizontal speed lines on left side of button content */}
-										<HStack spacing="3px" opacity={0.8} align="center" position="absolute" left="0">
-											<Box w="8px" h="2px" bg="white" borderRadius="full" />
-											<Box w="12px" h="2px" bg="white" borderRadius="full" />
-											<Box w="6px" h="2px" bg="white" borderRadius="full" />
-										</HStack>
+
 										<Text>Get Free Quotes</Text>
 										<Circle size="20px" bg="white" color="#D90404" display="inline-flex" alignItems="center" justify="center" position="absolute" right="0">
 											<ChevronRightIcon size={14} />

@@ -68,7 +68,7 @@ const sections = [
     icon: FaUserSecret,
     content: [
       "Re-Conditioned Engine is a professional engine reconditioning service provider based in the UK.",
-      "We specialize in high-quality engine rebuilding, testing, and delivery services.",
+      "We specialize in high-quality engine rebuilding, testing, and fitting services.",
       "Company registration number: 12345678 (Registered in England and Wales)",
       "Registered address: 44 Fowler Road, Hainault Business Park, Ilford London, IG6 3UT",
       "Contact email: info@reconditionedengine.co.uk",
@@ -82,7 +82,7 @@ const sections = [
     content: [
       "When you use our services, we may collect the following information:",
       "• Your name and contact information (email address, phone number)",
-      "• Your postcode for delivery calculations",
+      "• Your postcode for vehicle collection calculations",
       "• Vehicle details (make, model, year, registration number)",
       "• Engine specifications and requirements",
       "• Communication preferences and service history"
