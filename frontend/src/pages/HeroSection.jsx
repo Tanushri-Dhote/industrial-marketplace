@@ -817,113 +817,138 @@ export default function HeroSection({ category = "Engines", initialBrand = "", i
 								)}
 
 								{/* Model Select */}
-								{selectedBrand && (selectedBrand !== "mercedes-benz" || selectedClass) && (
-									<Flex direction={{ base: "row", sm: "column" }} align={{ base: "center", sm: "start" }} gap={{ base: 3, sm: 1 }} w="full">
-										<Text fontSize="12px" fontWeight="700" color="#1E293B" minW={{ base: "90px", sm: "auto" }} textAlign="left">
-											Select Model
-										</Text>
-										<Flex
-											border="1.5px solid"
-											borderColor="gray.200"
-											borderRadius="lg"
-											overflow="hidden"
-											h="46px"
+								<Flex
+									display={{
+										base: (selectedBrand && (selectedBrand !== "mercedes-benz" || selectedClass)) ? "flex" : "none",
+										sm: "flex"
+									}}
+									direction={{ base: "row", sm: "column" }}
+									align={{ base: "center", sm: "start" }}
+									gap={{ base: 3, sm: 1 }}
+									w="full"
+								>
+									<Text fontSize="12px" fontWeight="700" color="#1E293B" minW={{ base: "90px", sm: "auto" }} textAlign="left">
+										Select Model
+									</Text>
+									<Flex
+										border="1.5px solid"
+										borderColor="gray.200"
+										borderRadius="lg"
+										overflow="hidden"
+										h="46px"
+										w="full"
+										bg={(!selectedBrand || (selectedBrand === "mercedes-benz" && !selectedClass)) ? "gray.50" : "white"}
+										align="center"
+										_hover={{ borderColor: "gray.300" }}
+										_focusWithin={{ borderColor: RED, boxShadow: "0 0 0 1px rgba(217, 4, 4, 0.1)" }}
+									>
+										<Flex bg="#FEF2F2" w="42px" h="full" align="center" justify="center" borderRight="1.5px solid" borderColor="gray.200" flexShrink={0}>
+											<Icon as={FaCar} color="#D90404" boxSize={4} />
+										</Flex>
+										<Select
+											variant="unstyled"
+											placeholder={loadingModels ? "Loading Models..." : "Choose Model"}
+											value={selectedModel}
+											onChange={(e) => {
+												setSelectedModel(e.target.value);
+												setSelectedYear("");
+												setSelectedEngineSize("");
+											}}
+											isDisabled={!selectedBrand || loadingModels || (selectedBrand === "mercedes-benz" && !selectedClass)}
+											h="full"
 											w="full"
-											bg="white"
-											align="center"
-											_hover={{ borderColor: "gray.300" }}
-											_focusWithin={{ borderColor: RED, boxShadow: "0 0 0 1px rgba(217, 4, 4, 0.1)" }}
+											px={3}
+											fontWeight="600"
+											fontSize="13px"
+											color="gray.700"
+											cursor="pointer"
 										>
-											<Flex bg="#FEF2F2" w="42px" h="full" align="center" justify="center" borderRight="1.5px solid" borderColor="gray.200" flexShrink={0}>
-												<Icon as={FaCar} color="#D90404" boxSize={4} />
-											</Flex>
-											<Select
-												variant="unstyled"
-												placeholder={loadingModels ? "Loading Models..." : "Choose Model"}
-												value={selectedModel}
-												onChange={(e) => {
-													setSelectedModel(e.target.value);
-													setSelectedYear("");
-													setSelectedEngineSize("");
-												}}
-												h="full"
-												w="full"
-												px={3}
-												fontWeight="600"
-												fontSize="13px"
-												color="gray.700"
-												cursor="pointer"
-											>
-												{filteredModels.some(m => m.year || m.type) ? (
-													[...new Set(filteredModels.map(m => m.name))]
-														.sort((a, b) => a.localeCompare(b, undefined, { numeric: true }))
-														.map((name) => (
-															<option key={name} value={name}>
-																{name}
-															</option>
-														))
-												) : (
-													filteredModels.map((model) => (
-														<option key={model._id} value={model.slug}>
-															{model.name}
+											{filteredModels.some(m => m.year || m.type) ? (
+												[...new Set(filteredModels.map(m => m.name))]
+													.sort((a, b) => a.localeCompare(b, undefined, { numeric: true }))
+													.map((name) => (
+														<option key={name} value={name}>
+															{name}
 														</option>
 													))
-												)}
-											</Select>
-										</Flex>
+											) : (
+												filteredModels.map((model) => (
+													<option key={model._id} value={model.slug}>
+														{model.name}
+													</option>
+												))
+											)}
+										</Select>
 									</Flex>
-								)}
+								</Flex>
 
 								{/* Year Select */}
-								{selectedModel && (
-									<Flex direction={{ base: "row", sm: "column" }} align={{ base: "center", sm: "start" }} gap={{ base: 3, sm: 1 }} w="full">
-										<Text fontSize="12px" fontWeight="700" color="#1E293B" minW={{ base: "90px", sm: "auto" }} textAlign="left">
-											Select Year
-										</Text>
-										<Flex
-											border="1.5px solid"
-											borderColor="gray.200"
-											borderRadius="lg"
-											overflow="hidden"
-											h="46px"
-											w="full"
-											bg="white"
-											align="center"
-											_hover={{ borderColor: "gray.300" }}
-											_focusWithin={{ borderColor: RED, boxShadow: "0 0 0 1px rgba(217, 4, 4, 0.1)" }}
-										>
-											<Flex bg="#FEF2F2" w="42px" h="full" align="center" justify="center" borderRight="1.5px solid" borderColor="gray.200" flexShrink={0}>
-												<Icon as={FaCalendarAlt} color="#D90404" boxSize={4} />
-											</Flex>
-											<Select
-												variant="unstyled"
-												placeholder={loadingProducts ? "Loading Years..." : "Choose Year"}
-												value={selectedYear}
-												onChange={(e) => {
-													setSelectedYear(e.target.value);
-													setSelectedEngineSize("");
-												}}
-												h="full"
-												w="full"
-												px={3}
-												fontWeight="600"
-												fontSize="13px"
-												color="gray.700"
-												cursor="pointer"
-											>
-												{dynamicYears.map((y) => (
-													<option key={y} value={y}>
-														{y}
-													</option>
-												))}
-											</Select>
+								<Flex
+									display={{
+										base: selectedModel ? "flex" : "none",
+										sm: "flex"
+									}}
+									direction={{ base: "row", sm: "column" }}
+									align={{ base: "center", sm: "start" }}
+									gap={{ base: 3, sm: 1 }}
+									w="full"
+								>
+									<Text fontSize="12px" fontWeight="700" color="#1E293B" minW={{ base: "90px", sm: "auto" }} textAlign="left">
+										Select Year
+									</Text>
+									<Flex
+										border="1.5px solid"
+										borderColor="gray.200"
+										borderRadius="lg"
+										overflow="hidden"
+										h="46px"
+										w="full"
+										bg={!selectedModel ? "gray.50" : "white"}
+										align="center"
+										_hover={{ borderColor: "gray.300" }}
+										_focusWithin={{ borderColor: RED, boxShadow: "0 0 0 1px rgba(217, 4, 4, 0.1)" }}
+									>
+										<Flex bg="#FEF2F2" w="42px" h="full" align="center" justify="center" borderRight="1.5px solid" borderColor="gray.200" flexShrink={0}>
+											<Icon as={FaCalendarAlt} color="#D90404" boxSize={4} />
 										</Flex>
+										<Select
+											variant="unstyled"
+											placeholder={loadingProducts ? "Loading Years..." : "Choose Year"}
+											value={selectedYear}
+											onChange={(e) => {
+												setSelectedYear(e.target.value);
+												setSelectedEngineSize("");
+											}}
+											isDisabled={!selectedModel || loadingProducts}
+											h="full"
+											w="full"
+											px={3}
+											fontWeight="600"
+											fontSize="13px"
+											color="gray.700"
+											cursor="pointer"
+										>
+											{dynamicYears.map((y) => (
+												<option key={y} value={y}>
+													{y}
+												</option>
+											))}
+										</Select>
 									</Flex>
-								)}
+								</Flex>
 
 								{/* Engine Size Select */}
-								{selectedYear && showEngineSizeSelect && (
-									<Flex direction={{ base: "row", sm: "column" }} align={{ base: "center", sm: "start" }} gap={{ base: 3, sm: 1 }} w="full">
+								{showEngineSizeSelect && (
+									<Flex
+										display={{
+											base: selectedYear ? "flex" : "none",
+											sm: "flex"
+										}}
+										direction={{ base: "row", sm: "column" }}
+										align={{ base: "center", sm: "start" }}
+										gap={{ base: 3, sm: 1 }}
+										w="full"
+									>
 										<Text fontSize="12px" fontWeight="700" color="#1E293B" minW={{ base: "90px", sm: "auto" }} textAlign="left">
 											Engine Size
 										</Text>
@@ -934,7 +959,7 @@ export default function HeroSection({ category = "Engines", initialBrand = "", i
 											overflow="hidden"
 											h="46px"
 											w="full"
-											bg="white"
+											bg={!selectedYear ? "gray.50" : "white"}
 											align="center"
 											_hover={{ borderColor: "gray.300" }}
 											_focusWithin={{ borderColor: RED, boxShadow: "0 0 0 1px rgba(217, 4, 4, 0.1)" }}
@@ -947,6 +972,7 @@ export default function HeroSection({ category = "Engines", initialBrand = "", i
 												placeholder={loadingProducts ? "Loading Engines..." : "Select Engine Size/Type"}
 												value={selectedEngineSize}
 												onChange={(e) => setSelectedEngineSize(e.target.value)}
+												isDisabled={!selectedYear || loadingProducts}
 												h="full"
 												w="full"
 												px={3}
