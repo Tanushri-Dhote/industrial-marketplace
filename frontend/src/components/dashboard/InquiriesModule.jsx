@@ -402,8 +402,9 @@ export default function InquiriesModule({ moduleId }) {
 					</VStack>
 				</Flex>
 			) : (
-				{/* Desktop Table View */}
-				<Box display={{ base: "none", lg: "block" }} overflowX="auto" borderRadius="xl" border="1px solid" borderColor="gray.100">
+				<>
+					{/* Desktop Table View */}
+					<Box display={{ base: "none", lg: "block" }} overflowX="auto" borderRadius="xl" border="1px solid" borderColor="gray.100">
 					<Table variant="simple" size="sm">
 						<Thead>
 							<Tr bg={DARK}>
@@ -864,7 +865,8 @@ export default function InquiriesModule({ moduleId }) {
 						))}
 					</VStack>
 				</Box>
-			)}
+			</>
+		)}
 
 			<InquiryViewModal
 				isOpen={isViewOpen}

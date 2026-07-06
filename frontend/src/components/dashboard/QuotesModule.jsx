@@ -161,8 +161,9 @@ export default function QuotesModule() {
 					<Spinner size="xl" color="#D90404" />
 				</Center>
 			) : (
-				{/* Desktop Table View */}
-				<Box display={{ base: "none", lg: "block" }} overflowX="auto" borderRadius="xl" border="1px solid" borderColor="gray.100">
+				<>
+					{/* Desktop Table View */}
+					<Box display={{ base: "none", lg: "block" }} overflowX="auto" borderRadius="xl" border="1px solid" borderColor="gray.100">
 					<Table variant="simple" layout="fixed" minW="1000px">
 						<Thead bg="gray.50">
 							<Tr>
@@ -384,7 +385,8 @@ export default function QuotesModule() {
 						})}
 					</VStack>
 				</Box>
-			)}
+			</>
+		)}
 
 			<QuoteModal isOpen={isOpen} onClose={onClose} onSave={handleSave} quote={editingQuote} />
 			<QuoteViewModal isOpen={isViewOpen} onClose={onViewClose} quote={viewingQuote} />
