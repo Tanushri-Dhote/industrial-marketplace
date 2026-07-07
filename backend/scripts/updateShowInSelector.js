@@ -107,6 +107,61 @@ async function run() {
 		await connectDB();
 		console.log("Connected to MongoDB.");
 
+		// Read input.html to load expected main models dynamically
+		const htmlPath = path.join(__dirname, "../input.html");
+		let mainModelsByBrand = {};
+		if (fs.existsSync(htmlPath)) {
+			console.log(`Found input.html. Extracting expected main models...`);
+			const htmlContent = fs.readFileSync(htmlPath, "utf8");
+			const brandRegex = /Most Popular\s+(?:<span>)?([a-zA-Z0-9\s-]+?)(?:<\/span>)?\s+Engines/gi;
+			let match;
+			const brandsFound = [];
+			while ((match = brandRegex.exec(htmlContent)) !== null) {
+				brandsFound.push({
+					name: match[1].trim(),
+					index: match.index
+				});
+			}
+
+			for (let i = 0; i < brandsFound.length; i++) {
+				const bInfo = brandsFound[i];
+				const start = bInfo.index;
+				const end = (i + 1 < brandsFound.length) ? brandsFound[i+1].index : htmlContent.length;
+				const htmlSection = htmlContent.substring(start, end);
+
+				const brandSlug = bInfo.name.toLowerCase().replace(/\s+/g, "-");
+				
+				// Matches class="bg-..." followed by brand name + model name + Engines
+				const blockRegex = new RegExp(`bg-([a-zA-Z0-9-]+)[\\s\\S]*?>\\s*(?:${bInfo.name})\\s+([A-Za-z0-9\\s-+]+?)\\s+Engines`, "gi");
+				const modelNames = [];
+				const seen = new Set();
+				let mapMatch;
+				while ((mapMatch = blockRegex.exec(htmlSection)) !== null) {
+					const modelName = mapMatch[2].trim().replace(/\s+/g, " ");
+					const lower = modelName.toLowerCase();
+					if (!seen.has(lower)) {
+						seen.add(lower);
+						modelNames.push(modelName);
+					}
+				}
+				mainModelsByBrand[brandSlug] = modelNames;
+				console.log(`  - "${bInfo.name}" expects models: ${modelNames.join(", ")}`);
+			}
+		}
+
+		// Cleanup incorrect parent models from database (previous script runs)
+		const fordBrand = await Brand.findOne({ slug: "ford" });
+		if (fordBrand) {
+			const toDelete = ["B", "C", "Grand", "Street"];
+			const deleteRes = await Model.deleteMany({
+				brandId: fordBrand._id,
+				name: { $in: toDelete }
+			});
+			if (deleteRes.deletedCount > 0) {
+				console.log(`🧹 Cleaned up ${deleteRes.deletedCount} incorrect parent models ("B", "C", "Grand", "Street") from previous script run.`);
+			}
+		}
+
 		const brands = await Brand.find({ isActive: true });
 		console.log(`Checking models across ${brands.length} active brands.`);
 
@@ -117,10 +172,31 @@ async function run() {
 		for (const brand of brands) {
 			const models = await Model.find({ brandId: brand._id });
 			
-			// Map models by their main name prefix case-insensitively
+			const brandSlug = brand.slug;
+			const mainModels = mainModelsByBrand[brandSlug] || [];
+			// Sort by length descending to match more specific parents first (e.g. "Transit Connect" before "Transit")
+			mainModels.sort((a, b) => b.length - a.length);
+
+			// Map models by their main name prefix case-insensitively using mainModels list
 			const grouped = {};
 			models.forEach(m => {
-				const mainName = getMainModelName(m.name);
+				let matchedParent = null;
+				const normName = m.name.toLowerCase().replace(/[\s-]+/g, "");
+
+				// Try to find if m.name matches or starts with any of the expected main models
+				for (const mainName of mainModels) {
+					const normMain = mainName.toLowerCase().replace(/[\s-]+/g, "");
+					
+					// Exact match or starts with parent name (e.g. "Transit Connect Cargo" matches "Transit Connect")
+					if (normName === normMain || normName.startsWith(normMain)) {
+						matchedParent = mainName;
+						break;
+					}
+				}
+
+				// Fallback to old alphanumeric helper if no main model matched
+				const mainName = matchedParent || getMainModelName(m.name);
+				
 				let displayMainName = mainName;
 				if (displayMainName === displayMainName.toLowerCase()) {
 					displayMainName = displayMainName.charAt(0).toUpperCase() + displayMainName.slice(1);
