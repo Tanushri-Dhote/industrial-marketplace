@@ -288,16 +288,17 @@ async function run() {
 						}
 
 						if (groupHasSpecs) {
-							// If we found specs for any submodel, but NONE of them have real engine codes
-							if (!groupHasRealSpecs) {
+							// If we found specs for any submodel, but NONE of them have real engine codes,
+							// hide it ONLY if it also has no products.
+							if (!groupHasRealSpecs && totalProducts === 0) {
 								showInSelector = false;
-								console.log(`Main model "${m.name}" (${brand.name}) only has default RSE specs in its group. Hiding.`);
+								console.log(`Main model "${m.name}" (${brand.name}) only has default RSE specs and no products. Hiding.`);
 							}
 						} else {
 							// No specs found for any submodel in the group, check if there are any products
 							if (totalProducts === 0) {
 								showInSelector = false;
-								console.log(`Main model "${m.name}" (${brand.name}) has no specs and no products in its group. Hiding.`);
+								console.log(`Main model "${m.name}" (${brand.name}) has no specs and no products. Hiding.`);
 							}
 						}
 					} else {
