@@ -15,8 +15,8 @@ async function uploadRoutes(fastify, options) {
 			const ext = path.extname(data.filename) || ".png";
 			const filename = `${Date.now()}-${Math.random().toString(36).substring(2, 8)}${ext}`;
 			
-			// Resolve frontend/public/uploads path
-			const uploadDir = path.resolve(__dirname, "../../../../frontend/public/uploads");
+			// Resolve backend uploads path
+			const uploadDir = path.resolve(__dirname, "../../../uploads");
 			
 			// Ensure uploads directory exists
 			if (!fs.existsSync(uploadDir)) {
@@ -28,7 +28,7 @@ async function uploadRoutes(fastify, options) {
 
 			return {
 				success: true,
-				url: `/uploads/${filename}`,
+				url: `/api/uploads/${filename}`,
 			};
 		} catch (err) {
 			return reply.code(500).send({ message: err.message });

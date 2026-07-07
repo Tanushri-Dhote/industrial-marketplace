@@ -60,6 +60,8 @@ fastify.addHook("onRequest", async (request, reply) => {
 // Register Routes
 fastify.register(require("./routes/fastify/admin.routes"), { prefix: "/api" });
 fastify.register(require("./routes/fastify/upload.routes"), { prefix: "/api/upload" });
+fastify.register(require("./routes/fastify/serve-uploads.routes"), { prefix: "/api/uploads" });
+fastify.register(require("./routes/fastify/serve-uploads.routes"), { prefix: "/uploads" });
 fastify.register(require("./routes/fastify/auth.routes"), { prefix: "/api/auth" });
 fastify.register(require("./routes/fastify/blog.routes"), { prefix: "/api/blogs" });
 fastify.register(require("./routes/fastify/brand.routes"), { prefix: "/api/brands" });
