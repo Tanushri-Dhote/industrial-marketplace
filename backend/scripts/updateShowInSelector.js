@@ -9,13 +9,29 @@ const ModelEngineSpec = require("../src/models/ModelEngineSpec");
 const Product = require("../src/models/Product");
 
 // Load bg.css for sprite coordinate lookup
-const cssPath = path.join(__dirname, "../../bg.css");
+const possiblePaths = [
+	path.join(__dirname, "../../bg.css"),
+	path.join(__dirname, "../bg.css"),
+	path.join(process.cwd(), "bg.css"),
+	path.join(process.cwd(), "backend/bg.css"),
+	"/app/bg.css",
+	"/app/backend/bg.css"
+];
+
 let cssContent = "";
-try {
-	cssContent = fs.readFileSync(cssPath, "utf8");
-	console.log("Successfully loaded bg.css for coordinate lookup.");
-} catch (e) {
-	console.log("Warning: bg.css not found, new models will default to spritePosition 0,0.");
+let loadedPath = "";
+for (const p of possiblePaths) {
+	if (fs.existsSync(p)) {
+		cssContent = fs.readFileSync(p, "utf8");
+		loadedPath = p;
+		break;
+	}
+}
+
+if (cssContent) {
+	console.log(`Successfully loaded bg.css for coordinate lookup from: ${loadedPath}`);
+} else {
+	console.log("Warning: bg.css not found. Tried paths:\n" + possiblePaths.join("\n") + "\nNew models will default to spritePosition 0,0.");
 }
 
 function getSpriteCoords(modelName) {

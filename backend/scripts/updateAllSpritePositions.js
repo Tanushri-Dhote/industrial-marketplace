@@ -57,9 +57,29 @@ async function run() {
 		console.log("Connected to MongoDB.");
 
 		// Load bg.css content
-		const cssPath = path.join(__dirname, "../../bg.css");
-		const cssContent = fs.readFileSync(cssPath, "utf8");
-		console.log("Loaded bg.css successfully.");
+		const possiblePaths = [
+			path.join(__dirname, "../../bg.css"),
+			path.join(__dirname, "../bg.css"),
+			path.join(process.cwd(), "bg.css"),
+			path.join(process.cwd(), "backend/bg.css"),
+			"/app/bg.css",
+			"/app/backend/bg.css"
+		];
+
+		let cssContent = "";
+		let loadedPath = "";
+		for (const p of possiblePaths) {
+			if (fs.existsSync(p)) {
+				cssContent = fs.readFileSync(p, "utf8");
+				loadedPath = p;
+				break;
+			}
+		}
+
+		if (!cssContent) {
+			throw new Error(`Could not find bg.css. Checked paths:\n${possiblePaths.join("\n")}`);
+		}
+		console.log(`Loaded bg.css successfully from: ${loadedPath}`);
 
 		const brand = await Brand.findOne({ slug: "citroen" });
 		if (!brand) {
