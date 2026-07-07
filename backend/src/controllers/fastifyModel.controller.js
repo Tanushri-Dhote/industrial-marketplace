@@ -49,6 +49,8 @@ exports.getModelsByBrand = async (request, reply) => {
 
 		const models = await Model.find({
 			brandId: brand._id,
+			isActive: { $ne: false },
+			showInSelector: { $ne: false },
 		}).sort({ name: 1 }).lean();
 
 		// Save to cache

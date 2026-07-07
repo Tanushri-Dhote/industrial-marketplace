@@ -49,6 +49,10 @@ const modelSchema = new mongoose.Schema(
 			type: Boolean,
 			default: true,
 		},
+		showInSelector: {
+			type: Boolean,
+			default: true,
+		},
 		// Sprite positioning for car_sprites.png
 		spritePosition: {
 			x: {
