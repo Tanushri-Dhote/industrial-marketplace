@@ -186,6 +186,21 @@ async function run() {
 								showInSelector = false;
 								console.log(`Main model "${m.name}" (${brand.name}) has empty specs. Hiding.`);
 							}
+						} else {
+							// No specs found, check products for parent and all its submodels
+							let totalProducts = 0;
+							for (const sub of list) {
+								const productCount = await Product.countDocuments({
+									make: new RegExp(`^${brand.name}$`, "i"),
+									model: new RegExp(`^${sub.name}$`, "i")
+								});
+								totalProducts += productCount;
+							}
+
+							if (totalProducts === 0) {
+								showInSelector = false;
+								console.log(`Main model "${m.name}" (${brand.name}) has no specs and no products. Hiding.`);
+							}
 						}
 					} else {
 						// This is a submodel, always hide it from the selector
