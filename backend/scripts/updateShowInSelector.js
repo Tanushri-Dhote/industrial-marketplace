@@ -163,43 +163,51 @@ async function run() {
 						// This is the parent model, determine if it should show
 						showInSelector = true;
 
-						// Check if specs are default RSE specs
-						const specModelSlug = m.name.replace(/\s+/g, "-").toLowerCase();
-						const spec = await ModelEngineSpec.findOne({
-							brandSlug: brand.slug,
-							modelSlug: specModelSlug
-						});
+						let groupHasSpecs = false;
+						let groupHasRealSpecs = false;
+						let totalProducts = 0;
 
-						if (spec) {
-							const hasCostTable = spec.costTable && spec.costTable.length > 0;
-							if (hasCostTable) {
-								const allCodesAreRse = spec.costTable.every(item => {
-									const code = (item.engineCode || "").toUpperCase().trim();
-									return code.startsWith("RSE") || code === "DEFAULT" || code === "";
-								});
+						for (const sub of list) {
+							// 1. Check specs for this submodel
+							const specModelSlug = sub.name.replace(/\s+/g, "-").toLowerCase();
+							const spec = await ModelEngineSpec.findOne({
+								brandSlug: brand.slug,
+								modelSlug: specModelSlug
+							});
 
-								if (allCodesAreRse) {
-									showInSelector = false;
-									console.log(`Main model "${m.name}" (${brand.name}) only has default RSE engine codes. Hiding.`);
+							if (spec) {
+								groupHasSpecs = true;
+								const hasCostTable = spec.costTable && spec.costTable.length > 0;
+								if (hasCostTable) {
+									const allCodesAreRse = spec.costTable.every(item => {
+										const code = (item.engineCode || "").toUpperCase().trim();
+										return code.startsWith("RSE") || code === "DEFAULT" || code === "";
+									});
+									if (!allCodesAreRse) {
+										groupHasRealSpecs = true;
+									}
 								}
-							} else {
+							}
+
+							// 2. Count products for this submodel
+							const productCount = await Product.countDocuments({
+								make: new RegExp(`^${brand.name}$`, "i"),
+								model: new RegExp(`^${sub.name}$`, "i")
+							});
+							totalProducts += productCount;
+						}
+
+						if (groupHasSpecs) {
+							// If we found specs for any submodel, but NONE of them have real engine codes
+							if (!groupHasRealSpecs) {
 								showInSelector = false;
-								console.log(`Main model "${m.name}" (${brand.name}) has empty specs. Hiding.`);
+								console.log(`Main model "${m.name}" (${brand.name}) only has default RSE specs in its group. Hiding.`);
 							}
 						} else {
-							// No specs found, check products for parent and all its submodels
-							let totalProducts = 0;
-							for (const sub of list) {
-								const productCount = await Product.countDocuments({
-									make: new RegExp(`^${brand.name}$`, "i"),
-									model: new RegExp(`^${sub.name}$`, "i")
-								});
-								totalProducts += productCount;
-							}
-
+							// No specs found for any submodel in the group, check if there are any products
 							if (totalProducts === 0) {
 								showInSelector = false;
-								console.log(`Main model "${m.name}" (${brand.name}) has no specs and no products. Hiding.`);
+								console.log(`Main model "${m.name}" (${brand.name}) has no specs and no products in its group. Hiding.`);
 							}
 						}
 					} else {
