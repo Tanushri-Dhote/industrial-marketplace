@@ -22,8 +22,14 @@ import {
 	VStack,
 	Flex,
 	SimpleGrid,
-	HStack
+	HStack,
+	Accordion,
+	AccordionItem,
+	AccordionButton,
+	AccordionIcon,
+	AccordionPanel
 } from "@chakra-ui/react";
+import { AddIcon } from "@chakra-ui/icons";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import API from "../services/api";
@@ -34,9 +40,16 @@ import HeroSection from "./HeroSection";
 import ReviewsSection from "./ReviewsSection";
 import TrustBar from "./TrustBar";
 import WarrantyBannerSection from "./WarrantyBannerSection";
-
 const RED = "#D90404";
 const DARK = "#0F172A";
+
+const isSubmodel = (nameB, nameA) => {
+	if (nameB.toLowerCase() === nameA.toLowerCase()) return false;
+	if (nameB.length <= nameA.length) return false;
+	const escapedA = nameA.replace(/[-\/\\^$*+?.()|[\]{}]/g, "\\$&");
+	const regex = new RegExp(`^${escapedA}\\b`, "i");
+	return regex.test(nameB);
+};
 
 export default function ModelEnginePage() {
 	const { landingPageSlug } = useParams();
@@ -96,18 +109,66 @@ export default function ModelEnginePage() {
 				}
 				setModel(matchedModel);
 
-				// 3. Fetch specifications from MongoDB
-				try {
-					const specsRes = await API.get(`/models/specs/${matchedBrand.slug}/${matchedModel.name.replace(/\s+/g, "-").toLowerCase()}`);
-					if (specsRes.data?.success && specsRes.data?.data) {
-						setSpecs(specsRes.data.data);
+				// Find all submodels (including the model itself)
+				const submodels = modelsList.filter(
+					(m) => m._id === matchedModel._id || isSubmodel(m.name, matchedModel.name)
+				);
+
+				// 3. Fetch specifications for all submodels in parallel
+				const specsPromises = submodels.map(async (sub) => {
+					try {
+						const specsRes = await API.get(
+							`/models/specs/${matchedBrand.slug}/${sub.name.replace(/\s+/g, "-").toLowerCase()}`
+						);
+						return specsRes.data?.success && specsRes.data?.data ? specsRes.data.data : null;
+					} catch {
+						return null;
 					}
-				} catch (err) {
-					// 4. Fallback: query product database to dynamically build specs
-					const productsRes = await API.get("/products", {
-						params: { make: matchedBrand.name, model: matchedModel.name }
+				});
+
+				const specsList = (await Promise.all(specsPromises)).filter(Boolean);
+
+				if (specsList.length > 0) {
+					const combinedDiesel = new Set();
+					const combinedPetrol = new Set();
+					const combinedCostTable = [];
+
+					specsList.forEach((spec) => {
+						if (spec.popularDiesel) {
+							spec.popularDiesel.forEach((item) => combinedDiesel.add(item));
+						}
+						if (spec.popularPetrol) {
+							spec.popularPetrol.forEach((item) => combinedPetrol.add(item));
+						}
+						if (spec.costTable) {
+							combinedCostTable.push(...spec.costTable);
+						}
 					});
-					const products = productsRes.data?.data || productsRes.data || [];
+
+					setSpecs({
+						brandSlug: matchedBrand.slug,
+						modelSlug: matchedModel.slug,
+						brandName: matchedBrand.name,
+						modelName: matchedModel.name,
+						popularDiesel: Array.from(combinedDiesel),
+						popularPetrol: Array.from(combinedPetrol),
+						costTable: combinedCostTable,
+					});
+				} else {
+					// 4. Fallback: query product database for all submodels in parallel to dynamically build specs
+					const productsPromises = submodels.map(async (sub) => {
+						try {
+							const productsRes = await API.get("/products", {
+								params: { make: matchedBrand.name, model: sub.name }
+							});
+							return productsRes.data?.data || productsRes.data || [];
+						} catch {
+							return [];
+						}
+					});
+
+					const allProductsArrays = await Promise.all(productsPromises);
+					const products = allProductsArrays.flat();
 
 					if (products.length > 0) {
 						// Aggregate from products
@@ -248,7 +309,7 @@ export default function ModelEnginePage() {
 			<TrustBar />
 
 			{/* ── POPULAR ENGINES ACCORDION ── */}
-			{/* <Box py={16} bg="white">
+			<Box py={16} bg="white">
 				<Container maxW="container.xl" px={{ base: 4, md: 6 }}>
 					<VStack spacing={8} align="center" mb={12}>
 						<Heading
@@ -335,7 +396,7 @@ export default function ModelEnginePage() {
 						)}
 					</Accordion>
 				</Container>
-			</Box> */}
+			</Box>
 
 			{/* ── COST TABLE ── */}
 			{specs.costTable?.length > 0 && (

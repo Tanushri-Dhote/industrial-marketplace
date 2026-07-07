@@ -24,9 +24,19 @@ import {
 } from "@chakra-ui/react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useQuery } from "@tanstack/react-query";
-import { Link as RouterLink, useNavigate } from "react-router-dom";
+import { Link as RouterLink, useNavigate, useSearchParams } from "react-router-dom";
 import { FaArrowLeft, FaArrowRight, FaTimes, FaTools, FaCarSide, FaCheckCircle } from "react-icons/fa";
+import { useEffect } from "react";
 import API from "../services/api";
+
+const isSubmodel = (nameB, nameA) => {
+	if (nameB.toLowerCase() === nameA.toLowerCase()) return false;
+	if (nameB.length <= nameA.length) return false;
+	const escapedA = nameA.replace(/[-\/\\^$*+?.()|[\]{}]/g, "\\$&");
+	const regex = new RegExp(`^${escapedA}\\b`, "i");
+	return regex.test(nameB);
+};
+
 
 const MotionBox = motion(Box);
 const MotionVStack = motion(VStack);
@@ -295,6 +305,7 @@ const getMercedesClass = (modelName) => {
 
 export default function BrandModelSelectorSection() {
 	const navigate = useNavigate();
+	const [searchParams, setSearchParams] = useSearchParams();
 	const [selectedBrand, setSelectedBrand] = useState(null);
 	const [selectedClass, setSelectedClass] = useState(null);
 	const [selectedModel, setSelectedModel] = useState(null);
@@ -305,13 +316,41 @@ export default function BrandModelSelectorSection() {
 		queryKey: ["brands"],
 		queryFn: async () => {
 			const res = await API.get("/brands");
-			// return (res.data?.data || res.data || []).filter((b) => b.isActive !== false);
 			return (res.data?.data || res.data || []).filter(
 				(brand) => brand.isActive !== false
 			);
 		},
 		staleTime: 1000 * 60 * 30,
 	});
+
+	// Synchronize URL search params to local state
+	useEffect(() => {
+		if (loadingBrands || brands.length === 0) return;
+
+		const brandSlug = searchParams.get("selBrand");
+		const className = searchParams.get("selClass");
+
+		if (brandSlug) {
+			const foundBrand = brands.find((b) => b.slug === brandSlug);
+			if (foundBrand) {
+				setSelectedBrand(foundBrand);
+				setShowModels(true);
+				if (className) {
+					setSelectedClass(className);
+				} else {
+					setSelectedClass(null);
+				}
+			} else {
+				setSelectedBrand(null);
+				setShowModels(false);
+				setSelectedClass(null);
+			}
+		} else {
+			setSelectedBrand(null);
+			setShowModels(false);
+			setSelectedClass(null);
+		}
+	}, [searchParams, brands, loadingBrands]);
 
 	// Fetch models for selected brand
 	const { data: models = [], isLoading: loadingModels } = useQuery({
@@ -344,14 +383,11 @@ export default function BrandModelSelectorSection() {
 	});
 
 	const handleBrandSelect = (brand) => {
-		setSelectedBrand(brand);
-		setShowModels(true);
-		setSelectedModel(null);
-		setSelectedClass(null);
+		setSearchParams({ selBrand: brand.slug });
 	};
 
 	const handleClassSelect = (classObj) => {
-		setSelectedClass(classObj.name);
+		setSearchParams({ selBrand: selectedBrand.slug, selClass: classObj.name });
 	};
 
 	const handleModelSelect = (model) => {
@@ -361,14 +397,11 @@ export default function BrandModelSelectorSection() {
 	};
 
 	const handleBackToBrands = () => {
-		setShowModels(false);
-		setSelectedBrand(null);
-		setSelectedModel(null);
-		setSelectedClass(null);
+		setSearchParams({});
 	};
 
 	const handleBackToClasses = () => {
-		setSelectedClass(null);
+		setSearchParams({ selBrand: selectedBrand.slug });
 	};
 
 	const handleBackToModels = () => {
@@ -725,7 +758,11 @@ export default function BrandModelSelectorSection() {
 														);
 														const uniqueModels = [];
 														const modelNamesSeen = new Set();
-														for (const m of filteredModels) {
+														const filteredMainModels = filteredModels.filter((m) => {
+															const hasParent = filteredModels.some((other) => isSubmodel(m.name, other.name));
+															return !hasParent;
+														});
+														for (const m of filteredMainModels) {
 															if (!modelNamesSeen.has(m.name)) {
 																modelNamesSeen.add(m.name);
 																uniqueModels.push(m);
@@ -738,7 +775,11 @@ export default function BrandModelSelectorSection() {
 												} else {
 													const uniqueModels = [];
 													const modelNamesSeen = new Set();
-													for (const m of models) {
+													const filteredMainModels = models.filter((m) => {
+														const hasParent = models.some((other) => isSubmodel(m.name, other.name));
+														return !hasParent;
+													});
+													for (const m of filteredMainModels) {
 														if (!modelNamesSeen.has(m.name)) {
 															modelNamesSeen.add(m.name);
 															uniqueModels.push(m);
