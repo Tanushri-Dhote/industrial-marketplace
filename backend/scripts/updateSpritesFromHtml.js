@@ -6,6 +6,57 @@ const connectDB = require("../src/config/db");
 const Brand = require("../src/models/Brand");
 const Model = require("../src/models/Model");
 
+// Grouping helper
+const getMainModelName = (name) => {
+	const nameUpper = name.toUpperCase();
+	
+	// Mercedes-Benz special classes
+	if (nameUpper.startsWith("A-CLASS") || nameUpper === "A CLASS") return "A-Class";
+	if (nameUpper.startsWith("B-CLASS") || nameUpper === "B CLASS") return "B-Class";
+	if (nameUpper.startsWith("C-CLASS") || nameUpper === "C CLASS") return "C-Class";
+	if (nameUpper.startsWith("E-CLASS") || nameUpper === "E CLASS") return "E-Class";
+	if (nameUpper.startsWith("S-CLASS") || nameUpper === "S CLASS") return "S-Class";
+	if (nameUpper.startsWith("G-CLASS") || nameUpper === "G CLASS") return "G-Class";
+	if (nameUpper.startsWith("X-CLASS") || nameUpper === "X CLASS") return "X-Class";
+	if (nameUpper.startsWith("GL-CLASS") || nameUpper === "GL CLASS") return "GL-Class";
+	if (nameUpper.startsWith("GLA-CLASS") || nameUpper === "GLA CLASS") return "GLA-Class";
+	if (nameUpper.startsWith("GLB-CLASS") || nameUpper === "GLB CLASS") return "GLB-Class";
+	if (nameUpper.startsWith("GLC-CLASS") || nameUpper === "GLC CLASS") return "GLC-Class";
+	if (nameUpper.startsWith("GLE-CLASS") || nameUpper === "GLE CLASS") return "GLE";
+	if (nameUpper.startsWith("GLS-CLASS") || nameUpper === "GLS CLASS") return "GLS";
+	
+	// General alphanumeric starts: C1-C6, A1-A8, Q2-Q8, S1-S5, CX-3 etc.
+	const matchAlphaNumeric = name.match(/^([a-zA-Z]+[0-9]+)\b/i);
+	if (matchAlphaNumeric) {
+		return matchAlphaNumeric[1].toUpperCase();
+	}
+
+	// Series models: "1 Series", "3 Series"
+	const matchSeries = name.match(/^(\d+\s+Series)\b/i);
+	if (matchSeries) {
+		return matchSeries[1];
+	}
+
+	// Hyphenated starts: C-Crosser, X-Type, S-Type, F-Pace, E-Pace
+	const matchHyphenated = name.match(/^([a-zA-Z]+-[a-zA-Z0-9]+)\b/i);
+	if (matchHyphenated) {
+		return matchHyphenated[1];
+	}
+
+	// Range Rover: "Range Rover Sport" -> "Range Rover"
+	if (nameUpper.startsWith("RANGE ROVER")) {
+		return "Range Rover";
+	}
+
+	// Fallback to first word if it has spaces
+	const words = name.trim().split(/\s+/);
+	if (words.length > 1) {
+		return words[0];
+	}
+
+	return name;
+};
+
 async function run() {
 	try {
 		await connectDB();
@@ -158,10 +209,21 @@ async function run() {
 				const x = parseInt(parts[0].replace("px", "").trim(), 10);
 				const y = parseInt(parts[1].replace("px", "").trim(), 10);
 
-				const dbModel = await Model.findOne({
+				// Find model in database
+				let dbModel = await Model.findOne({
 					brandId: brand._id,
 					name: new RegExp(`^${map.name}$`, "i")
 				});
+
+				// Fallback: If not found by full name, check if we can update the parent model directly
+				const mainName = getMainModelName(map.name);
+				let parentModel = null;
+				if (mainName.toLowerCase() !== map.name.toLowerCase()) {
+					parentModel = await Model.findOne({
+						brandId: brand._id,
+						name: new RegExp(`^${mainName}$`, "i")
+					});
+				}
 
 				if (dbModel) {
 					dbModel.spriteClass = map.cls;
@@ -172,8 +234,26 @@ async function run() {
 					await dbModel.save();
 					updatedCount++;
 					console.log(`✅ Updated "${dbModel.name}" -> Class: "${map.cls}", Pos: X=${x}, Y=${y}`);
-				} else {
-					console.log(`⚠️ Model "${map.name}" not found in database.`);
+				}
+
+				// If parent model exists, also update parent model so the parent card shows the sprite!
+				if (parentModel) {
+					parentModel.spriteClass = map.cls;
+					parentModel.spriteSheetUrl = "/images/car_sprites.png";
+					parentModel.spritePosition = { x, y };
+					parentModel.spriteSize = { width: 135, height: 76 };
+					parentModel.imageUrl = null;
+					await parentModel.save();
+					if (!dbModel) {
+						updatedCount++;
+						console.log(`✅ Updated parent "${parentModel.name}" (fallback for "${map.name}") -> Class: "${map.cls}", Pos: X=${x}, Y=${y}`);
+					} else {
+						console.log(`   └─ Also updated parent model "${parentModel.name}" with same sprite.`);
+					}
+				}
+
+				if (!dbModel && !parentModel) {
+					console.log(`⚠️ Model "${map.name}" (and parent "${mainName}") not found in database.`);
 				}
 			}
 
