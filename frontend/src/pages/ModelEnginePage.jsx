@@ -309,7 +309,7 @@ export default function ModelEnginePage() {
 			<TrustBar />
 
 			{/* ── POPULAR ENGINES ACCORDION ── */}
-			<Box py={16} bg="white">
+			{/* <Box py={16} bg="white">
 				<Container maxW="container.xl" px={{ base: 4, md: 6 }}>
 					<VStack spacing={8} align="center" mb={12}>
 						<Heading
@@ -396,7 +396,7 @@ export default function ModelEnginePage() {
 						)}
 					</Accordion>
 				</Container>
-			</Box>
+			</Box> */}
 
 			{/* ── COST TABLE ── */}
 			{specs.costTable?.length > 0 && (
