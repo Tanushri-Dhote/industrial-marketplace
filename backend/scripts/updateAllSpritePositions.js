@@ -61,15 +61,19 @@ async function run() {
 		const cssContent = fs.readFileSync(cssPath, "utf8");
 		console.log("Loaded bg.css successfully.");
 
-		const models = await Model.find({});
-		console.log(`Found ${models.length} models in the database to update.`);
+		const brand = await Brand.findOne({ slug: "citroen" });
+		if (!brand) {
+			console.error("❌ Citroen brand not found in database.");
+			process.exit(1);
+		}
+
+		const models = await Model.find({ brandId: brand._id });
+		console.log(`Found ${models.length} Citroen models in the database to update.`);
 
 		let updatedCount = 0;
 		let notFoundCount = 0;
 
 		for (const model of models) {
-			const brand = await Brand.findById(model.brandId);
-			if (!brand) continue;
 
 			// Try to find the exact class coordinates
 			// Normalization formats to check:
