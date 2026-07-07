@@ -186,21 +186,6 @@ async function run() {
 								showInSelector = false;
 								console.log(`Main model "${m.name}" (${brand.name}) has empty specs. Hiding.`);
 							}
-						} else {
-							// No specs found, check products for parent and all its submodels
-							let totalProducts = 0;
-							for (const sub of list) {
-								const productCount = await Product.countDocuments({
-									make: new RegExp(`^${brand.name}$`, "i"),
-									model: new RegExp(`^${sub.name}$`, "i")
-								});
-								totalProducts += productCount;
-							}
-
-							if (totalProducts === 0) {
-								showInSelector = false;
-								console.log(`Main model "${m.name}" (${brand.name}) has no specs and no products. Hiding.`);
-							}
 						}
 					} else {
 						// This is a submodel, always hide it from the selector
@@ -215,43 +200,6 @@ async function run() {
 					} else {
 						hiddenCount++;
 					}
-				}
-
-				// Also make sure synthesized parent's showInSelector is updated if it was just created
-				if (createdCount > 0 && parentModel.isNew === false) {
-					// Check its specs (synthesized won't have specs directly, but might have products through submodels)
-					let totalProducts = 0;
-					for (const sub of list) {
-						const productCount = await Product.countDocuments({
-							make: new RegExp(`^${brand.name}$`, "i"),
-							model: new RegExp(`^${sub.name}$`, "i")
-						});
-						totalProducts += productCount;
-					}
-					
-					const spec = await ModelEngineSpec.findOne({
-						brandSlug: brand.slug,
-						modelSlug: parentModel.name.replace(/\s+/g, "-").toLowerCase()
-					});
-
-					let parentShow = true;
-					if (spec) {
-						const hasCostTable = spec.costTable && spec.costTable.length > 0;
-						if (hasCostTable) {
-							const allCodesAreRse = spec.costTable.every(item => {
-								const code = (item.engineCode || "").toUpperCase().trim();
-								return code.startsWith("RSE") || code === "DEFAULT" || code === "";
-							});
-							if (allCodesAreRse) parentShow = false;
-						} else {
-							parentShow = false;
-						}
-					} else if (totalProducts === 0) {
-						parentShow = false;
-					}
-
-					parentModel.showInSelector = parentShow;
-					await parentModel.save();
 				}
 			}
 		}
