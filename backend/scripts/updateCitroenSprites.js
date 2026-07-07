@@ -94,6 +94,7 @@ async function run() {
 				dbModel.spriteSheetUrl = "/images/car_sprites.png";
 				dbModel.spritePosition = { x, y };
 				dbModel.spriteSize = { width: 135, height: 76 };
+				dbModel.imageUrl = null; // Clear image to force sprite rendering
 				await dbModel.save();
 				updatedCount++;
 				console.log(`✅ Updated "${dbModel.name}" (${brand.name}) -> Class: "${map.cls}", Pos: X=${x}, Y=${y}`);

@@ -117,16 +117,30 @@ async function run() {
 		for (const brand of brands) {
 			const models = await Model.find({ brandId: brand._id });
 			
-			// Map models by their main name prefix
+			// Map models by their main name prefix case-insensitively
 			const grouped = {};
 			models.forEach(m => {
 				const mainName = getMainModelName(m.name);
-				if (!grouped[mainName]) grouped[mainName] = [];
-				grouped[mainName].push(m);
+				let displayMainName = mainName;
+				if (displayMainName === displayMainName.toLowerCase()) {
+					displayMainName = displayMainName.charAt(0).toUpperCase() + displayMainName.slice(1);
+				}
+				if (/^c\d+$/i.test(displayMainName)) {
+					displayMainName = "C" + displayMainName.substring(1);
+				}
+
+				const key = displayMainName.toLowerCase();
+				if (!grouped[key]) {
+					grouped[key] = {
+						mainName: displayMainName,
+						list: []
+					};
+				}
+				grouped[key].list.push(m);
 			});
 
-			for (const mainName of Object.keys(grouped)) {
-				const list = grouped[mainName];
+			for (const key of Object.keys(grouped)) {
+				const { mainName, list } = grouped[key];
 				
 				// 1. Check if the parent model (exact match) exists
 				let parentModel = list.find(m => m.name.toLowerCase() === mainName.toLowerCase());
