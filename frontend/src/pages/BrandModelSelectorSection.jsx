@@ -113,7 +113,16 @@ function ModelCard({ model, onSelect, brandName }) {
 				borderColor: accentColor,
 			}}
 		>
-			{model.spriteSheetUrl ? (
+			{model.imageUrl ? (
+				<Image
+					src={model.imageUrl}
+					alt={model.name}
+					h="80px"
+					objectFit="contain"
+					mx="auto"
+					mb={3}
+				/>
+			) : model.spriteSheetUrl ? (
 				<Box
 					className="make-cars-sprite"
 					w={`${model.spriteSize?.width || 135}px`}
@@ -122,15 +131,6 @@ function ModelCard({ model, onSelect, brandName }) {
 					backgroundPosition={`${model.spritePosition?.x || 0}px ${model.spritePosition?.y || 0}px`}
 					backgroundRepeat="no-repeat"
 					backgroundSize="auto"
-					mx="auto"
-					mb={3}
-				/>
-			) : model.imageUrl ? (
-				<Image
-					src={model.imageUrl}
-					alt={model.name}
-					h="80px"
-					objectFit="contain"
 					mx="auto"
 					mb={3}
 				/>
@@ -675,10 +675,10 @@ export default function BrandModelSelectorSection() {
 											</Center>
 										) : models.length > 0 ? (
 											(() => {
-												const fallbackModel = models.find((m) => m.spriteSheetUrl || m.imageUrl);
+												const fallbackModel = models.find((m) => m.imageUrl || m.spriteSheetUrl);
 
 												const getDisplayModel = (model) => {
-													const hasImage = model.spriteSheetUrl || model.imageUrl;
+													const hasImage = model.imageUrl || model.spriteSheetUrl;
 													if (hasImage || !fallbackModel) return model;
 													return {
 														...model,
@@ -704,7 +704,7 @@ export default function BrandModelSelectorSection() {
 														const sortedClassNames = Object.keys(classMap).sort();
 														const classesToRender = sortedClassNames.map((className) => {
 															const classModels = classMap[className];
-															const repModel = classModels.find((m) => m.spriteSheetUrl || m.imageUrl) || fallbackModel;
+															const repModel = classModels.find((m) => m.imageUrl || m.spriteSheetUrl) || fallbackModel;
 															return {
 																_id: `class-${className}`,
 																name: className,
