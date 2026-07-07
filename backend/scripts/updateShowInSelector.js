@@ -5,6 +5,7 @@ const connectDB = require("../src/config/db");
 const Brand = require("../src/models/Brand");
 const Model = require("../src/models/Model");
 const ModelEngineSpec = require("../src/models/ModelEngineSpec");
+const Product = require("../src/models/Product");
 
 async function run() {
 	try {
