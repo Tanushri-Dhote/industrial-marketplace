@@ -43,6 +43,20 @@ async function run() {
 						showInSelector = false;
 						console.log(`Model "${model.name}" (${brand.name}) only has default RSE engine codes. Setting showInSelector = false`);
 					}
+				} else {
+					showInSelector = false;
+					console.log(`Model "${model.name}" (${brand.name}) has empty specs. Setting showInSelector = false`);
+				}
+			} else {
+				// No specs found, check if there are any products for this model
+				const productCount = await Product.countDocuments({
+					make: new RegExp(`^${brand.name}$`, "i"),
+					model: new RegExp(`^${model.name}$`, "i")
+				});
+
+				if (productCount === 0) {
+					showInSelector = false;
+					console.log(`Model "${model.name}" (${brand.name}) has no specs and no products. Setting showInSelector = false`);
 				}
 			}
 
