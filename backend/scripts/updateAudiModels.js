@@ -56,6 +56,23 @@ const newAudiModels = [
 	{ model: "TT", startYear: 2014, endYear: 2023, type: "Coupe; Roadster" },
 	{ model: "R8", startYear: 2007, endYear: 2015, type: "Coupe; Spyder" },
 	{ model: "R8", startYear: 2015, endYear: 2024, type: "Coupe; Spyder" },
+	{ model: "Allroad", startYear: 2000, endYear: "Present", type: "Estate; Crossover" },
+	{ model: "RS3", startYear: 2011, endYear: "Present", type: "Hatchback; Saloon" },
+	{ model: "RS4", startYear: 2000, endYear: "Present", type: "Saloon; Avant" },
+	{ model: "RS5", startYear: 2010, endYear: "Present", type: "Coupe; Sportback" },
+	{ model: "RS6", startYear: 2002, endYear: "Present", type: "Saloon; Avant" },
+	{ model: "RSQ3", startYear: 2013, endYear: "Present", type: "SUV; Sportback" },
+	{ model: "RSQ8", startYear: 2020, endYear: "Present", type: "SUV" },
+	{ model: "S1", startYear: 2014, endYear: 2018, type: "Hatchback; Sportback" },
+	{ model: "S3", startYear: 1999, endYear: "Present", type: "Hatchback; Saloon; Cabriolet" },
+	{ model: "S4", startYear: 1997, endYear: "Present", type: "Saloon; Avant; Cabriolet" },
+	{ model: "S5", startYear: 2007, endYear: "Present", type: "Coupe; Sportback; Cabriolet" },
+	{ model: "SQ2", startYear: 2019, endYear: "Present", type: "SUV" },
+	{ model: "SQ5", startYear: 2013, endYear: "Present", type: "SUV" },
+	{ model: "SQ7", startYear: 2016, endYear: "Present", type: "SUV" },
+	{ model: "SQ8", startYear: 2019, endYear: "Present", type: "SUV" },
+	{ model: "TTRS", startYear: 2009, endYear: "Present", type: "Coupe; Roadster" },
+	{ model: "TTS", startYear: 2008, endYear: "Present", type: "Coupe; Roadster" },
 ];
 
 async function update() {
@@ -94,13 +111,30 @@ async function update() {
 				{ name: "a6", x: -1215, y: -1444 },
 				{ name: "a7", x: -810, y: -2888 },
 				{ name: "a8", x: -2835, y: -2356 },
+				{ name: "allroad", x: -2295, y: -2128 },
 				{ name: "q2", x: -270, y: -760 },
 				{ name: "q3", x: -1755, y: -2280 },
 				{ name: "q5", x: -2430, y: -2736 },
 				{ name: "q7", x: -2025, y: -2508 },
 				{ name: "q8", x: -3105, y: -2356 },
+				{ name: "r8", x: -2835, y: -2812 },
+				{ name: "rs3", x: -3105, y: -2128 },
+				{ name: "rs4", x: -3105, y: -1976 },
+				{ name: "rs5", x: -3105, y: -1900 },
+				{ name: "rs6", x: -3105, y: -1824 },
+				{ name: "rsq3", x: -3105, y: -1748 },
+				{ name: "rsq8", x: -3105, y: -1672 },
+				{ name: "s1", x: -3105, y: -1596 },
+				{ name: "s3", x: -2970, y: -2964 },
+				{ name: "s4", x: -3105, y: 0 },
+				{ name: "s5", x: -3105, y: -76 },
+				{ name: "sq2", x: -3105, y: -152 },
+				{ name: "sq5", x: -3105, y: -228 },
+				{ name: "sq7", x: -3105, y: -304 },
+				{ name: "sq8", x: -3105, y: -380 },
 				{ name: "tt", x: -1215, y: -1748 },
-				{ name: "r8", x: -2835, y: -2812 }
+				{ name: "ttrs", x: -270, y: -532 },
+				{ name: "tts", x: -3105, y: -456 }
 			];
 
 			const match = audiModelData.find(d => {
@@ -112,20 +146,12 @@ async function update() {
 			});
 
 			if (match) {
-				if (match.x === -945 && match.y === -1672) {
-					spriteFields = {
-						imageUrl: "/brands/Audi.png",
-						spriteSheetUrl: "",
-						spritePosition: { x: 0, y: 0 }
-					};
-				} else {
-					spriteFields = {
-						spriteClass: `bg-${match.name}`,
-						spriteSheetUrl: "/images/car_sprites.png",
-						spritePosition: { x: match.x, y: match.y },
-						spriteSize: { width: 135, height: 76 }
-					};
-				}
+				spriteFields = {
+					spriteClass: `bg-${match.name}`,
+					spriteSheetUrl: "/images/car_sprites.png",
+					spritePosition: { x: match.x, y: match.y },
+					spriteSize: { width: 135, height: 76 }
+				};
 			}
 
 			return {
