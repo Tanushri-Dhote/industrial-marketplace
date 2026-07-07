@@ -82,8 +82,8 @@ export default function ModelEnginePage() {
 				}
 				setBrand(matchedBrand);
 
-				// 2. Fetch models for this brand to find the specific model
-				const modelsRes = await API.get(`/models/${matchedBrand._id}`);
+				// 2. Fetch models for this brand to find the specific model (including hidden submodels)
+				const modelsRes = await API.get(`/models/${matchedBrand._id}?all=true`);
 				const modelsList = modelsRes.data?.data || modelsRes.data || [];
 
 				const modelSlugPart = cleanSlug.substring(matchedBrand.slug.length + 1);
