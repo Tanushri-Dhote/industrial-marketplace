@@ -134,61 +134,52 @@ function EngineProductCard({ engine }) {
 }
 
 const getMercedesClass = (modelName) => {
-	const nameUpper = modelName.toUpperCase();
-	if (nameUpper.startsWith("A ")) return "A-Class";
-	if (nameUpper.startsWith("B ")) return "B-Class";
-	if (nameUpper.startsWith("C ")) {
-		if (nameUpper.startsWith("CLK")) return "CLK";
-		if (nameUpper.startsWith("CLS")) return "CLS";
-		if (nameUpper.startsWith("CLC")) return "CLC-Class";
-		if (nameUpper.startsWith("CITAN")) return "Citan";
-		return "C-Class";
-	}
-	if (nameUpper.startsWith("E ")) return "E-Class";
-	if (nameUpper.startsWith("S ")) {
-		if (nameUpper.startsWith("SLC")) return "SLC";
-		if (nameUpper.startsWith("SLK")) return "SLK";
-		if (nameUpper.startsWith("SLS")) return "SLS AMG";
-		if (nameUpper.startsWith("SL")) return "SL";
-		return "S-Class";
-	}
-	if (nameUpper.startsWith("G ")) {
-		if (nameUpper.startsWith("GLA")) return "GLA-Class";
-		if (nameUpper.startsWith("GLB")) return "GLB-Class";
-		if (nameUpper.startsWith("GLC")) return "GLC-Class";
-		if (nameUpper.startsWith("GLE")) return "GLE";
-		if (nameUpper.startsWith("GLS")) return "GLS";
-		if (nameUpper.startsWith("GLK")) return "GLK-Class";
-		if (nameUpper.startsWith("GL")) return "GL-Class";
-		return "G-Class";
-	}
-	if (nameUpper.startsWith("GLA ")) return "GLA-Class";
-	if (nameUpper.startsWith("GLB ")) return "GLB-Class";
-	if (nameUpper.startsWith("GLC ")) return "GLC-Class";
-	if (nameUpper.startsWith("GLE ")) return "GLE";
-	if (nameUpper.startsWith("GLS ")) return "GLS";
-	if (nameUpper.startsWith("GLK ")) return "GLK-Class";
-	if (nameUpper.startsWith("GL ")) return "GL-Class";
-	if (nameUpper.startsWith("CLK ")) return "CLK";
-	if (nameUpper.startsWith("CLS ")) return "CLS";
-	if (nameUpper.startsWith("SL ")) return "SL";
-	if (nameUpper.startsWith("SLK ")) return "SLK";
-	if (nameUpper.startsWith("SLC ")) return "SLC";
-	if (nameUpper.startsWith("AMG GT")) return "AMG GT";
-	if (nameUpper.startsWith("CLA ")) return "CLA";
-	if (nameUpper.startsWith("SPRINTER ")) return "Sprinter";
-	if (nameUpper.startsWith("VITO ")) return "Vito";
-	if (nameUpper.startsWith("VIANO ")) return "Viano";
-	if (nameUpper.startsWith("CITAN ")) return "Citan";
-	if (nameUpper.startsWith("X ")) return "X-Class";
-	if (nameUpper.startsWith("MB 100") || nameUpper.startsWith("MB100")) return "MB100";
-	if (nameUpper.startsWith("MB 140") || nameUpper.startsWith("MB140")) return "MB140";
-	if (nameUpper.startsWith("R ")) return "R-Class";
-	if (nameUpper.startsWith("VANEO ")) return "Vaneo";
-	if (nameUpper.startsWith("VARIO ")) return "Vario";
-	if (nameUpper.startsWith("SLS ")) return "SLS AMG";
-	if (nameUpper.startsWith("CLC ")) return "CLC-Class";
-	if (nameUpper.startsWith("ML ") || nameUpper.startsWith("ML-") || nameUpper.startsWith("M-")) return "M-Class";
+	const clean = modelName.trim().toUpperCase().replace(/[\s-]+/g, " ");
+	
+	const isClass = (cls) => {
+		const regex = new RegExp(`^${cls}(?:\\b|\\s|$)`, "i");
+		return regex.test(clean);
+	};
+
+	if (isClass("A")) return "A-Class";
+	if (isClass("B")) return "B-Class";
+	
+	if (isClass("CLK")) return "CLK";
+	if (isClass("CLS")) return "CLS";
+	if (isClass("CLC")) return "CLC-Class";
+	
+	if (isClass("C")) return "C-Class";
+	if (isClass("E")) return "E-Class";
+	
+	if (isClass("SLC")) return "SLC";
+	if (isClass("SLK")) return "SLK";
+	if (isClass("SLS")) return "SLS AMG";
+	if (isClass("SL")) return "SL";
+	if (isClass("S")) return "S-Class";
+	
+	if (isClass("GLA")) return "GLA-Class";
+	if (isClass("GLB")) return "GLB-Class";
+	if (isClass("GLC")) return "GLC-Class";
+	if (isClass("GLE")) return "GLE";
+	if (isClass("GLS")) return "GLS";
+	if (isClass("GLK")) return "GLK-Class";
+	if (isClass("GL")) return "GL-Class";
+	if (isClass("G")) return "G-Class";
+	
+	if (isClass("AMG GT")) return "AMG GT";
+	if (isClass("CLA")) return "CLA";
+	if (isClass("SPRINTER")) return "Sprinter";
+	if (isClass("VITO")) return "Vito";
+	if (isClass("VIANO")) return "Viano";
+	if (isClass("CITAN")) return "Citan";
+	if (isClass("X")) return "X-Class";
+	if (isClass("MB 100") || isClass("MB100")) return "MB100";
+	if (isClass("MB 140") || isClass("MB140")) return "MB140";
+	if (isClass("R")) return "R-Class";
+	if (isClass("VANEO")) return "Vaneo";
+	if (isClass("VARIO")) return "Vario";
+	if (isClass("ML") || isClass("M")) return "M-Class";
+	
 	return "Other";
 };
 
