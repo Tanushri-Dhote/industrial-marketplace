@@ -532,7 +532,7 @@ export default function ModelsModule() {
 
 							<FormControl>
 								<FormLabel fontSize="13px" fontWeight="700">
-									Year / Range (Optional)
+									Year / Range 
 								</FormLabel>
 								<Input
 									placeholder="e.g., 2010 - 2018 or 2018 - Present"
@@ -546,7 +546,7 @@ export default function ModelsModule() {
 
 							<FormControl>
 								<FormLabel fontSize="13px" fontWeight="700">
-									Body Type (Optional)
+									Body Type 
 								</FormLabel>
 								<Input
 									placeholder="e.g., Hatchback; Sportback"

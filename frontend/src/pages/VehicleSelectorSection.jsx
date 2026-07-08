@@ -144,11 +144,11 @@ export default function VehicleSelectorSection({ category }) {
               <ListIcon as={CheckCircleIcon} color={accentColor} boxSize={5} />
               6 Months Warranty*
             </ListItem>
-
+{/* 
             <ListItem display="flex" alignItems="center" gap={2} whiteSpace="nowrap">
               <ListIcon as={CheckCircleIcon} color={accentColor} boxSize={5} />
               It Only Takes a Minute
-            </ListItem>
+            </ListItem> */}
           </List>
 
         </VStack>

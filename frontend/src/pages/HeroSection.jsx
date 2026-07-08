@@ -653,6 +653,7 @@ export default function HeroSection({ category = "Engines", initialBrand = "", i
 									display="inline-flex"
 									alignItems="center"
 									boxShadow="md"
+									alignSelf={{ base: "center", lg: "flex-start" }}
 								>
 									<Box w="3px" h="14px" bg={RED} mr={3} borderRadius="full" />
 									<Text fontSize="12px" fontWeight="600" letterSpacing="0.5px">
