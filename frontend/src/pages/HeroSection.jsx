@@ -14,11 +14,14 @@ import {
 	ModalCloseButton,
 	ModalContent,
 	ModalOverlay,
-	Select,
 	SimpleGrid,
 	Text,
 	useDisclosure,
-	VStack
+	VStack,
+	Menu,
+	MenuButton,
+	MenuList,
+	MenuItem
 } from "@chakra-ui/react";
 import { motion } from "framer-motion";
 import React, { useEffect, useState } from "react";
@@ -806,50 +809,55 @@ export default function HeroSection({ category = "Engines", initialBrand = "", i
 										<Flex bg="#FEF2F2" w="42px" h="full" align="center" justify="center" borderRight="1.5px solid" borderColor="gray.200" flexShrink={0}>
 											<Icon as={FaCar} color="#D90404" boxSize={4} />
 										</Flex>
-										<Box flex={1} h="full" position="relative">
-											<select
-												value={selectedBrand}
-												onChange={(e) => {
-													setSelectedBrand(e.target.value);
-													setSelectedModel("");
-													setSelectedClass("");
-													setSelectedYear("");
-													setSelectedEngineSize("");
-												}}
-												style={{
-													height: "100%",
-													width: "100%",
-													border: "none",
-													outline: "none",
-													paddingLeft: "12px",
-													paddingRight: "32px",
-													fontWeight: "600",
-													fontSize: "13px",
-													color: "#4A5568",
-													cursor: "pointer",
-													backgroundColor: "transparent",
-													appearance: "none",
-													WebkitAppearance: "none",
-													MozAppearance: "none",
-												}}
-											>
-												<option value="">Choose Brand</option>
-												{brands.map((brand) => (
-													<option key={brand._id} value={brand.slug}>
-														{brand.name}
-													</option>
-												))}
-											</select>
-											<Box
-												position="absolute"
-												right="12px"
-												top="50%"
-												transform="translateY(-50%)"
-												pointerEvents="none"
-												color="gray.400"
-											>
-												<FaChevronDown size="12px" />
-											</Box>
+										<Box flex={1} h="full">
+											<Menu matchWidth>
+												<MenuButton
+													as={Button}
+													rightIcon={<FaChevronDown size="10px" color="#94A3B8" />}
+													bg="transparent"
+													_hover={{ bg: "transparent" }}
+													_active={{ bg: "transparent" }}
+													_focus={{ boxShadow: "none" }}
+													h="full"
+													w="full"
+													px={3}
+													textAlign="left"
+													fontWeight="600"
+													fontSize="13px"
+													color="gray.700"
+												>
+													{selectedBrand ? (brands.find(b => b.slug === selectedBrand)?.name || selectedBrand) : "Choose Brand"}
+												</MenuButton>
+												<MenuList maxH="250px" overflowY="auto" borderRadius="xl" border="1px solid" borderColor="gray.200" boxShadow="0 10px 25px -5px rgba(0,0,0,0.1)" py={1} zIndex={10}>
+													<MenuItem fontSize="13px" fontWeight="600" color="gray.500" _hover={{ bg: "gray.50" }} onClick={() => {
+														setSelectedBrand("");
+														setSelectedModel("");
+														setSelectedClass("");
+														setSelectedYear("");
+														setSelectedEngineSize("");
+													}}>
+														Choose Brand
+													</MenuItem>
+													{brands.map((brand) => (
+														<MenuItem
+															key={brand._id}
+															fontSize="13px"
+															fontWeight="600"
+															color="gray.700"
+															_hover={{ bg: "red.50", color: RED }}
+															onClick={() => {
+																setSelectedBrand(brand.slug);
+																setSelectedModel("");
+																setSelectedClass("");
+																setSelectedYear("");
+																setSelectedEngineSize("");
+															}}
+														>
+															{brand.name}
+														</MenuItem>
+													))}
+												</MenuList>
+											</Menu>
 										</Box>
 									</Flex>
 								</VStack>
@@ -875,49 +883,53 @@ export default function HeroSection({ category = "Engines", initialBrand = "", i
 											<Flex bg="#FEF2F2" w="42px" h="full" align="center" justify="center" borderRight="1.5px solid" borderColor="gray.200" flexShrink={0}>
 												<Icon as={FaCar} color="#D90404" boxSize={4} />
 											</Flex>
-										<Box flex={1} h="full" position="relative">
-											<select
-												value={selectedClass}
-												onChange={(e) => {
-													setSelectedClass(e.target.value);
-													setSelectedModel("");
-													setSelectedYear("");
-													setSelectedEngineSize("");
-												}}
-												style={{
-													height: "100%",
-													width: "100%",
-													border: "none",
-													outline: "none",
-													paddingLeft: "12px",
-													paddingRight: "32px",
-													fontWeight: "600",
-													fontSize: "13px",
-													color: "#4A5568",
-													cursor: "pointer",
-													backgroundColor: "transparent",
-													appearance: "none",
-													WebkitAppearance: "none",
-													MozAppearance: "none",
-												}}
-											>
-												<option value="">Choose Class</option>
-												{[...new Set(models.map((m) => getMercedesClass(m.name)))].sort().map((cls) => (
-													<option key={cls} value={cls}>
-														{cls}
-													</option>
-												))}
-											</select>
-											<Box
-												position="absolute"
-												right="12px"
-												top="50%"
-												transform="translateY(-50%)"
-												pointerEvents="none"
-												color="gray.400"
-											>
-												<FaChevronDown size="12px" />
-											</Box>
+										<Box flex={1} h="full">
+											<Menu matchWidth>
+												<MenuButton
+													as={Button}
+													rightIcon={<FaChevronDown size="10px" color="#94A3B8" />}
+													bg="transparent"
+													_hover={{ bg: "transparent" }}
+													_active={{ bg: "transparent" }}
+													_focus={{ boxShadow: "none" }}
+													h="full"
+													w="full"
+													px={3}
+													textAlign="left"
+													fontWeight="600"
+													fontSize="13px"
+													color="gray.700"
+												>
+													{selectedClass || "Choose Class"}
+												</MenuButton>
+												<MenuList maxH="250px" overflowY="auto" borderRadius="xl" border="1px solid" borderColor="gray.200" boxShadow="0 10px 25px -5px rgba(0,0,0,0.1)" py={1} zIndex={10}>
+													<MenuItem fontSize="13px" fontWeight="600" color="gray.500" _hover={{ bg: "gray.50" }} onClick={() => {
+														setSelectedClass("");
+														setSelectedModel("");
+														setSelectedYear("");
+														setSelectedEngineSize("");
+													}}>
+														Choose Class
+													</MenuItem>
+													{[...new Set(models.map((m) => getMercedesClass(m.name)))].sort().map((cls) => (
+														<MenuItem
+															key={cls}
+															fontSize="13px"
+															fontWeight="600"
+															color="gray.700"
+															_hover={{ bg: "red.50", color: RED }}
+															onClick={() => {
+																setSelectedClass(cls);
+																setSelectedModel("");
+																setSelectedYear("");
+																setSelectedEngineSize("");
+															}}
+														>
+															{cls}
+														</MenuItem>
+													))}
+												</MenuList>
+											</Menu>
 										</Box>
 										</Flex>
 									</VStack>
@@ -951,59 +963,74 @@ export default function HeroSection({ category = "Engines", initialBrand = "", i
 										<Flex bg="#FEF2F2" w="42px" h="full" align="center" justify="center" borderRight="1.5px solid" borderColor="gray.200" flexShrink={0}>
 											<Icon as={FaCar} color="#D90404" boxSize={4} />
 										</Flex>
-										<Box flex={1} h="full" position="relative">
-											<select
-												value={selectedModel}
-												onChange={(e) => {
-													setSelectedModel(e.target.value);
-													setSelectedYear("");
-													setSelectedEngineSize("");
-												}}
-												disabled={!selectedBrand || loadingModels || (selectedBrand === "mercedes-benz" && !selectedClass)}
-												style={{
-													height: "100%",
-													width: "100%",
-													border: "none",
-													outline: "none",
-													paddingLeft: "12px",
-													paddingRight: "32px",
-													fontWeight: "600",
-													fontSize: "13px",
-													color: "#4A5568",
-													cursor: (!selectedBrand || loadingModels || (selectedBrand === "mercedes-benz" && !selectedClass)) ? "not-allowed" : "pointer",
-													backgroundColor: "transparent",
-													appearance: "none",
-													WebkitAppearance: "none",
-													MozAppearance: "none",
-												}}
-											>
-												<option value="">{loadingModels ? "Loading Models..." : "Choose Model"}</option>
-												{filteredModels.some(m => m.year || m.type) ? (
-													[...new Set(filteredModels.map(m => m.name))]
-														.sort((a, b) => a.localeCompare(b, undefined, { numeric: true }))
-														.map((name) => (
-															<option key={name} value={name}>
-																{name}
-															</option>
+										<Box flex={1} h="full">
+											<Menu matchWidth>
+												<MenuButton
+													as={Button}
+													rightIcon={<FaChevronDown size="10px" color="#94A3B8" />}
+													bg="transparent"
+													_hover={{ bg: "transparent" }}
+													_active={{ bg: "transparent" }}
+													_focus={{ boxShadow: "none" }}
+													disabled={!selectedBrand || loadingModels || (selectedBrand === "mercedes-benz" && !selectedClass)}
+													h="full"
+													w="full"
+													px={3}
+													textAlign="left"
+													fontWeight="600"
+													fontSize="13px"
+													color="gray.700"
+													cursor={(!selectedBrand || loadingModels || (selectedBrand === "mercedes-benz" && !selectedClass)) ? "not-allowed" : "pointer"}
+												>
+													{loadingModels ? "Loading Models..." : (selectedModel ? (models.find(m => m.slug === selectedModel || m._id === selectedModel)?.name || selectedModel) : "Choose Model")}
+												</MenuButton>
+												<MenuList maxH="250px" overflowY="auto" borderRadius="xl" border="1px solid" borderColor="gray.200" boxShadow="0 10px 25px -5px rgba(0,0,0,0.1)" py={1} zIndex={10}>
+													<MenuItem fontSize="13px" fontWeight="600" color="gray.500" _hover={{ bg: "gray.50" }} onClick={() => {
+														setSelectedModel("");
+														setSelectedYear("");
+														setSelectedEngineSize("");
+													}}>
+														Choose Model
+													</MenuItem>
+													{filteredModels.some(m => m.year || m.type) ? (
+														[...new Set(filteredModels.map(m => m.name))]
+															.sort((a, b) => a.localeCompare(b, undefined, { numeric: true }))
+															.map((name) => (
+																<MenuItem
+																	key={name}
+																	fontSize="13px"
+																	fontWeight="600"
+																	color="gray.700"
+																	_hover={{ bg: "red.50", color: RED }}
+																	onClick={() => {
+																		setSelectedModel(name);
+																		setSelectedYear("");
+																		setSelectedEngineSize("");
+																	}}
+																>
+																	{name}
+																</MenuItem>
+															))
+													) : (
+														filteredModels.map((model) => (
+															<MenuItem
+																key={model._id}
+																fontSize="13px"
+																fontWeight="600"
+																color="gray.700"
+																_hover={{ bg: "red.50", color: RED }}
+																onClick={() => {
+																	setSelectedModel(model.slug);
+																	setSelectedYear("");
+																	setSelectedEngineSize("");
+																}}
+															>
+																{model.name}
+															</MenuItem>
 														))
-												) : (
-													filteredModels.map((model) => (
-														<option key={model._id} value={model.slug}>
-															{model.name}
-														</option>
-													))
-												)}
-											</select>
-											<Box
-												position="absolute"
-												right="12px"
-												top="50%"
-												transform="translateY(-50%)"
-												pointerEvents="none"
-												color="gray.400"
-											>
-												<FaChevronDown size="12px" />
-											</Box>
+													)}
+												</MenuList>
+											</Menu>
 										</Box>
 									</Flex>
 								</VStack>
@@ -1036,48 +1063,51 @@ export default function HeroSection({ category = "Engines", initialBrand = "", i
 										<Flex bg="#FEF2F2" w="42px" h="full" align="center" justify="center" borderRight="1.5px solid" borderColor="gray.200" flexShrink={0}>
 											<Icon as={FaCalendarAlt} color="#D90404" boxSize={4} />
 										</Flex>
-										<Box flex={1} h="full" position="relative">
-											<select
-												value={selectedYear}
-												onChange={(e) => {
-													setSelectedYear(e.target.value);
-													setSelectedEngineSize("");
-												}}
-												disabled={!selectedModel || loadingProducts}
-												style={{
-													height: "100%",
-													width: "100%",
-													border: "none",
-													outline: "none",
-													paddingLeft: "12px",
-													paddingRight: "32px",
-													fontWeight: "600",
-													fontSize: "13px",
-													color: "#4A5568",
-													cursor: (!selectedModel || loadingProducts) ? "not-allowed" : "pointer",
-													backgroundColor: "transparent",
-													appearance: "none",
-													WebkitAppearance: "none",
-													MozAppearance: "none",
-												}}
-											>
-												<option value="">{loadingProducts ? "Loading Years..." : "Choose Year"}</option>
-												{dynamicYears.map((y) => (
-													<option key={y} value={y}>
-														{y}
-													</option>
-												))}
-											</select>
-											<Box
-												position="absolute"
-												right="12px"
-												top="50%"
-												transform="translateY(-50%)"
-												pointerEvents="none"
-												color="gray.400"
-											>
-												<FaChevronDown size="12px" />
-											</Box>
+										<Box flex={1} h="full">
+											<Menu matchWidth>
+												<MenuButton
+													as={Button}
+													rightIcon={<FaChevronDown size="10px" color="#94A3B8" />}
+													bg="transparent"
+													_hover={{ bg: "transparent" }}
+													_active={{ bg: "transparent" }}
+													_focus={{ boxShadow: "none" }}
+													disabled={!selectedModel || loadingProducts}
+													h="full"
+													w="full"
+													px={3}
+													textAlign="left"
+													fontWeight="600"
+													fontSize="13px"
+													color="gray.700"
+													cursor={(!selectedModel || loadingProducts) ? "not-allowed" : "pointer"}
+												>
+													{loadingProducts ? "Loading Years..." : (selectedYear || "Choose Year")}
+												</MenuButton>
+												<MenuList maxH="250px" overflowY="auto" borderRadius="xl" border="1px solid" borderColor="gray.200" boxShadow="0 10px 25px -5px rgba(0,0,0,0.1)" py={1} zIndex={10}>
+													<MenuItem fontSize="13px" fontWeight="600" color="gray.500" _hover={{ bg: "gray.50" }} onClick={() => {
+														setSelectedYear("");
+														setSelectedEngineSize("");
+													}}>
+														Choose Year
+													</MenuItem>
+													{dynamicYears.map((y) => (
+														<MenuItem
+															key={y}
+															fontSize="13px"
+															fontWeight="600"
+															color="gray.700"
+															_hover={{ bg: "red.50", color: RED }}
+															onClick={() => {
+																setSelectedYear(y);
+																setSelectedEngineSize("");
+															}}
+														>
+															{y}
+														</MenuItem>
+													))}
+												</MenuList>
+											</Menu>
 										</Box>
 									</Flex>
 								</VStack>
@@ -1111,45 +1141,45 @@ export default function HeroSection({ category = "Engines", initialBrand = "", i
 											<Flex bg="#FEF2F2" w="42px" h="full" align="center" justify="center" borderRight="1.5px solid" borderColor="gray.200" flexShrink={0}>
 												<Icon as={FaCogs} color="#D90404" boxSize={4} />
 											</Flex>
-										<Box flex={1} h="full" position="relative">
-											<select
-												value={selectedEngineSize}
-												onChange={(e) => setSelectedEngineSize(e.target.value)}
-												disabled={!selectedYear || loadingProducts}
-												style={{
-													height: "100%",
-													width: "100%",
-													border: "none",
-													outline: "none",
-													paddingLeft: "12px",
-													paddingRight: "32px",
-													fontWeight: "600",
-													fontSize: "13px",
-													color: "#4A5568",
-													cursor: (!selectedYear || loadingProducts) ? "not-allowed" : "pointer",
-													backgroundColor: "transparent",
-													appearance: "none",
-													WebkitAppearance: "none",
-													MozAppearance: "none",
-												}}
-											>
-												<option value="">{loadingProducts ? "Loading Engines..." : "Select Engine Size/Type"}</option>
-												{dynamicEngines.map((size) => (
-													<option key={size} value={size}>
-														{size}
-													</option>
-												))}
-											</select>
-											<Box
-												position="absolute"
-												right="12px"
-												top="50%"
-												transform="translateY(-50%)"
-												pointerEvents="none"
-												color="gray.400"
-											>
-												<FaChevronDown size="12px" />
-											</Box>
+										<Box flex={1} h="full">
+											<Menu matchWidth>
+												<MenuButton
+													as={Button}
+													rightIcon={<FaChevronDown size="10px" color="#94A3B8" />}
+													bg="transparent"
+													_hover={{ bg: "transparent" }}
+													_active={{ bg: "transparent" }}
+													_focus={{ boxShadow: "none" }}
+													disabled={!selectedYear || loadingProducts}
+													h="full"
+													w="full"
+													px={3}
+													textAlign="left"
+													fontWeight="600"
+													fontSize="13px"
+													color="gray.700"
+													cursor={(!selectedYear || loadingProducts) ? "not-allowed" : "pointer"}
+												>
+													{loadingProducts ? "Loading Engines..." : (selectedEngineSize || "Select Engine Size/Type")}
+												</MenuButton>
+												<MenuList maxH="250px" overflowY="auto" borderRadius="xl" border="1px solid" borderColor="gray.200" boxShadow="0 10px 25px -5px rgba(0,0,0,0.1)" py={1} zIndex={10}>
+													<MenuItem fontSize="13px" fontWeight="600" color="gray.500" _hover={{ bg: "gray.50" }} onClick={() => setSelectedEngineSize("")}>
+														Select Engine Size/Type
+														</MenuItem>
+													{dynamicEngines.map((size) => (
+														<MenuItem
+															key={size}
+															fontSize="13px"
+															fontWeight="600"
+															color="gray.700"
+															_hover={{ bg: "red.50", color: RED }}
+															onClick={() => setSelectedEngineSize(size)}
+														>
+															{size}
+														</MenuItem>
+													))}
+												</MenuList>
+											</Menu>
 										</Box>
 										</Flex>
 									</VStack>
