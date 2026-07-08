@@ -129,10 +129,12 @@ async function run() {
 				const end = (i + 1 < brandsFound.length) ? brandsFound[i+1].index : htmlContent.length;
 				const htmlSection = htmlContent.substring(start, end);
 
-				const brandSlug = bInfo.name.toLowerCase().replace(/\s+/g, "-");
+				let brandSlug = bInfo.name.toLowerCase().replace(/\s+/g, "-");
+				if (brandSlug === "vw") brandSlug = "volkswagen";
 				
 				// Matches class="bg-..." followed by brand name + model name + Engines
-				const blockRegex = new RegExp(`bg-([a-zA-Z0-9-]+)[\\s\\S]*?>\\s*(?:${bInfo.name})\\s+([A-Za-z0-9\\s-+]+?)\\s+Engines`, "gi");
+				const brandPattern = brandSlug === "volkswagen" ? "(?:Volkswagen|VW)" : bInfo.name.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
+				const blockRegex = new RegExp(`bg-([a-zA-Z0-9-]+)[\\s\\S]*?>\\s*(?:${brandPattern})\\s+([A-Za-z0-9\\s-+]+?)\\s+Engines`, "gi");
 				const modelNames = [];
 				const seen = new Set();
 				let mapMatch;

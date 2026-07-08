@@ -137,9 +137,13 @@ async function run() {
 				const end = (i + 1 < brandsFound.length) ? brandsFound[i+1].index : htmlContent.length;
 				const htmlSection = htmlContent.substring(start, end);
 
-				const brand = await Brand.findOne({
+				let brand = await Brand.findOne({
 					name: new RegExp(`^${bInfo.name}$`, "i")
 				});
+
+				if (!brand && bInfo.name.toLowerCase() === "vw") {
+					brand = await Brand.findOne({ slug: "volkswagen" });
+				}
 
 				if (!brand) {
 					console.log(`⚠️ Brand "${bInfo.name}" detected in HTML but not found in database. Skipping.`);
@@ -167,7 +171,8 @@ async function run() {
 			console.log(`------------------------------------------------------------`);
 
 			const cleanBrandName = brand.name.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
-			const blockRegex = new RegExp(`bg-([a-zA-Z0-9-]+)[\\s\\S]*?>\\s*(?:${cleanBrandName})\\s+([A-Za-z0-9\\s-]+?)\\s+Engines`, "gi");
+			const brandPattern = brand.slug === "volkswagen" ? "(?:Volkswagen|VW)" : cleanBrandName;
+			const blockRegex = new RegExp(`bg-([a-zA-Z0-9-]+)[\\s\\S]*?>\\s*(?:${brandPattern})\\s+([A-Za-z0-9\\s-+]+?)\\s+Engines`, "gi");
 
 			const mappings = [];
 			const seenClasses = new Set();
