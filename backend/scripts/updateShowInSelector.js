@@ -250,6 +250,7 @@ async function run() {
 				// Any other models in the group are submodels and should be hidden from selector.
 				for (const m of list) {
 					let showInSelector = false;
+					let isActive = true;
 
 					if (m._id.toString() === parentModel._id.toString()) {
 						// This is the parent model, determine if it should show
@@ -300,15 +301,35 @@ async function run() {
 							// No specs found for any submodel in the group, check if there are any products
 							if (totalProducts === 0) {
 								showInSelector = false;
-								console.log(`Main model "${m.name}" (${brand.name}) has no specs and no products. Hiding.`);
+								isActive = false;
+								console.log(`Main model "${m.name}" (${brand.name}) has no specs and no products. Hiding & Deactivating.`);
 							}
 						}
 					} else {
 						// This is a submodel, always hide it from the selector
 						showInSelector = false;
+
+						// Check if this submodel has specs or products to decide if it's active
+						const specModelSlug = m.name.replace(/\s+/g, "-").toLowerCase();
+						const spec = await ModelEngineSpec.findOne({
+							brandSlug: brand.slug,
+							modelSlug: specModelSlug
+						});
+						const hasSpecs = spec && spec.costTable && spec.costTable.length > 0;
+						
+						const productCount = await Product.countDocuments({
+							make: new RegExp(`^${brand.name}$`, "i"),
+							model: new RegExp(`^${m.name}$`, "i")
+						});
+
+						if (!hasSpecs && productCount === 0) {
+							isActive = false;
+							console.log(`Submodel "${m.name}" (${brand.name}) has no specs and no products. Deactivating.`);
+						}
 					}
 
 					m.showInSelector = showInSelector;
+					m.isActive = isActive;
 					await m.save();
 
 					if (showInSelector) {

@@ -23,6 +23,7 @@ exports.getModelsByBrand = async (request, reply) => {
 			}
 			const models = await Model.find({
 				brandId: brand._id,
+				isActive: { $ne: false },
 			}).sort({ name: 1 }).lean();
 			return reply.send({
 				success: true,
