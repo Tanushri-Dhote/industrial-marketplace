@@ -1260,12 +1260,12 @@ export default function HeroSection({ category = "Engines", initialBrand = "", i
 										<Text fontSize={{ base: "11px", md: "13px" }} fontWeight="700" color="#1E293B" whiteSpace="nowrap">6 Months Warranty*</Text>
 									</HStack>
 
-									<HStack spacing={2}>
+									{/* <HStack spacing={2}>
 										<Circle size={{ base: "26px", md: "32px" }} border="1.5px solid" borderColor="gray.200" bg="white" boxShadow="sm" flexShrink={0}>
 											<Icon as={FaClock} color="#D90404" boxSize={{ base: "12px", md: "14px" }} />
 										</Circle>
 										<Text fontSize={{ base: "11px", md: "13px" }} fontWeight="700" color="#1E293B" whiteSpace="nowrap">It Only Takes a Minute</Text>
-									</HStack>
+									</HStack> */}
 								</Flex>
 
 								{/* Slanted Black Badge */}

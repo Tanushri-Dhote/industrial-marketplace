@@ -44,7 +44,7 @@ export default function VehicleSelectorSection({ category }) {
             <VStack spacing={6}>
               {/* Row 1: 3 Fields */}
               <HStack spacing={4} w="full" flexWrap={{ base: "wrap", lg: "nowrap" }}>
-                <Select 
+                <Select
                   placeholder="Select Make"
                   size="lg"
                   fontSize="15px"
@@ -54,7 +54,7 @@ export default function VehicleSelectorSection({ category }) {
                   _hover={{ borderColor: accentColor }}
                   _focus={{ borderColor: accentColor, boxShadow: "0 0 0 3px rgba(255,107,0,0.15)" }}
                 />
-                <Select 
+                <Select
                   placeholder="Select Model"
                   size="lg"
                   fontSize="15px"
@@ -64,7 +64,7 @@ export default function VehicleSelectorSection({ category }) {
                   _hover={{ borderColor: accentColor }}
                   _focus={{ borderColor: accentColor, boxShadow: "0 0 0 3px rgba(255,107,0,0.15)" }}
                 />
-                <Select 
+                <Select
                   placeholder="Select Year"
                   size="lg"
                   fontSize="15px"
@@ -78,7 +78,7 @@ export default function VehicleSelectorSection({ category }) {
 
               {/* Row 2: 2 Fields + Button */}
               <HStack spacing={4} w="full" flexWrap={{ base: "wrap", lg: "nowrap" }}>
-                <Select 
+                <Select
                   placeholder="Select Type"
                   size="lg"
                   fontSize="15px"
@@ -89,7 +89,7 @@ export default function VehicleSelectorSection({ category }) {
                   _focus={{ borderColor: accentColor, boxShadow: "0 0 0 3px rgba(255,107,0,0.15)" }}
                   flex={1}
                 />
-                <Select 
+                <Select
                   placeholder="Select Part"
                   size="lg"
                   fontSize="15px"
@@ -109,7 +109,7 @@ export default function VehicleSelectorSection({ category }) {
                   h="52px"
                   px={10}
                   borderRadius="full"
-                  _hover={{ 
+                  _hover={{
                     bg: "#e55a00",
                     transform: "translateY(-2px)"
                   }}
@@ -125,10 +125,10 @@ export default function VehicleSelectorSection({ category }) {
           </Box>
 
           {/* Features in One Single Row */}
-          <List 
-            display="flex" 
+          <List
+            display="flex"
             flexDirection={{ base: "column", md: "row" }}
-            justifyContent="center" 
+            justifyContent="center"
             alignItems="center"
             gap={{ base: 6, md: 10 }}
             fontSize="16px"
@@ -144,7 +144,7 @@ export default function VehicleSelectorSection({ category }) {
               <ListIcon as={CheckCircleIcon} color={accentColor} boxSize={5} />
               6 Months Warranty*
             </ListItem>
-{/* 
+            {/* 
             <ListItem display="flex" alignItems="center" gap={2} whiteSpace="nowrap">
               <ListIcon as={CheckCircleIcon} color={accentColor} boxSize={5} />
               It Only Takes a Minute

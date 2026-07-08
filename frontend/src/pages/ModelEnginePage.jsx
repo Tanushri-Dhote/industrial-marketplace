@@ -400,7 +400,7 @@ export default function ModelEnginePage() {
 
 			{/* ── COST TABLE ── */}
 			{specs.costTable?.length > 0 && (
-				<Box py={16} bg="#F8FAFC">
+				<Box id="cost-table" py={16} bg="#F8FAFC">
 					<Container maxW="1400px"px={{ base: 4, md: 6 }}>
 						<VStack spacing={8} align="center" mb={12}>
 							<Heading

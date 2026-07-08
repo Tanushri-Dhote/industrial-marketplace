@@ -373,25 +373,6 @@ export default function BrandModelSelectorSection() {
 		staleTime: 1000 * 60 * 10,
 	});
 
-	// Synchronize URL search params to selectedModel
-	useEffect(() => {
-		if (loadingModels) return;
-
-		const modelSlugPart = searchParams.get("selModel");
-		if (modelSlugPart && models.length > 0) {
-			const foundModel = models.find(
-				(m) => m.name.toLowerCase().replace(/\s+/g, "-") === modelSlugPart
-			);
-			if (foundModel) {
-				setSelectedModel(foundModel);
-			} else {
-				setSelectedModel(null);
-			}
-		} else {
-			setSelectedModel(null);
-		}
-	}, [searchParams, models, loadingModels]);
-
 	const handleBrandSelect = (brand) => {
 		setSearchParams({ selBrand: brand.slug });
 	};
@@ -403,14 +384,7 @@ export default function BrandModelSelectorSection() {
 	const handleModelSelect = (model) => {
 		const brandSlug = selectedBrand?.slug || "";
 		const modelSlugPart = model.name.toLowerCase().replace(/\s+/g, "-");
-		const params = {
-			selBrand: brandSlug,
-			selModel: modelSlugPart,
-		};
-		if (selectedClass) {
-			params.selClass = selectedClass;
-		}
-		setSearchParams(params);
+		navigate(`/${brandSlug}-${modelSlugPart}-engines#cost-table`);
 	};
 
 	const handleBackToBrands = () => {
@@ -422,11 +396,7 @@ export default function BrandModelSelectorSection() {
 	};
 
 	const handleBackToModels = () => {
-		const params = { selBrand: selectedBrand.slug };
-		if (selectedClass) {
-			params.selClass = selectedClass;
-		}
-		setSearchParams(params);
+		setSelectedModel(null);
 	};
 
 
