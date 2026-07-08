@@ -212,7 +212,7 @@ export default function ProductsPage() {
 		queryKey: ['models', currentBrand?._id],
 		queryFn: async () => {
 			if (!currentBrand?._id) return [];
-			const res = await API.get(`/models/${currentBrand._id}`);
+			const res = await API.get(`/models/${currentBrand._id}?all=true`);
 			return res.data?.data || [];
 		},
 		enabled: !!currentBrand?._id,

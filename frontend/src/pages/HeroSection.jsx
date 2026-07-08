@@ -205,7 +205,7 @@ export default function HeroSection({ category = "Engines", initialBrand = "", i
 			try {
 				const brandObj = brands.find((b) => b.slug === selectedBrand);
 				if (brandObj) {
-					const res = await API.get(`/models/${brandObj._id}`);
+					const res = await API.get(`/models/${brandObj._id}?all=true`);
 					setModels(res.data?.data || res.data || []);
 				} else {
 					setModels([]);
