@@ -253,15 +253,10 @@ export default function HeroSection({ category = "Engines", initialBrand = "", i
 				return;
 			}
 
-			const hasYearType = models.some(m => m.year || m.type);
-			if (hasYearType) {
-				// const years = [...new Set(
-				// 	models
-				// 		.filter(m => m.name === selectedModel)
-				// 		.map(m => m.year)
-				// 		.filter(Boolean)
-				// )].sort((a, b) => b.localeCompare(a, undefined, { numeric: true }));
+			const selectedModelObj = models.find(m => m.slug === selectedModel || m.name === selectedModel);
+			const hasYearType = selectedModelObj && (selectedModelObj.year || selectedModelObj.type);
 
+			if (hasYearType) {
 				const years = [
 					...new Set(
 						models
@@ -290,9 +285,8 @@ export default function HeroSection({ category = "Engines", initialBrand = "", i
 								return [m.year.trim()];
 							})
 					)
-				].sort((a, b) => Number(a) - Number(b));
+				].sort((a, b) => Number(b) - Number(a));
 
-				setDynamicYears(years);
 				setDynamicYears(years);
 				setSelectedYear("");
 				setDynamicEngines([]);
@@ -303,47 +297,105 @@ export default function HeroSection({ category = "Engines", initialBrand = "", i
 			setLoadingProducts(true);
 			try {
 				const brandObj = brands.find((b) => b.slug === selectedBrand);
-				const modelObj = models.find((m) => m.slug === selectedModel);
+				const modelObj = models.find((m) => m.slug === selectedModel || m.name === selectedModel);
 
-				const makeFilter = brandObj ? brandObj.name : selectedBrand;
-				const modelName = modelObj ? modelObj.name : selectedModel;
+				const brandSlug = brandObj ? brandObj.slug : selectedBrand;
+				const modelSlug = modelObj ? modelObj.slug : selectedModel;
 
-				const res = await API.get("/products", {
-					params: { make: makeFilter, model: modelName }
-				});
-				const products = res.data?.data || res.data || [];
+				// Try to fetch specifications for this brand and model to resolve exact years/sizes
+				let specs = null;
+				try {
+					const specsRes = await API.get(`/models/specs/${brandSlug}/${modelSlug}`);
+					if (specsRes.data?.success && specsRes.data?.data) {
+						specs = specsRes.data.data;
+					}
+				} catch (err) {
+					console.log("No specs found for this model, falling back to products or defaults");
+				}
 
-				if (products.length > 0) {
-					const years = [...new Set(products.map(p => p.year).filter(Boolean))]
-						.map(Number)
-						.sort((a, b) => b - a)
-						.map(String);
-
-					let engines = [];
-					products.forEach(p => {
-						if (p.engineType) engines.push(p.engineType);
-						if (p.specifications) {
-							const specsObj = p.specifications instanceof Map
-								? Object.fromEntries(p.specifications)
-								: p.specifications;
-
-							const size = specsObj["Engine Size"] || specsObj["Engine Size/Type"] || specsObj["engineSize"];
-							if (size) engines.push(size);
-						}
-						if (p.compatibility && Array.isArray(p.compatibility)) {
-							p.compatibility.forEach(c => {
-								if (c.engine) engines.push(c.engine);
-								if (c.code) engines.push(c.code);
-							});
+				if (specs && specs.costTable && specs.costTable.length > 0) {
+					const yearsSet = new Set();
+					specs.costTable.forEach(row => {
+						if (!row.years) return;
+						if (row.years.includes("-")) {
+							const [startStr, endStr] = row.years.split("-").map(y => y.trim().toLowerCase());
+							const start = parseInt(startStr, 10);
+							let end = parseInt(endStr, 10);
+							if (endStr === "present") {
+								end = new Date().getFullYear();
+							}
+							if (!isNaN(start) && !isNaN(end)) {
+								for (let y = start; y <= end; y++) {
+									yearsSet.add(String(y));
+								}
+							}
+						} else {
+							const yr = parseInt(row.years.trim(), 10);
+							if (!isNaN(yr)) {
+								yearsSet.add(String(yr));
+							}
 						}
 					});
-					const uniqueEngines = [...new Set(engines.filter(Boolean))].sort();
+
+					const enginesSet = new Set();
+					specs.costTable.forEach(row => {
+						if (row.engineSize && row.fuel) {
+							const sizeStr = row.engineSize.toLowerCase().includes("litre") || row.engineSize.toLowerCase().includes("l")
+								? row.engineSize 
+								: `${row.engineSize}L`;
+							enginesSet.add(`${sizeStr} ${row.fuel}`);
+						} else if (row.engineSize) {
+							enginesSet.add(row.engineSize);
+						}
+					});
+
+					const years = [...yearsSet].sort((a, b) => Number(b) - Number(a));
+					const engines = [...enginesSet].sort();
 
 					setDynamicYears(years.length > 0 ? years : yearsList);
-					setDynamicEngines(uniqueEngines.length > 0 ? uniqueEngines : engineSizesList);
+					setDynamicEngines(engines.length > 0 ? engines : engineSizesList);
 				} else {
-					setDynamicYears(yearsList);
-					setDynamicEngines(engineSizesList);
+					// Fallback to products query
+					const makeFilter = brandObj ? brandObj.name : selectedBrand;
+					const modelName = modelObj ? modelObj.name : selectedModel;
+
+					const res = await API.get("/products", {
+						params: { make: makeFilter, model: modelName }
+					});
+					const products = res.data?.data || res.data || [];
+
+					if (products.length > 0) {
+						const years = [...new Set(products.map(p => p.year).filter(Boolean))]
+							.map(Number)
+							.sort((a, b) => b - a)
+							.map(String);
+
+						let engines = [];
+						products.forEach(p => {
+							if (p.engineType) engines.push(p.engineType);
+							if (p.specifications) {
+								const specsObj = p.specifications instanceof Map
+									? Object.fromEntries(p.specifications)
+									: p.specifications;
+
+								const size = specsObj["Engine Size"] || specsObj["Engine Size/Type"] || specsObj["engineSize"];
+								if (size) engines.push(size);
+							}
+							if (p.compatibility && Array.isArray(p.compatibility)) {
+								p.compatibility.forEach(c => {
+									if (c.engine) engines.push(c.engine);
+									if (c.code) engines.push(c.code);
+								});
+							}
+						});
+						const uniqueEngines = [...new Set(engines.filter(Boolean))].sort();
+
+						setDynamicYears(years.length > 0 ? years : yearsList);
+						setDynamicEngines(uniqueEngines.length > 0 ? uniqueEngines : engineSizesList);
+					} else {
+						setDynamicYears(yearsList);
+						setDynamicEngines(engineSizesList);
+					}
 				}
 			} catch (error) {
 				console.error("Failed to fetch matching products", error);
