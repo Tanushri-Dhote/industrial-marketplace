@@ -30,7 +30,8 @@ import {
 	FaShieldAlt,
 	FaStar,
 	FaTools,
-	FaTruck
+	FaTruck,
+	FaChevronDown
 } from "react-icons/fa";
 import { MdLibraryBooks } from "react-icons/md";
 import { Link as RouterLink, useNavigate } from "react-router-dom";
@@ -805,31 +806,51 @@ export default function HeroSection({ category = "Engines", initialBrand = "", i
 										<Flex bg="#FEF2F2" w="42px" h="full" align="center" justify="center" borderRight="1.5px solid" borderColor="gray.200" flexShrink={0}>
 											<Icon as={FaCar} color="#D90404" boxSize={4} />
 										</Flex>
-										<Select
-											variant="unstyled"
-											placeholder="Choose Brand"
-											value={selectedBrand}
-											onChange={(e) => {
-												setSelectedBrand(e.target.value);
-												setSelectedModel("");
-												setSelectedClass("");
-												setSelectedYear("");
-												setSelectedEngineSize("");
-											}}
-											h="full"
-											w="full"
-											px={3}
-											fontWeight="600"
-											fontSize="13px"
-											color="gray.700"
-											cursor="pointer"
-										>
-											{brands.map((brand) => (
-												<option key={brand._id} value={brand.slug}>
-													{brand.name}
-												</option>
-											))}
-										</Select>
+										<Box flex={1} h="full" position="relative">
+											<select
+												value={selectedBrand}
+												onChange={(e) => {
+													setSelectedBrand(e.target.value);
+													setSelectedModel("");
+													setSelectedClass("");
+													setSelectedYear("");
+													setSelectedEngineSize("");
+												}}
+												style={{
+													height: "100%",
+													width: "100%",
+													border: "none",
+													outline: "none",
+													paddingLeft: "12px",
+													paddingRight: "32px",
+													fontWeight: "600",
+													fontSize: "13px",
+													color: "#4A5568",
+													cursor: "pointer",
+													backgroundColor: "transparent",
+													appearance: "none",
+													WebkitAppearance: "none",
+													MozAppearance: "none",
+												}}
+											>
+												<option value="">Choose Brand</option>
+												{brands.map((brand) => (
+													<option key={brand._id} value={brand.slug}>
+														{brand.name}
+													</option>
+												))}
+											</select>
+											<Box
+												position="absolute"
+												right="12px"
+												top="50%"
+												transform="translateY(-50%)"
+												pointerEvents="none"
+												color="gray.400"
+											>
+												<FaChevronDown size="12px" />
+											</Box>
+										</Box>
 									</Flex>
 								</VStack>
 
@@ -854,9 +875,8 @@ export default function HeroSection({ category = "Engines", initialBrand = "", i
 											<Flex bg="#FEF2F2" w="42px" h="full" align="center" justify="center" borderRight="1.5px solid" borderColor="gray.200" flexShrink={0}>
 												<Icon as={FaCar} color="#D90404" boxSize={4} />
 											</Flex>
-											<Select
-												variant="unstyled"
-												placeholder="Choose Class"
+										<Box flex={1} h="full" position="relative">
+											<select
 												value={selectedClass}
 												onChange={(e) => {
 													setSelectedClass(e.target.value);
@@ -864,20 +884,41 @@ export default function HeroSection({ category = "Engines", initialBrand = "", i
 													setSelectedYear("");
 													setSelectedEngineSize("");
 												}}
-												h="full"
-												w="full"
-												px={3}
-												fontWeight="600"
-												fontSize="13px"
-												color="gray.700"
-												cursor="pointer"
+												style={{
+													height: "100%",
+													width: "100%",
+													border: "none",
+													outline: "none",
+													paddingLeft: "12px",
+													paddingRight: "32px",
+													fontWeight: "600",
+													fontSize: "13px",
+													color: "#4A5568",
+													cursor: "pointer",
+													backgroundColor: "transparent",
+													appearance: "none",
+													WebkitAppearance: "none",
+													MozAppearance: "none",
+												}}
 											>
+												<option value="">Choose Class</option>
 												{[...new Set(models.map((m) => getMercedesClass(m.name)))].sort().map((cls) => (
 													<option key={cls} value={cls}>
 														{cls}
 													</option>
 												))}
-											</Select>
+											</select>
+											<Box
+												position="absolute"
+												right="12px"
+												top="50%"
+												transform="translateY(-50%)"
+												pointerEvents="none"
+												color="gray.400"
+											>
+												<FaChevronDown size="12px" />
+											</Box>
+										</Box>
 										</Flex>
 									</VStack>
 								)}
@@ -910,40 +951,60 @@ export default function HeroSection({ category = "Engines", initialBrand = "", i
 										<Flex bg="#FEF2F2" w="42px" h="full" align="center" justify="center" borderRight="1.5px solid" borderColor="gray.200" flexShrink={0}>
 											<Icon as={FaCar} color="#D90404" boxSize={4} />
 										</Flex>
-										<Select
-											variant="unstyled"
-											placeholder={loadingModels ? "Loading Models..." : "Choose Model"}
-											value={selectedModel}
-											onChange={(e) => {
-												setSelectedModel(e.target.value);
-												setSelectedYear("");
-												setSelectedEngineSize("");
-											}}
-											isDisabled={!selectedBrand || loadingModels || (selectedBrand === "mercedes-benz" && !selectedClass)}
-											h="full"
-											w="full"
-											px={3}
-											fontWeight="600"
-											fontSize="13px"
-											color="gray.700"
-											cursor="pointer"
-										>
-											{filteredModels.some(m => m.year || m.type) ? (
-												[...new Set(filteredModels.map(m => m.name))]
-													.sort((a, b) => a.localeCompare(b, undefined, { numeric: true }))
-													.map((name) => (
-														<option key={name} value={name}>
-															{name}
+										<Box flex={1} h="full" position="relative">
+											<select
+												value={selectedModel}
+												onChange={(e) => {
+													setSelectedModel(e.target.value);
+													setSelectedYear("");
+													setSelectedEngineSize("");
+												}}
+												disabled={!selectedBrand || loadingModels || (selectedBrand === "mercedes-benz" && !selectedClass)}
+												style={{
+													height: "100%",
+													width: "100%",
+													border: "none",
+													outline: "none",
+													paddingLeft: "12px",
+													paddingRight: "32px",
+													fontWeight: "600",
+													fontSize: "13px",
+													color: "#4A5568",
+													cursor: (!selectedBrand || loadingModels || (selectedBrand === "mercedes-benz" && !selectedClass)) ? "not-allowed" : "pointer",
+													backgroundColor: "transparent",
+													appearance: "none",
+													WebkitAppearance: "none",
+													MozAppearance: "none",
+												}}
+											>
+												<option value="">{loadingModels ? "Loading Models..." : "Choose Model"}</option>
+												{filteredModels.some(m => m.year || m.type) ? (
+													[...new Set(filteredModels.map(m => m.name))]
+														.sort((a, b) => a.localeCompare(b, undefined, { numeric: true }))
+														.map((name) => (
+															<option key={name} value={name}>
+																{name}
+															</option>
+														))
+												) : (
+													filteredModels.map((model) => (
+														<option key={model._id} value={model.slug}>
+															{model.name}
 														</option>
 													))
-											) : (
-												filteredModels.map((model) => (
-													<option key={model._id} value={model.slug}>
-														{model.name}
-													</option>
-												))
-											)}
-										</Select>
+												)}
+											</select>
+											<Box
+												position="absolute"
+												right="12px"
+												top="50%"
+												transform="translateY(-50%)"
+												pointerEvents="none"
+												color="gray.400"
+											>
+												<FaChevronDown size="12px" />
+											</Box>
+										</Box>
 									</Flex>
 								</VStack>
 
@@ -975,29 +1036,49 @@ export default function HeroSection({ category = "Engines", initialBrand = "", i
 										<Flex bg="#FEF2F2" w="42px" h="full" align="center" justify="center" borderRight="1.5px solid" borderColor="gray.200" flexShrink={0}>
 											<Icon as={FaCalendarAlt} color="#D90404" boxSize={4} />
 										</Flex>
-										<Select
-											variant="unstyled"
-											placeholder={loadingProducts ? "Loading Years..." : "Choose Year"}
-											value={selectedYear}
-											onChange={(e) => {
-												setSelectedYear(e.target.value);
-												setSelectedEngineSize("");
-											}}
-											isDisabled={!selectedModel || loadingProducts}
-											h="full"
-											w="full"
-											px={3}
-											fontWeight="600"
-											fontSize="13px"
-											color="gray.700"
-											cursor="pointer"
-										>
-											{dynamicYears.map((y) => (
-												<option key={y} value={y}>
-													{y}
-												</option>
-											))}
-										</Select>
+										<Box flex={1} h="full" position="relative">
+											<select
+												value={selectedYear}
+												onChange={(e) => {
+													setSelectedYear(e.target.value);
+													setSelectedEngineSize("");
+												}}
+												disabled={!selectedModel || loadingProducts}
+												style={{
+													height: "100%",
+													width: "100%",
+													border: "none",
+													outline: "none",
+													paddingLeft: "12px",
+													paddingRight: "32px",
+													fontWeight: "600",
+													fontSize: "13px",
+													color: "#4A5568",
+													cursor: (!selectedModel || loadingProducts) ? "not-allowed" : "pointer",
+													backgroundColor: "transparent",
+													appearance: "none",
+													WebkitAppearance: "none",
+													MozAppearance: "none",
+												}}
+											>
+												<option value="">{loadingProducts ? "Loading Years..." : "Choose Year"}</option>
+												{dynamicYears.map((y) => (
+													<option key={y} value={y}>
+														{y}
+													</option>
+												))}
+											</select>
+											<Box
+												position="absolute"
+												right="12px"
+												top="50%"
+												transform="translateY(-50%)"
+												pointerEvents="none"
+												color="gray.400"
+											>
+												<FaChevronDown size="12px" />
+											</Box>
+										</Box>
 									</Flex>
 								</VStack>
 
@@ -1030,26 +1111,46 @@ export default function HeroSection({ category = "Engines", initialBrand = "", i
 											<Flex bg="#FEF2F2" w="42px" h="full" align="center" justify="center" borderRight="1.5px solid" borderColor="gray.200" flexShrink={0}>
 												<Icon as={FaCogs} color="#D90404" boxSize={4} />
 											</Flex>
-											<Select
-												variant="unstyled"
-												placeholder={loadingProducts ? "Loading Engines..." : "Select Engine Size/Type"}
+										<Box flex={1} h="full" position="relative">
+											<select
 												value={selectedEngineSize}
 												onChange={(e) => setSelectedEngineSize(e.target.value)}
-												isDisabled={!selectedYear || loadingProducts}
-												h="full"
-												w="full"
-												px={3}
-												fontWeight="600"
-												fontSize="13px"
-												color="gray.700"
-												cursor="pointer"
+												disabled={!selectedYear || loadingProducts}
+												style={{
+													height: "100%",
+													width: "100%",
+													border: "none",
+													outline: "none",
+													paddingLeft: "12px",
+													paddingRight: "32px",
+													fontWeight: "600",
+													fontSize: "13px",
+													color: "#4A5568",
+													cursor: (!selectedYear || loadingProducts) ? "not-allowed" : "pointer",
+													backgroundColor: "transparent",
+													appearance: "none",
+													WebkitAppearance: "none",
+													MozAppearance: "none",
+												}}
 											>
+												<option value="">{loadingProducts ? "Loading Engines..." : "Select Engine Size/Type"}</option>
 												{dynamicEngines.map((size) => (
 													<option key={size} value={size}>
 														{size}
 													</option>
 												))}
-											</Select>
+											</select>
+											<Box
+												position="absolute"
+												right="12px"
+												top="50%"
+												transform="translateY(-50%)"
+												pointerEvents="none"
+												color="gray.400"
+											>
+												<FaChevronDown size="12px" />
+											</Box>
+										</Box>
 										</Flex>
 									</VStack>
 								)}
