@@ -343,25 +343,6 @@ export default function BrandModelSelectorSection() {
 		}
 	}, [searchParams, brands, loadingBrands]);
 
-	// Synchronize URL search params to selectedModel
-	useEffect(() => {
-		if (loadingModels) return;
-
-		const modelSlugPart = searchParams.get("selModel");
-		if (modelSlugPart && models.length > 0) {
-			const foundModel = models.find(
-				(m) => m.name.toLowerCase().replace(/\s+/g, "-") === modelSlugPart
-			);
-			if (foundModel) {
-				setSelectedModel(foundModel);
-			} else {
-				setSelectedModel(null);
-			}
-		} else {
-			setSelectedModel(null);
-		}
-	}, [searchParams, models, loadingModels]);
-
 	// Fetch models for selected brand
 	const { data: models = [], isLoading: loadingModels } = useQuery({
 		queryKey: ["models", selectedBrand?._id],
@@ -391,6 +372,25 @@ export default function BrandModelSelectorSection() {
 		enabled: !!selectedBrand && !!selectedModel,
 		staleTime: 1000 * 60 * 10,
 	});
+
+	// Synchronize URL search params to selectedModel
+	useEffect(() => {
+		if (loadingModels) return;
+
+		const modelSlugPart = searchParams.get("selModel");
+		if (modelSlugPart && models.length > 0) {
+			const foundModel = models.find(
+				(m) => m.name.toLowerCase().replace(/\s+/g, "-") === modelSlugPart
+			);
+			if (foundModel) {
+				setSelectedModel(foundModel);
+			} else {
+				setSelectedModel(null);
+			}
+		} else {
+			setSelectedModel(null);
+		}
+	}, [searchParams, models, loadingModels]);
 
 	const handleBrandSelect = (brand) => {
 		setSearchParams({ selBrand: brand.slug });
