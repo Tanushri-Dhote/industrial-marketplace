@@ -10,7 +10,10 @@ exports.getBrands = async (request, reply) => {
 	try {
 		const { all } = request.query || {};
 		if (all === "true" || all === true) {
-			const brands = await Brand.find({ isActive: true }).sort({ name: 1 }).lean();
+			const brands = await Brand.find({ isActive: true })
+				.select("name slug logoUrl isActive spriteClass spritePosition spriteSize spriteSheetUrl productMake")
+				.sort({ name: 1 })
+				.lean();
 			return reply.code(200).send({ success: true, data: brands });
 		}
 
@@ -19,7 +22,10 @@ exports.getBrands = async (request, reply) => {
 			return reply.code(200).send({ success: true, data: cachedBrands });
 		}
 
-		const brands = await Brand.find({ isActive: true }).sort({ name: 1 }).lean();
+		const brands = await Brand.find({ isActive: true })
+			.select("name slug logoUrl isActive spriteClass spritePosition spriteSize spriteSheetUrl productMake")
+			.sort({ name: 1 })
+			.lean();
 
 		cachedBrands = brands;
 		cacheTimestamp = now;
@@ -33,7 +39,9 @@ exports.getBrands = async (request, reply) => {
 exports.getBrandBySlug = async (request, reply) => {
 	try {
 		const { slug } = request.params;
-		const brand = await Brand.findOne({ slug, isActive: true }).lean();
+		const brand = await Brand.findOne({ slug, isActive: true })
+			.select("name slug logoUrl isActive spriteClass spritePosition spriteSize spriteSheetUrl productMake featuredCars description heroImage")
+			.lean();
 
 		if (!brand) {
 			return reply.code(404).send({ message: "Brand not found" });
