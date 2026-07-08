@@ -241,6 +241,7 @@ async function run() {
 					});
 					
 					await parentModel.save();
+					list.push(parentModel);
 					createdCount++;
 					console.log(`[NEW] Created missing main model "${mainName}" for brand "${brand.name}".`);
 				}
