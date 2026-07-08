@@ -1,56 +1,63 @@
 // src/components/HeroSection.jsx
-import React from "react";
+import { ChevronRightIcon } from "@chakra-ui/icons";
 import {
 	Box,
 	Button,
+	Circle,
 	Container,
 	Flex,
 	Heading,
 	HStack,
 	Icon,
-	Image,
-	Input,
-	Text,
-	VStack,
-	Circle,
 	Modal,
-	ModalOverlay,
-	ModalContent,
-	ModalCloseButton,
 	ModalBody,
-	useDisclosure,
+	ModalCloseButton,
+	ModalContent,
+	ModalOverlay,
 	Select,
 	SimpleGrid,
-	GridItem,
+	Text,
+	useDisclosure,
+	VStack
 } from "@chakra-ui/react";
 import { motion } from "framer-motion";
+import React, { useEffect, useState } from "react";
 import {
-	FaShieldAlt,
-	FaTools,
-	FaTruck,
-	FaSearch,
-	FaCog,
-	FaPlus,
-	FaCar,
-	FaCogs,
 	FaCalendarAlt,
+	FaCar,
 	FaClock,
+	FaCogs,
+	FaShieldAlt,
 	FaStar,
+	FaTools,
+	FaTruck
 } from "react-icons/fa";
 import { MdLibraryBooks } from "react-icons/md";
-import { Link as RouterLink } from "react-router-dom";
-import { useNavigate } from "react-router-dom";
-import { useState, useEffect } from "react";
-import { ChevronRightIcon, CheckCircleIcon } from "@chakra-ui/icons";
-import { ShieldCheck, Wrench, Clock, BadgePercent, Car } from "lucide-react";
-import CallSellerPage from "./CallSellerPage";
-import API from "../services/api";
+import { Link as RouterLink, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
+import API from "../services/api";
+import CallSellerPage from "./CallSellerPage";
 
 const MotionBox = motion(Box);
 
 const RED = "#D90404";
 const DARK = "#111111";
+
+const isYearInRange = (selectedYear, dbYear) => {
+	if (!dbYear) return false;
+	if (dbYear === selectedYear) return true;
+	if (dbYear.includes("-")) {
+		const [startStr, endStr] = dbYear.split("-").map(s => s.trim().toLowerCase());
+		const start = parseInt(startStr, 10);
+		let end = parseInt(endStr, 10);
+		if (endStr === "present") {
+			end = new Date().getFullYear();
+		}
+		const yr = parseInt(selectedYear, 10);
+		return yr >= start && yr <= end;
+	}
+	return false;
+};
 
 const getMercedesClass = (modelName) => {
 	const clean = modelName.trim().toUpperCase().replace(/[\s-]+/g, " ");
@@ -262,9 +269,14 @@ export default function HeroSection({ category = "Engines", initialBrand = "", i
 							.flatMap((m) => {
 								if (!m.year) return [];
 
-								// Handle ranges like "2009 - 2025"
+								// Handle ranges like "2009 - 2025" or "2018 - Present"
 								if (m.year.includes("-")) {
-									const [start, end] = m.year.split("-").map((y) => parseInt(y.trim(), 10));
+									const [startStr, endStr] = m.year.split("-").map(y => y.trim().toLowerCase());
+									const start = parseInt(startStr, 10);
+									let end = parseInt(endStr, 10);
+									if (endStr === "present") {
+										end = new Date().getFullYear();
+									}
 
 									if (!isNaN(start) && !isNaN(end)) {
 										const arr = [];
@@ -350,7 +362,7 @@ export default function HeroSection({ category = "Engines", initialBrand = "", i
 		if (hasYearType && selectedModel && selectedYear) {
 			const types = [...new Set(
 				models
-					.filter(m => m.name === selectedModel && m.year === selectedYear)
+					.filter(m => m.name === selectedModel && isYearInRange(selectedYear, m.year))
 					.flatMap(m => m.type ? m.type.split("; ") : [])
 			)].sort();
 			setDynamicEngines(types);
@@ -386,9 +398,20 @@ export default function HeroSection({ category = "Engines", initialBrand = "", i
 
 		const brandObj = brands.find((b) => b.slug === selectedBrand);
 		const hasYearType = models.some(m => m.year || m.type);
-		const modelObj = hasYearType
-			? models.find((m) => m.name === selectedModel)
-			: models.find((m) => m.slug === selectedModel);
+		let modelObj;
+		if (hasYearType) {
+			modelObj = models.find((m) => {
+				const matchName = m.name === selectedModel;
+				const matchYear = isYearInRange(selectedYear, m.year);
+				const matchType = !selectedEngineSize || (m.type && m.type.split("; ").map(s => s.trim().toLowerCase()).includes(selectedEngineSize.toLowerCase()));
+				return matchName && matchYear && matchType;
+			});
+			if (!modelObj) {
+				modelObj = models.find((m) => m.name === selectedModel);
+			}
+		} else {
+			modelObj = models.find((m) => m.slug === selectedModel);
+		}
 
 		navigate("/call-seller", {
 			state: {
