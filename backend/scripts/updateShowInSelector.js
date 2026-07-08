@@ -308,7 +308,7 @@ async function run() {
 							}
 						}
 
-						// Check if this parent model is a placeholder (i.e. has no specs/products of its own)
+						// Check if this parent model is a placeholder (i.e. has no specs/products of its own OR has active submodels in its group)
 						const ownSpecSlug = m.name.replace(/\s+/g, "-").toLowerCase();
 						const ownSpec = await ModelEngineSpec.findOne({
 							brandSlug: brand.slug,
@@ -319,7 +319,29 @@ async function run() {
 							model: new RegExp(`^${m.name}$`, "i")
 						});
 						const hasOwnData = (ownSpec && ownSpec.costTable && ownSpec.costTable.length > 0) || ownProductCount > 0;
-						isPlaceholder = !hasOwnData;
+
+						// Count active submodels
+						let activeSubmodelCount = 0;
+						for (const sub of list) {
+							if (sub._id.toString() === parentModel._id.toString()) continue;
+							
+							const specModelSlug = sub.name.replace(/\s+/g, "-").toLowerCase();
+							const spec = await ModelEngineSpec.findOne({
+								brandSlug: brand.slug,
+								modelSlug: specModelSlug
+							});
+							const hasSpecs = spec && spec.costTable && spec.costTable.length > 0;
+							const productCount = await Product.countDocuments({
+								make: new RegExp(`^${brand.name}$`, "i"),
+								model: new RegExp(`^${sub.name}$`, "i")
+							});
+							
+							if (hasSpecs || productCount > 0) {
+								activeSubmodelCount++;
+							}
+						}
+
+						isPlaceholder = !hasOwnData || activeSubmodelCount > 0;
 					} else {
 						// This is a submodel, always hide it from the selector
 						showInSelector = false;
