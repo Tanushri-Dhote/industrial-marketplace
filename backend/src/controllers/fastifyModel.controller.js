@@ -25,7 +25,10 @@ exports.getModelsByBrand = async (request, reply) => {
 				brandId: brand._id,
 				isActive: { $ne: false },
 				isPlaceholder: { $ne: true },
-			}).sort({ name: 1 }).lean();
+			})
+			.select("name slug brandId showInSelector year type")
+			.sort({ name: 1 })
+			.lean();
 			return reply.send({
 				success: true,
 				data: models,
@@ -53,7 +56,10 @@ exports.getModelsByBrand = async (request, reply) => {
 			brandId: brand._id,
 			isActive: { $ne: false },
 			showInSelector: { $ne: false },
-		}).sort({ name: 1 }).lean();
+		})
+		.select("name slug brandId showInSelector year type spriteClass spriteSheetUrl spritePosition spriteSize")
+		.sort({ name: 1 })
+		.lean();
 
 		// Save to cache
 		modelsCache[cacheKey] = models;
