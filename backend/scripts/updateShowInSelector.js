@@ -251,6 +251,7 @@ async function run() {
 				for (const m of list) {
 					let showInSelector = false;
 					let isActive = true;
+					let isPlaceholder = false;
 
 					if (m._id.toString() === parentModel._id.toString()) {
 						// This is the parent model, determine if it should show
@@ -305,6 +306,19 @@ async function run() {
 								console.log(`Main model "${m.name}" (${brand.name}) has no specs and no products. Hiding & Deactivating.`);
 							}
 						}
+
+						// Check if this parent model is a placeholder (i.e. has no specs/products of its own)
+						const ownSpecSlug = m.name.replace(/\s+/g, "-").toLowerCase();
+						const ownSpec = await ModelEngineSpec.findOne({
+							brandSlug: brand.slug,
+							modelSlug: ownSpecSlug
+						});
+						const ownProductCount = await Product.countDocuments({
+							make: new RegExp(`^${brand.name}$`, "i"),
+							model: new RegExp(`^${m.name}$`, "i")
+						});
+						const hasOwnData = (ownSpec && ownSpec.costTable && ownSpec.costTable.length > 0) || ownProductCount > 0;
+						isPlaceholder = !hasOwnData;
 					} else {
 						// This is a submodel, always hide it from the selector
 						showInSelector = false;
@@ -330,6 +344,7 @@ async function run() {
 
 					m.showInSelector = showInSelector;
 					m.isActive = isActive;
+					m.isPlaceholder = isPlaceholder;
 					await m.save();
 
 					if (showInSelector) {

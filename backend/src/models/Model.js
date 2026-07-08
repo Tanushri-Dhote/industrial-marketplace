@@ -53,6 +53,10 @@ const modelSchema = new mongoose.Schema(
 			type: Boolean,
 			default: true,
 		},
+		isPlaceholder: {
+			type: Boolean,
+			default: false,
+		},
 		// Sprite positioning for car_sprites.png
 		spritePosition: {
 			x: {
