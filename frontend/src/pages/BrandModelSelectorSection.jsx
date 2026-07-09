@@ -92,7 +92,7 @@ function BrandCard({ brand, onSelect, isSelected }) {
 						backgroundPosition={`${brand.spritePosition?.x || 0}px ${brand.spritePosition?.y || 0}px`}
 						backgroundRepeat="no-repeat"
 						backgroundSize="auto" // Ensure it doesn't stretch
-						transform="scale(0.65)"
+						transform="scale(0.42)"
 						transformOrigin="center"
 					/>
 				</Box>
