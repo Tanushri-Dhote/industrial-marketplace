@@ -844,7 +844,7 @@ export default function BrandModelSelectorSection() {
 											sm: "repeat(4, 1fr)",
 											md: "repeat(6, 1fr)",
 											lg: "repeat(6, 1fr)",
-											xl: "repeat(8, 1fr)",
+											xl: "repeat(6, 1fr)",
 										}}
 										gap={{ base: 4, md: 6 }}
 									>
