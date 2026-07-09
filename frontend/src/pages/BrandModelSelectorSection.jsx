@@ -68,22 +68,19 @@ function BrandCard({ brand, onSelect, isSelected }) {
 			variants={itemVariants}
 			as="button"
 			onClick={() => onSelect(brand)}
-			bg="white"
-			borderRadius="12px"
-			p={3}
+			bg="transparent"
+			p={2}
 			textAlign="center"
 			cursor="pointer"
-			transition="all 0.25s ease"
-			border={isSelected ? `2px solid ${accentColor}` : "2px solid transparent"}
+			transition="all 0.2s ease"
 			_hover={{
-				transform: "translateY(-4px)",
-				boxShadow: `0 12px 24px rgba(217, 4, 4, 0.15)`,
-				borderColor: accentColor,
+				transform: "translateY(-3px)",
 			}}
 			position="relative"
+			w="full"
 		>
 			{brand.spriteSheetUrl ? (
-				<Box display="flex" justifyContent="center" alignItems="center" h="45px" mb={2} overflow="hidden">
+				<Box display="flex" justifyContent="center" alignItems="center" h="40px" mb={1.5} overflow="hidden">
 					<Box
 						className="make-sprite"
 						w={`${brand.spriteSize?.width || 105}px`}
@@ -92,16 +89,48 @@ function BrandCard({ brand, onSelect, isSelected }) {
 						backgroundPosition={`${brand.spritePosition?.x || 0}px ${brand.spritePosition?.y || 0}px`}
 						backgroundRepeat="no-repeat"
 						backgroundSize="auto" // Ensure it doesn't stretch
-						transform="scale(0.42)"
+						transform="scale(0.38)"
 						transformOrigin="center"
+						filter={isSelected ? "none" : "grayscale(15%) opacity(90%)"}
+						_hover={{ filter: "none" }}
+						transition="all 0.2s ease"
 					/>
 				</Box>
 			) : (
-				<Image src={brand.logoUrl} alt={brand.name} h="45px" objectFit="contain" mx="auto" mb={2} />
+				<Image 
+					src={brand.logoUrl} 
+					alt={brand.name} 
+					h="40px" 
+					objectFit="contain" 
+					mx="auto" 
+					mb={1.5} 
+					filter={isSelected ? "none" : "grayscale(15%) opacity(90%)"}
+					_hover={{ filter: "none" }}
+					transition="all 0.2s ease"
+				/>
 			)}
-			<Text fontSize="13px" fontWeight="700" color={darkColor} noOfLines={2}>
+			<Text 
+				fontSize="13px" 
+				fontWeight={isSelected ? "800" : "600"} 
+				color={isSelected ? accentColor : "gray.700"}
+				_hover={{ color: accentColor }}
+				noOfLines={1}
+				transition="all 0.2s ease"
+			>
 				{brand.name}
 			</Text>
+			{isSelected && (
+				<Box
+					position="absolute"
+					bottom="-2px"
+					left="50%"
+					transform="translateX(-50%)"
+					w="12px"
+					h="2.5px"
+					bg={accentColor}
+					borderRadius="full"
+				/>
+			)}
 		</MotionBox>
 	);
 }
@@ -804,27 +833,31 @@ export default function BrandModelSelectorSection() {
 								</MotionVStack>
 							) : (
 								/* State 0: Brand Grid */
-								<MotionGrid
-									key="brands-grid"
-									variants={containerVariants}
-									initial="hidden"
-									animate="show"
-									templateColumns={{
-										base: "repeat(2, 1fr)",
-										md: "repeat(4, 1fr)",
-										lg: "repeat(6, 1fr)",
-									}}
-									gap={{ base: 3, md: 4 }}
-								>
-									{brands.map((brand) => (
-										<BrandCard
-											key={brand._id}
-											brand={brand}
-											onSelect={handleBrandSelect}
-											isSelected={selectedBrand?._id === brand._id}
-										/>
-									))}
-								</MotionGrid>
+								<Box bg="white" borderRadius="20px" p={{ base: 5, md: 8 }} boxShadow="0 10px 30px rgba(0, 0, 0, 0.02)">
+									<MotionGrid
+										key="brands-grid"
+										variants={containerVariants}
+										initial="hidden"
+										animate="show"
+										templateColumns={{
+											base: "repeat(3, 1fr)",
+											sm: "repeat(4, 1fr)",
+											md: "repeat(6, 1fr)",
+											lg: "repeat(6, 1fr)",
+											xl: "repeat(8, 1fr)",
+										}}
+										gap={{ base: 4, md: 6 }}
+									>
+										{brands.map((brand) => (
+											<BrandCard
+												key={brand._id}
+												brand={brand}
+												onSelect={handleBrandSelect}
+												isSelected={selectedBrand?._id === brand._id}
+											/>
+										))}
+									</MotionGrid>
+								</Box>
 							)}
 					</AnimatePresence>
 
