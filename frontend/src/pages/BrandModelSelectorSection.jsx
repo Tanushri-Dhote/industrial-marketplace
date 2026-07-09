@@ -70,7 +70,7 @@ function BrandCard({ brand, onSelect, isSelected }) {
 			onClick={() => onSelect(brand)}
 			bg="white"
 			borderRadius="12px"
-			p={4}
+			p={3}
 			textAlign="center"
 			cursor="pointer"
 			transition="all 0.25s ease"
@@ -83,21 +83,23 @@ function BrandCard({ brand, onSelect, isSelected }) {
 			position="relative"
 		>
 			{brand.spriteSheetUrl ? (
-				<Box
-					className="make-sprite"
-					w={`${brand.spriteSize?.width || 105}px`}
-					h={`${brand.spriteSize?.height || 105}px`}
-					backgroundImage={`url(${brand.spriteSheetUrl})`}
-					backgroundPosition={`${brand.spritePosition?.x || 0}px ${brand.spritePosition?.y || 0}px`}
-					backgroundRepeat="no-repeat"
-					backgroundSize="auto" // Ensure it doesn't stretch
-					mx="auto"
-					mb={3}
-				/>
+				<Box display="flex" justifyContent="center" alignItems="center" h="45px" mb={2} overflow="hidden">
+					<Box
+						className="make-sprite"
+						w={`${brand.spriteSize?.width || 105}px`}
+						h={`${brand.spriteSize?.height || 105}px`}
+						backgroundImage={`url(${brand.spriteSheetUrl})`}
+						backgroundPosition={`${brand.spritePosition?.x || 0}px ${brand.spritePosition?.y || 0}px`}
+						backgroundRepeat="no-repeat"
+						backgroundSize="auto" // Ensure it doesn't stretch
+						transform="scale(0.65)"
+						transformOrigin="center"
+					/>
+				</Box>
 			) : (
-				<Image src={brand.logoUrl} alt={brand.name} h="60px" objectFit="contain" mx="auto" mb={3} />
+				<Image src={brand.logoUrl} alt={brand.name} h="45px" objectFit="contain" mx="auto" mb={2} />
 			)}
-			<Text fontSize="14px" fontWeight="700" color={darkColor} noOfLines={2}>
+			<Text fontSize="13px" fontWeight="700" color={darkColor} noOfLines={2}>
 				{brand.name}
 			</Text>
 		</MotionBox>
@@ -810,7 +812,7 @@ export default function BrandModelSelectorSection() {
 									templateColumns={{
 										base: "repeat(2, 1fr)",
 										md: "repeat(4, 1fr)",
-										lg: "repeat(5, 1fr)",
+										lg: "repeat(6, 1fr)",
 									}}
 									gap={{ base: 3, md: 4 }}
 								>
