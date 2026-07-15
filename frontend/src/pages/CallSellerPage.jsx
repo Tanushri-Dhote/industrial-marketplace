@@ -19,6 +19,7 @@ import {
 	Spinner,
 	FormControl,
 	FormErrorMessage,
+	Select,
 } from "@chakra-ui/react";
 import {
 	CheckCircleIcon,
@@ -93,6 +94,8 @@ export default function CallSellerPage({
 		email: "",
 		phone: "",
 	});
+	const [phonePrefix, setPhonePrefix] = useState("+44");
+	const [phoneBody, setPhoneBody] = useState("");
 
 	const vrmRef = useRef(null);
 	const postcodeRef = useRef(null);
@@ -120,7 +123,7 @@ export default function CallSellerPage({
 
 	// Phone Validation Flags
 	const isPhoneValid = ukPhoneRegex.test(form.phone.replace(/\s+/g, ""));
-	const showPhoneError = form.phone.replace(/\s+/g, "").length >= 5 && !isPhoneValid;
+	const showPhoneError = phoneBody.replace(/\s+/g, "").length >= 5 && !isPhoneValid;
 
 	useEffect(() => {
 		const handler = setTimeout(() => {
@@ -210,28 +213,41 @@ export default function CallSellerPage({
 		}
 	}, [debouncedVrm, safeVrm]);
 
-	const handlePhoneChange = (val) => {
-		// Allow only numbers, +, and space
+	const handlePhoneBodyChange = (val) => {
+		if (!val) {
+			setPhoneBody("");
+			setForm((prev) => ({ ...prev, phone: "" }));
+			return;
+		}
+
 		let cleaned = val.replace(/[^\d+ ]/g, "");
 
-		// Only one '+' allowed at the beginning
-		if (cleaned.includes("+")) {
-			cleaned = "+" + cleaned.replace(/\+/g, "");
-		}
-
-		// Prevent typing beyond standard UK numbers (max digits)
-		const digits = cleaned.replace(/\D/g, "");
-		if (cleaned.startsWith("+44")) {
-			if (digits.length > 12) return; // +44 followed by 10 digits
-		} else if (cleaned.startsWith("+")) {
-			if (digits.length > 11) return;
-		} else if (cleaned.startsWith("0")) {
-			if (digits.length > 11) return; // 0 followed by 10 digits
+		let activePrefix = phonePrefix;
+		if (cleaned.trim().startsWith("+44")) {
+			activePrefix = "+44";
+			setPhonePrefix("+44");
+			cleaned = cleaned.trim().substring(3).replace(/[^\d ]/g, "");
+		} else if (cleaned.trim().startsWith("0")) {
+			activePrefix = "0";
+			setPhonePrefix("0");
+			cleaned = cleaned.trim().substring(1).replace(/[^\d ]/g, "");
 		} else {
-			if (digits.length > 11) return;
+			cleaned = cleaned.replace(/\+/g, "");
 		}
 
-		setForm((prev) => ({ ...prev, phone: cleaned }));
+		const digits = cleaned.replace(/\D/g, "");
+		if (digits.length > 10) return;
+
+		setPhoneBody(cleaned);
+		
+		const fullPhone = activePrefix + cleaned.replace(/\s+/g, "");
+		setForm((prev) => ({ ...prev, phone: fullPhone }));
+	};
+
+	const handlePrefixChange = (newPrefix) => {
+		setPhonePrefix(newPrefix);
+		const fullPhone = newPrefix + phoneBody.replace(/\s+/g, "");
+		setForm((prev) => ({ ...prev, phone: fullPhone }));
 	};
 
 	useEffect(() => {
@@ -757,27 +773,40 @@ export default function CallSellerPage({
 									</InputGroup>
 
 									<FormControl isInvalid={showPhoneError}>
-										<InputGroup size="md">
-											<InputLeftElement h="40px"><PhoneIcon color="#E10600" /></InputLeftElement>
-											<Input
-												ref={phoneRef}
-												type="tel"
-												placeholder="+44 7700 900000"
+										<HStack spacing={2} w="full">
+											<Select
+												w="110px"
 												borderRadius="lg"
-												value={form.phone}
-												onChange={(e) => handlePhoneChange(e.target.value)}
-												onKeyDown={(e) => {
-													if (e.key === "Enter") {
-														e.preventDefault();
-														if (form.name && form.email && form.phone && isPhoneValid) {
-															handleGetQuote();
+												value={phonePrefix}
+												onChange={(e) => handlePrefixChange(e.target.value)}
+												borderColor="gray.200"
+												_focus={{ borderColor: RED }}
+											>
+												<option value="+44">+44</option>
+												<option value="0">0 (UK)</option>
+											</Select>
+											<InputGroup size="md">
+												<InputLeftElement h="40px"><PhoneIcon color="#E10600" /></InputLeftElement>
+												<Input
+													ref={phoneRef}
+													type="tel"
+													placeholder="7700 900000"
+													borderRadius="lg"
+													value={phoneBody}
+													onChange={(e) => handlePhoneBodyChange(e.target.value)}
+													onKeyDown={(e) => {
+														if (e.key === "Enter") {
+															e.preventDefault();
+															if (form.name && form.email && form.phone && isPhoneValid) {
+																handleGetQuote();
+															}
 														}
-													}
-												}}
-											/>
-										</InputGroup>
+													}}
+												/>
+											</InputGroup>
+										</HStack>
 										<FormErrorMessage fontSize="xs" mt={1}>
-											Invalid UK phone number (e.g. 07700 900000 or +44 7700 900000)
+											Invalid UK phone number (e.g. 7700 900000)
 										</FormErrorMessage>
 									</FormControl>
 
