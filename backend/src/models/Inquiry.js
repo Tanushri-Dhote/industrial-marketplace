@@ -54,7 +54,7 @@ const inquirySchema = new mongoose.Schema({
       validator: function (v) {
         if (!v) return true;
         const cleaned = v.replace(/\s+/g, "");
-        return /^(?:(?:\+44|0)7\d{9}|(?:\+44|0)1\d{9}|(?:\+44|0)2\d{9})$/.test(cleaned);
+        return /^(?:(?:\+44|0)[12378]\d{8,9})$/.test(cleaned);
       },
       message: props => `${props.value} is not a valid UK phone number!`
     }

@@ -43,13 +43,13 @@ const schema = yup.object({
     .test('is-uk-phone', 'Invalid UK phone number', (value) => {
       if (!value) return false;
       const cleaned = value.replace(/\s+/g, '');
-      return /^(?:(?:\+44\s?|0)7\d{3}\s?\d{6}|(?:\+44\s?|0)1\d{2}\s?\d{7}|(?:\+44\s?|0)2\d{1}\s?\d{8})$/.test(cleaned);
+      return /^(?:(?:\+44|0)[12378]\d{8,9})$/.test(cleaned);
     }),
   phone2: yup.string()
     .test('is-uk-phone-optional', 'Invalid UK phone number', (value) => {
       if (!value) return true;
       const cleaned = value.replace(/\s+/g, '');
-      return /^(?:(?:\+44\s?|0)7\d{3}\s?\d{6}|(?:\+44\s?|0)1\d{2}\s?\d{7}|(?:\+44\s?|0)2\d{1}\s?\d{8})$/.test(cleaned);
+      return /^(?:(?:\+44|0)[12378]\d{8,9})$/.test(cleaned);
     })
     .optional(),
   warranty: yup.string().required('Warranty period is required'),

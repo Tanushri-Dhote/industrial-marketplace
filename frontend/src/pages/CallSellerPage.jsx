@@ -17,6 +17,8 @@ import {
 	Divider,
 	SimpleGrid,
 	Spinner,
+	FormControl,
+	FormErrorMessage,
 } from "@chakra-ui/react";
 import {
 	CheckCircleIcon,
@@ -108,7 +110,18 @@ export default function CallSellerPage({
 	const [isLoadingVehicle, setIsLoadingVehicle] = useState(false);
 	const [debouncedVrm, setDebouncedVrm] = useState("");
 	const [lookupError, setLookupError] = useState("");
- 
+
+	const ukPostcodeRegex = /^[A-Z]{1,2}[0-9][A-Z0-9]? ?[0-9][A-Z]{2}$/i;
+	const ukPhoneRegex = /^(?:(?:\+44|0)[12378]\d{8,9})$/;
+
+	// Postcode Validation Flags
+	const isPostcodeValid = ukPostcodeRegex.test(form.postcode.trim());
+	const showPostcodeError = form.postcode.trim().length >= 5 && !isPostcodeValid;
+
+	// Phone Validation Flags
+	const isPhoneValid = ukPhoneRegex.test(form.phone.replace(/\s+/g, ""));
+	const showPhoneError = form.phone.replace(/\s+/g, "").length >= 5 && !isPhoneValid;
+
 	useEffect(() => {
 		const handler = setTimeout(() => {
 			setDebouncedVrm(manualVrm);
@@ -257,9 +270,7 @@ export default function CallSellerPage({
 			if (fittingOptions.length === 0) return toast.error("Please select fitting option");
 			if (!form.postcode) return toast.error("Postcode is required");
 
-			const cleanedPostcode = (form.postcode || "").replace(/\s+/g, "").toUpperCase();
-			const ukPostcodeRegex = /^[A-Z]{1,2}[0-9][A-Z0-9]? ?[0-9][A-Z]{2}$/i;
-			if (!ukPostcodeRegex.test(cleanedPostcode)) {
+			if (!isPostcodeValid) {
 				return toast.error("Invalid UK postcode format");
 			}
 		}
@@ -480,29 +491,38 @@ export default function CallSellerPage({
 										<Text fontWeight="700" fontSize="sm" color="gray.700" mb={3}>
 											Delivery & Details
 										</Text>
-										<VStack spacing={3}>
-											<InputGroup size="md">
-												<InputLeftElement h="40px" pointerEvents="none">
-													<MapPin color="#E10600" size={18} />
-												</InputLeftElement>
-												<Input
-													ref={postcodeRef}
-													placeholder="Your Postcode"
-													borderRadius="lg"
-													value={form.postcode}
-													onChange={(e) => setForm({ ...form, postcode: e.target.value.toUpperCase() })}
-													onKeyDown={(e) => {
-														if (e.key === "Enter") {
-															e.preventDefault();
-															if (!brand && engineTypeRef.current) {
-																engineTypeRef.current.focus();
-															} else {
-																notesRef.current?.focus();
+										<VStack spacing={3} align="stretch" w="full">
+											<FormControl isInvalid={showPostcodeError}>
+												<InputGroup size="md">
+													<InputLeftElement h="40px" pointerEvents="none">
+														<MapPin color="#E10600" size={18} />
+													</InputLeftElement>
+													<Input
+														ref={postcodeRef}
+														placeholder="Your Postcode"
+														borderRadius="lg"
+														value={form.postcode}
+														maxLength={8}
+														onChange={(e) => {
+															const cleaned = e.target.value.replace(/[^A-Za-z0-9 ]/g, "").toUpperCase();
+															setForm({ ...form, postcode: cleaned });
+														}}
+														onKeyDown={(e) => {
+															if (e.key === "Enter") {
+																e.preventDefault();
+																if (!brand && engineTypeRef.current) {
+																	engineTypeRef.current.focus();
+																} else {
+																	notesRef.current?.focus();
+																}
 															}
-														}
-													}}
-												/>
-											</InputGroup>
+														}}
+													/>
+												</InputGroup>
+												<FormErrorMessage fontSize="xs" mt={1}>
+													Invalid UK postcode format (e.g. SW1A 1AA)
+												</FormErrorMessage>
+											</FormControl>
 
 											{!brand && (
 												<InputGroup size="md">
@@ -677,6 +697,7 @@ export default function CallSellerPage({
 								borderRadius="xl"
 								rightIcon={<ChevronRightIcon />}
 								onClick={handleNext}
+								isDisabled={!form.postcode || !isPostcodeValid}
 								mt={6}
 								w="full"
 								_hover={{ bg: "#C10500" }}
@@ -735,25 +756,30 @@ export default function CallSellerPage({
 										/>
 									</InputGroup>
 
-									<InputGroup size="md">
-										<InputLeftElement h="40px"><PhoneIcon color="#E10600" /></InputLeftElement>
-										<Input
-											ref={phoneRef}
-											type="tel"
-											placeholder="+44 7700 900000"
-											borderRadius="lg"
-											value={form.phone}
-											onChange={(e) => handlePhoneChange(e.target.value)}
-											onKeyDown={(e) => {
-												if (e.key === "Enter") {
-													e.preventDefault();
-													if (form.name && form.email && form.phone) {
-														handleGetQuote();
+									<FormControl isInvalid={showPhoneError}>
+										<InputGroup size="md">
+											<InputLeftElement h="40px"><PhoneIcon color="#E10600" /></InputLeftElement>
+											<Input
+												ref={phoneRef}
+												type="tel"
+												placeholder="+44 7700 900000"
+												borderRadius="lg"
+												value={form.phone}
+												onChange={(e) => handlePhoneChange(e.target.value)}
+												onKeyDown={(e) => {
+													if (e.key === "Enter") {
+														e.preventDefault();
+														if (form.name && form.email && form.phone && isPhoneValid) {
+															handleGetQuote();
+														}
 													}
-												}
-											}}
-										/>
-									</InputGroup>
+												}}
+											/>
+										</InputGroup>
+										<FormErrorMessage fontSize="xs" mt={1}>
+											Invalid UK phone number (e.g. 07700 900000 or +44 7700 900000)
+										</FormErrorMessage>
+									</FormControl>
 
 									<Button
 										w="full"
@@ -765,7 +791,7 @@ export default function CallSellerPage({
 										fontWeight="700"
 										borderRadius="xl"
 										onClick={handleGetQuote}
-										isDisabled={!form.name || !form.email || !form.phone}
+										isDisabled={!form.name || !form.email || !form.phone || !isPhoneValid}
 										isLoading={submitting}
 										loadingText="Submitting Request..."
 										_hover={{ bg: "#C10500" }}

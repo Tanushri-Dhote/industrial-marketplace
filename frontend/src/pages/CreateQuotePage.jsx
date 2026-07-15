@@ -504,18 +504,18 @@ export default function CreateQuotePage() {
 			return;
 		}
 
-		if (customer.phone) {
+		if (customer.phone && customer.phone.trim() !== "" && customer.phone.trim() !== "+44") {
 			const cleanedPhone = customer.phone.replace(/\s+/g, "");
-			const ukPhoneRegex = /^(?:(?:\+44\s?|0)7\d{3}\s?\d{6}|(?:\+44\s?|0)1\d{2}\s?\d{7}|(?:\+44\s?|0)2\d{1}\s?\d{8})$/;
+			const ukPhoneRegex = /^(?:(?:\+44\s?|0)[12378]\d{8,9})$/;
 			if (!ukPhoneRegex.test(cleanedPhone)) {
 				toast({ title: "Invalid UK phone number", status: "warning", position: "top-right" });
 				return;
 			}
 		}
 
-		if (customer.postcode) {
+		if (customer.postcode && customer.postcode.trim() !== "") {
 			const ukPostcodeRegex = /^[A-Z]{1,2}[0-9][A-Z0-9]? ?[0-9][A-Z]{2}$/i;
-			if (!ukPostcodeRegex.test(customer.postcode)) {
+			if (!ukPostcodeRegex.test(customer.postcode.trim())) {
 				toast({ title: "Invalid UK postcode", status: "warning", position: "top-right" });
 				return;
 			}

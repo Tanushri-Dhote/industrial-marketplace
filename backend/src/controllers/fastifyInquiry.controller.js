@@ -36,8 +36,8 @@ const validateVRM = async (req, reply) => {
     }
 
     if (phone) {
-      // UK Phone Regex (Mobiles starting with 07, Landlines 01/02)
-      const ukPhoneRegex = /^(?:(?:\+44\s?|0)7\d{3}\s?\d{6}|(?:\+44\s?|0)1\d{2}\s?\d{7}|(?:\+44\s?|0)2\d{1}\s?\d{8})$/;
+      // UK Phone Regex (Mobiles starting with 07, Landlines 01/02, Business 03, Freephone 08)
+      const ukPhoneRegex = /^(?:(?:\+44|0)[12378]\d{8,9})$/;
       if (!ukPhoneRegex.test(phone.replace(/\s+/g, ""))) {
         return reply.status(400).send({ success: false, message: "Invalid UK phone number" });
       }
